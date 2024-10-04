@@ -1,0 +1,66 @@
+{
+  "msg": {
+    "blank": "{{name}} 不可以為空",
+    "deletSuccess": "刪除成功",
+    "copySuccess": "複製成功",
+    "createSuccess": "創建成功",
+    "themeExist": "主題已經存在",
+    "themeNotExist": "主題不存在",
+    "sureDeleteTheme": "確定是否要刪除該主題?"
+  },
+  "g": {
+    "edit": "編輯",
+    "copy": "複製",
+    "delete": "刪除",
+    "submit": "提交",
+    "ok": "確定",
+    "no": "取消"
+  },
+  "title": {
+    "home": "清單列表",
+    "editTheme": "編輯主題",
+    "copyTheme": "複製主題"
+  },
+  "home": { "createTheme": "創建主題" },
+  "themeHeader": {
+    "name": "主題名稱",
+    "version": "版本",
+    "title": "標題",
+    "type": "清單類型",
+    "imageList": "圖片清單",
+    "list": "清單",
+    "table": "Table表格"
+  },
+  "themeImage": {
+    "imageKey": "圖片json key",
+    "imageUrl": "自訂義來源",
+    "imageUrlPlaceholder": "設定方法ex: http://localhost/images/${id}.jpg"
+  },
+  "themeLabel": {
+    "title": "資料欄位設定",
+    "order": "順序",
+    "byKey": "命名key值",
+    "labelName": "標籤名稱",
+    "type": "標籤類型",
+    "string": "字串",
+    "stringSplit": "字串需分割",
+    "seq": "序列號",
+    "isVisible": "是否顯示",
+    "isSort": "是否用來排序",
+    "isSearch": "是否為文字搜尋按鈕",
+    "isCopy": "是否為點選複製",
+    "splitByPh": "以哪個字串做分割",
+    "useSpacePh": "分格用字串"
+  },
+  "themeDB": {
+    "title": "資料來源設定",
+    "type": "類型",
+    "source": "來源",
+    "name": "名稱",
+    "groupLabel": "群組",
+    "json": "設定json",
+    "jsonPh": "設定資料來源限json格式",
+    "group": "設定群組",
+    "groupPh": "設定要用的group，多group以,區隔"
+  }
+}

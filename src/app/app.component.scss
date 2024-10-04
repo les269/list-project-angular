@@ -1,0 +1,20 @@
+.sidenav {
+  display: flex;
+  z-index: 102;
+  overflow: auto;
+  transition: margin-left 0.3s;
+}
+.layout-mask {
+  display: none;
+  z-index: 980;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  transition-duration: 0.2s;
+}
+.layout-mask.layout-mask-activity {
+  display: block !important;
+}

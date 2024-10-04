@@ -1,0 +1,33 @@
+.layout-sidenav {
+  display: flex;
+  position: fixed;
+  flex-direction: column;
+  height: calc(100% - 48px);
+  background-color: #f3f6f9;
+  width: 200px;
+  top: 51px;
+  transition: all 0.2s;
+  transform: translate3d(-200px, 0px, 0px);
+  z-index: 1002;
+}
+.sidenav-display {
+  transform: translate3d(0px, 0px, 0px);
+}
+.anchor-menu {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s,
+    box-shadow 0.2s;
+  border-radius: 3px;
+  background-color: transparent;
+  color: #607d8b;
+  border-color: transparent;
+  text-decoration: none;
+
+  &:hover {
+    background: rgba(96, 125, 139, 0.04);
+    border-color: transparent;
+    color: #607d8b;
+    text-decoration: none;
+  }
+}

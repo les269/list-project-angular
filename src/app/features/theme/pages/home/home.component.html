@@ -1,0 +1,68 @@
+<div class="col-md-10 offset-md-1 col-xs-12">
+  <button type="button" class="btn btn-primary" (click)="routeCreate()">
+    {{ "home.createTheme" | translate }}
+  </button>
+  @for (type of eThemeHeaderType | keyvalue; track $index) { @if
+  (list[type.value].length>0) {
+  <h4 class="d-flex">{{ "themeHeader." + type.key | translate }}</h4>
+  <div class="row">
+    @for (item of list[type.value]; track $index) {
+    <div class="col-4">
+      <div class="theme-content">
+        <div class="theme-detail">
+          <div class="row">
+            <div class="fw-bold" style="width: 100px">
+              {{ "themeHeader.name" | translate }}
+            </div>
+            <div class="row-text col-9" style="width: calc(100% - 100px)">
+              {{ item.name }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="fw-bold" style="width: 100px">
+              {{ "themeHeader.version" | translate }}
+            </div>
+            <div class="row-text col-9" style="width: calc(100% - 100px)">
+              {{ item.version }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="fw-bold" style="width: 100px">
+              {{ "themeHeader.title" | translate }}
+            </div>
+            <div class="row-text col-9" style="width: calc(100% - 100px)">
+              {{ item.title }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="fw-bold" style="width: 100px">
+              {{ "themeHeader.type" | translate }}
+            </div>
+            <div class="row-text col-9" style="width: calc(100% - 100px)">
+              {{ "themeHeader." + item.type | translate }}
+            </div>
+          </div>
+        </div>
+        <span class="border-top"></span>
+        <div class="theme-buttons">
+          <button type="button" class="btn btn-primary" (click)="onEdit(item)">
+            {{ "g.edit" | translate }}
+          </button>
+          <button type="button" class="btn btn-primary" (click)="onCopy(item)">
+            {{ "g.copy" | translate }}
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="onDelete(item)"
+          >
+            {{ "g.delete" | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    }
+  </div>
+  } }
+</div>
