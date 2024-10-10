@@ -1,7 +1,7 @@
 .topbar-content {
   width: 100%;
-  position: fixed;
-
+  position: sticky;
+  top: 0;
   > div.topbar-component {
     background: #2196f3 !important;
     padding: 0.5rem 1rem;

@@ -10,7 +10,7 @@ import { Store } from '@ngrx/store';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageBoxComponent } from '../../../../core/components/message-box.component';
 import { CopyThemeComponent } from '../../components/copy-theme.component';
-import { isNotBlank } from '../../../../shared/util/helper';
+import { getHeaderId, isNotBlank } from '../../../../shared/util/helper';
 
 @Component({
   standalone: true,
@@ -39,14 +39,15 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.translateService
-      .get('title.home')
-      .subscribe((title) => this.store.dispatch(updateTitle({ title })));
+    this.translateService.get('title.home').subscribe(title => {
+      this.store.dispatch(updateTitle({ title }));
+      document.title = title;
+    });
     this.getList();
   }
 
   getList() {
-    this.themeService.getAllTheme().subscribe((res) => {
+    this.themeService.getAllTheme().subscribe(res => {
       this.clearList();
       for (const value of res) {
         this.list[value.type].push(value);
@@ -73,7 +74,7 @@ export class HomeComponent implements OnInit {
     const dialogRef = this.matDialog.open(CopyThemeComponent, {
       data: { themeHeader: item },
     });
-    dialogRef.afterClosed().subscribe((result) => {
+    dialogRef.afterClosed().subscribe(result => {
       if (isNotBlank(result)) {
         this.snackbarService.openByI18N('msg.copySuccess');
         this.getList();
@@ -85,13 +86,19 @@ export class HomeComponent implements OnInit {
       data: { message: this.translateService.instant('msg.sureDeleteTheme') },
     });
 
-    dialogRef.afterClosed().subscribe((result) => {
+    dialogRef.afterClosed().subscribe(result => {
       if (isNotBlank(result)) {
         this.themeService.deleteTheme(item).subscribe(() => {
           this.snackbarService.openByI18N('msg.deletSuccess');
           this.getList();
         });
       }
+    });
+  }
+
+  navigateList(item: ThemeHeader) {
+    this.router.navigate(['image-list'], {
+      queryParams: { headerId: getHeaderId(item) },
     });
   }
 }

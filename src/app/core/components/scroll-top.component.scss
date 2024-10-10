@@ -1,0 +1,32 @@
+.go-to-top {
+  position: fixed;
+  bottom: 60px;
+  right: 20px;
+  background-color: #2196f3;
+  color: #fff;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  box-shadow:
+    0 2px 4px -1px rgba(0, 0, 0, 0.2),
+    0 4px 5px 0 rgba(0, 0, 0, 0.14),
+    0 1px 10px 0 rgba(0, 0, 0, 0.12);
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
+  > .mat-icon {
+    margin: 4px;
+  }
+}
+
+@keyframes test {
+  from {
+    left: 0;
+  }
+  to {
+    left: 100px;
+  }
+}

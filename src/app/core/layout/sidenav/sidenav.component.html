@@ -1,8 +1,11 @@
 <div
   class="layout-sidenav"
-  [ngClass]="{ 'sidenav-display': (openSidenav$ | async) }"
->
-  <!-- <a *ngFor="let route; of" class="anchor-menu" (click)="close()">{{
-    route.data.title
-  }}</a> -->
+  [ngClass]="{ 'sidenav-display': (openSidenav$ | async) }">
+  <a
+    *ngFor="let route of myRoutes"
+    class="anchor-menu"
+    [routerLink]="route.path"
+    (click)="close()"
+    >{{ route.title }}</a
+  >
 </div>

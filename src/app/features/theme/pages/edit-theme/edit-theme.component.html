@@ -2,14 +2,14 @@
   <div class="container page">
     <div class="row">
       <div class="col-md-10 offset-md-1 col-xs-12">
-        <!-- <pre><p>{{model | json}}</p></pre> -->
         <button mat-icon-button (click)="onBack()">
           <mat-icon>arrow_back</mat-icon>
         </button>
+        <!-- TODO 拆成component -->
         <form #themeForm="ngForm">
           <div class="mb-3">
             <label for="name" class="form-label">{{
-              "themeHeader.name" | translate
+              'themeHeader.name' | translate
             }}</label>
             <input
               type="text"
@@ -19,12 +19,11 @@
               name="name"
               #name="ngModel"
               required
-              [disabled]="status === 'edit'"
-            />
+              [disabled]="status === 'edit'" />
           </div>
           <div class="mb-3">
             <label for="version" class="form-label">{{
-              "themeHeader.version" | translate
+              'themeHeader.version' | translate
             }}</label>
             <input
               type="text"
@@ -33,31 +32,28 @@
               id="version"
               name="version"
               required
-              [disabled]="status === 'edit'"
-            />
+              [disabled]="status === 'edit'" />
           </div>
           <div class="mb-3">
             <label class="form-label" for="type">{{
-              "themeHeader.type" | translate
+              'themeHeader.type' | translate
             }}</label>
             <select
               class="form-control form-select"
               [(ngModel)]="model.themeHeader.type"
               name="type"
               required
-              [disabled]="status === 'edit'"
-            >
+              [disabled]="status === 'edit'">
               <option
                 *ngFor="let type of eThemeHeaderType | keyvalue"
-                [ngValue]="type.key"
-              >
-                {{ "themeHeader." + type.key | translate }}
+                [ngValue]="type.key">
+                {{ 'themeHeader.' + type.key | translate }}
               </option>
             </select>
           </div>
           <div class="mb-3">
             <label for="title" class="form-label">{{
-              "themeHeader.title" | translate
+              'themeHeader.title' | translate
             }}</label>
             <input
               type="text"
@@ -65,67 +61,62 @@
               [(ngModel)]="model.themeHeader.title"
               id="title"
               name="title"
-              required
-            />
+              required />
           </div>
 
           @if (model.themeHeader.type === eThemeHeaderType.imageList) {
-          <div>
-            <div class="form-check form-check-inline">
-              <input
-                class="form-check-input"
-                type="radio"
-                name="imageKeyRadio"
-                id="imageKeyRadio"
-                value="key"
-                [(ngModel)]="model.themeImage!.type"
-              />
-              <label class="form-check-label" for="imageKeyRadio">
-                {{ "themeImage.imageKey" | translate }}
-              </label>
+            <div>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="imageKeyRadio"
+                  id="imageKeyRadio"
+                  value="key"
+                  [(ngModel)]="model.themeImage!.type" />
+                <label class="form-check-label" for="imageKeyRadio">
+                  {{ 'themeImage.imageKey' | translate }}
+                </label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="imageUrlRadio"
+                  id="imageUrlRadio"
+                  value="url"
+                  [(ngModel)]="model.themeImage!.type" />
+                <label class="form-check-label" for="imageUrlRadio">
+                  {{ 'themeImage.imageUrl' | translate }}
+                </label>
+              </div>
             </div>
-            <div class="form-check form-check-inline">
-              <input
-                class="form-check-input"
-                type="radio"
-                name="imageUrlRadio"
-                id="imageUrlRadio"
-                value="url"
-                [(ngModel)]="model.themeImage!.type"
-              />
-              <label class="form-check-label" for="imageUrlRadio">
-                {{ "themeImage.imageUrl" | translate }}
-              </label>
-            </div>
-          </div>
-          @if (model.themeImage.type==='key') {
-          <div class="mb-3">
-            <input
-              class="form-control"
-              [(ngModel)]="model.themeImage.imageKey"
-              name="imageKey"
-            />
-          </div>
-          } @else if (model.themeImage.type==='url') {
-          <div class="mb-3">
-            <input
-              class="form-control"
-              name="imageUrl"
-              [placeholder]="'themeImage.imageUrlPlaceholder' | translate"
-              [(ngModel)]="model.themeImage.imageUrl"
-            />
-          </div>
-          } }
-          <label class="h3">{{ "themeLabel.title" | translate }}</label>
+            @if (model.themeImage.type === 'key') {
+              <div class="mb-3">
+                <input
+                  class="form-control"
+                  [(ngModel)]="model.themeImage.imageKey"
+                  name="imageKey" />
+              </div>
+            } @else if (model.themeImage.type === 'url') {
+              <div class="mb-3">
+                <input
+                  class="form-control"
+                  name="imageUrl"
+                  [placeholder]="'themeImage.imageUrlPlaceholder' | translate"
+                  [(ngModel)]="model.themeImage.imageUrl" />
+              </div>
+            }
+          }
+          <label class="h3">{{ 'themeLabel.title' | translate }}</label>
           <div class="card mb-3">
             <table
               mat-table
               [dataSource]="model.themeLabelList"
-              multiTemplateDataRows
-            >
+              multiTemplateDataRows>
               <ng-container matColumnDef="seq">
                 <th mat-header-cell *matHeaderCellDef>
-                  {{ "themeLabel.order" | translate }}
+                  {{ 'themeLabel.order' | translate }}
                 </th>
                 <td mat-cell *matCellDef="let element">
                   {{ element.seq }}
@@ -133,85 +124,67 @@
               </ng-container>
               <ng-container matColumnDef="byKey">
                 <th mat-header-cell *matHeaderCellDef>
-                  {{ "themeLabel.byKey" | translate }}
+                  {{ 'themeLabel.byKey' | translate }}
                 </th>
                 <td mat-cell *matCellDef="let element; let i = dataIndex">
                   <input
                     class="form-control"
                     [(ngModel)]="element.byKey"
-                    name="byKey{{ i }}"
-                  />
+                    name="byKey{{ i }}" />
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="label">
                 <th mat-header-cell *matHeaderCellDef>
-                  {{ "themeLabel.labelName" | translate }}
+                  {{ 'themeLabel.labelName' | translate }}
                 </th>
                 <td mat-cell *matCellDef="let element; let i = dataIndex">
                   <input
                     class="form-control"
                     [(ngModel)]="element.label"
-                    name="label{{ i }}"
-                  />
+                    name="label{{ i }}" />
                 </td>
               </ng-container>
               <ng-container matColumnDef="type">
                 <th mat-header-cell *matHeaderCellDef>
-                  {{ "themeLabel.type" | translate }}
+                  {{ 'themeLabel.type' | translate }}
                 </th>
                 <td mat-cell *matCellDef="let element; let i = dataIndex">
                   <select
                     [(ngModel)]="element.type"
                     class="form-control"
                     style="width: 120px"
-                    (change)="onSelectLabelType(element)"
-                    name="labelType{{ i }}"
-                  >
-                    @for (type of eThemeLabelType|keyvalue; track $index) {
-                    <option [value]="type.key">
-                      {{ "themeLabel." + type.key | translate }}
-                    </option>
+                    name="labelType{{ i }}">
+                    @for (type of eThemeLabelType | keyvalue; track $index) {
+                      <option [value]="type.key">
+                        {{ 'themeLabel.' + type.key | translate }}
+                      </option>
                     }
                   </select>
                 </td>
               </ng-container>
-              <ng-container matColumnDef="expand">
+              <ng-container matColumnDef="other">
                 <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
                 <td mat-cell *matCellDef="let element; let i = dataIndex">
                   <div class="row flex-nowrap">
-                    <button
-                      mat-icon-button
-                      (click)="
-                        expandedLabel =
-                          expandedLabel === element ? null : element;
-                        $event.stopPropagation()
-                      "
-                    >
-                      @if (expandedLabel === element) {
-                      <mat-icon>close_fullscreen</mat-icon>
-                      } @else {
-                      <mat-icon>open_in_full</mat-icon>
-                      }
-                    </button>
                     <div
                       class="flex column align-content-center"
                       style="width: 48px"
                       role="group"
-                      aria-label="Vertical button group"
-                    >
+                      aria-label="Vertical button group">
                       @if (i !== 0) {
-                      <mat-icon
-                        class="dropupdown-icon up"
-                        (click)="onLabelTypeUpDown(i, 'up')"
-                        >arrow_drop_up</mat-icon
-                      >
-                      } @if (i !== model.themeLabelList.length-1) {
-                      <mat-icon
-                        class="dropupdown-icon down"
-                        (click)="onLabelTypeUpDown(i, 'down')"
-                        >arrow_drop_down</mat-icon
-                      >
+                        <mat-icon
+                          class="dropupdown-icon up"
+                          (click)="onLabelTypeUpDown(i, 'up')"
+                          >arrow_drop_up</mat-icon
+                        >
+                      }
+                      @if (i !== model.themeLabelList.length - 1) {
+                        <mat-icon
+                          class="dropupdown-icon down"
+                          (click)="onLabelTypeUpDown(i, 'down')"
+                          >arrow_drop_down</mat-icon
+                        >
                       }
                     </div>
                     <button mat-icon-button (click)="onDeletLabelData(i)">
@@ -224,53 +197,61 @@
                 <td
                   mat-cell
                   *matCellDef="let element; let i = dataIndex"
-                  [attr.colspan]="labelDisplayedColumns.length"
-                >
-                  <div
-                    class="d-flex"
-                    [@detailExpand]="
-                      element == expandedLabel ? 'expanded' : 'collapsed'
-                    "
-                  >
+                  [attr.colspan]="labelDisplayedColumns.length">
+                  <div class="d-flex">
                     <div class="column p-1">
                       @if (element.type === 'stringSplit') {
-                      <div class="input-group">
-                        <input
-                          type="text"
-                          class="form-control"
-                          [placeholder]="'themeLabel.splitByPh' | translate"
-                          [(ngModel)]="element.splitBy"
-                          name="labelSplitBy{{ i }}"
-                        />
-                        <input
-                          type="text"
-                          class="form-control"
-                          [placeholder]="'themeLabel.useSpacePh' | translate"
-                          [(ngModel)]="element.useSpace"
-                          name="labelUseSpace{{ i }}"
-                        />
-                      </div>
+                        <div class="input-group">
+                          <input
+                            type="text"
+                            class="form-control"
+                            [placeholder]="'themeLabel.splitByPh' | translate"
+                            [(ngModel)]="element.splitBy"
+                            name="labelSplitBy{{ i }}" />
+                          <input
+                            type="text"
+                            class="form-control"
+                            [placeholder]="'themeLabel.useSpacePh' | translate"
+                            [(ngModel)]="element.useSpace"
+                            name="labelUseSpace{{ i }}" />
+                        </div>
                       }
                       <mat-checkbox
                         [(ngModel)]="element.isVisible"
-                        name="labelVisible{{ i }}"
-                      >
-                        {{ "themeLabel.isVisible" | translate }}
+                        name="labelVisible{{ i }}">
+                        {{ 'themeLabel.isVisible' | translate }}
                       </mat-checkbox>
                       <mat-checkbox
                         [(ngModel)]="element.isSort"
                         name="labelSort{{ i }}"
-                        >{{ "themeLabel.isSort" | translate }}</mat-checkbox
+                        >{{ 'themeLabel.isSort' | translate }}</mat-checkbox
                       >
                       <mat-checkbox
-                        [(ngModel)]="element.isSearch"
-                        name="labelSearch{{ i }}"
-                        >{{ "themeLabel.isSearch" | translate }}</mat-checkbox
+                        [(ngModel)]="element.isSearchValue"
+                        name="labelSearchValue{{ i }}"
+                        >{{
+                          'themeLabel.isSearchValue' | translate
+                        }}</mat-checkbox
+                      >
+                      <mat-checkbox
+                        [(ngModel)]="element.isSearchButton"
+                        name="labelSearchButton{{ i }}"
+                        >{{
+                          'themeLabel.isSearchButton' | translate
+                        }}</mat-checkbox
                       >
                       <mat-checkbox
                         [(ngModel)]="element.isCopy"
                         name="labelCopy{{ i }}"
-                        >{{ "themeLabel.isCopy" | translate }}</mat-checkbox
+                        >{{ 'themeLabel.isCopy' | translate }}</mat-checkbox
+                      >
+                      <mat-checkbox
+                        [(ngModel)]="element.isDefaultKey"
+                        name="labelDefaultKey{{ i }}"
+                        (change)="changeLableDefaultKey($event, i)"
+                        >{{
+                          'themeLabel.isDefaultKey' | translate
+                        }}</mat-checkbox
                       >
                     </div>
                   </div>
@@ -290,85 +271,116 @@
               <tr
                 mat-row
                 *matRowDef="let element; columns: labelDisplayedColumns"
-                class="element-row"
-              ></tr>
+                class="element-row"></tr>
               <tr
                 mat-row
-                *matRowDef="let row; columns: ['expandedDetail']"
-                style="height: 0px"
-              ></tr>
+                *matRowDef="let row; columns: ['expandedDetail']"></tr>
               <tr mat-footer-row *matFooterRowDef="['addItem']"></tr>
             </table>
           </div>
-          <label class="h3">{{ "themeDB.title" | translate }}</label>
+          <label class="h3">{{ 'themeDB.title' | translate }}</label>
           <div class="card mb-3">
             <table
               mat-table
               [dataSource]="model.themeDBList"
-              multiTemplateDataRows
-            >
+              multiTemplateDataRows>
+              <ng-container matColumnDef="order">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ 'themeLabel.order' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let element">
+                  {{ element.seq }}
+                </td>
+              </ng-container>
               <ng-container matColumnDef="type">
                 <th mat-header-cell *matHeaderCellDef>
-                  {{ "themeDB.type" | translate }}
+                  {{ 'themeDB.type' | translate }}
                 </th>
                 <td mat-cell *matCellDef="let element; let i = dataIndex">
                   <select
                     [(ngModel)]="element.type"
                     name="dbType{{ i }}"
                     class="form-control"
-                    style="width: 120px"
-                  >
-                    @for (type of eThemeDBType|keyvalue; track $index) {
-                    <option [value]="type.key">
-                      {{ "themeDB." + type.key | translate }}
-                    </option>
+                    style="width: 120px">
+                    @for (type of eThemeDBType | keyvalue; track $index) {
+                      <option [value]="type.key">
+                        {{ 'themeDB.' + type.key | translate }}
+                      </option>
                     }
                   </select>
                 </td>
               </ng-container>
               <ng-container matColumnDef="source">
                 <th mat-header-cell *matHeaderCellDef>
-                  {{ "themeDB.source" | translate }}
+                  {{ 'themeDB.source' | translate }}
                 </th>
                 <td mat-cell *matCellDef="let element; let i = dataIndex">
                   <input
                     class="form-control"
                     name="dbSource{{ i }}"
                     [(ngModel)]="element.source"
-                    [placeholder]="'themeDB.' + element.type + 'Ph' | translate"
-                  />
+                    [placeholder]="
+                      'themeDB.' + element.type + 'Ph' | translate
+                    " />
                 </td>
               </ng-container>
               <ng-container matColumnDef="label">
                 <th mat-header-cell *matHeaderCellDef>
-                  {{ "themeDB.name" | translate }}
+                  {{ 'themeDB.name' | translate }}
                 </th>
                 <td mat-cell *matCellDef="let element; let i = dataIndex">
                   <input
                     class="form-control"
                     name="dbLabel{{ i }}"
-                    [(ngModel)]="element.label"
-                  />
+                    [(ngModel)]="element.label" />
                 </td>
               </ng-container>
               <ng-container matColumnDef="group">
                 <th mat-header-cell *matHeaderCellDef>
-                  {{ "themeDB.groupLabel" | translate }}
+                  {{ 'themeDB.groupLabel' | translate }}
                 </th>
                 <td mat-cell *matCellDef="let element; let i = dataIndex">
                   <input
                     class="form-control"
                     name="dbGroup{{ i }}"
-                    [(ngModel)]="element.groups"
-                  />
+                    [(ngModel)]="element.groups" />
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="other">
+                <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
+                <td mat-cell *matCellDef="let element; let i = dataIndex">
+                  <div class="row flex-nowrap">
+                    <div
+                      class="flex column align-content-center"
+                      style="width: 48px"
+                      role="group"
+                      aria-label="Vertical button group">
+                      @if (i !== 0) {
+                        <mat-icon
+                          class="dropupdown-icon up"
+                          (click)="onDBUpDown(i, 'up')"
+                          >arrow_drop_up</mat-icon
+                        >
+                      }
+                      @if (i !== model.themeDBList.length - 1) {
+                        <mat-icon
+                          class="dropupdown-icon down"
+                          (click)="onDBUpDown(i, 'down')"
+                          >arrow_drop_down</mat-icon
+                        >
+                      }
+                    </div>
+                    <button mat-icon-button (click)="onDeletDB(i)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
                 </td>
               </ng-container>
               <ng-container matColumnDef="addDB">
                 <td
                   mat-footer-cell
                   *matFooterCellDef
-                  [attr.colspan]="dbDisplayedColumns.length"
-                >
+                  [attr.colspan]="dbDisplayedColumns.length">
                   <div class="row justify-content-center">
                     <button mat-icon-button (click)="onAddDB()">
                       <mat-icon>add</mat-icon>
@@ -376,13 +388,20 @@
                   </div>
                 </td>
               </ng-container>
-              <ng-container matColumnDef="other">
-                <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
-                <td mat-cell *matCellDef="let element; let i = dataIndex">
-                  <div class="row flex-nowrap">
-                    <button mat-icon-button (click)="onDeletDB(i)">
-                      <mat-icon>delete</mat-icon>
-                    </button>
+              <ng-container matColumnDef="expandedDetail">
+                <td
+                  mat-cell
+                  *matCellDef="let element; let i = dataIndex"
+                  [attr.colspan]="dbDisplayedColumns.length">
+                  <div class="d-flex">
+                    <div class="column p-1">
+                      <mat-checkbox
+                        [(ngModel)]="element.isDefault"
+                        name="DBDefault{{ i }}"
+                        (change)="changeDBDefaultKey($event, i)">
+                        {{ 'themeDB.isDefault' | translate }}
+                      </mat-checkbox>
+                    </div>
                   </div>
                 </td>
               </ng-container>
@@ -390,18 +409,30 @@
               <tr mat-header-row *matHeaderRowDef="dbDisplayedColumns"></tr>
               <tr
                 mat-row
-                *matRowDef="let row; columns: dbDisplayedColumns"
-              ></tr>
+                *matRowDef="let row; columns: dbDisplayedColumns"></tr>
+              <tr
+                mat-row
+                *matRowDef="let row; columns: ['expandedDetail']"></tr>
               <tr mat-footer-row *matFooterRowDef="['addDB']"></tr>
             </table>
           </div>
+          @if (status === 'edit') {
+            <div class="my-4">
+              <button
+                type="submit"
+                class="btn btn-success w-100"
+                (click)="update(false)">
+                {{ 'g.save' | translate }}
+              </button>
+            </div>
+          }
+
           <div class="my-4">
             <button
               type="submit"
               class="btn btn-success w-100"
-              (click)="update()"
-            >
-              {{ "g.submit" | translate }}
+              (click)="update(true)">
+              {{ 'g.submit' | translate }}
             </button>
           </div>
         </form>

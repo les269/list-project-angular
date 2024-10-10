@@ -15,4 +15,11 @@ export const routes: Routes = [
         (mod) => mod.CreateThemeComponent
       ),
   },
+  {
+    path: 'image-list',
+    loadComponent: () =>
+      import(
+        './features/theme/pages/image-list-view/image-list-view.component'
+      ).then((mod) => mod.ImageListViewComponent),
+  },
 ];

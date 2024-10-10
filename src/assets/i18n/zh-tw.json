@@ -6,7 +6,9 @@
     "createSuccess": "創建成功",
     "themeExist": "主題已經存在",
     "themeNotExist": "主題不存在",
-    "sureDeleteTheme": "確定是否要刪除該主題?"
+    "sureDeleteTheme": "確定是否要刪除該主題?",
+    "copyText": "以複製至剪貼簿: {{text}}",
+    "repeatColumn": "{{text}} 不可以有重複欄位"
   },
   "g": {
     "edit": "編輯",
@@ -14,7 +16,10 @@
     "delete": "刪除",
     "submit": "提交",
     "ok": "確定",
-    "no": "取消"
+    "no": "取消",
+    "save": "保存",
+    "totalNum": "總數量",
+    "page": "頁"
   },
   "title": {
     "home": "清單列表",
@@ -44,16 +49,21 @@
     "type": "標籤類型",
     "string": "字串",
     "stringSplit": "字串需分割",
+    "fileSize": "檔案容量",
     "seq": "序列號",
     "isVisible": "是否顯示",
     "isSort": "是否用來排序",
-    "isSearch": "是否為文字搜尋按鈕",
+    "isSearchButton": "是否為文字搜尋按鈕",
+    "isSearchValue": "是否允許被搜尋",
     "isCopy": "是否為點選複製",
     "splitByPh": "以哪個字串做分割",
-    "useSpacePh": "分格用字串"
+    "useSpacePh": "分格用字串",
+    "dateFormat": "日期格式",
+    "isDefaultKey": "是否當為預設使用的key值"
   },
   "themeDB": {
     "title": "資料來源設定",
+    "order": "順序",
     "type": "類型",
     "source": "來源",
     "name": "名稱",
@@ -61,6 +71,7 @@
     "json": "設定json",
     "jsonPh": "設定資料來源限json格式",
     "group": "設定群組",
-    "groupPh": "設定要用的group，多group以,區隔"
+    "groupPh": "設定要用的group，多group以,區隔",
+    "isDefault": "是否預設使用"
   }
 }

@@ -1,10 +1,11 @@
-<app-layout-header #header />
-<app-sidenav class="sidenav"></app-sidenav>
-<div [style.padding-top.px]="60">
-  <router-outlet></router-outlet>
+<div>
+  <app-layout-header #header />
+  <app-sidenav class="sidenav"></app-sidenav>
+  <div>
+    <router-outlet></router-outlet>
+  </div>
+  <div
+    class="layout-mask"
+    [ngClass]="{ 'layout-mask-activity': (openSidenav$ | async) }"
+    (click)="closeSidenav()"></div>
 </div>
-<div
-  class="layout-mask"
-  [ngClass]="{ 'layout-mask-activity': (openSidenav$ | async) }"
-  (click)="closeSidenav()"
-></div>

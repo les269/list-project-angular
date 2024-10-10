@@ -44,8 +44,7 @@ import { SnackbarService } from '../../../core/services/snackbar.service';
           [(ngModel)]="target.name"
           id="name"
           name="name"
-          #name="ngModel"
-        />
+          #name="ngModel" />
       </div>
       <div class="mb-3">
         <label for="version" class="form-label">{{
@@ -56,8 +55,7 @@ import { SnackbarService } from '../../../core/services/snackbar.service';
           class="form-control"
           [(ngModel)]="target.version"
           id="version"
-          name="version"
-        />
+          name="version" />
       </div>
       <div class="mb-3">
         <label class="form-label" for="type">{{
@@ -66,12 +64,10 @@ import { SnackbarService } from '../../../core/services/snackbar.service';
         <select
           class="form-control form-select"
           [(ngModel)]="target.type"
-          name="type"
-        >
+          name="type">
           <option
             *ngFor="let type of eThemeHeaderType | keyvalue"
-            [ngValue]="type.key"
-          >
+            [ngValue]="type.key">
             {{ 'themeHeader.' + type.key | translate }}
           </option>
         </select>
@@ -85,8 +81,7 @@ import { SnackbarService } from '../../../core/services/snackbar.service';
           class="form-control"
           [(ngModel)]="target.title"
           id="title"
-          name="title"
-        />
+          name="title" />
       </div>
     </mat-dialog-content>
     <mat-dialog-actions>
@@ -111,7 +106,6 @@ export class CopyThemeComponent implements OnInit {
   };
   constructor(
     private themeService: ThemeService,
-    private translateService: TranslateService,
     private snackbarService: SnackbarService
   ) {}
 
@@ -141,7 +135,7 @@ export class CopyThemeComponent implements OnInit {
     this.themeService
       .existTheme(this.target)
       .pipe(
-        switchMap((res) => {
+        switchMap(res => {
           if (res) {
             this.snackbarService.openByI18N('msg.themeExist');
             return EMPTY;

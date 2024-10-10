@@ -10,7 +10,10 @@ import {
   trigger,
 } from '@angular/animations';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
+import {
+  MatCheckboxChange,
+  MatCheckboxModule,
+} from '@angular/material/checkbox';
 import { CommonModule } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -28,7 +31,7 @@ import {
 } from '../../models';
 import { ThemeService } from '../../services/theme.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { isBlank, isNotBlank } from '../../../../shared/util/helper';
+import { isBlank, isNotBlank, isRepeat } from '../../../../shared/util/helper';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EMPTY, filter, switchMap, tap, throwError } from 'rxjs';
 import { updateTitle } from '../../../../shared/state/layout.actions';
@@ -49,16 +52,6 @@ import { Store } from '@ngrx/store';
   selector: 'app-edit-theme',
   templateUrl: 'edit-theme.component.html',
   styleUrls: ['edit-theme.component.scss'],
-  animations: [
-    trigger('detailExpand', [
-      state('collapsed,void', style({ height: '0px', minHeight: '0' })),
-      state('expanded', style({ height: '*' })),
-      transition(
-        'expanded <=> collapsed',
-        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')
-      ),
-    ]),
-  ],
 })
 export class CreateThemeComponent implements OnInit {
   status: 'new' | 'edit' = 'new';
@@ -81,15 +74,10 @@ export class CreateThemeComponent implements OnInit {
   eThemeHeaderType = ThemeHeaderType;
   eThemeImageType = ThemeImageType;
   // 標籤設定
-  labelDataSource = new MatTableDataSource<ThemeLabel>(
-    this.model.themeLabelList
-  );
-  expandedLabel?: ThemeLabel | null;
-  labelDisplayedColumns: string[] = ['seq', 'byKey', 'label', 'type', 'expand'];
+  labelDisplayedColumns: string[] = ['seq', 'byKey', 'label', 'type', 'other'];
   eThemeLabelType = ThemeLabelType;
   // 資料來源設定
-  dbSource = new MatTableDataSource<ThemeDB>([]);
-  dbDisplayedColumns = ['type', 'source', 'label', 'group', 'other'];
+  dbDisplayedColumns = ['order', 'type', 'source', 'label', 'group', 'other'];
   eThemeDBType = ThemeDBType;
   //自定義功能
   customSource = new MatTableDataSource<ThemeCustom>([]);
@@ -106,21 +94,23 @@ export class CreateThemeComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.translateService
-      .get('title.editTheme')
-      .subscribe((title) => this.store.dispatch(updateTitle({ title })));
+    this.translateService.get('title.editTheme').subscribe(title => {
+      this.store.dispatch(updateTitle({ title }));
+      document.title = title;
+    });
+
     this.route.queryParams
       .pipe(
-        tap((x) => console.log(x)),
+        tap(x => console.log(x)),
         filter(
-          (params) =>
+          params =>
             isNotBlank(params['name']) &&
             isNotBlank(params['version']) &&
             isNotBlank(params['type'])
         ),
-        switchMap((params) => this.themeService.findTheme(params))
+        switchMap(params => this.themeService.findTheme(params))
       )
-      .subscribe((res) => {
+      .subscribe(res => {
         if (res.themeHeader === null) {
           this.router.navigate(['']);
           return;
@@ -138,14 +128,14 @@ export class CreateThemeComponent implements OnInit {
     this.router.navigate(['']);
   }
 
-  update() {
+  update(back: boolean) {
     if (!this.validationModel()) {
       return;
     }
     this.themeService
       .existTheme(this.model.themeHeader)
       .pipe(
-        switchMap((exist) => {
+        switchMap(exist => {
           if (this.status === 'new' && exist) {
             this.snackbarService.openByI18N('msg.themeExist');
             return EMPTY;
@@ -158,11 +148,13 @@ export class CreateThemeComponent implements OnInit {
         })
       )
       .subscribe(() => {
-        this.router.navigate(['']);
+        if (back) {
+          this.router.navigate(['']);
+        }
         this.snackbarService.openByI18N('msg.createSuccess');
       });
   }
-
+  //驗證資料正確
   validationModel(): boolean {
     if (isBlank(this.model.themeHeader.name)) {
       this.snackbarService.isBlankMessage('themeHeader.name');
@@ -207,6 +199,13 @@ export class CreateThemeComponent implements OnInit {
         return false;
       }
     }
+    //byKey不可重複
+    if (isRepeat(this.model.themeLabelList.map(x => x.byKey))) {
+      this.snackbarService.openByI18N('msg.repeatColumn', {
+        text: this.translateService.instant('themeLabel.byKey'),
+      });
+      return false;
+    }
     for (let db of this.model.themeDBList) {
       if (isBlank(db.source)) {
         this.snackbarService.isBlankMessage('themeDB.source');
@@ -219,37 +218,30 @@ export class CreateThemeComponent implements OnInit {
     }
     return true;
   }
-
-  resetTheme() {
-    this.model.themeHeader = {
-      name: '',
-      version: '',
-      title: '',
-      type: ThemeHeaderType.imageList,
-    };
-  }
-
+  //新增資料欄位
   addLabel() {
     let element: ThemeLabel = {
-      seq: this.labelDataSource.data.length + 1,
+      seq: this.model.themeLabelList.length + 1,
       byKey: '',
       label: '',
       type: ThemeLabelType.string,
       splitBy: '',
-      useSpace: '，',
-      isSearch: false,
+      useSpace: '、',
+      isSearchButton: false,
       isCopy: false,
       isVisible: false,
       isSort: false,
+      isSearchValue: false,
+      isDefaultKey: false,
     };
-    this.model.themeLabelList = [...this.model.themeLabelList, element];
-    this.expandedLabel = element;
+    this.model.themeLabelList = [...this.model.themeLabelList, element].map(
+      (x, i) => {
+        x.seq = i + 1;
+        return x;
+      }
+    );
   }
-
-  onSelectLabelType(element: any) {
-    console.log(element);
-  }
-
+  //資料欄位的上下移動
   onLabelTypeUpDown(index: number, type: 'up' | 'down') {
     let data: ThemeLabel[] = JSON.parse(
       JSON.stringify(this.model.themeLabelList)
@@ -262,6 +254,7 @@ export class CreateThemeComponent implements OnInit {
       return x;
     });
   }
+  //刪除資料欄位
   onDeletLabelData(index: number) {
     this.model.themeLabelList = this.model.themeLabelList
       .filter((x, i) => i !== index)
@@ -270,18 +263,60 @@ export class CreateThemeComponent implements OnInit {
         return x;
       });
   }
+  //改變資料欄位的預設欄位,只能有一筆或無
+  changeLableDefaultKey(event: MatCheckboxChange, index: number) {
+    if (event.checked) {
+      this.model.themeLabelList.map((x, i) => {
+        if (i !== index) {
+          x.isDefaultKey = false;
+        }
+        return x;
+      });
+    }
+  }
+  //新增資料來源
   onAddDB() {
     let element: ThemeDB = {
+      seq: this.model.themeDBList.length + 1,
       type: ThemeDBType.json,
       source: '',
       label: '',
-      group: '',
+      groups: '',
+      isDefault: false,
     };
-    this.model.themeDBList = [...this.model.themeDBList, element];
+    this.model.themeDBList = [...this.model.themeDBList, element].map(
+      (x, i) => {
+        x.seq = i + 1;
+        return x;
+      }
+    );
   }
+  //刪除資料來源
   onDeletDB(index: number) {
     this.model.themeDBList = this.model.themeDBList.filter(
       (x, i) => i !== index
     );
+  }
+  //資料來源的上下移動
+  onDBUpDown(index: number, type: 'up' | 'down') {
+    let data: ThemeDB[] = JSON.parse(JSON.stringify(this.model.themeDBList));
+    let source = data[index];
+    let target = data.splice(index + (type === 'up' ? -1 : 1), 1, source);
+    data.splice(index, 1, target[0]);
+    this.model.themeDBList = data.map((x, i) => {
+      x.seq = i + 1;
+      return x;
+    });
+  }
+  //改變清單預設使用的資料來源
+  changeDBDefaultKey(event: MatCheckboxChange, index: number) {
+    if (event.checked) {
+      this.model.themeDBList.map((x, i) => {
+        if (i !== index) {
+          x.isDefault = false;
+        }
+        return x;
+      });
+    }
   }
 }

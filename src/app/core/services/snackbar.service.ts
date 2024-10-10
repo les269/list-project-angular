@@ -23,8 +23,8 @@ export class SnackbarService {
     );
   }
 
-  openByI18N(name: string) {
-    this.snackBar.open(this.translateService.instant(name), '', {
+  openByI18N(name: string, obj?: Object) {
+    this.snackBar.open(this.translateService.instant(name, obj), '', {
       duration: 3000,
     });
   }

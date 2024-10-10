@@ -16,6 +16,10 @@ export class ThemeService {
     return this.http.get<ThemeHeader[]>('/theme/all');
   }
 
+  getByHeaderId(req: Partial<string>): Observable<ThemeResponent> {
+    return this.http.get<ThemeResponent>(`/theme/id?headerId=${req}`);
+  }
+
   findTheme(req: Partial<ThemeHeader>): Observable<ThemeResponent> {
     return this.http.post<ThemeResponent>('/theme/one', req);
   }

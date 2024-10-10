@@ -8,7 +8,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const snackbar: MatSnackBar = inject(MatSnackBar);
   return next(req).pipe(
-    catchError((error) => {
+    catchError(error => {
       snackbar.open(
         'Error found: ' +
           (typeof error.error === 'string' ? error.error : error.message),

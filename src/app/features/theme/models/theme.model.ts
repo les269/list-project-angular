@@ -45,23 +45,30 @@ export interface ThemeLabel {
   type: ThemeLabelType;
   splitBy: string;
   useSpace: string;
-  isSearch: boolean;
+  isSearchButton: boolean;
+  isSearchValue: boolean;
   isCopy: boolean;
   isVisible: boolean;
   isSort: boolean;
+  isDefaultKey: boolean;
 }
 
 export enum ThemeLabelType {
   string = 'string',
   stringSplit = 'stringSplit',
   seq = 'seq',
+  fileSize = 'fileSize',
+  //TODO:是否有需求
+  //dateFormat = 'dateFormat',
 }
 
 export interface ThemeDB {
+  seq: number;
   type: ThemeDBType;
   source: string;
   label: string;
-  group: string;
+  groups: string;
+  isDefault: boolean;
 }
 
 export enum ThemeDBType {

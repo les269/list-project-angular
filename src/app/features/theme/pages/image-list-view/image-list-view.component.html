@@ -1,0 +1,232 @@
+<div class="content">
+  <div id="content-header" class="content-header" href="#scrollspyHeading1">
+    <div class="header-left col-4">
+      @if (themeDBList && themeDBList.length > 1) {
+        <select
+          class="list-select"
+          [compareWith]="compareDB"
+          [(ngModel)]="useDB"
+          (change)="changeQueryParams()">
+          @for (db of themeDBList; track $index) {
+            <option [ngValue]="db">
+              {{ db.label }}
+            </option>
+          }
+        </select>
+      }
+    </div>
+    <div class="header-center col-4">
+      <div class="d-flex">
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="searchValue"
+          (keydown.enter)="changeQueryParams()" />
+        <button
+          class="search-btn"
+          (click)="searchValue = ''; changeQueryParams()">
+          <mat-icon>clear</mat-icon>
+        </button>
+        <button class="search-btn" (click)="changeQueryParams()">
+          <mat-icon>search</mat-icon>
+        </button>
+        @if (defaultKey !== '') {
+          <button class="search-btn" (click)="randomSearch()">
+            <mat-icon>shuffle</mat-icon>
+          </button>
+        }
+      </div>
+    </div>
+    <div class="header-right col-4">
+      @if (sortArray.length > 0) {
+        <select
+          class="list-select"
+          [compareWith]="compareSort"
+          [(ngModel)]="sortValue"
+          (change)="changeQueryParams()">
+          @for (sort of sortArray; track $index) {
+            <option [ngValue]="sort">
+              {{ sort.label }}
+            </option>
+          }
+        </select>
+        <div class="d-flex flex-column justify-content-center">
+          <mat-icon
+            class="sortAsc"
+            (click)="sortAsc = !sortAsc; changeQueryParams()"
+            >{{
+              sortAsc ? 'keyboard_arrow_down' : 'keyboard_arrow_up'
+            }}</mat-icon
+          >
+        </div>
+      }
+      @if (pages.length > 0) {
+        <select
+          class="list-select"
+          [(ngModel)]="currentPage"
+          (change)="changeQueryParams()">
+          @for (page of pages; track $index) {
+            <option [ngValue]="page">
+              {{ page }} {{ 'g.page' | translate }}
+            </option>
+          }
+        </select>
+        <div
+          class="d-flex flex-column justify-content-center"
+          style="height: 34px">
+          @if (currentPage !== 1 && pages.length !== 1) {
+            <mat-icon class="prePage" (click)="prePage()"
+              >keyboard_arrow_up</mat-icon
+            >
+          }
+          @if (currentPage !== pages.length && pages.length !== 1) {
+            <mat-icon class="nextPage" (click)="nextPage()"
+              >keyboard_arrow_down</mat-icon
+            >
+          }
+        </div>
+      }
+    </div>
+  </div>
+  <div class="list-content">
+    <div class="py-2">
+      {{ 'g.totalNum' | translate }}: {{ filterData?.length }}
+    </div>
+    <ng-container *ngTemplateOutlet="dataListRef"></ng-container>
+  </div>
+</div>
+
+<ng-template #dataListRef>
+  @for (data of viewData; track $index; let i = $index) {
+    <div
+      class="d-flex card"
+      (mouseenter)="onMouseEnter(i)"
+      (mouseleave)="onMouseLeave(i)">
+      <div class="card-body">
+        <div class="img-content">
+          @switch (themeImage.type) {
+            @case ('key') {
+              <img
+                alt=""
+                [ngSrc]="data[themeImage.imageKey]"
+                fill
+                priority="{{ i === 0 }}" />
+            }
+            @case ('url') {
+              <img
+                alt=""
+                [ngSrc]="themeImage.imageUrl | replaceValue: data"
+                fill
+                priority="{{ i === 0 }}" />
+            }
+          }
+        </div>
+        <div class="detail-content">
+          <div class="detail-rows scrollbar-primary">
+            @for (label of themeLabelList; track $index; let idx = $index) {
+              @if (label.isVisible) {
+                <div class="detail-row">
+                  <div class="row-label">{{ label.label }}</div>
+                  <ng-container
+                    *ngTemplateOutlet="
+                      labelValueRef;
+                      context: { $implicit: data, label, index: i }
+                    "></ng-container>
+                </div>
+              }
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</ng-template>
+<ng-template
+  #labelValueRef
+  labelValue
+  let-data
+  let-label="label"
+  let-index="index">
+  <div>
+    @switch (label.type) {
+      @case ('string') {
+        <div
+          class="row-text"
+          ngCopy
+          [enableCopy]="label.isCopy && !label.isSearchButton">
+          @if (label.isSearchButton) {
+            <a
+              class="text-link"
+              href="javascript:void(0);"
+              (click)="searchValue = data[label.byKey]; changeQueryParams()">
+              {{ data[label.byKey] }}</a
+            >
+          } @else {
+            <ng-container>{{ data[label.byKey] }}</ng-container>
+          }
+          @if (label.isCopy && label.isSearchButton && hoveredIndex === index) {
+            <mat-icon
+              class="copy-icon"
+              fontIcon="content_copy"
+              (click)="copyText(data[label.byKey])"></mat-icon>
+          }
+        </div>
+      }
+      @case ('stringSplit') {
+        <ng-container
+          *ngTemplateOutlet="
+            splitTextRef;
+            context: { $implicit: getStringSplit(label, data), label, index }
+          "></ng-container>
+      }
+      @case ('seq') {
+        <div>{{ data[seqKey] }}</div>
+      }
+      @case ('fileSize') {
+        <div>{{ data[label.byKey] | fileSize }}</div>
+      }
+      @default {
+        <div>{{ data[label.byKey] }}</div>
+      }
+    }
+  </div>
+</ng-template>
+
+<ng-template
+  labelValue
+  #splitTextRef
+  let-label="label"
+  let-array
+  let-index="index">
+  @if (array.length > 0) {
+    @if (label.isSearchButton) {
+      <div class="text-links">
+        @for (text of array; track $index; let isLast = $last) {
+          <a
+            href="javascript:void(0);"
+            class="text-link"
+            (click)="searchValue = text; changeQueryParams()"
+            >{{ text }}</a
+          >
+          @if (label.isCopy && label.isSearchButton && hoveredIndex === index) {
+            <mat-icon
+              class="copy-icon"
+              fontIcon="content_copy"
+              (click)="copyText(text)"></mat-icon>
+          }
+          @if (!isLast) {
+            <ng-container>{{ label.useSpace }}</ng-container>
+          }
+        }
+      </div>
+    } @else {
+      @for (text of array; track $index; let isLast = $last) {
+        <div href="javascript:void(0);" class="row-text">{{ text }}</div>
+        @if (!isLast) {
+          <ng-container>{{ label.useSpace }}</ng-container>
+        }
+      }
+    }
+  }
+</ng-template>
+<app-scrollTop></app-scrollTop>
