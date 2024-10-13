@@ -24,3 +24,7 @@ body {
 
 @include mat.core();
 @include mat.color-variants-backwards-compatibility($theme);
+
+.NgxEditor__MenuBar {
+  background-color: transparent !important;
+}

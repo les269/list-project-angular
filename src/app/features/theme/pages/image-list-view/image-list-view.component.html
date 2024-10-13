@@ -1,5 +1,5 @@
 <div class="content">
-  <div id="content-header" class="content-header" href="#scrollspyHeading1">
+  <div class="content-header">
     <div class="header-left col-4">
       @if (themeDBList && themeDBList.length > 1) {
         <select
@@ -38,54 +38,7 @@
       </div>
     </div>
     <div class="header-right col-4">
-      @if (sortArray.length > 0) {
-        <select
-          class="list-select"
-          [compareWith]="compareSort"
-          [(ngModel)]="sortValue"
-          (change)="changeQueryParams()">
-          @for (sort of sortArray; track $index) {
-            <option [ngValue]="sort">
-              {{ sort.label }}
-            </option>
-          }
-        </select>
-        <div class="d-flex flex-column justify-content-center">
-          <mat-icon
-            class="sortAsc"
-            (click)="sortAsc = !sortAsc; changeQueryParams()"
-            >{{
-              sortAsc ? 'keyboard_arrow_down' : 'keyboard_arrow_up'
-            }}</mat-icon
-          >
-        </div>
-      }
-      @if (pages.length > 0) {
-        <select
-          class="list-select"
-          [(ngModel)]="currentPage"
-          (change)="changeQueryParams()">
-          @for (page of pages; track $index) {
-            <option [ngValue]="page">
-              {{ page }} {{ 'g.page' | translate }}
-            </option>
-          }
-        </select>
-        <div
-          class="d-flex flex-column justify-content-center"
-          style="height: 34px">
-          @if (currentPage !== 1 && pages.length !== 1) {
-            <mat-icon class="prePage" (click)="prePage()"
-              >keyboard_arrow_up</mat-icon
-            >
-          }
-          @if (currentPage !== pages.length && pages.length !== 1) {
-            <mat-icon class="nextPage" (click)="nextPage()"
-              >keyboard_arrow_down</mat-icon
-            >
-          }
-        </div>
-      }
+      <ng-container *ngTemplateOutlet="headerRight"></ng-container>
     </div>
   </div>
   <div class="list-content">
@@ -94,8 +47,59 @@
     </div>
     <ng-container *ngTemplateOutlet="dataListRef"></ng-container>
   </div>
+  <div class="content-footer">
+    <div class="footer-left col-4"></div>
+    <div class="footer-center col-4"></div>
+    <div class="footer-right col-4">
+      <ng-container *ngTemplateOutlet="headerRight"></ng-container>
+    </div>
+  </div>
 </div>
 
+<ng-template #headerRight>
+  @if (sortArray.length > 0) {
+    <select
+      class="list-select"
+      [compareWith]="compareSort"
+      [(ngModel)]="sortValue"
+      (change)="toTop(); changeQueryParams()">
+      @for (sort of sortArray; track $index) {
+        <option [ngValue]="sort">
+          {{ sort.label }}
+        </option>
+      }
+    </select>
+    <div class="d-flex flex-column justify-content-center">
+      <mat-icon
+        class="sortAsc"
+        (click)="sortAsc = !sortAsc; toTop(); changeQueryParams()"
+        >{{ sortAsc ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</mat-icon
+      >
+    </div>
+  }
+  @if (pages.length > 0) {
+    <select
+      class="list-select"
+      [(ngModel)]="currentPage"
+      (change)="toTop(); changeQueryParams()">
+      @for (page of pages; track $index) {
+        <option [ngValue]="page">{{ page }} {{ 'g.page' | translate }}</option>
+      }
+    </select>
+    <div class="d-flex flex-column justify-content-center" style="height: 34px">
+      @if (currentPage !== 1 && pages.length !== 1) {
+        <mat-icon class="prePage" (click)="prePage()"
+          >keyboard_arrow_up</mat-icon
+        >
+      }
+      @if (currentPage !== pages.length && pages.length !== 1) {
+        <mat-icon class="nextPage" (click)="nextPage()"
+          >keyboard_arrow_down</mat-icon
+        >
+      }
+    </div>
+  }
+</ng-template>
 <ng-template #dataListRef>
   @for (data of viewData; track $index; let i = $index) {
     <div
@@ -136,6 +140,110 @@
               }
             }
           </div>
+
+          @if (defaultKey && themeCustomList.length > 0) {
+            <div class="detail-buttons">
+              @for (custom of themeCustomList; track $index) {
+                @switch (custom.type) {
+                  @case ('buttonIconBoolean') {
+                    <div class="custom-button-group">
+                      <button
+                        class="custom-button"
+                        (click)="changeCustomValue(data, custom)">
+                        <label class="px-2">{{ custom.label }}</label>
+                        <mat-icon>{{
+                          getCustomValueForUI(data, custom)
+                        }}</mat-icon>
+                      </button>
+                    </div>
+                  }
+                  @case ('buttonIconFill') {
+                    <div class="custom-button-group">
+                      <button
+                        class="custom-button"
+                        (click)="changeCustomValue(data, custom)">
+                        <label class="px-2">{{ custom.label }}</label>
+                        <mat-icon
+                          [fontSet]="
+                            getCustomValueForUI(data, custom)
+                              ? ''
+                              : 'material-icons-outlined'
+                          "
+                          [style.color]="
+                            getCustomValueForUI(data, custom)
+                              ? custom.buttonIconFillColor
+                              : '#000'
+                          "
+                          >{{ custom.buttonIconFill }}</mat-icon
+                        >
+                      </button>
+                    </div>
+                  }
+                  @case ('buttonInputUrl') {
+                    <div class="custom-button-group">
+                      <button
+                        class="custom-button"
+                        (click)="openButtonInputUrlDialog(data, custom)">
+                        <label class="px-2">{{ custom.label }}</label>
+                      </button>
+                      @if (getCustomValue(data, custom) !== '') {
+                        <button
+                          class="custom-button custom-icon"
+                          (click)="openNewPage(getCustomValue(data, custom))">
+                          <mat-icon>open_in_new</mat-icon>
+                        </button>
+                      }
+                    </div>
+                  }
+                  @case ('copyValue') {
+                    <div class="custom-button-group">
+                      <button
+                        class="custom-button"
+                        (click)="onCopyValue(data, custom)">
+                        <label class="px-2">{{ custom.label }}</label>
+                      </button>
+                    </div>
+                  }
+                  @case ('copyValueByKey') {
+                    <div class="custom-button-group">
+                      <button
+                        class="custom-button"
+                        (click)="copyText(data[custom.copyValueByKey])">
+                        <label class="px-2">{{ custom.label }}</label>
+                      </button>
+                    </div>
+                  }
+                  @case ('openUrl') {
+                    <div class="custom-button-group">
+                      <button
+                        class="custom-button"
+                        (click)="onOpenUrl(data, custom)">
+                        <label class="px-2">{{ custom.label }}</label>
+                      </button>
+                    </div>
+                  }
+                  @case ('openUrlByKey') {
+                    <div class="custom-button-group">
+                      <button
+                        class="custom-button"
+                        (click)="openNewPage(data[custom.openUrlByKey])">
+                        <label class="px-2">{{ custom.label }}</label>
+                      </button>
+                    </div>
+                  }
+                  @case ('writeNote') {
+                    <div class="custom-button-group">
+                      <button
+                        class="custom-button"
+                        (click)="onWriteNote(data, custom)">
+                        <label class="px-2">{{ custom.label }}</label>
+                      </button>
+                    </div>
+                  }
+                }
+              }
+            </div>
+          }
         </div>
       </div>
     </div>
@@ -191,7 +299,6 @@
     }
   </div>
 </ng-template>
-
 <ng-template
   labelValue
   #splitTextRef
@@ -229,4 +336,5 @@
     }
   }
 </ng-template>
+
 <app-scrollTop></app-scrollTop>

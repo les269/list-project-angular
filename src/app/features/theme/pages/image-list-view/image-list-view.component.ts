@@ -6,10 +6,16 @@ import {
   getRandomInt,
   isBlank,
   isNotBlank,
+  isNotNull,
+  isNull,
+  replaceValue,
 } from '../../../../shared/util/helper';
 import { ThemeService } from '../../services/theme.service';
 import {
   SortType,
+  ThemeCustom,
+  ThemeCustomValue,
+  ThemeCustomValueResponse,
   ThemeDB,
   ThemeHeader,
   ThemeImage,
@@ -27,9 +33,13 @@ import {
 } from '../../../../shared/util/util.pipe';
 import { Store } from '@ngrx/store';
 import { updateTitle } from '../../../../shared/state/layout.actions';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ScrollTopComponent } from '../../../../core/components/scroll-top.component';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatDialog } from '@angular/material/dialog';
+import { ButtonInputUrlDialog } from '../../components/button-input-url.dialog';
+import { WriteNoteDialog } from '../../components/write-note.dialog';
 
 @Component({
   standalone: true,
@@ -45,6 +55,7 @@ import { ScrollTopComponent } from '../../../../core/components/scroll-top.compo
     FormsModule,
     ReactiveFormsModule,
     ScrollTopComponent,
+    MatMenuModule,
   ],
   selector: 'app-image-list-view',
   templateUrl: 'image-list-view.component.html',
@@ -56,6 +67,7 @@ export class ImageListViewComponent implements OnInit {
   themeImage!: ThemeImage;
   themeLabelList!: ThemeLabel[];
   themeDBList!: ThemeDB[];
+  themeCustomList!: ThemeCustom[];
   dataSoure: { db: ThemeDB; data: any }[] = [];
   useDB!: ThemeDB;
   dbSeq: number = -1;
@@ -72,6 +84,8 @@ export class ImageListViewComponent implements OnInit {
   sortAsc: boolean = true;
   searchKey: string[] = [];
   defaultKey = '';
+  customValueMap: ThemeCustomValueResponse = {};
+  randomStr = 'random';
 
   constructor(
     private themeService: ThemeService,
@@ -79,7 +93,9 @@ export class ImageListViewComponent implements OnInit {
     private route: ActivatedRoute,
     private readonly http: HttpClient,
     private snackbarService: SnackbarService,
-    private store: Store
+    private store: Store,
+    private matDialog: MatDialog,
+    private translateService: TranslateService
   ) {}
 
   ngOnInit() {
@@ -97,6 +113,9 @@ export class ImageListViewComponent implements OnInit {
         a.seq > b.seq ? 1 : -1
       );
       this.themeDBList = res.themeDBList.sort((a, b) =>
+        a.seq > b.seq ? 1 : -1
+      );
+      this.themeCustomList = res.themeCustomList.sort((a, b) =>
         a.seq > b.seq ? 1 : -1
       );
       this.defaultKey =
@@ -118,7 +137,17 @@ export class ImageListViewComponent implements OnInit {
       .pipe(
         //concatMap按照順序訂閱並發出,避免一次性發出而失敗
         concatMap((x, i) =>
-          this.http.get(x.source).pipe(map(res => ({ db: x, data: res })))
+          this.http.get(x.source).pipe(
+            map((res: any) => {
+              res = res.map((x: any) => {
+                x[this.randomStr] = crypto.getRandomValues(
+                  new Uint32Array(1)
+                )[0];
+                return x;
+              });
+              return { db: x, data: res };
+            })
+          )
         ),
         toArray()
       )
@@ -128,7 +157,7 @@ export class ImageListViewComponent implements OnInit {
         this.initData();
       });
   }
-
+  //資料初始化
   async initData() {
     const values = this.route.snapshot.queryParams;
     let { sort, asc } = values;
@@ -155,13 +184,17 @@ export class ImageListViewComponent implements OnInit {
       .filter(x => x.isSort)
       .map(x => ({ key: x.byKey, label: x.label }));
     if (this.sortArray.length > 0) {
+      this.sortArray.push({
+        key: 'random',
+        label: this.translateService.instant('g.randomSort'),
+      });
       let sortValue = this.sortArray.find(x => x.key === sort);
       this.sortValue =
         isNotBlank(sort) && sortValue ? sortValue : this.sortArray[0];
     }
     //設定過濾資料欄位
     this.searchKey = this.themeLabelList
-      .filter(x => x.isSearchValue)
+      .filter(x => x.isSearchValue && x.type !== 'seq')
       .map(x => x.byKey);
 
     this.onSearch();
@@ -261,12 +294,16 @@ export class ImageListViewComponent implements OnInit {
       db: this.useDB.seq,
     };
     if (this.sortArray.length > 0) {
-      queryParams['sort'] = this.sortValue!.key.trim();
+      queryParams['sort'] = this.sortValue?.key?.trim();
       queryParams['asc'] = this.sortAsc;
     }
     return this.router.navigate([], {
       queryParams,
     });
+  }
+  //scroll到最上面
+  toTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   /**
@@ -281,10 +318,16 @@ export class ImageListViewComponent implements OnInit {
     // 設定序號
     this.viewData = this.filterData
       .map((x: any, i: number) => {
-        x.seq = i + 1;
+        if (isNotBlank(this.seqKey)) {
+          x[this.seqKey] = i + 1;
+        }
         return x;
       })
       .filter((x: any, i: number) => i >= start && i < end);
+    //處理自定義
+    if (isNotBlank(this.defaultKey)) {
+      this.getCustomValueMap();
+    }
   }
 
   getStringSplit(label: ThemeLabel, view: any): string[] {
@@ -307,33 +350,41 @@ export class ImageListViewComponent implements OnInit {
     this.hoveredIndex = null;
   }
 
+  /**
+   * 複製到剪貼簿
+   * @param text
+   */
   copyText(text: string) {
     navigator.clipboard.writeText(text);
     this.snackbarService.openByI18N('msg.copyText', { text });
   }
+  //上一頁
   prePage() {
     this.currentPage = parseInt(this.currentPage + '', 10);
     if (this.currentPage - 1 !== 0) {
       this.currentPage -= 1;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      this.toTop();
       this.changeData();
       this.changeQueryParams();
     }
   }
+  //下一頁
   nextPage() {
     this.currentPage = parseInt(this.currentPage + '', 10);
     if (this.currentPage + 1 <= this.pages.length) {
       this.currentPage += 1;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      this.toTop();
       this.changeData();
       this.changeQueryParams();
     }
   }
-
+  //執行排序
   onSort() {
     if (this.sortValue) {
-      if (this.sortValue.key === '$$random$$') {
-        this.filterData.sort((a: any, b: any) => (a.sort > b.sort ? 1 : -1));
+      if (this.sortValue.key === this.randomStr) {
+        this.filterData.sort((a: any, b: any) =>
+          a[this.randomStr] > b[this.randomStr] ? 1 : -1
+        );
       } else {
         this.filterData = this.filterData.sort(
           dynamicSort(this.sortValue.key, this.sortAsc)
@@ -356,5 +407,150 @@ export class ImageListViewComponent implements OnInit {
     const randomNo = getRandomInt(1, this.useData.length);
     this.searchValue = this.useData[randomNo][this.defaultKey];
     this.changeQueryParams();
+  }
+
+  /**
+   * 從資料庫取得自定義資料
+   */
+  getCustomValueMap() {
+    let req = {
+      headerId: this.headerId,
+      valueList: this.viewData.map((x: any) => x[this.defaultKey]),
+    };
+    this.themeService.findCustomValue(req).subscribe(res => {
+      this.customValueMap = res;
+      this.customValueMap = this.viewData
+        .map((x: any) => x[this.defaultKey])
+        .reduce((a: ThemeCustomValueResponse, b: string) => {
+          if (!a.hasOwnProperty(b)) {
+            a[b] = {};
+          }
+          return a;
+        }, this.customValueMap);
+    });
+  }
+
+  getCustomValue(data: any, custom: ThemeCustom) {
+    if (this.checkCustomValueExist(data, custom)) {
+      return this.customValueMap[data[this.defaultKey]][custom.byKey];
+    }
+    return '';
+  }
+
+  /**
+   * 取得UI要使用的自定義資料的字串
+   * @param data
+   * @param custom
+   * @returns
+   */
+  getCustomValueForUI(data: any, custom: ThemeCustom) {
+    let result: any = '';
+    let value = '';
+    if (this.checkCustomValueExist(data, custom)) {
+      value = this.customValueMap[data[this.defaultKey]][custom.byKey];
+    }
+
+    switch (custom.type) {
+      case 'buttonIconBoolean':
+        if (isBlank(value) || value === 'true') {
+          result = custom.buttonIconTrue;
+        } else {
+          result = custom.buttonIconFalse;
+        }
+        break;
+      case 'buttonIconFill':
+        result = value === 'true';
+        break;
+    }
+    return result;
+  }
+
+  /**
+   * 檢查是否有存在自訂字串
+   * @param data
+   * @param custom
+   * @returns
+   */
+  checkCustomValueExist(data: any, custom: ThemeCustom): boolean {
+    if (
+      isBlank(this.defaultKey) ||
+      isBlank(data[this.defaultKey]) ||
+      isNull(this.customValueMap[data[this.defaultKey]]) ||
+      isNull(this.customValueMap[data[this.defaultKey]][custom.byKey])
+    ) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * 執行更新自定義字串
+   * @param custom
+   * @param data
+   * @param value
+   */
+  changeCustomValue(data: any, custom: ThemeCustom, value?: any) {
+    let req: ThemeCustomValue = {
+      headerId: this.headerId,
+      byKey: custom.byKey,
+      correspondDataValue: data[this.defaultKey],
+      customValue: value,
+    };
+    let x = this.getCustomValue(data, custom);
+    //定義每種資料改變方式
+    switch (custom.type) {
+      case 'buttonIconBoolean':
+        req.customValue = isBlank(x) || x === 'true' ? 'false' : 'true';
+        break;
+      case 'buttonIconFill':
+        req.customValue = !(x === 'true') + '';
+        break;
+      case 'buttonInputUrl':
+        req.customValue = value;
+        break;
+    }
+
+    this.themeService.updateCustomValue(req).subscribe(() => {
+      this.customValueMap[req.correspondDataValue][req.byKey] = req.customValue;
+    });
+  }
+
+  openButtonInputUrlDialog(data: any, custom: ThemeCustom) {
+    const dialogRef = this.matDialog.open(ButtonInputUrlDialog, {
+      width: '600px',
+      data: this.getCustomValue(data, custom),
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (isNotNull(result)) {
+        this.changeCustomValue(data, custom, result);
+      }
+    });
+  }
+
+  openNewPage(text: string) {
+    window.open(text, '_blank');
+  }
+
+  onCopyValue(data: any, custom: ThemeCustom) {
+    this.copyText(replaceValue(custom.copyValue, data));
+  }
+
+  onOpenUrl(data: any, custom: ThemeCustom) {
+    this.openNewPage(replaceValue(custom.openUrl, data));
+  }
+
+  onWriteNote(data: any, custom: ThemeCustom) {
+    const dialogRef = this.matDialog.open(WriteNoteDialog, {
+      data: this.getCustomValue(data, custom) ?? '',
+      width: '60vw',
+      height: '80vh',
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (isNotNull(result)) {
+        this.changeCustomValue(data, custom, result);
+      }
+    });
   }
 }

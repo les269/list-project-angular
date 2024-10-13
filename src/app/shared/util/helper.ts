@@ -4,6 +4,9 @@ export const isBlank = (s: any): boolean =>
   s === undefined || s === null || s.trim() === '';
 export const isNotBlank = (s: any): boolean => !isBlank(s);
 
+export const isNull = (s: any): boolean => s === undefined || s === null;
+export const isNotNull = (s: any): boolean => !isNull(s);
+
 export const isRepeat = (arr: any[]): boolean =>
   arr.length !== arr.filter((e, i, arr2) => arr2.indexOf(e) === i).length;
 
@@ -39,3 +42,8 @@ export function getRandomInt(min: number, max: number) {
   max = Math.floor(max);
   return Math.floor(randomNumber * (max - min + 1)) + min;
 }
+
+export const replaceValue = (value: string, obj: any): string =>
+  value.replace(/\$\{(.*?)\}/g, (match, key) => {
+    return obj[key.trim()] || match;
+  });

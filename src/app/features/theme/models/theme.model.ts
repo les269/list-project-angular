@@ -3,7 +3,7 @@ export interface ThemeRequest {
   themeImage: ThemeImage;
   themeLabelList: ThemeLabel[];
   themeDBList: ThemeDB[];
-  themeCustom: ThemeCustom[];
+  themeCustomList: ThemeCustom[];
 }
 
 export interface ThemeResponent {
@@ -11,7 +11,7 @@ export interface ThemeResponent {
   themeImage: ThemeImage;
   themeLabelList: ThemeLabel[];
   themeDBList: ThemeDB[];
-  themeCustom: ThemeCustom[];
+  themeCustomList: ThemeCustom[];
 }
 
 export interface ThemeHeader {
@@ -77,22 +77,41 @@ export enum ThemeDBType {
 }
 
 export interface ThemeCustom {
-  type: string;
-  key?: string;
-  label?: string;
-  api?: string;
-  method?: string;
-  openUrl?: string;
-  openUrlByKey?: string;
-  copyValue?: string;
-  copyValueByKey?: string;
-  buttonIconBefore?: string;
-  buttonIconAfter?: string;
-  completedMsg?: string;
-  note?: string;
+  type: ThemeCustomType;
+  byKey: string; //對應客製化數值的key
+  label: string; //顯示的按鈕名稱
+  seq: number; //顯示順序
+  // TODO 呼叫api的先暫停不寫 是否再另外table來存放api
+  // api: string;
+  // method: string;
+  // header: string;
+  // cookie: string;
+  // completedMsg: string;
+  //用於windows.open
+  openUrl: string;
+  openUrlByKey: string;
+  //複製對應data的資料
+  copyValue: string;
+  copyValueByKey: string;
+  //按鈕使用的icon false為填滿 true填滿
+  buttonIconFill: string;
+  buttonIconFillColor: string;
+  //按鈕false跟true的圖案
+  buttonIconTrue: string;
+  buttonIconFalse: string;
 }
 
-export enum ThemeCustomType {}
+export enum ThemeCustomType {
+  openUrl = 'openUrl',
+  openUrlByKey = 'openUrlByKey',
+  writeNote = 'writeNote',
+  copyValue = 'copyValue',
+  copyValueByKey = 'copyValueByKey',
+  buttonIconBoolean = 'buttonIconBoolean',
+  buttonIconFill = 'buttonIconFill',
+  buttonInputUrl = 'buttonInputUrl',
+  // callApi = 'callApi',
+}
 
 export interface CopyThemeData {
   themeHeader: ThemeHeader;
@@ -100,4 +119,20 @@ export interface CopyThemeData {
 export interface CopyThemeRequest {
   source: ThemeHeader;
   target: ThemeHeader;
+}
+
+export interface ThemeCustomValue {
+  headerId: string;
+  byKey: string;
+  correspondDataValue: string;
+  customValue: string;
+}
+
+export interface ThemeCustomValueResponse {
+  [correspondDataValue: string]: { [byKey: string]: string };
+}
+
+export interface ThemeCustomValueRequest {
+  headerId: string;
+  valueList: string[];
 }

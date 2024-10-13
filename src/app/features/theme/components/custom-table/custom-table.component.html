@@ -1,0 +1,195 @@
+<label class="h3">{{ 'themeCustom.title' | translate }}</label>
+<div class="card mb-3">
+  <table mat-table [dataSource]="themeCustomList" multiTemplateDataRows>
+    <ng-container matColumnDef="order">
+      <th mat-header-cell *matHeaderCellDef>
+        {{ 'themeLabel.order' | translate }}
+      </th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.seq }}
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="type">
+      <th mat-header-cell *matHeaderCellDef>
+        {{ 'themeDB.type' | translate }}
+      </th>
+      <td mat-cell *matCellDef="let element; let i = dataIndex">
+        <select
+          [(ngModel)]="element.type"
+          name="customType{{ i }}"
+          class="form-control"
+          style="min-width: 200px">
+          @for (type of eThemeCustomType | keyvalue; track $index) {
+            <option [value]="type.key">
+              {{ 'themeCustom.' + type.key | translate }}
+            </option>
+          }
+        </select>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="byKey">
+      <th mat-header-cell *matHeaderCellDef>
+        {{ 'themeCustom.byKey' | translate }}
+      </th>
+      <td mat-cell *matCellDef="let element; let i = dataIndex">
+        <input
+          class="form-control"
+          name="customByKey{{ i }}"
+          [(ngModel)]="element.byKey" />
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="label">
+      <th mat-header-cell *matHeaderCellDef>
+        {{ 'themeDB.name' | translate }}
+      </th>
+      <td mat-cell *matCellDef="let element; let i = dataIndex">
+        <input
+          class="form-control"
+          name="customLabel{{ i }}"
+          [(ngModel)]="element.label" />
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="other">
+      <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
+      <td mat-cell *matCellDef="let element; let i = dataIndex">
+        <div class="row flex-nowrap">
+          <div
+            class="flex column align-content-center"
+            style="width: 48px"
+            role="group"
+            aria-label="Vertical button group">
+            @if (i !== 0) {
+              <mat-icon class="dropupdown-icon up" (click)="onUpDown(i, 'up')"
+                >arrow_drop_up</mat-icon
+              >
+            }
+            @if (i !== themeCustomList.length - 1) {
+              <mat-icon
+                class="dropupdown-icon down"
+                (click)="onUpDown(i, 'down')"
+                >arrow_drop_down</mat-icon
+              >
+            }
+          </div>
+          <button mat-icon-button (click)="onDelet(i)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="addDB">
+      <td
+        mat-footer-cell
+        *matFooterCellDef
+        [attr.colspan]="displayedColumns.length">
+        <div class="row justify-content-center">
+          <button mat-icon-button (click)="onAdd()">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="expandedDetail">
+      <td
+        mat-cell
+        *matCellDef="let element; let i = dataIndex"
+        [attr.colspan]="displayedColumns.length">
+        <div class="d-flex flex-column mb-2">
+          @switch (element.type) {
+            @case ('buttonIconBoolean') {
+              <div class="d-flex align-items-center">
+                <h6 class="mb-0">
+                  {{ 'themeCustom.writeIconName' | translate }}
+                </h6>
+                <a
+                  href="https://fonts.google.com/icons"
+                  class="card-link text-nowrap p-2"
+                  target="_blank"
+                  >{{ 'themeCustom.googleIconUrl' | translate }}</a
+                >
+              </div>
+
+              <div class="d-flex">
+                <input
+                  class="form-control"
+                  [placeholder]="'themeCustom.clickBeforeIcon' | translate"
+                  [(ngModel)]="element.buttonIconTrue"
+                  name="customButtonIconTrue{{ i }}" />
+                <input
+                  class="form-control"
+                  [placeholder]="'themeCustom.clickAfterIcon' | translate"
+                  [(ngModel)]="element.buttonIconFalse"
+                  name="customButtonIconFalse{{ i }}" />
+              </div>
+            }
+            @case ('buttonIconFill') {
+              <div class="d-flex align-items-center">
+                <h6 class="mb-0">
+                  {{ 'themeCustom.writeIconName' | translate }}
+                </h6>
+                <a
+                  href="https://fonts.google.com/icons"
+                  class="card-link text-nowrap p-2"
+                  target="_blank"
+                  >{{ 'themeCustom.googleIconUrl' | translate }}</a
+                >
+              </div>
+              <div class="d-flex">
+                <input
+                  class="form-control"
+                  [placeholder]="'themeCustom.fillIcon' | translate"
+                  [(ngModel)]="element.buttonIconFill"
+                  name="customButtonIconFill{{ i }}" />
+                <input
+                  type="color"
+                  [placeholder]="'themeCustom.fillIconColor' | translate"
+                  class="form-control form-control-color"
+                  [(ngModel)]="element.buttonIconFillColor"
+                  name="customButtonIconFillColor{{ i }}" />
+              </div>
+            }
+            @case ('copyValue') {
+              <input
+                class="form-control"
+                [placeholder]="'themeCustom.copyValuePH' | translate"
+                [(ngModel)]="element.copyValue"
+                name="customCopyValue{{ i }}" />
+            }
+            @case ('copyValueByKey') {
+              <input
+                class="form-control"
+                [placeholder]="'themeCustom.copyValueByKeyPH' | translate"
+                [(ngModel)]="element.copyValueByKey"
+                name="customCopyValueByKey{{ i }}" />
+            }
+            @case ('openUrl') {
+              <input
+                class="form-control"
+                [placeholder]="'themeCustom.openUrlPH' | translate"
+                [(ngModel)]="element.openUrl"
+                name="customOpenUrl{{ i }}" />
+            }
+            @case ('openUrlByKey') {
+              <input
+                class="form-control"
+                [placeholder]="'themeCustom.openUrlByKeyPH' | translate"
+                [(ngModel)]="element.openUrlByKey"
+                name="customOpenUrlByKey{{ i }}" />
+            }
+          }
+        </div>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr
+      mat-row
+      *matRowDef="let row; columns: displayedColumns"
+      class="element-row"></tr>
+    <tr
+      mat-row
+      class="h-auto"
+      *matRowDef="let row; columns: ['expandedDetail']"></tr>
+    <tr mat-footer-row *matFooterRowDef="['addDB']"></tr>
+  </table>
+</div>

@@ -5,7 +5,7 @@
         <button mat-icon-button (click)="onBack()">
           <mat-icon>arrow_back</mat-icon>
         </button>
-        <!-- TODO 拆成component -->
+        <!-- TODO 拆成header component -->
         <form #themeForm="ngForm">
           <div class="mb-3">
             <label for="name" class="form-label">{{
@@ -108,6 +108,7 @@
               </div>
             }
           }
+          <!-- TODO 拆成標籤table component -->
           <label class="h3">{{ 'themeLabel.title' | translate }}</label>
           <div class="card mb-3">
             <table
@@ -154,7 +155,8 @@
                     [(ngModel)]="element.type"
                     class="form-control"
                     style="width: 120px"
-                    name="labelType{{ i }}">
+                    name="labelType{{ i }}"
+                    (ngModelChange)="changeLableType(element.type, i)">
                     @for (type of eThemeLabelType | keyvalue; track $index) {
                       <option [value]="type.key">
                         {{ 'themeLabel.' + type.key | translate }}
@@ -226,13 +228,16 @@
                         name="labelSort{{ i }}"
                         >{{ 'themeLabel.isSort' | translate }}</mat-checkbox
                       >
-                      <mat-checkbox
-                        [(ngModel)]="element.isSearchValue"
-                        name="labelSearchValue{{ i }}"
-                        >{{
-                          'themeLabel.isSearchValue' | translate
-                        }}</mat-checkbox
-                      >
+                      @if (element.type !== 'seq') {
+                        <mat-checkbox
+                          [(ngModel)]="element.isSearchValue"
+                          name="labelSearchValue{{ i }}"
+                          >{{
+                            'themeLabel.isSearchValue' | translate
+                          }}</mat-checkbox
+                        >
+                      }
+
                       <mat-checkbox
                         [(ngModel)]="element.isSearchButton"
                         name="labelSearchButton{{ i }}"
@@ -278,6 +283,7 @@
               <tr mat-footer-row *matFooterRowDef="['addItem']"></tr>
             </table>
           </div>
+          <!-- TODO 拆成資料來源 component -->
           <label class="h3">{{ 'themeDB.title' | translate }}</label>
           <div class="card mb-3">
             <table
@@ -416,12 +422,14 @@
               <tr mat-footer-row *matFooterRowDef="['addDB']"></tr>
             </table>
           </div>
+          <app-custom-table
+            [(themeCustomList)]="model.themeCustomList"></app-custom-table>
           @if (status === 'edit') {
             <div class="my-4">
               <button
                 type="submit"
                 class="btn btn-success w-100"
-                (click)="update(false)">
+                (click)="update(false, 'save')">
                 {{ 'g.save' | translate }}
               </button>
             </div>
@@ -431,7 +439,7 @@
             <button
               type="submit"
               class="btn btn-success w-100"
-              (click)="update(true)">
+              (click)="update(true, 'commit')">
               {{ 'g.submit' | translate }}
             </button>
           </div>

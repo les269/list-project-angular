@@ -3,7 +3,8 @@
     "blank": "{{name}} 不可以為空",
     "deletSuccess": "刪除成功",
     "copySuccess": "複製成功",
-    "createSuccess": "創建成功",
+    "commitSuccess": "提交成功",
+    "saveSuccess": "保存成功",
     "themeExist": "主題已經存在",
     "themeNotExist": "主題不存在",
     "sureDeleteTheme": "確定是否要刪除該主題?",
@@ -15,16 +16,21 @@
     "copy": "複製",
     "delete": "刪除",
     "submit": "提交",
+    "clear": "清除",
     "ok": "確定",
     "no": "取消",
     "save": "保存",
     "totalNum": "總數量",
-    "page": "頁"
+    "page": "頁",
+    "empty": "空",
+    "randomSort": "隨機排序"
   },
   "title": {
     "home": "清單列表",
     "editTheme": "編輯主題",
-    "copyTheme": "複製主題"
+    "copyTheme": "複製主題",
+    "inputUrl": "輸入網址",
+    "writeEditor": "編輯Note"
   },
   "home": { "createTheme": "創建主題" },
   "themeHeader": {
@@ -39,7 +45,7 @@
   "themeImage": {
     "imageKey": "圖片json key",
     "imageUrl": "自訂義來源",
-    "imageUrlPlaceholder": "設定方法ex: http://localhost/images/${id}.jpg"
+    "imageUrlPlaceholder": "設定方法ex: http://localhost/images/${id}.jpg ${id}=>id是指data的id"
   },
   "themeLabel": {
     "title": "資料欄位設定",
@@ -59,7 +65,7 @@
     "splitByPh": "以哪個字串做分割",
     "useSpacePh": "分格用字串",
     "dateFormat": "日期格式",
-    "isDefaultKey": "是否當為預設使用的key值"
+    "isDefaultKey": "當為預設使用的key值,需使用唯一值且確保不為空值,改變時自定義的資料不會隨之改變或刪除"
   },
   "themeDB": {
     "title": "資料來源設定",
@@ -73,5 +79,28 @@
     "group": "設定群組",
     "groupPh": "設定要用的group，多group以,區隔",
     "isDefault": "是否預設使用"
+  },
+  "themeCustom": {
+    "title": "自定義設定",
+    "openUrl": "開啟自定義網址",
+    "openUrlByKey": "開啟網址用key值",
+    "writeNote": "填寫文字",
+    "copyValue": "複製自定義內容",
+    "copyValueByKey": "複製自定義內容用key值",
+    "buttonIconBoolean": "按鈕圖案自定義正反",
+    "buttonIconFill": "按鈕圖案自定義填充顏色(要先確認是否可以填充)",
+    "googleIconUrl": "icon來源",
+    "writeIconName": "請填寫要顯示的Icon name",
+    "clickBeforeIcon": "點擊前顯示的icon name",
+    "clickAfterIcon": "點擊後顯示的icon name",
+    "byKey": "命名key值",
+    "fillIcon": "輸入可以填充會改變的icon name",
+    "fillIconColor": "輸入填充的顏色僅限HEX",
+    "copyValuePH": "自定義文字 ex: hello ${id} ${id}=>id是指data的id",
+    "copyValueByKeyPH": "對應data的key",
+    "openUrlPH": "自定義開啟網址 ex: https://www.google.com/search?q=${id} ${id}=>id是指data的id",
+    "openUrlByKeyPH": "對應data的key",
+    "buttonInputUrl": "輸入自定義開啟網址",
+    "labelName": "標籤名稱"
   }
 }

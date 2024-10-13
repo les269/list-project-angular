@@ -9,7 +9,7 @@ import { updateTitle } from '../../../../shared/state/layout.actions';
 import { Store } from '@ngrx/store';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageBoxComponent } from '../../../../core/components/message-box.component';
-import { CopyThemeComponent } from '../../components/copy-theme.component';
+import { CopyThemeComponent } from '../../components/copy-theme.dialog';
 import { getHeaderId, isNotBlank } from '../../../../shared/util/helper';
 
 @Component({

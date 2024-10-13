@@ -3,6 +3,9 @@ import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import {
   CopyThemeRequest,
+  ThemeCustomValue,
+  ThemeCustomValueRequest,
+  ThemeCustomValueResponse,
   ThemeHeader,
   ThemeRequest,
   ThemeResponent,
@@ -37,5 +40,13 @@ export class ThemeService {
   }
   copyTheme(req: Partial<CopyThemeRequest>): Observable<void> {
     return this.http.post<void>('/theme/copy', req);
+  }
+  findCustomValue(
+    req: Partial<ThemeCustomValueRequest>
+  ): Observable<ThemeCustomValueResponse> {
+    return this.http.post<ThemeCustomValueResponse>('/theme/custom/value', req);
+  }
+  updateCustomValue(req: Partial<ThemeCustomValue>): Observable<void> {
+    return this.http.post<void>('/theme/custom/update', req);
   }
 }

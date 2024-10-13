@@ -36,6 +36,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { EMPTY, filter, switchMap, tap, throwError } from 'rxjs';
 import { updateTitle } from '../../../../shared/state/layout.actions';
 import { Store } from '@ngrx/store';
+import { CustomTableComponent } from '../../components/custom-table/custom-table.component';
 @Component({
   standalone: true,
   imports: [
@@ -48,6 +49,7 @@ import { Store } from '@ngrx/store';
     CommonModule,
     MatListModule,
     TranslateModule,
+    CustomTableComponent,
   ],
   selector: 'app-edit-theme',
   templateUrl: 'edit-theme.component.html',
@@ -69,7 +71,7 @@ export class CreateThemeComponent implements OnInit {
     },
     themeLabelList: [],
     themeDBList: [],
-    themeCustom: [],
+    themeCustomList: [],
   };
   eThemeHeaderType = ThemeHeaderType;
   eThemeImageType = ThemeImageType;
@@ -79,10 +81,6 @@ export class CreateThemeComponent implements OnInit {
   // 資料來源設定
   dbDisplayedColumns = ['order', 'type', 'source', 'label', 'group', 'other'];
   eThemeDBType = ThemeDBType;
-  //自定義功能
-  customSource = new MatTableDataSource<ThemeCustom>([]);
-  customDisplayedColumns = [];
-  eThemeCustomType = ThemeCustomType;
 
   constructor(
     private router: Router,
@@ -118,9 +116,9 @@ export class CreateThemeComponent implements OnInit {
         this.status = 'edit';
         this.model.themeHeader = res.themeHeader;
         this.model.themeImage = res.themeImage;
-        this.model.themeLabelList = res.themeLabelList;
-        this.model.themeDBList = res.themeDBList;
-        this.model.themeCustom = res.themeCustom;
+        this.model.themeLabelList = res.themeLabelList ?? [];
+        this.model.themeDBList = res.themeDBList ?? [];
+        this.model.themeCustomList = res.themeCustomList ?? [];
       });
   }
 
@@ -128,7 +126,7 @@ export class CreateThemeComponent implements OnInit {
     this.router.navigate(['']);
   }
 
-  update(back: boolean) {
+  update(back: boolean, type: 'save' | 'commit') {
     if (!this.validationModel()) {
       return;
     }
@@ -151,7 +149,9 @@ export class CreateThemeComponent implements OnInit {
         if (back) {
           this.router.navigate(['']);
         }
-        this.snackbarService.openByI18N('msg.createSuccess');
+        this.snackbarService.openByI18N(
+          type === 'commit' ? 'msg.commitSuccess' : 'msg.saveSuccess'
+        );
       });
   }
   //驗證資料正確
@@ -216,6 +216,23 @@ export class CreateThemeComponent implements OnInit {
         return false;
       }
     }
+    //byKey不可重複
+    if (isRepeat(this.model.themeCustomList.map(x => x.byKey))) {
+      this.snackbarService.openByI18N('msg.repeatColumn', {
+        text: this.translateService.instant('themeCustom.byKey'),
+      });
+      return false;
+    }
+    for (let custom of this.model.themeCustomList) {
+      if (isBlank(custom.label)) {
+        this.snackbarService.isBlankMessage('themeCustom.labelName');
+        return false;
+      }
+      if (isBlank(custom.byKey)) {
+        this.snackbarService.isBlankMessage('themeCustom.byKey');
+        return false;
+      }
+    }
     return true;
   }
   //新增資料欄位
@@ -262,6 +279,12 @@ export class CreateThemeComponent implements OnInit {
         x.seq = i + 1;
         return x;
       });
+  }
+  //
+  changeLableType(event: ThemeLabelType, index: number) {
+    if (event === 'seq') {
+      this.model.themeLabelList[index].isSearchValue = false;
+    }
   }
   //改變資料欄位的預設欄位,只能有一筆或無
   changeLableDefaultKey(event: MatCheckboxChange, index: number) {
