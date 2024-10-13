@@ -1,6 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { concatMap, debounceTime, from, map, toArray } from 'rxjs';
+import {
+  concatMap,
+  debounceTime,
+  from,
+  map,
+  Subscription,
+  toArray,
+} from 'rxjs';
 import {
   dynamicSort,
   getRandomInt,
@@ -86,6 +93,8 @@ export class ImageListViewComponent implements OnInit {
   defaultKey = '';
   customValueMap: ThemeCustomValueResponse = {};
   randomStr = 'random';
+  routeParamSub: Subscription | undefined;
+  routeEventsSub: Subscription | undefined;
 
   constructor(
     private themeService: ThemeService,
@@ -99,33 +108,47 @@ export class ImageListViewComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.changeUrl();
-    this.headerId = this.route.snapshot.queryParams['headerId'];
-    if (isBlank(this.headerId)) {
-      this.router.navigate(['']);
-      return;
-    }
-    this.themeService.getByHeaderId(this.headerId).subscribe(res => {
-      this.themeHeader = res.themeHeader;
+    this.routeParamSub = this.route.paramMap
+      .pipe(debounceTime(100))
+      .subscribe(params => {
+        this.changeUrl();
+        this.headerId = `ThemeHeader:${params.get('name')},${params.get('version')},imageList`;
+        if (isBlank(this.headerId)) {
+          this.router.navigate(['']);
+          return;
+        }
+        this.themeService.getByHeaderId(this.headerId).subscribe(res => {
+          this.themeHeader = res.themeHeader;
 
-      this.themeImage = res.themeImage;
-      this.themeLabelList = res.themeLabelList.sort((a, b) =>
-        a.seq > b.seq ? 1 : -1
-      );
-      this.themeDBList = res.themeDBList.sort((a, b) =>
-        a.seq > b.seq ? 1 : -1
-      );
-      this.themeCustomList = res.themeCustomList.sort((a, b) =>
-        a.seq > b.seq ? 1 : -1
-      );
-      this.defaultKey =
-        this.themeLabelList.find(x => x.isDefaultKey)?.byKey ?? '';
-      //設定標題
-      document.title = this.themeHeader.title;
-      this.store.dispatch(updateTitle({ title: this.themeHeader.title }));
-      //呼叫取得清單資料
-      this.getData();
-    });
+          this.themeImage = res.themeImage;
+          this.themeLabelList = res.themeLabelList.sort((a, b) =>
+            a.seq > b.seq ? 1 : -1
+          );
+          this.themeDBList = res.themeDBList.sort((a, b) =>
+            a.seq > b.seq ? 1 : -1
+          );
+          this.themeCustomList = res.themeCustomList.sort((a, b) =>
+            a.seq > b.seq ? 1 : -1
+          );
+          this.defaultKey =
+            this.themeLabelList.find(x => x.isDefaultKey)?.byKey ?? '';
+          //設定標題
+          document.title = this.themeHeader.title;
+          this.store.dispatch(updateTitle({ title: this.themeHeader.title }));
+          //呼叫取得清單資料
+          this.getData();
+        });
+      });
+  }
+
+  // 記得在組件銷毀時取消訂閱
+  ngOnDestroy() {
+    if (this.routeParamSub) {
+      this.routeParamSub.unsubscribe();
+    }
+    if (this.routeEventsSub) {
+      this.routeEventsSub.unsubscribe();
+    }
   }
 
   /**
@@ -201,12 +224,14 @@ export class ImageListViewComponent implements OnInit {
     this.changeData();
     await this.changeQueryParams();
     // 監聽url params的變化
-    this.router.events.pipe(debounceTime(100)).subscribe(event => {
-      this.changeUrl();
-      this.changeDataSource();
-      this.onSearch();
-      this.changeData();
-    });
+    this.routeEventsSub = this.router.events
+      .pipe(debounceTime(100))
+      .subscribe(event => {
+        this.changeUrl();
+        this.changeDataSource();
+        this.onSearch();
+        this.changeData();
+      });
   }
 
   //使用query param的資料來設定當前資料的來源,排序,頁數
@@ -288,7 +313,6 @@ export class ImageListViewComponent implements OnInit {
    */
   changeQueryParams() {
     let queryParams: { [key: string]: any } = {
-      headerId: this.headerId,
       page: this.currentPage,
       searchValue: this.searchValue,
       db: this.useDB.seq,

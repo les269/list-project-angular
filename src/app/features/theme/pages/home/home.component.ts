@@ -10,7 +10,7 @@ import { Store } from '@ngrx/store';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageBoxComponent } from '../../../../core/components/message-box.component';
 import { CopyThemeComponent } from '../../components/copy-theme.dialog';
-import { getHeaderId, isNotBlank } from '../../../../shared/util/helper';
+import { isNotBlank } from '../../../../shared/util/helper';
 
 @Component({
   standalone: true,
@@ -52,7 +52,6 @@ export class HomeComponent implements OnInit {
       for (const value of res) {
         this.list[value.type].push(value);
       }
-      console.log(this.list);
     });
   }
 
@@ -97,8 +96,6 @@ export class HomeComponent implements OnInit {
   }
 
   navigateList(item: ThemeHeader) {
-    this.router.navigate(['image-list'], {
-      queryParams: { headerId: getHeaderId(item) },
-    });
+    this.router.navigate(['imageList', item.name, item.version]);
   }
 }
