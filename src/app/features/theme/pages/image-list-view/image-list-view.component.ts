@@ -540,9 +540,9 @@ export class ImageListViewComponent implements OnInit {
     this.openNewPage(replaceValue(custom.openUrl, data));
   }
 
-  onWriteNote(data: any, custom: ThemeCustom) {
+  openWriteNoteDialog(data: any, custom: ThemeCustom, disabled: boolean) {
     const dialogRef = this.matDialog.open(WriteNoteDialog, {
-      data: this.getCustomValue(data, custom) ?? '',
+      data: { value: this.getCustomValue(data, custom) ?? '', disabled },
       width: '60vw',
       height: '80vh',
     });

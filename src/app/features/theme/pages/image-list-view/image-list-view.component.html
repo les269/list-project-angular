@@ -151,7 +151,7 @@
                         class="custom-button"
                         (click)="changeCustomValue(data, custom)">
                         <label class="px-2">{{ custom.label }}</label>
-                        <mat-icon>{{
+                        <mat-icon class="material-icons-outlined">{{
                           getCustomValueForUI(data, custom)
                         }}</mat-icon>
                       </button>
@@ -235,9 +235,18 @@
                     <div class="custom-button-group">
                       <button
                         class="custom-button"
-                        (click)="onWriteNote(data, custom)">
+                        (click)="openWriteNoteDialog(data, custom, false)">
                         <label class="px-2">{{ custom.label }}</label>
                       </button>
+                      @if (getCustomValue(data, custom) !== '') {
+                        <button
+                          class="custom-button custom-icon"
+                          (click)="openWriteNoteDialog(data, custom, true)">
+                          <mat-icon class="material-icons-outlined"
+                            >description</mat-icon
+                          >
+                        </button>
+                      }
                     </div>
                   }
                 }

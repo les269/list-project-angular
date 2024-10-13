@@ -28,3 +28,24 @@ body {
 .NgxEditor__MenuBar {
   background-color: transparent !important;
 }
+
+.scrollbar-primary::-webkit-scrollbar {
+  width: 10px;
+}
+
+.scrollbar-primary::-webkit-scrollbar-track-piece {
+  background: none;
+}
+
+.scrollbar-primary::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+ngx-editor.disabled > div.NgxEditor {
+  background: transparent;
+  border: none;
+  > .NgxEditor__Content--Disabled {
+    -webkit-user-select: text;
+    user-select: text;
+    pointer-events: auto;
+  }
+}
