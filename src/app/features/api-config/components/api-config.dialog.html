@@ -1,0 +1,92 @@
+<h2 mat-dialog-title>{{ 'title.editApi' | translate }}</h2>
+<mat-dialog-content class="scrollbar-primary">
+  <form #apiConfigForm="ngForm">
+    <div class="form-group mb-2">
+      <label for="apiName">{{'apiConfig.apiName'|translate}}</label>
+      <input
+        class="form-control"
+        id="apiName"
+        name="apiName"
+        [(ngModel)]="value.apiName"
+        [disabled]="type==='edit'" />
+    </div>
+    <div class="form-group mb-2">
+      <label for="apiLabel">{{'apiConfig.apiLabel'|translate}}</label>
+      <input
+        class="form-control"
+        id="apiLabel"
+        name="apiLabel"
+        [(ngModel)]="value.apiLabel"
+        [disabled]="type==='edit'" />
+    </div>
+    <div class="form-group mb-2">
+      <label for="httpMethod">{{'apiConfig.httpMethod'|translate}}</label>
+      <select
+        class="form-control form-select"
+        [(ngModel)]="value.httpMethod"
+        name="httpMethod">
+        <option
+          *ngFor="let type of eHttpMethodType | keyvalue"
+          [ngValue]="type.key">
+          {{ type.key | uppercase }}
+        </option>
+      </select>
+    </div>
+    <div class="form-group mb-2">
+      <label for="endpointUrl">{{'apiConfig.endpointUrl'|translate}}</label>
+      <input
+        class="form-control"
+        id="endpointUrl"
+        name="endpointUrl"
+        [placeholder]="'apiConfig.endpointUrlPH'|translate"
+        [(ngModel)]="value.endpointUrl" />
+    </div>
+    <div class="form-group mb-2">
+      <label for="requestBody">{{'apiConfig.requestBody'|translate}}</label>
+      <textarea
+        class="form-control"
+        id="requestBody"
+        name="requestBody"
+        [placeholder]="'apiConfig.requestBodyPH'|translate"
+        [(ngModel)]="value.requestBody"
+        [rows]="5"></textarea>
+      <div class="d-flex justify-content-end">
+        <button mat-button class="rounded" (click)="formatBody()">
+          format
+        </button>
+      </div>
+    </div>
+    <div class="form-group mb-2">
+      <label for="httpParams">{{'apiConfig.httpParams'|translate}}</label>
+      <input
+        class="form-control"
+        id="httpParams"
+        name="httpParams"
+        [(ngModel)]="value.httpParams" />
+    </div>
+    <div class="form-group mb-2">
+      <label for="httpHeaders">{{'apiConfig.httpHeaders'|translate}}</label>
+      <input
+        class="form-control"
+        id="httpHeaders"
+        name="httpHeaders"
+        [(ngModel)]="value.httpHeaders" />
+    </div>
+    <div class="form-group mb-2">
+      <label for="successMessage"
+        >{{'apiConfig.successMessage'|translate}}</label
+      >
+      <input
+        class="form-control"
+        id="successMessage"
+        name="successMessage"
+        [(ngModel)]="value.successMessage" />
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">{{ 'g.no' | translate }}</button>
+  <button mat-button cdkFocusInitial (click)="onOk()">
+    {{ 'g.ok' | translate }}
+  </button>
+</mat-dialog-actions>

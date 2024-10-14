@@ -19,10 +19,14 @@ import { ThemeHeader, ThemeHeaderType } from '../../../features/theme/models';
 export class SidenavComponent implements OnInit {
   eThemeHeaderType = ThemeHeaderType;
   openSidenav$: Observable<Readonly<boolean>>;
-  myRoutes: any = [
+  myRoutes: { path: string; title: string }[] = [
     {
       path: '',
       title: 'title.home',
+    },
+    {
+      path: 'api-config-list',
+      title: 'title.apiConfigList',
     },
   ];
   list: {

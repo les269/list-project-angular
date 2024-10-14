@@ -1,0 +1,11 @@
+tr.select-row:hover {
+  background: whitesmoke;
+  cursor: pointer;
+  user-select: none;
+}
+
+tr.select-row:active {
+  background: #efefef;
+  cursor: pointer;
+  user-select: none;
+}

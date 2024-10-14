@@ -16,6 +16,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'api-config-list',
+    loadComponent: () =>
+      import(
+        './features/api-config/page/api-config-list/api-config-list.component'
+      ).then(mod => mod.ApiConfigListComponent),
+  },
+  {
     path: 'imageList/:name/:version',
     loadComponent: () =>
       import(

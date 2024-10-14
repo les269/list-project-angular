@@ -1,0 +1,78 @@
+<div class="col-md-10 offset-md-1 col-xs-12">
+  <div class="card mt-3">
+    <table mat-table [dataSource]="list" multiTemplateDataRows>
+      <ng-container matColumnDef="apiName">
+        <th mat-header-cell *matHeaderCellDef>
+          {{ 'apiConfig.apiName' | translate }}
+        </th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.apiName }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="apiLabel">
+        <th mat-header-cell *matHeaderCellDef>
+          {{ 'apiConfig.apiLabel' | translate }}
+        </th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.apiLabel }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="httpMethod">
+        <th mat-header-cell *matHeaderCellDef>
+          {{ 'apiConfig.httpMethod' | translate }}
+        </th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.httpMethod | uppercase }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="endpointUrl">
+        <th mat-header-cell *matHeaderCellDef>
+          {{ 'apiConfig.endpointUrl' | translate }}
+        </th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.endpointUrl }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="other">
+        <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
+        <td mat-cell *matCellDef="let element; let i = dataIndex">
+          <div class="row flex-nowrap">
+            <button mat-icon-button (click)="onEdit(i)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button (click)="onDelete(i)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="addDB">
+        <td
+          mat-footer-cell
+          *matFooterCellDef
+          [attr.colspan]="displayedColumns.length">
+          <div class="row justify-content-center">
+            <button mat-button class="rounded" (click)="onAdd()">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="expandedDetail">
+        <td
+          mat-cell
+          *matCellDef="let element; let i = dataIndex"
+          [attr.colspan]="displayedColumns.length">
+          <div class="d-flex flex-column mb-2"></div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: displayedColumns"
+        class="element-row"></tr>
+      <tr mat-footer-row *matFooterRowDef="['addDB']"></tr>
+    </table>
+  </div>
+</div>

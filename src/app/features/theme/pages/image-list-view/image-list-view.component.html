@@ -249,6 +249,15 @@
                       }
                     </div>
                   }
+                  @case ('apiArray') {
+                    <div class="custom-button-group">
+                      <button
+                        class="custom-button"
+                        (click)="callApi(data, custom)">
+                        <label class="px-2">{{ custom.label }}</label>
+                      </button>
+                    </div>
+                  }
                 }
               }
             </div>

@@ -81,18 +81,19 @@ export class HomeComponent implements OnInit {
     });
   }
   onDelete(item: ThemeHeader) {
-    const dialogRef = this.matDialog.open(MessageBoxComponent, {
-      data: { message: this.translateService.instant('msg.sureDeleteTheme') },
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (isNotBlank(result)) {
-        this.themeService.deleteTheme(item).subscribe(() => {
-          this.snackbarService.openByI18N('msg.deletSuccess');
-          this.getList();
-        });
-      }
-    });
+    this.matDialog
+      .open(MessageBoxComponent, {
+        data: { message: this.translateService.instant('msg.sureDeleteTheme') },
+      })
+      .afterClosed()
+      .subscribe(result => {
+        if (isNotBlank(result)) {
+          this.themeService.deleteTheme(item).subscribe(() => {
+            this.snackbarService.openByI18N('msg.deletSuccess');
+            this.getList();
+          });
+        }
+      });
   }
 
   navigateList(item: ThemeHeader) {

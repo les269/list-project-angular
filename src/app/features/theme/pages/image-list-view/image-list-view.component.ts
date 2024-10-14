@@ -47,6 +47,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDialog } from '@angular/material/dialog';
 import { ButtonInputUrlDialog } from '../../components/button-input-url.dialog';
 import { WriteNoteDialog } from '../../components/write-note.dialog';
+import { ApiConfigService } from '../../../api-config/service/api-config.service';
 
 @Component({
   standalone: true,
@@ -104,7 +105,8 @@ export class ImageListViewComponent implements OnInit {
     private snackbarService: SnackbarService,
     private store: Store,
     private matDialog: MatDialog,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private apiConfigService: ApiConfigService
   ) {}
 
   ngOnInit() {
@@ -576,5 +578,9 @@ export class ImageListViewComponent implements OnInit {
         this.changeCustomValue(data, custom, result);
       }
     });
+  }
+
+  callApi(data: any, custom: ThemeCustom) {
+    this.apiConfigService.callApi(custom.apiArray, data);
   }
 }

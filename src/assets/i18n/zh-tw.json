@@ -7,9 +7,13 @@
     "saveSuccess": "保存成功",
     "themeExist": "主題已經存在",
     "themeNotExist": "主題不存在",
-    "sureDeleteTheme": "確定是否要刪除該主題?",
+    "sureDeleteTheme": "是否要刪除該主題?",
+    "sureDeleteApi": "是否要刪除該API?",
     "copyText": "以複製至剪貼簿: {{text}}",
-    "repeatColumn": "{{text}} 不可以有重複欄位"
+    "repeatColumn": "{{text}} 不可以有重複欄位",
+    "apiExist": "API已經存在,在API名稱跟API標籤不可以重複",
+    "apiArrayEmtpy": "API未配置",
+    "apiArrayError": "API配置被刪除有錯誤"
   },
   "g": {
     "edit": "編輯",
@@ -30,7 +34,10 @@
     "editTheme": "編輯主題",
     "copyTheme": "複製主題",
     "inputUrl": "輸入網址",
-    "writeEditor": "編輯Note"
+    "writeEditor": "編輯Note",
+    "apiConfigList": "配置API清單",
+    "editApi": "編輯API",
+    "pleaseSelect": "請選擇"
   },
   "home": { "createTheme": "創建主題" },
   "themeHeader": {
@@ -101,6 +108,19 @@
     "openUrlPH": "自定義開啟網址 ex: https://www.google.com/search?q=${id} ${id}=>id是指data的id",
     "openUrlByKeyPH": "對應data的key",
     "buttonInputUrl": "輸入自定義開啟網址",
-    "labelName": "標籤名稱"
+    "labelName": "標籤名稱",
+    "apiArray": "呼叫API"
+  },
+  "apiConfig": {
+    "apiName": "API名稱",
+    "apiLabel": "API標籤",
+    "httpMethod": "HTTP請求方法",
+    "endpointUrl": "URL設定",
+    "endpointUrlPH": "呼叫的網址 ex: http://myApi/something?id=${id} ${id}=>id是指data的id",
+    "requestBody": "請求內容",
+    "requestBodyPH": "請求內容 \n{\n\"data\":\"${id}\"\n}\n ${id}=>id是指data的id",
+    "httpParams": "HTTP參數",
+    "httpHeaders": "HTTP標頭",
+    "successMessage": "成功訊息"
   }
 }

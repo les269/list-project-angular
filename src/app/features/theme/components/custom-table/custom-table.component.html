@@ -71,7 +71,7 @@
               >
             }
           </div>
-          <button mat-icon-button (click)="onDelet(i)">
+          <button mat-icon-button (click)="onDelete(i)">
             <mat-icon>delete</mat-icon>
           </button>
         </div>
@@ -83,7 +83,7 @@
         *matFooterCellDef
         [attr.colspan]="displayedColumns.length">
         <div class="row justify-content-center">
-          <button mat-icon-button (click)="onAdd()">
+          <button mat-button class="rounded" (click)="onAdd()">
             <mat-icon>add</mat-icon>
           </button>
         </div>
@@ -109,7 +109,7 @@
                 >
               </div>
 
-              <div class="d-flex">
+              <div class="d-flex input-group">
                 <input
                   class="form-control"
                   [placeholder]="'themeCustom.clickBeforeIcon' | translate"
@@ -136,45 +136,70 @@
               </div>
               <div class="d-flex">
                 <input
-                  class="form-control"
+                  class="form-control mt-1"
                   [placeholder]="'themeCustom.fillIcon' | translate"
                   [(ngModel)]="element.buttonIconFill"
                   name="customButtonIconFill{{ i }}" />
                 <input
                   type="color"
                   [placeholder]="'themeCustom.fillIconColor' | translate"
-                  class="form-control form-control-color"
+                  class="form-control form-control-color mt-1"
                   [(ngModel)]="element.buttonIconFillColor"
                   name="customButtonIconFillColor{{ i }}" />
               </div>
             }
             @case ('copyValue') {
               <input
-                class="form-control"
+                class="form-control mt-1"
                 [placeholder]="'themeCustom.copyValuePH' | translate"
                 [(ngModel)]="element.copyValue"
                 name="customCopyValue{{ i }}" />
             }
             @case ('copyValueByKey') {
               <input
-                class="form-control"
+                class="form-control mt-1"
                 [placeholder]="'themeCustom.copyValueByKeyPH' | translate"
                 [(ngModel)]="element.copyValueByKey"
                 name="customCopyValueByKey{{ i }}" />
             }
             @case ('openUrl') {
               <input
-                class="form-control"
+                class="form-control mt-1"
                 [placeholder]="'themeCustom.openUrlPH' | translate"
                 [(ngModel)]="element.openUrl"
                 name="customOpenUrl{{ i }}" />
             }
             @case ('openUrlByKey') {
               <input
-                class="form-control"
+                class="form-control mt-1"
                 [placeholder]="'themeCustom.openUrlByKeyPH' | translate"
                 [(ngModel)]="element.openUrlByKey"
                 name="customOpenUrlByKey{{ i }}" />
+            }
+            @case ('apiArray') {
+              <div class="mt-1 d-flex flex-wrap gap-3">
+                @for (
+                  apiConfig of toJsonParse(element.apiArray);
+                  track $index;
+                  let index = $index
+                ) {
+                  <mat-chip cdkDrag
+                    >{{ apiConfig }}
+                    <button matChipRemove (click)="removeApi(element, index)">
+                      <mat-icon>cancel</mat-icon>
+                    </button>
+                  </mat-chip>
+                }
+                <button
+                  class="btn btn-outline-primary d-flex"
+                  (click)="selectApi(element)">
+                  <mat-icon class="material-icons-outlined"
+                    ><span class="material-symbols-outlined">
+                      select_window_2
+                    </span></mat-icon
+                  >
+                </button>
+              </div>
             }
           }
         </div>

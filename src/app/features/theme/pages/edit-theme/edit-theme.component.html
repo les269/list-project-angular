@@ -265,7 +265,7 @@
               <ng-container matColumnDef="addItem">
                 <td mat-footer-cell *matFooterCellDef colspan="5">
                   <div class="row justify-content-center">
-                    <button mat-icon-button (click)="addLabel()">
+                    <button mat-button class="rounded" (click)="addLabel()">
                       <mat-icon>add</mat-icon>
                     </button>
                   </div>
@@ -388,7 +388,7 @@
                   *matFooterCellDef
                   [attr.colspan]="dbDisplayedColumns.length">
                   <div class="row justify-content-center">
-                    <button mat-icon-button (click)="onAddDB()">
+                    <button mat-button class="rounded" (click)="onAddDB()">
                       <mat-icon>add</mat-icon>
                     </button>
                   </div>

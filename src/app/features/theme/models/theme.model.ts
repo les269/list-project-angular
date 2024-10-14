@@ -81,12 +81,7 @@ export interface ThemeCustom {
   byKey: string; //對應客製化數值的key
   label: string; //顯示的按鈕名稱
   seq: number; //顯示順序
-  // TODO 呼叫api的先暫停不寫 是否再另外table來存放api
-  // api: string;
-  // method: string;
-  // header: string;
-  // cookie: string;
-  // completedMsg: string;
+  apiName: string;
   //用於windows.open
   openUrl: string;
   openUrlByKey: string;
@@ -99,6 +94,7 @@ export interface ThemeCustom {
   //按鈕false跟true的圖案
   buttonIconTrue: string;
   buttonIconFalse: string;
+  apiArray: string;
 }
 
 export enum ThemeCustomType {
@@ -110,7 +106,7 @@ export enum ThemeCustomType {
   buttonIconBoolean = 'buttonIconBoolean',
   buttonIconFill = 'buttonIconFill',
   buttonInputUrl = 'buttonInputUrl',
-  // callApi = 'callApi',
+  apiArray = 'apiArray',
 }
 
 export interface CopyThemeData {
