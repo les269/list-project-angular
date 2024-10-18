@@ -13,7 +13,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { TranslateModule } from '@ngx-translate/core';
 import { SnackbarService } from '../../../core/services/snackbar.service';
-import { isBlank } from '../../../shared/util/helper';
+import { isBlank, isNotJson, jsonFormat } from '../../../shared/util/helper';
 import { ApiConfigService } from '../service/api-config.service';
 
 export interface ApiConfigDialogData {
@@ -83,13 +83,20 @@ export class ApiConfigDialog {
       this.snackbarService.openByI18N('msg.apiExist');
       return;
     }
+    if (
+      (httpMethod === 'post' || httpMethod === 'put') &&
+      isNotJson(requestBody)
+    ) {
+      this.snackbarService.openByI18N('msg.jsonError');
+      return;
+    }
     this.apiConfigService
       .update({
         apiName: apiName.trim(),
         apiLabel: apiLabel.trim(),
         httpMethod,
         endpointUrl: endpointUrl.trim(),
-        requestBody: JSON.stringify(JSON.parse(requestBody.trim())),
+        requestBody: jsonFormat(requestBody),
         httpParams: httpParams.trim(),
         httpHeaders: httpHeaders.trim(),
         successMessage: successMessage.trim(),

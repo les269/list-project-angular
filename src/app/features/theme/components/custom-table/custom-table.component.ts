@@ -14,7 +14,7 @@ import {
   BaseSelectTableData,
   SelectTableDialog,
 } from '../../../../core/components/select-table/select-table.dialog';
-import { isBlank } from '../../../../shared/util/helper';
+import { isBlank, isNull } from '../../../../shared/util/helper';
 
 @Component({
   standalone: true,
@@ -50,6 +50,9 @@ export class CustomTableComponent implements OnInit {
   }
 
   onAdd() {
+    if (isNull(this.themeCustomList)) {
+      this.themeCustomList = [];
+    }
     let element: ThemeCustom = {
       seq: this.themeCustomList.length + 1,
       byKey: '',

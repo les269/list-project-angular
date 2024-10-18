@@ -1,27 +1,36 @@
-# ListProjectAngular
+# 自定義清單系統
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.4.
+## 描述
 
-## Development server
+這是一個來顯示清單的系統，需要配置清單主題、資料欄位、資料來源，可以配置自定義設定來執行一些功能像是開啟新頁視窗或複製值
+當需要呼叫其他系統的API可以到配置API清單
+需搭配後端 https://github.com/les269/listProjectBackend
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## 目錄
 
-## Code scaffolding
+- [安裝](#安裝)
+- [使用方法](#使用方法)
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## 安裝
 
-## Build
+1. 克隆：
+   ```bash
+   git clone https://github.com/les269/list-project-angular.git
+   ```
+2. 安裝依賴項：
+   ```bash
+   npm install
+   ```
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+## 使用方法
 
-## Running unit tests
+執行運用程式：
+`bash
+    nx serve
+    `
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## 預覽
 
-## Running end-to-end tests
+## 新功能
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+聯繫我 : pook20042004@gmail.com

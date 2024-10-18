@@ -1,34 +1,13 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormsModule, NgForm, ReactiveFormsModule } from '@angular/forms';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { Component, OnInit } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
-import {
-  animate,
-  state,
-  style,
-  transition,
-  trigger,
-} from '@angular/animations';
 import { MatButtonModule } from '@angular/material/button';
-import {
-  MatCheckboxChange,
-  MatCheckboxModule,
-} from '@angular/material/checkbox';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { CommonModule } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import {
-  ThemeCustom,
-  ThemeCustomType,
-  ThemeDB,
-  ThemeDBType,
-  ThemeHeader,
-  ThemeHeaderType,
-  ThemeImageType,
-  ThemeLabel,
-  ThemeLabelType,
-  ThemeRequest,
-} from '../../models';
+import { ThemeHeader, ThemeHeaderType, ThemeImageType } from '../../models';
 import { ThemeService } from '../../services/theme.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { isBlank, isNotBlank, isRepeat } from '../../../../shared/util/helper';
@@ -37,6 +16,8 @@ import { EMPTY, filter, switchMap, tap, throwError } from 'rxjs';
 import { updateTitle } from '../../../../shared/state/layout.actions';
 import { Store } from '@ngrx/store';
 import { CustomTableComponent } from '../../components/custom-table/custom-table.component';
+import { ThemeLabelTableComponent } from '../../components/theme-label-table/theme-label-table.component';
+import { ThemeDBTableComponent } from '../../components/theme-db-table/theme-db-table.component';
 @Component({
   standalone: true,
   imports: [
@@ -50,6 +31,8 @@ import { CustomTableComponent } from '../../components/custom-table/custom-table
     MatListModule,
     TranslateModule,
     CustomTableComponent,
+    ThemeLabelTableComponent,
+    ThemeDBTableComponent,
   ],
   selector: 'app-edit-theme',
   templateUrl: 'edit-theme.component.html',
@@ -57,13 +40,11 @@ import { CustomTableComponent } from '../../components/custom-table/custom-table
 })
 export class CreateThemeComponent implements OnInit {
   status: 'new' | 'edit' = 'new';
-  model: ThemeRequest = {
-    themeHeader: {
-      name: '',
-      version: '',
-      title: '',
-      type: ThemeHeaderType.imageList,
-    },
+  model: ThemeHeader = {
+    name: '',
+    version: '',
+    title: '',
+    type: ThemeHeaderType.imageList,
     themeImage: {
       type: ThemeImageType.key,
       imageKey: '',
@@ -75,12 +56,6 @@ export class CreateThemeComponent implements OnInit {
   };
   eThemeHeaderType = ThemeHeaderType;
   eThemeImageType = ThemeImageType;
-  // 標籤設定
-  labelDisplayedColumns: string[] = ['seq', 'byKey', 'label', 'type', 'other'];
-  eThemeLabelType = ThemeLabelType;
-  // 資料來源設定
-  dbDisplayedColumns = ['order', 'type', 'source', 'label', 'group', 'other'];
-  eThemeDBType = ThemeDBType;
 
   constructor(
     private router: Router,
@@ -106,19 +81,21 @@ export class CreateThemeComponent implements OnInit {
             isNotBlank(params['version']) &&
             isNotBlank(params['type'])
         ),
-        switchMap(params => this.themeService.findTheme(params))
+        switchMap(params =>
+          this.themeService.findTheme({
+            name: params['name'],
+            version: params['version'],
+            type: params['type'],
+          })
+        )
       )
       .subscribe(res => {
-        if (res.themeHeader === null) {
+        if (res === null) {
           this.router.navigate(['']);
           return;
         }
         this.status = 'edit';
-        this.model.themeHeader = res.themeHeader;
-        this.model.themeImage = res.themeImage;
-        this.model.themeLabelList = res.themeLabelList ?? [];
-        this.model.themeDBList = res.themeDBList ?? [];
-        this.model.themeCustomList = res.themeCustomList ?? [];
+        this.model = res;
       });
   }
 
@@ -131,7 +108,7 @@ export class CreateThemeComponent implements OnInit {
       return;
     }
     this.themeService
-      .existTheme(this.model.themeHeader)
+      .existTheme(this.model)
       .pipe(
         switchMap(exist => {
           if (this.status === 'new' && exist) {
@@ -156,38 +133,39 @@ export class CreateThemeComponent implements OnInit {
   }
   //驗證資料正確
   validationModel(): boolean {
-    if (isBlank(this.model.themeHeader.name)) {
+    const { themeImage } = this.model;
+    if (isBlank(this.model.name)) {
       this.snackbarService.isBlankMessage('themeHeader.name');
       return false;
     }
-    if (isBlank(this.model.themeHeader.version)) {
+    if (isBlank(this.model.version)) {
       this.snackbarService.isBlankMessage('themeHeader.version');
       return false;
     }
-    if (isBlank(this.model.themeHeader.title)) {
+    if (isBlank(this.model.title)) {
       this.snackbarService.isBlankMessage('themeHeader.title');
       return false;
     }
-    this.model.themeHeader.name = this.model.themeHeader.name.trim();
-    this.model.themeHeader.version = this.model.themeHeader.version.trim();
-    this.model.themeHeader.title = this.model.themeHeader.title.trim();
-    if (this.model.themeHeader.type === ThemeHeaderType.imageList) {
+    this.model.name = this.model.name.trim();
+    this.model.version = this.model.version.trim();
+    this.model.title = this.model.title.trim();
+    if (this.model.type === ThemeHeaderType.imageList) {
       if (
-        this.model.themeImage.type === ThemeImageType.key &&
-        isBlank(this.model.themeImage.imageKey)
+        themeImage.type === ThemeImageType.key &&
+        isBlank(themeImage.imageKey)
       ) {
         this.snackbarService.isBlankMessage('themeImage.imageKey');
         return false;
       }
       if (
-        this.model.themeImage.type === ThemeImageType.url &&
-        isBlank(this.model.themeImage.imageUrl)
+        themeImage.type === ThemeImageType.url &&
+        isBlank(themeImage.imageUrl)
       ) {
         this.snackbarService.isBlankMessage('themeImage.imageUrl');
         return false;
       }
-      this.model.themeImage.imageKey = this.model.themeImage.imageKey.trim();
-      this.model.themeImage.imageUrl = this.model.themeImage.imageUrl.trim();
+      themeImage.imageKey = themeImage.imageKey.trim();
+      themeImage.imageUrl = themeImage.imageUrl.trim();
     }
     for (let label of this.model.themeLabelList) {
       if (isBlank(label.label)) {
@@ -234,112 +212,5 @@ export class CreateThemeComponent implements OnInit {
       }
     }
     return true;
-  }
-  //新增資料欄位
-  addLabel() {
-    let element: ThemeLabel = {
-      seq: this.model.themeLabelList.length + 1,
-      byKey: '',
-      label: '',
-      type: ThemeLabelType.string,
-      splitBy: '',
-      useSpace: '、',
-      isSearchButton: false,
-      isCopy: false,
-      isVisible: false,
-      isSort: false,
-      isSearchValue: false,
-      isDefaultKey: false,
-    };
-    this.model.themeLabelList = [...this.model.themeLabelList, element].map(
-      (x, i) => {
-        x.seq = i + 1;
-        return x;
-      }
-    );
-  }
-  //資料欄位的上下移動
-  onLabelTypeUpDown(index: number, type: 'up' | 'down') {
-    let data: ThemeLabel[] = JSON.parse(
-      JSON.stringify(this.model.themeLabelList)
-    );
-    let source = data[index];
-    let target = data.splice(index + (type === 'up' ? -1 : 1), 1, source);
-    data.splice(index, 1, target[0]);
-    this.model.themeLabelList = data.map((x, i) => {
-      x.seq = i + 1;
-      return x;
-    });
-  }
-  //刪除資料欄位
-  onDeletLabelData(index: number) {
-    this.model.themeLabelList = this.model.themeLabelList
-      .filter((x, i) => i !== index)
-      .map((x, i) => {
-        x.seq = i + 1;
-        return x;
-      });
-  }
-  //
-  changeLableType(event: ThemeLabelType, index: number) {
-    if (event === 'seq') {
-      this.model.themeLabelList[index].isSearchValue = false;
-    }
-  }
-  //改變資料欄位的預設欄位,只能有一筆或無
-  changeLableDefaultKey(event: MatCheckboxChange, index: number) {
-    if (event.checked) {
-      this.model.themeLabelList.map((x, i) => {
-        if (i !== index) {
-          x.isDefaultKey = false;
-        }
-        return x;
-      });
-    }
-  }
-  //新增資料來源
-  onAddDB() {
-    let element: ThemeDB = {
-      seq: this.model.themeDBList.length + 1,
-      type: ThemeDBType.json,
-      source: '',
-      label: '',
-      groups: '',
-      isDefault: false,
-    };
-    this.model.themeDBList = [...this.model.themeDBList, element].map(
-      (x, i) => {
-        x.seq = i + 1;
-        return x;
-      }
-    );
-  }
-  //刪除資料來源
-  onDeletDB(index: number) {
-    this.model.themeDBList = this.model.themeDBList.filter(
-      (x, i) => i !== index
-    );
-  }
-  //資料來源的上下移動
-  onDBUpDown(index: number, type: 'up' | 'down') {
-    let data: ThemeDB[] = JSON.parse(JSON.stringify(this.model.themeDBList));
-    let source = data[index];
-    let target = data.splice(index + (type === 'up' ? -1 : 1), 1, source);
-    data.splice(index, 1, target[0]);
-    this.model.themeDBList = data.map((x, i) => {
-      x.seq = i + 1;
-      return x;
-    });
-  }
-  //改變清單預設使用的資料來源
-  changeDBDefaultKey(event: MatCheckboxChange, index: number) {
-    if (event.checked) {
-      this.model.themeDBList.map((x, i) => {
-        if (i !== index) {
-          x.isDefault = false;
-        }
-        return x;
-      });
-    }
   }
 }

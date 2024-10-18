@@ -7,8 +7,6 @@ import {
   ThemeCustomValueRequest,
   ThemeCustomValueResponse,
   ThemeHeader,
-  ThemeRequest,
-  ThemeResponent,
 } from '../models';
 
 @Injectable({ providedIn: 'root' })
@@ -19,19 +17,19 @@ export class ThemeService {
     return this.http.get<ThemeHeader[]>('/theme/all');
   }
 
-  getByHeaderId(req: Partial<string>): Observable<ThemeResponent> {
-    return this.http.get<ThemeResponent>(`/theme/id?headerId=${req}`);
+  getByHeaderId(req: Partial<string>): Observable<ThemeHeader> {
+    return this.http.get<ThemeHeader>(`/theme/id?headerId=${req}`);
   }
 
-  findTheme(req: Partial<ThemeHeader>): Observable<ThemeResponent> {
-    return this.http.post<ThemeResponent>('/theme/one', req);
+  findTheme(req: Partial<ThemeHeader>): Observable<ThemeHeader> {
+    return this.http.post<ThemeHeader>('/theme/one', req);
   }
 
   existTheme(req: Partial<ThemeHeader>): Observable<boolean> {
     return this.http.post<boolean>('/theme/exist', req);
   }
 
-  updateTheme(req: Partial<ThemeRequest>): Observable<void> {
+  updateTheme(req: Partial<ThemeHeader>): Observable<void> {
     return this.http.post<void>('/theme/update', req);
   }
 

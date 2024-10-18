@@ -81,3 +81,17 @@ export const replaceValue = (value: string, obj: any): string =>
       return match; // 如果路徑解析失敗，返回原值
     }
   });
+export const isJson = (s: string): boolean => {
+  if (isBlank(s)) {
+    return false;
+  }
+  try {
+    JSON.parse(s);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+export const isNotJson = (s: string): boolean => !isJson(s);
+export const jsonFormat = (s: string): string =>
+  isNotBlank(s) && isJson(s) ? JSON.stringify(JSON.parse(s.trim())) : '';

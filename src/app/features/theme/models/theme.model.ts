@@ -1,20 +1,15 @@
-export interface ThemeRequest {
-  themeHeader: ThemeHeader;
-  themeImage: ThemeImage;
-  themeLabelList: ThemeLabel[];
-  themeDBList: ThemeDB[];
-  themeCustomList: ThemeCustom[];
-}
-
-export interface ThemeResponent {
-  themeHeader: ThemeHeader;
-  themeImage: ThemeImage;
-  themeLabelList: ThemeLabel[];
-  themeDBList: ThemeDB[];
-  themeCustomList: ThemeCustom[];
-}
-
 export interface ThemeHeader {
+  name: string;
+  version: string;
+  title: string;
+  type: ThemeHeaderType;
+  themeImage: ThemeImage;
+  themeLabelList: ThemeLabel[];
+  themeDBList: ThemeDB[];
+  themeCustomList: ThemeCustom[];
+}
+
+export interface ThemeHeaderCopy {
   name: string;
   version: string;
   title: string;
@@ -23,7 +18,6 @@ export interface ThemeHeader {
 
 export enum ThemeHeaderType {
   imageList = 'imageList',
-  list = 'list',
   table = 'table',
 }
 
@@ -113,8 +107,8 @@ export interface CopyThemeData {
   themeHeader: ThemeHeader;
 }
 export interface CopyThemeRequest {
-  source: ThemeHeader;
-  target: ThemeHeader;
+  source: ThemeHeaderCopy;
+  target: ThemeHeaderCopy;
 }
 
 export interface ThemeCustomValue {

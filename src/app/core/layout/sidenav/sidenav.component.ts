@@ -3,7 +3,10 @@ import { Component, OnInit, Input, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { selectLayoutByKey } from '../../../shared/state/layout.selectors';
-import { changeSidenav } from '../../../shared/state/layout.actions';
+import {
+  changeSidenav,
+  updateList,
+} from '../../../shared/state/layout.actions';
 import { Router, RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { ThemeService } from '../../../features/theme/services/theme.service';
@@ -29,13 +32,11 @@ export class SidenavComponent implements OnInit {
       title: 'title.apiConfigList',
     },
   ];
-  list: {
-    [key in ThemeHeaderType]: ThemeHeader[];
-  } = {
-    [ThemeHeaderType.imageList]: [],
-    [ThemeHeaderType.list]: [],
-    [ThemeHeaderType.table]: [],
-  };
+  list$: Observable<
+    Readonly<{
+      [key in ThemeHeaderType]: ThemeHeader[];
+    }>
+  >;
 
   constructor(
     private router: Router,
@@ -43,20 +44,21 @@ export class SidenavComponent implements OnInit {
     private store: Store
   ) {
     this.openSidenav$ = this.store.pipe(selectLayoutByKey('openSidenav'));
+    this.list$ = this.store.pipe(selectLayoutByKey('list'));
   }
   ngOnInit() {
     this.themeService.getAllTheme().subscribe(res => {
-      this.clearList();
-      for (const value of res) {
-        this.list[value.type].push(value);
-      }
+      this.store.dispatch(
+        updateList({
+          [ThemeHeaderType.imageList]: res.filter(
+            x => x.type === ThemeHeaderType.imageList
+          ),
+          [ThemeHeaderType.table]: res.filter(
+            x => x.type === ThemeHeaderType.table
+          ),
+        })
+      );
     });
-  }
-  clearList() {
-    for (const key of Object.keys(ThemeHeaderType)) {
-      const value = ThemeHeaderType[key as keyof typeof ThemeHeaderType];
-      this.list[value] = [];
-    }
   }
 
   close() {

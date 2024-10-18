@@ -77,7 +77,7 @@
       >
     </div>
   }
-  @if (pages.length > 0) {
+  @if (pages.length > 1) {
     <select
       class="list-select"
       [(ngModel)]="currentPage"
@@ -164,17 +164,19 @@
                         (click)="changeCustomValue(data, custom)">
                         <label class="px-2">{{ custom.label }}</label>
                         <mat-icon
-                          [fontSet]="
-                            getCustomValueForUI(data, custom)
-                              ? ''
-                              : 'material-icons-outlined'
-                          "
                           [style.color]="
                             getCustomValueForUI(data, custom)
                               ? custom.buttonIconFillColor
                               : '#000'
                           "
-                          >{{ custom.buttonIconFill }}</mat-icon
+                          ><span
+                            [class]="
+                              getCustomValueForUI(data, custom)
+                                ? ''
+                                : 'material-symbols-outlined'
+                            ">
+                            {{ custom.buttonIconFill }}
+                          </span></mat-icon
                         >
                       </button>
                     </div>

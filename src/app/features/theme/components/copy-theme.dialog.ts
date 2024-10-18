@@ -1,4 +1,4 @@
-import { Component, inject, model, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
@@ -8,12 +8,12 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { CopyThemeData, ThemeHeader, ThemeHeaderType } from '../models';
+import { TranslateModule } from '@ngx-translate/core';
+import { CopyThemeData, ThemeHeaderCopy, ThemeHeaderType } from '../models';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ThemeService } from '../services/theme.service';
-import { EMPTY, empty, switchMap, throwError } from 'rxjs';
+import { EMPTY, switchMap } from 'rxjs';
 import { isBlank } from '../../../shared/util/helper';
 import { SnackbarService } from '../../../core/services/snackbar.service';
 
@@ -98,7 +98,7 @@ export class CopyThemeComponent implements OnInit {
   readonly dialogRef = inject(MatDialogRef<CopyThemeComponent>);
   readonly data = inject<CopyThemeData>(MAT_DIALOG_DATA);
   readonly eThemeHeaderType = ThemeHeaderType;
-  target: ThemeHeader = {
+  target: ThemeHeaderCopy = {
     name: '',
     version: '',
     title: '',

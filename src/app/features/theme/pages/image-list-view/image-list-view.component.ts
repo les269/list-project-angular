@@ -120,7 +120,7 @@ export class ImageListViewComponent implements OnInit {
           return;
         }
         this.themeService.getByHeaderId(this.headerId).subscribe(res => {
-          this.themeHeader = res.themeHeader;
+          this.themeHeader = res;
 
           this.themeImage = res.themeImage;
           this.themeLabelList = res.themeLabelList.sort((a, b) =>
@@ -430,7 +430,7 @@ export class ImageListViewComponent implements OnInit {
    * 隨機搜尋
    */
   randomSearch() {
-    const randomNo = getRandomInt(1, this.useData.length);
+    const randomNo = getRandomInt(1, this.useData.length) - 1;
     this.searchValue = this.useData[randomNo][this.defaultKey];
     this.changeQueryParams();
   }

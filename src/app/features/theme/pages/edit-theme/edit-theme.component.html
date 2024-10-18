@@ -14,7 +14,7 @@
             <input
               type="text"
               class="form-control"
-              [(ngModel)]="model.themeHeader.name"
+              [(ngModel)]="model.name"
               id="name"
               name="name"
               #name="ngModel"
@@ -28,7 +28,7 @@
             <input
               type="text"
               class="form-control"
-              [(ngModel)]="model.themeHeader.version"
+              [(ngModel)]="model.version"
               id="version"
               name="version"
               required
@@ -40,7 +40,7 @@
             }}</label>
             <select
               class="form-control form-select"
-              [(ngModel)]="model.themeHeader.type"
+              [(ngModel)]="model.type"
               name="type"
               required
               [disabled]="status === 'edit'">
@@ -58,13 +58,13 @@
             <input
               type="text"
               class="form-control"
-              [(ngModel)]="model.themeHeader.title"
+              [(ngModel)]="model.title"
               id="title"
               name="title"
               required />
           </div>
 
-          @if (model.themeHeader.type === eThemeHeaderType.imageList) {
+          @if (model.type === eThemeHeaderType.imageList) {
             <div>
               <div class="form-check form-check-inline">
                 <input
@@ -108,320 +108,10 @@
               </div>
             }
           }
-          <!-- TODO 拆成標籤table component -->
-          <label class="h3">{{ 'themeLabel.title' | translate }}</label>
-          <div class="card mb-3">
-            <table
-              mat-table
-              [dataSource]="model.themeLabelList"
-              multiTemplateDataRows>
-              <ng-container matColumnDef="seq">
-                <th mat-header-cell *matHeaderCellDef>
-                  {{ 'themeLabel.order' | translate }}
-                </th>
-                <td mat-cell *matCellDef="let element">
-                  {{ element.seq }}
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="byKey">
-                <th mat-header-cell *matHeaderCellDef>
-                  {{ 'themeLabel.byKey' | translate }}
-                </th>
-                <td mat-cell *matCellDef="let element; let i = dataIndex">
-                  <input
-                    class="form-control"
-                    [(ngModel)]="element.byKey"
-                    name="byKey{{ i }}" />
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="label">
-                <th mat-header-cell *matHeaderCellDef>
-                  {{ 'themeLabel.labelName' | translate }}
-                </th>
-                <td mat-cell *matCellDef="let element; let i = dataIndex">
-                  <input
-                    class="form-control"
-                    [(ngModel)]="element.label"
-                    name="label{{ i }}" />
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="type">
-                <th mat-header-cell *matHeaderCellDef>
-                  {{ 'themeLabel.type' | translate }}
-                </th>
-                <td mat-cell *matCellDef="let element; let i = dataIndex">
-                  <select
-                    [(ngModel)]="element.type"
-                    class="form-control"
-                    style="width: 120px"
-                    name="labelType{{ i }}"
-                    (ngModelChange)="changeLableType(element.type, i)">
-                    @for (type of eThemeLabelType | keyvalue; track $index) {
-                      <option [value]="type.key">
-                        {{ 'themeLabel.' + type.key | translate }}
-                      </option>
-                    }
-                  </select>
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="other">
-                <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
-                <td mat-cell *matCellDef="let element; let i = dataIndex">
-                  <div class="row flex-nowrap">
-                    <div
-                      class="flex column align-content-center"
-                      style="width: 48px"
-                      role="group"
-                      aria-label="Vertical button group">
-                      @if (i !== 0) {
-                        <mat-icon
-                          class="dropupdown-icon up"
-                          (click)="onLabelTypeUpDown(i, 'up')"
-                          >arrow_drop_up</mat-icon
-                        >
-                      }
-                      @if (i !== model.themeLabelList.length - 1) {
-                        <mat-icon
-                          class="dropupdown-icon down"
-                          (click)="onLabelTypeUpDown(i, 'down')"
-                          >arrow_drop_down</mat-icon
-                        >
-                      }
-                    </div>
-                    <button mat-icon-button (click)="onDeletLabelData(i)">
-                      <mat-icon>delete</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="expandedDetail">
-                <td
-                  mat-cell
-                  *matCellDef="let element; let i = dataIndex"
-                  [attr.colspan]="labelDisplayedColumns.length">
-                  <div class="d-flex">
-                    <div class="column p-1">
-                      @if (element.type === 'stringSplit') {
-                        <div class="input-group">
-                          <input
-                            type="text"
-                            class="form-control"
-                            [placeholder]="'themeLabel.splitByPh' | translate"
-                            [(ngModel)]="element.splitBy"
-                            name="labelSplitBy{{ i }}" />
-                          <input
-                            type="text"
-                            class="form-control"
-                            [placeholder]="'themeLabel.useSpacePh' | translate"
-                            [(ngModel)]="element.useSpace"
-                            name="labelUseSpace{{ i }}" />
-                        </div>
-                      }
-                      <mat-checkbox
-                        [(ngModel)]="element.isVisible"
-                        name="labelVisible{{ i }}">
-                        {{ 'themeLabel.isVisible' | translate }}
-                      </mat-checkbox>
-                      <mat-checkbox
-                        [(ngModel)]="element.isSort"
-                        name="labelSort{{ i }}"
-                        >{{ 'themeLabel.isSort' | translate }}</mat-checkbox
-                      >
-                      @if (element.type !== 'seq') {
-                        <mat-checkbox
-                          [(ngModel)]="element.isSearchValue"
-                          name="labelSearchValue{{ i }}"
-                          >{{
-                            'themeLabel.isSearchValue' | translate
-                          }}</mat-checkbox
-                        >
-                      }
-
-                      <mat-checkbox
-                        [(ngModel)]="element.isSearchButton"
-                        name="labelSearchButton{{ i }}"
-                        >{{
-                          'themeLabel.isSearchButton' | translate
-                        }}</mat-checkbox
-                      >
-                      <mat-checkbox
-                        [(ngModel)]="element.isCopy"
-                        name="labelCopy{{ i }}"
-                        >{{ 'themeLabel.isCopy' | translate }}</mat-checkbox
-                      >
-                      <mat-checkbox
-                        [(ngModel)]="element.isDefaultKey"
-                        name="labelDefaultKey{{ i }}"
-                        (change)="changeLableDefaultKey($event, i)"
-                        >{{
-                          'themeLabel.isDefaultKey' | translate
-                        }}</mat-checkbox
-                      >
-                    </div>
-                  </div>
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="addItem">
-                <td mat-footer-cell *matFooterCellDef colspan="5">
-                  <div class="row justify-content-center">
-                    <button mat-button class="rounded" (click)="addLabel()">
-                      <mat-icon>add</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </ng-container>
-
-              <tr mat-header-row *matHeaderRowDef="labelDisplayedColumns"></tr>
-              <tr
-                mat-row
-                *matRowDef="let element; columns: labelDisplayedColumns"
-                class="element-row"></tr>
-              <tr
-                mat-row
-                *matRowDef="let row; columns: ['expandedDetail']"></tr>
-              <tr mat-footer-row *matFooterRowDef="['addItem']"></tr>
-            </table>
-          </div>
-          <!-- TODO 拆成資料來源 component -->
-          <label class="h3">{{ 'themeDB.title' | translate }}</label>
-          <div class="card mb-3">
-            <table
-              mat-table
-              [dataSource]="model.themeDBList"
-              multiTemplateDataRows>
-              <ng-container matColumnDef="order">
-                <th mat-header-cell *matHeaderCellDef>
-                  {{ 'themeLabel.order' | translate }}
-                </th>
-                <td mat-cell *matCellDef="let element">
-                  {{ element.seq }}
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="type">
-                <th mat-header-cell *matHeaderCellDef>
-                  {{ 'themeDB.type' | translate }}
-                </th>
-                <td mat-cell *matCellDef="let element; let i = dataIndex">
-                  <select
-                    [(ngModel)]="element.type"
-                    name="dbType{{ i }}"
-                    class="form-control"
-                    style="width: 120px">
-                    @for (type of eThemeDBType | keyvalue; track $index) {
-                      <option [value]="type.key">
-                        {{ 'themeDB.' + type.key | translate }}
-                      </option>
-                    }
-                  </select>
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="source">
-                <th mat-header-cell *matHeaderCellDef>
-                  {{ 'themeDB.source' | translate }}
-                </th>
-                <td mat-cell *matCellDef="let element; let i = dataIndex">
-                  <input
-                    class="form-control"
-                    name="dbSource{{ i }}"
-                    [(ngModel)]="element.source"
-                    [placeholder]="
-                      'themeDB.' + element.type + 'Ph' | translate
-                    " />
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="label">
-                <th mat-header-cell *matHeaderCellDef>
-                  {{ 'themeDB.name' | translate }}
-                </th>
-                <td mat-cell *matCellDef="let element; let i = dataIndex">
-                  <input
-                    class="form-control"
-                    name="dbLabel{{ i }}"
-                    [(ngModel)]="element.label" />
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="group">
-                <th mat-header-cell *matHeaderCellDef>
-                  {{ 'themeDB.groupLabel' | translate }}
-                </th>
-                <td mat-cell *matCellDef="let element; let i = dataIndex">
-                  <input
-                    class="form-control"
-                    name="dbGroup{{ i }}"
-                    [(ngModel)]="element.groups" />
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="other">
-                <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
-                <td mat-cell *matCellDef="let element; let i = dataIndex">
-                  <div class="row flex-nowrap">
-                    <div
-                      class="flex column align-content-center"
-                      style="width: 48px"
-                      role="group"
-                      aria-label="Vertical button group">
-                      @if (i !== 0) {
-                        <mat-icon
-                          class="dropupdown-icon up"
-                          (click)="onDBUpDown(i, 'up')"
-                          >arrow_drop_up</mat-icon
-                        >
-                      }
-                      @if (i !== model.themeDBList.length - 1) {
-                        <mat-icon
-                          class="dropupdown-icon down"
-                          (click)="onDBUpDown(i, 'down')"
-                          >arrow_drop_down</mat-icon
-                        >
-                      }
-                    </div>
-                    <button mat-icon-button (click)="onDeletDB(i)">
-                      <mat-icon>delete</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="addDB">
-                <td
-                  mat-footer-cell
-                  *matFooterCellDef
-                  [attr.colspan]="dbDisplayedColumns.length">
-                  <div class="row justify-content-center">
-                    <button mat-button class="rounded" (click)="onAddDB()">
-                      <mat-icon>add</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="expandedDetail">
-                <td
-                  mat-cell
-                  *matCellDef="let element; let i = dataIndex"
-                  [attr.colspan]="dbDisplayedColumns.length">
-                  <div class="d-flex">
-                    <div class="column p-1">
-                      <mat-checkbox
-                        [(ngModel)]="element.isDefault"
-                        name="DBDefault{{ i }}"
-                        (change)="changeDBDefaultKey($event, i)">
-                        {{ 'themeDB.isDefault' | translate }}
-                      </mat-checkbox>
-                    </div>
-                  </div>
-                </td>
-              </ng-container>
-
-              <tr mat-header-row *matHeaderRowDef="dbDisplayedColumns"></tr>
-              <tr
-                mat-row
-                *matRowDef="let row; columns: dbDisplayedColumns"></tr>
-              <tr
-                mat-row
-                *matRowDef="let row; columns: ['expandedDetail']"></tr>
-              <tr mat-footer-row *matFooterRowDef="['addDB']"></tr>
-            </table>
-          </div>
+          <app-theme-label-table
+            [(themeLabelList)]="model.themeLabelList"></app-theme-label-table>
+          <app-theme-db-table
+            [(themeDBList)]="model.themeDBList"></app-theme-db-table>
           <app-custom-table
             [(themeCustomList)]="model.themeCustomList"></app-custom-table>
           @if (status === 'edit') {

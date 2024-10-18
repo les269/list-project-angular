@@ -5,12 +5,17 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { ThemeService } from '../../services/theme.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { updateTitle } from '../../../../shared/state/layout.actions';
+import {
+  updateList,
+  updateTitle,
+} from '../../../../shared/state/layout.actions';
 import { Store } from '@ngrx/store';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageBoxComponent } from '../../../../core/components/message-box.component';
 import { CopyThemeComponent } from '../../components/copy-theme.dialog';
 import { isNotBlank } from '../../../../shared/util/helper';
+import { selectLayoutByKey } from '../../../../shared/state/layout.selectors';
+import { Observable } from 'rxjs';
 
 @Component({
   standalone: true,
@@ -21,13 +26,11 @@ import { isNotBlank } from '../../../../shared/util/helper';
 })
 export class HomeComponent implements OnInit {
   eThemeHeaderType = ThemeHeaderType;
-  list: {
-    [key in ThemeHeaderType]: ThemeHeader[];
-  } = {
-    [ThemeHeaderType.imageList]: [],
-    [ThemeHeaderType.list]: [],
-    [ThemeHeaderType.table]: [],
-  };
+  list$: Observable<
+    Readonly<{
+      [key in ThemeHeaderType]: ThemeHeader[];
+    }>
+  >;
 
   constructor(
     private router: Router,
@@ -36,7 +39,9 @@ export class HomeComponent implements OnInit {
     private translateService: TranslateService,
     private store: Store,
     private matDialog: MatDialog
-  ) {}
+  ) {
+    this.list$ = this.store.pipe(selectLayoutByKey('list'));
+  }
 
   ngOnInit() {
     this.translateService.get('title.home').subscribe(title => {
@@ -48,18 +53,17 @@ export class HomeComponent implements OnInit {
 
   getList() {
     this.themeService.getAllTheme().subscribe(res => {
-      this.clearList();
-      for (const value of res) {
-        this.list[value.type].push(value);
-      }
+      this.store.dispatch(
+        updateList({
+          [ThemeHeaderType.imageList]: res.filter(
+            x => x.type === ThemeHeaderType.imageList
+          ),
+          [ThemeHeaderType.table]: res.filter(
+            x => x.type === ThemeHeaderType.table
+          ),
+        })
+      );
     });
-  }
-
-  clearList() {
-    for (const key of Object.keys(ThemeHeaderType)) {
-      const value = ThemeHeaderType[key as keyof typeof ThemeHeaderType];
-      this.list[value] = [];
-    }
   }
 
   routeCreate() {

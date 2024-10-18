@@ -13,7 +13,8 @@
     "repeatColumn": "{{text}} 不可以有重複欄位",
     "apiExist": "API已經存在,在API名稱跟API標籤不可以重複",
     "apiArrayEmtpy": "API未配置",
-    "apiArrayError": "API配置被刪除有錯誤"
+    "apiArrayError": "API配置被刪除有錯誤",
+    "jsonError": "請求內容轉換錯誤, 目前只支援json請輸入正確的json格式,最低限度為{}或[]皆可"
   },
   "g": {
     "edit": "編輯",

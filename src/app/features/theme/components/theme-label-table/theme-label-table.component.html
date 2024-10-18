@@ -1,0 +1,139 @@
+<label class="h3">{{ 'themeLabel.title' | translate }}</label>
+<div class="card mb-3">
+  <table mat-table [dataSource]="themeLabelList" multiTemplateDataRows>
+    <ng-container matColumnDef="seq">
+      <th mat-header-cell *matHeaderCellDef>
+        {{ 'themeLabel.order' | translate }}
+      </th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.seq }}
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="byKey">
+      <th mat-header-cell *matHeaderCellDef>
+        {{ 'themeLabel.byKey' | translate }}
+      </th>
+      <td mat-cell *matCellDef="let element; let i = dataIndex">
+        <input class="form-control" [(ngModel)]="element.byKey" />
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="label">
+      <th mat-header-cell *matHeaderCellDef>
+        {{ 'themeLabel.labelName' | translate }}
+      </th>
+      <td mat-cell *matCellDef="let element; let i = dataIndex">
+        <input class="form-control" [(ngModel)]="element.label" />
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="type">
+      <th mat-header-cell *matHeaderCellDef>
+        {{ 'themeLabel.type' | translate }}
+      </th>
+      <td mat-cell *matCellDef="let element; let i = dataIndex">
+        <select
+          [(ngModel)]="element.type"
+          class="form-control"
+          style="width: 120px"
+          (ngModelChange)="changeType(element.type, i)">
+          @for (type of eThemeLabelType | keyvalue; track $index) {
+            <option [value]="type.key">
+              {{ 'themeLabel.' + type.key | translate }}
+            </option>
+          }
+        </select>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="other">
+      <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
+      <td mat-cell *matCellDef="let element; let i = dataIndex">
+        <div class="row flex-nowrap">
+          <div class="flex column align-content-center" style="width: 48px">
+            @if (i !== 0) {
+              <mat-icon class="dropupdown-icon up" (click)="onUpDown(i, 'up')"
+                >arrow_drop_up</mat-icon
+              >
+            }
+            @if (i !== themeLabelList.length - 1) {
+              <mat-icon
+                class="dropupdown-icon down"
+                (click)="onUpDown(i, 'down')"
+                >arrow_drop_down</mat-icon
+              >
+            }
+          </div>
+          <button mat-icon-button (click)="onDelete(i)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="expandedDetail">
+      <td
+        mat-cell
+        *matCellDef="let element; let i = dataIndex"
+        [attr.colspan]="displayedColumns.length">
+        <div class="d-flex">
+          <div class="column p-1">
+            @if (element.type === 'stringSplit') {
+              <div class="input-group">
+                <input
+                  type="text"
+                  class="form-control"
+                  [placeholder]="'themeLabel.splitByPh' | translate"
+                  [(ngModel)]="element.splitBy" />
+                <input
+                  type="text"
+                  class="form-control"
+                  [placeholder]="'themeLabel.useSpacePh' | translate"
+                  [(ngModel)]="element.useSpace" />
+              </div>
+            }
+            <mat-checkbox [(ngModel)]="element.isVisible">
+              {{ 'themeLabel.isVisible' | translate }}
+            </mat-checkbox>
+            <mat-checkbox
+              [checked]="element.isSort"
+              [(ngModel)]="element.isSort"
+              >{{ 'themeLabel.isSort' | translate }}</mat-checkbox
+            >
+            @if (element.type !== 'seq') {
+              <mat-checkbox [(ngModel)]="element.isSearchValue">{{
+                'themeLabel.isSearchValue' | translate
+              }}</mat-checkbox>
+            }
+
+            <mat-checkbox [(ngModel)]="element.isSearchButton">{{
+              'themeLabel.isSearchButton' | translate
+            }}</mat-checkbox>
+            <mat-checkbox [(ngModel)]="element.isCopy">{{
+              'themeLabel.isCopy' | translate
+            }}</mat-checkbox>
+            <mat-checkbox
+              [(ngModel)]="element.isDefaultKey"
+              (change)="changeDefaultKey($event, i)"
+              >{{ 'themeLabel.isDefaultKey' | translate }}</mat-checkbox
+            >
+          </div>
+        </div>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="addItem">
+      <td mat-footer-cell *matFooterCellDef colspan="5">
+        <div class="row justify-content-center">
+          <button mat-button class="rounded" (click)="onAdd()">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr
+      mat-row
+      *matRowDef="let element; columns: displayedColumns"
+      class="element-row"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['expandedDetail']"></tr>
+    <tr mat-footer-row *matFooterRowDef="['addItem']"></tr>
+  </table>
+</div>
