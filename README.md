@@ -13,21 +13,22 @@
 
 ## 安裝
 
-1. 克隆：
+1. clone：
    ```bash
    git clone https://github.com/les269/list-project-angular.git
    ```
-2. 安裝依賴項：
+2. install：
    ```bash
    npm install
    ```
 
 ## 使用方法
 
-執行運用程式：
-`bash
-    nx serve
-    `
+執行程式：
+
+```bash
+   nx serve
+```
 
 ## 預覽
 
@@ -46,7 +47,6 @@
 | 圖片清單 顯示可以快速編輯資料的按鈕(那我要如何處置舊版清單的資料@@)                                                                      |      |
 | 可以import export各清單成json檔案(優先度最低)                                                                                            |      |
 | table清單顯示一個table,那需要考慮到原本舊版的按鈕如何搬過來                                                                              |      |
-
-## 新功能
+| 可以在網址上給json網址然後檢查config然後顯示成清單                                                                                       |      |
 
 聯繫我 : pook20042004@gmail.com
