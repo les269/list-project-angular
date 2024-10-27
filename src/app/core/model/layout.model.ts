@@ -7,3 +7,14 @@ export interface LayoutState {
     [key in ThemeHeaderType]: ThemeHeader[];
   };
 }
+
+export const myRoutes: { path: string; title: string }[] = [
+  {
+    path: '',
+    title: 'title.home',
+  },
+  {
+    path: 'api-config-list',
+    title: 'title.apiConfigList',
+  },
+];

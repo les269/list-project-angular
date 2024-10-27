@@ -13,8 +13,6 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { isBlank, isNotBlank, isRepeat } from '../../../../shared/util/helper';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EMPTY, filter, switchMap, tap, throwError } from 'rxjs';
-import { updateTitle } from '../../../../shared/state/layout.actions';
-import { Store } from '@ngrx/store';
 import { CustomTableComponent } from '../../components/custom-table/custom-table.component';
 import { ThemeLabelTableComponent } from '../../components/theme-label-table/theme-label-table.component';
 import { ThemeDBTableComponent } from '../../components/theme-db-table/theme-db-table.component';
@@ -62,16 +60,10 @@ export class CreateThemeComponent implements OnInit {
     private route: ActivatedRoute,
     private themeService: ThemeService,
     private snackbarService: SnackbarService,
-    private translateService: TranslateService,
-    private store: Store
+    private translateService: TranslateService
   ) {}
 
   ngOnInit() {
-    this.translateService.get('title.editTheme').subscribe(title => {
-      this.store.dispatch(updateTitle({ title }));
-      document.title = title;
-    });
-
     this.route.queryParams
       .pipe(
         tap(x => console.log(x)),

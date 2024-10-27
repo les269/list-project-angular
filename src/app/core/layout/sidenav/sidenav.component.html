@@ -1,6 +1,6 @@
 <div class="sidenav" [ngClass]="{ 'sidenav-display': (openSidenav$ | async) }">
   <a
-    *ngFor="let route of myRoutes"
+    *ngFor="let route of routes"
     class="menu-item"
     [routerLink]="route.path"
     (click)="close()"

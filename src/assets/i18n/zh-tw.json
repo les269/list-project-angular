@@ -7,14 +7,18 @@
     "saveSuccess": "保存成功",
     "themeExist": "主題已經存在",
     "themeNotExist": "主題不存在",
+    "scrapyExist": "該名稱已經存在",
+    "scrapyNotExist": "該名稱不存在",
     "sureDeleteTheme": "是否要刪除該主題?",
     "sureDeleteApi": "是否要刪除該API?",
+    "sureDeleteScrapy": "是否要刪除該爬蟲?",
     "copyText": "以複製至剪貼簿: {{text}}",
     "repeatColumn": "{{text}} 不可以有重複欄位",
     "apiExist": "API已經存在,在API名稱跟API標籤不可以重複",
     "apiArrayEmtpy": "API未配置",
     "apiArrayError": "API配置被刪除有錯誤",
-    "jsonError": "請求內容轉換錯誤, 目前只支援json請輸入正確的json格式,最低限度為{}或[]皆可"
+    "jsonError": "請求內容轉換錯誤, 目前只支援json請輸入正確的json格式,最低限度為{}或[]皆可",
+    "testJsonError": "測試用JSON轉換錯誤,請輸入正確的json格式{}且不支援陣列"
   },
   "g": {
     "edit": "編輯",
@@ -28,7 +32,13 @@
     "totalNum": "總數量",
     "page": "頁",
     "empty": "空",
-    "randomSort": "隨機排序"
+    "randomSort": "隨機排序",
+    "createdTime": "創建時間",
+    "updatedTime": "上次更新時間",
+    "name": "名稱",
+    "key": "鍵",
+    "value": "值",
+    "unnamed": "未命名"
   },
   "title": {
     "home": "清單列表",
@@ -36,9 +46,11 @@
     "copyTheme": "複製主題",
     "inputUrl": "輸入網址",
     "writeEditor": "編輯Note",
-    "apiConfigList": "配置API清單",
+    "apiConfigList": "API設定清單",
     "editApi": "編輯API",
-    "pleaseSelect": "請選擇"
+    "pleaseSelect": "請選擇",
+    "scrapyList": "爬蟲設定清單",
+    "scrapyEdit": "編輯爬蟲"
   },
   "home": { "createTheme": "創建主題" },
   "themeHeader": {
@@ -123,5 +135,32 @@
     "httpParams": "HTTP參數",
     "httpHeaders": "HTTP標頭",
     "successMessage": "成功訊息"
+  },
+  "scrapy": {
+    "name": "名稱",
+    "tabName": "Tab名稱",
+    "createScrapy": "創建爬蟲",
+    "deleteScrapy": "刪除爬蟲",
+    "url": "爬蟲網址",
+    "urlPH": "當需要用固定網址時可以使用 ex: https://www.google.com/search?q=${id}",
+    "cookie": "Cookie",
+    "redirect": "跳轉網址",
+    "scrapyData": "爬取資料",
+    "cssSelect": "CSS選擇器",
+    "scrapyPageType": "爬取頁面種類",
+    "scrapyDataType": "資料取得方式",
+    "test": "測試",
+    "testArea": "測試區",
+    "testJson": "測試用JSON",
+    "testUrl": "測試用網址",
+    "testHtml": "測試用HTML",
+    "testResult": "測試結果",
+    "cssSelectRemind": "當獲取到資料為單筆時會是保存成字串,而多筆時會保存成陣列,使用方法為Jsoup的select, 閱讀官方使用<a href='https://jsoup.org/apidocs/org/jsoup/select/Selector.html' target='_blank'>文件</a>。",
+    "redirectRemind": "當使用跳轉網址時在獲取資料的方式有限定, 只會拿鍵為'__redirect'的參數。",
+    "useAttr": "要取得的屬性,例如<a href='/ma-attr'>要取得href的字串輸入href即可",
+    "useReplaceString": "使用Css選擇器取得的資料來替換字串,例如替換字串要為'test:${0}${1}', 替換的地方用${x}而x由0開",
+    "useJsonRemind": "把資料注入'爬取頁面種類'為'跳轉網址'的爬蟲網址, 如果網址沒取得則忽略'爬取資料'直到有正確的跳轉網址可以進行爬取資料, 可以進行多個不同網頁的爬蟲。",
+    "useUrlRemind": "只會把第一筆'爬取頁面種類'為'爬取資料'的用來爬蟲",
+    "convertToArray": "當為單筆資料為字串時勾選則限定為陣列, 即為固定資料型別為陣列。"
   }
 }

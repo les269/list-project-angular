@@ -1,12 +1,25 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import {
+  ActivatedRoute,
+  NavigationEnd,
+  Router,
+  RouterOutlet,
+} from '@angular/router';
 import { HeaderComponent } from './core/layout/header/header.component';
 import { SidenavComponent } from './core/layout/sidenav/sidenav.component';
 import { CommonModule } from '@angular/common';
-import { Observable } from 'rxjs';
+import { filter, map, mergeMap, Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { selectLayoutByKey } from './shared/state/layout.selectors';
-import { changeSidenav } from './shared/state/layout.actions';
+import { changeSidenav, updateTitle } from './shared/state/layout.actions';
+import { Title } from '@angular/platform-browser';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-root',
@@ -15,19 +28,39 @@ import { changeSidenav } from './shared/state/layout.actions';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
-export class AppComponent implements AfterViewInit {
-  title = 'list-project-angular';
+export class AppComponent implements OnInit {
   openSidenav$: Observable<Readonly<boolean>>;
-  @ViewChild('header', { read: ElementRef }) header!: ElementRef;
-  headerHeight = 0;
 
-  constructor(private store: Store) {
+  constructor(
+    private store: Store,
+    private titleService: Title,
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private translateService: TranslateService
+  ) {
     this.openSidenav$ = this.store.pipe(selectLayoutByKey('openSidenav'));
   }
-
-  ngAfterViewInit() {
-    // 等待視圖初始化後取得 header 高度
-    this.headerHeight = this.header.nativeElement.lastChild.offsetHeight;
+  ngOnInit(): void {
+    this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        map(() => {
+          let route = this.activatedRoute;
+          while (route.firstChild) {
+            route = route.firstChild;
+          }
+          return route;
+        }),
+        mergeMap(route => route.data),
+        map(data => data['title'])
+      )
+      .subscribe(title => {
+        if (title) {
+          title = this.translateService.instant(title);
+          this.titleService.setTitle(title);
+          this.store.dispatch(updateTitle({ title }));
+        }
+      });
   }
 
   closeSidenav() {

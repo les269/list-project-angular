@@ -1,140 +1,135 @@
-<div class="editor-page">
-  <div class="container page">
-    <div class="row">
-      <div class="col-md-10 offset-md-1 col-xs-12">
-        <button mat-icon-button (click)="onBack()">
-          <mat-icon>arrow_back</mat-icon>
-        </button>
-        <!-- TODO 拆成header component -->
-        <form #themeForm="ngForm">
-          <div class="mb-3">
-            <label for="name" class="form-label">{{
-              'themeHeader.name' | translate
-            }}</label>
-            <input
-              type="text"
-              class="form-control"
-              [(ngModel)]="model.name"
-              id="name"
-              name="name"
-              #name="ngModel"
-              required
-              [disabled]="status === 'edit'" />
-          </div>
-          <div class="mb-3">
-            <label for="version" class="form-label">{{
-              'themeHeader.version' | translate
-            }}</label>
-            <input
-              type="text"
-              class="form-control"
-              [(ngModel)]="model.version"
-              id="version"
-              name="version"
-              required
-              [disabled]="status === 'edit'" />
-          </div>
-          <div class="mb-3">
-            <label class="form-label" for="type">{{
-              'themeHeader.type' | translate
-            }}</label>
-            <select
-              class="form-control form-select"
-              [(ngModel)]="model.type"
-              name="type"
-              required
-              [disabled]="status === 'edit'">
-              <option
-                *ngFor="let type of eThemeHeaderType | keyvalue"
-                [ngValue]="type.key">
-                {{ 'themeHeader.' + type.key | translate }}
-              </option>
-            </select>
-          </div>
-          <div class="mb-3">
-            <label for="title" class="form-label">{{
-              'themeHeader.title' | translate
-            }}</label>
-            <input
-              type="text"
-              class="form-control"
-              [(ngModel)]="model.title"
-              id="title"
-              name="title"
-              required />
-          </div>
-
-          @if (model.type === eThemeHeaderType.imageList) {
-            <div>
-              <div class="form-check form-check-inline">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="imageKeyRadio"
-                  id="imageKeyRadio"
-                  value="key"
-                  [(ngModel)]="model.themeImage!.type" />
-                <label class="form-check-label" for="imageKeyRadio">
-                  {{ 'themeImage.imageKey' | translate }}
-                </label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="imageUrlRadio"
-                  id="imageUrlRadio"
-                  value="url"
-                  [(ngModel)]="model.themeImage!.type" />
-                <label class="form-check-label" for="imageUrlRadio">
-                  {{ 'themeImage.imageUrl' | translate }}
-                </label>
-              </div>
-            </div>
-            @if (model.themeImage.type === 'key') {
-              <div class="mb-3">
-                <input
-                  class="form-control"
-                  [(ngModel)]="model.themeImage.imageKey"
-                  name="imageKey" />
-              </div>
-            } @else if (model.themeImage.type === 'url') {
-              <div class="mb-3">
-                <input
-                  class="form-control"
-                  name="imageUrl"
-                  [placeholder]="'themeImage.imageUrlPlaceholder' | translate"
-                  [(ngModel)]="model.themeImage.imageUrl" />
-              </div>
-            }
-          }
-          <app-theme-label-table
-            [(themeLabelList)]="model.themeLabelList"></app-theme-label-table>
-          <app-theme-db-table
-            [(themeDBList)]="model.themeDBList"></app-theme-db-table>
-          <app-custom-table
-            [(themeCustomList)]="model.themeCustomList"></app-custom-table>
-          @if (status === 'edit') {
-            <div class="my-4">
-              <button
-                type="submit"
-                class="btn btn-success w-100"
-                (click)="update(false, 'save')">
-                {{ 'g.save' | translate }}
-              </button>
-            </div>
-          }
-
-          <div class="my-4">
-            <button
-              type="submit"
-              class="btn btn-success w-100"
-              (click)="update(true, 'commit')">
-              {{ 'g.submit' | translate }}
-            </button>
-          </div>
-        </form>
+<div class="container d-flex">
+  <div class="col-md-10 offset-md-1 col-xs-12">
+    <button mat-icon-button (click)="onBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <form #themeForm="ngForm">
+      <div class="mb-3">
+        <label for="name" class="form-label">{{
+          'themeHeader.name' | translate
+        }}</label>
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="model.name"
+          id="name"
+          name="name"
+          #name="ngModel"
+          required
+          [disabled]="status === 'edit'" />
       </div>
-    </div>
+      <div class="mb-3">
+        <label for="version" class="form-label">{{
+          'themeHeader.version' | translate
+        }}</label>
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="model.version"
+          id="version"
+          name="version"
+          required
+          [disabled]="status === 'edit'" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="type">{{
+          'themeHeader.type' | translate
+        }}</label>
+        <select
+          class="form-control form-select"
+          [(ngModel)]="model.type"
+          name="type"
+          required
+          [disabled]="status === 'edit'">
+          <option
+            *ngFor="let type of eThemeHeaderType | keyvalue"
+            [ngValue]="type.key">
+            {{ 'themeHeader.' + type.key | translate }}
+          </option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="title" class="form-label">{{
+          'themeHeader.title' | translate
+        }}</label>
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="model.title"
+          id="title"
+          name="title"
+          required />
+      </div>
+
+      @if (model.type === eThemeHeaderType.imageList) {
+        <div>
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="imageKeyRadio"
+              id="imageKeyRadio"
+              value="key"
+              [(ngModel)]="model.themeImage!.type" />
+            <label class="form-check-label" for="imageKeyRadio">
+              {{ 'themeImage.imageKey' | translate }}
+            </label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="imageUrlRadio"
+              id="imageUrlRadio"
+              value="url"
+              [(ngModel)]="model.themeImage!.type" />
+            <label class="form-check-label" for="imageUrlRadio">
+              {{ 'themeImage.imageUrl' | translate }}
+            </label>
+          </div>
+        </div>
+        @if (model.themeImage.type === 'key') {
+          <div class="mb-3">
+            <input
+              class="form-control"
+              [(ngModel)]="model.themeImage.imageKey"
+              name="imageKey" />
+          </div>
+        } @else if (model.themeImage.type === 'url') {
+          <div class="mb-3">
+            <input
+              class="form-control"
+              name="imageUrl"
+              [placeholder]="'themeImage.imageUrlPlaceholder' | translate"
+              [(ngModel)]="model.themeImage.imageUrl" />
+          </div>
+        }
+      }
+      <app-theme-label-table
+        [(themeLabelList)]="model.themeLabelList"></app-theme-label-table>
+      <app-theme-db-table
+        [(themeDBList)]="model.themeDBList"></app-theme-db-table>
+      <app-custom-table
+        [(themeCustomList)]="model.themeCustomList"></app-custom-table>
+      @if (status === 'edit') {
+        <div class="my-4">
+          <button
+            type="submit"
+            class="btn btn-success w-100"
+            (click)="update(false, 'save')">
+            {{ 'g.save' | translate }}
+          </button>
+        </div>
+      }
+
+      <div class="my-4">
+        <button
+          type="submit"
+          class="btn btn-success w-100"
+          (click)="update(true, 'commit')">
+          {{ 'g.submit' | translate }}
+        </button>
+      </div>
+    </form>
   </div>
 </div>

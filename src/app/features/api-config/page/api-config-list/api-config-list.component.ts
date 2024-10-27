@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { updateTitle } from '../../../../shared/state/layout.actions';
-import { Store } from '@ngrx/store';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { ApiConfig, HttpMethodType } from '../../model';
@@ -41,17 +39,12 @@ export class ApiConfigListComponent implements OnInit {
   list: ApiConfig[] = [];
   constructor(
     private translateService: TranslateService,
-    private store: Store,
     private apiConfigService: ApiConfigService,
     private matDialog: MatDialog,
     private snackbarService: SnackbarService
   ) {}
 
   ngOnInit() {
-    this.translateService.get('title.apiConfigList').subscribe(title => {
-      this.store.dispatch(updateTitle({ title }));
-      document.title = title;
-    });
     this.getList();
   }
 

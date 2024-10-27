@@ -5,10 +5,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { ThemeService } from '../../services/theme.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
-import {
-  updateList,
-  updateTitle,
-} from '../../../../shared/state/layout.actions';
+import { updateList } from '../../../../shared/state/layout.actions';
 import { Store } from '@ngrx/store';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageBoxComponent } from '../../../../core/components/message-box.component';
@@ -44,10 +41,6 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.translateService.get('title.home').subscribe(title => {
-      this.store.dispatch(updateTitle({ title }));
-      document.title = title;
-    });
     this.getList();
   }
 
@@ -67,11 +60,11 @@ export class HomeComponent implements OnInit {
   }
 
   routeCreate() {
-    this.router.navigate(['edit']);
+    this.router.navigate(['theme-edit']);
   }
 
   onEdit(item: ThemeHeader) {
-    this.router.navigate(['edit'], { queryParams: item });
+    this.router.navigate(['theme-edit'], { queryParams: item });
   }
   onCopy(item: ThemeHeader) {
     const dialogRef = this.matDialog.open(CopyThemeComponent, {

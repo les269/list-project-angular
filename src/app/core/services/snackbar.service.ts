@@ -36,8 +36,9 @@ export class SnackbarService {
   }
 
   openErrorSnackbar(message: string): void {
+    console.error(message);
+
     this.snackBar.open(message, 'Dismiss', {
-      duration: 5000,
       panelClass: ['error-snackbar'],
     });
   }

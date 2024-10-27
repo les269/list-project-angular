@@ -1,0 +1,311 @@
+<div class="container d-flex">
+  <div class="col-md-10 offset-md-1 col-xs-12 mt-2">
+    <button mat-icon-button (click)="onBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="form-group mb-2">
+      <label>{{ 'scrapy.name' | translate }}</label>
+      <input
+        class="form-control"
+        [(ngModel)]="model.name"
+        [disabled]="status === 'edit'" />
+    </div>
+    <button type="button" class="btn btn-primary" (click)="onAddData()">
+      {{ 'scrapy.createScrapy' | translate }}
+    </button>
+    <mat-tab-group
+      [selectedIndex]="selected"
+      (selectedIndexChange)="selected = $event">
+      @for (data of model.data; track $index; let index = $index) {
+        <mat-tab>
+          <ng-template mat-tab-label>
+            @if (model.data.length !== 1 && index !== 0) {
+              <button
+                mat-icon-button
+                (click)="
+                  $event.stopPropagation(); moveTab(model.data, index, 'left')
+                ">
+                <mat-icon>arrow_left</mat-icon>
+              </button>
+            }
+            {{ data.name ? data.name : '(' + ('g.unnamed' | translate) + ')' }}
+            @if (model.data.length !== 1 && index !== model.data.length - 1) {
+              <button
+                mat-icon-button
+                (click)="
+                  $event.stopPropagation(); moveTab(model.data, index, 'right')
+                ">
+                <mat-icon>arrow_right</mat-icon>
+              </button>
+            }
+          </ng-template>
+          <button
+            type="button"
+            class="btn btn-primary mt-2"
+            (click)="onDeleteData(index)">
+            {{ 'scrapy.deleteScrapy' | translate }}
+          </button>
+          @if (model.data.length !== 1 && index !== 0) {
+            <button
+              mat-icon-button
+              (click)="moveTab(model.data, index, 'left')">
+              <mat-icon>chevron_left</mat-icon>
+            </button>
+          }
+          @if (model.data.length !== 1 && index !== model.data.length - 1) {
+            <button
+              mat-icon-button
+              (click)="moveTab(model.data, index, 'right')">
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          }
+
+          <div class="form-group my-2">
+            <label>{{ 'scrapy.tabName' | translate }}</label>
+            <input class="form-control" [(ngModel)]="data.name" />
+          </div>
+          <div class="form-group my-2">
+            <label>{{ 'scrapy.url' | translate }}</label>
+            <input
+              class="form-control"
+              [(ngModel)]="data.url"
+              [placeholder]="'scrapy.urlPH' | translate" />
+          </div>
+          <label class="h6">{{ 'scrapy.cookie' | translate }}</label>
+          <div class="card">
+            <table mat-table [dataSource]="data.cookie" multiTemplateDataRows>
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ 'g.name' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let element">
+                  <input class="form-control" [(ngModel)]="element.name" />
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="value">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ 'g.value' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let element">
+                  <input class="form-control" [(ngModel)]="element.value" />
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="other">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let element; let i = dataIndex">
+                  <div class="row flex-nowrap">
+                    <button mat-icon-button (click)="onDeleteCookie(data, i)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="add">
+                <td
+                  mat-footer-cell
+                  *matFooterCellDef
+                  [attr.colspan]="cookieDisplayedColumns.length">
+                  <div class="row justify-content-center">
+                    <button
+                      mat-button
+                      class="rounded"
+                      (click)="onAddCookie(data)">
+                      <mat-icon>add</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="cookieDisplayedColumns"></tr>
+              <tr
+                mat-row
+                *matRowDef="let row; columns: cookieDisplayedColumns"></tr>
+              <tr mat-footer-row *matFooterRowDef="['add']"></tr>
+            </table>
+          </div>
+          <div class="my-2">
+            <label class="form-label" for="type">{{
+              'scrapy.scrapyPageType' | translate
+            }}</label>
+            <select
+              class="form-control form-select"
+              [(ngModel)]="data.scrapyPageType">
+              <option
+                *ngFor="let type of eScrapyPageType | keyvalue"
+                [ngValue]="type.key">
+                {{ 'scrapy.' + type.key | translate }}
+              </option>
+            </select>
+            @if (data.scrapyPageType === 'redirect') {
+              <label class="form-text">{{
+                'scrapy.redirectRemind' | translate
+              }}</label>
+            }
+          </div>
+          <label class="form-text"
+            ><div [innerHTML]="'scrapy.cssSelectRemind' | translate"></div
+          ></label>
+          <div class="card">
+            <table
+              mat-table
+              [dataSource]="data.cssSelectList"
+              multiTemplateDataRows>
+              <ng-container matColumnDef="key">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ 'g.key' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let element">
+                  <input class="form-control" [(ngModel)]="element.key" />
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="value">
+                <th mat-header-cell *matHeaderCellDef>
+                  {{ 'scrapy.cssSelect' | translate }}
+                </th>
+                <td mat-cell *matCellDef="let element">
+                  <input class="form-control" [(ngModel)]="element.value" />
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="other">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let element; let i = dataIndex">
+                  <div class="row flex-nowrap">
+                    <button
+                      mat-icon-button
+                      (click)="onDeleteCssSelect(data, i)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="expandedDetail">
+                <td
+                  mat-cell
+                  *matCellDef="let element; let i = dataIndex"
+                  [attr.colspan]="cssSelectDisplayedColumns.length">
+                  <div class="d-flex flex-column mb-2">
+                    <mat-checkbox
+                      [checked]="element.convertToArray"
+                      [(ngModel)]="element.convertToArray">
+                      {{ 'scrapy.convertToArray' | translate }}
+                    </mat-checkbox>
+                    <div class="d-flex input-group">
+                      <input
+                        class="form-control"
+                        [matTooltip]="'scrapy.useAttr' | translate"
+                        [placeholder]="'scrapy.useAttr' | translate"
+                        [(ngModel)]="element.attr" />
+                    </div>
+                    <div class="d-flex input-group">
+                      <input
+                        class="form-control"
+                        [matTooltip]="'scrapy.useReplaceString' | translate"
+                        [placeholder]="'scrapy.useReplaceString' | translate"
+                        [(ngModel)]="element.replaceString" />
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="add">
+                <td
+                  mat-footer-cell
+                  *matFooterCellDef
+                  [attr.colspan]="cssSelectDisplayedColumns.length">
+                  <div class="row justify-content-center">
+                    <button
+                      mat-button
+                      class="rounded"
+                      (click)="onAddCssSelect(data)">
+                      <mat-icon>add</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+              <tr
+                mat-header-row
+                *matHeaderRowDef="cssSelectDisplayedColumns"></tr>
+              <tr
+                mat-row
+                *matRowDef="let row; columns: cssSelectDisplayedColumns"></tr>
+              <tr
+                mat-row
+                *matRowDef="let row; columns: ['expandedDetail']"></tr>
+              <tr mat-footer-row *matFooterRowDef="['add']"></tr>
+            </table>
+          </div>
+          <div class="form-group mb-2">
+            <label>{{ 'scrapy.testHtml' | translate }}</label>
+            <code-editor
+              [style.height]="'400px'"
+              [(ngModel)]="data.html"
+              [language]="'html'"
+              [indentWithTab]="true"
+              [languages]="languages" />
+            <button
+              type="button"
+              class="btn btn-primary"
+              (click)="onTestParseHtml(model.data[index])">
+              {{ 'scrapy.test' | translate }}
+            </button>
+          </div>
+          <label>{{ 'scrapy.testResult' | translate }}</label>
+          <code-editor
+            [(ngModel)]="testResult"
+            [language]="'json'"
+            [indentWithTab]="true"
+            [languages]="languages" />
+        </mat-tab>
+      }
+      <mat-tab [label]="'scrapy.testArea' | translate">
+        <div class="form-group mb-2">
+          <div>{{ 'scrapy.testJson' | translate }}</div>
+          <label class="form-text">{{
+            'scrapy.useJsonRemind' | translate
+          }}</label>
+          <code-editor
+            [(ngModel)]="model.testJson"
+            [language]="'json'"
+            [indentWithTab]="true"
+            [languages]="languages" />
+          <button type="button" class="btn btn-primary" (click)="onTestJson()">
+            {{ 'scrapy.test' | translate }}
+          </button>
+        </div>
+        <div class="form-group mb-2">
+          <div>{{ 'scrapy.testUrl' | translate }}</div>
+          <label class="form-text">{{
+            'scrapy.useUrlRemind' | translate
+          }}</label>
+          <input class="form-control" [(ngModel)]="model.testUrl" />
+          <button type="button" class="btn btn-primary" (click)="onTestUrl()">
+            {{ 'scrapy.test' | translate }}
+          </button>
+        </div>
+        <label>{{ 'scrapy.testResult' | translate }}</label>
+        <code-editor
+          [(ngModel)]="testResult"
+          [language]="'json'"
+          [indentWithTab]="true"
+          [languages]="languages" />
+      </mat-tab>
+    </mat-tab-group>
+    @if (status === 'edit') {
+      <div class="my-4">
+        <button
+          type="submit"
+          class="btn btn-success w-100"
+          (click)="update(false, 'save')">
+          {{ 'g.save' | translate }}
+        </button>
+      </div>
+    }
+
+    <div class="my-4">
+      <button
+        type="submit"
+        class="btn btn-success w-100"
+        (click)="update(true, 'commit')">
+        {{ 'g.submit' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

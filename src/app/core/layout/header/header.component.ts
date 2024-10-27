@@ -24,7 +24,6 @@ import { selectLayoutByKey } from '../../../shared/state/layout.selectors';
 })
 export class HeaderComponent {
   title$: Observable<Readonly<string>>;
-  title = 'test';
   constructor(private store: Store) {
     this.title$ = this.store.pipe(selectLayoutByKey('title'));
   }

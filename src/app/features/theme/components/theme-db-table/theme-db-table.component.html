@@ -85,7 +85,7 @@
         </div>
       </td>
     </ng-container>
-    <ng-container matColumnDef="addDB">
+    <ng-container matColumnDef="add">
       <td
         mat-footer-cell
         *matFooterCellDef
@@ -118,6 +118,6 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: ['expandedDetail']"></tr>
-    <tr mat-footer-row *matFooterRowDef="['addDB']"></tr>
+    <tr mat-footer-row *matFooterRowDef="['add']"></tr>
   </table>
 </div>

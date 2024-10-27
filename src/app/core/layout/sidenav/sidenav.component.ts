@@ -11,6 +11,7 @@ import { Router, RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { ThemeService } from '../../../features/theme/services/theme.service';
 import { ThemeHeader, ThemeHeaderType } from '../../../features/theme/models';
+import { routes } from '../../../app.routes';
 
 @Component({
   standalone: true,
@@ -22,16 +23,9 @@ import { ThemeHeader, ThemeHeaderType } from '../../../features/theme/models';
 export class SidenavComponent implements OnInit {
   eThemeHeaderType = ThemeHeaderType;
   openSidenav$: Observable<Readonly<boolean>>;
-  myRoutes: { path: string; title: string }[] = [
-    {
-      path: '',
-      title: 'title.home',
-    },
-    {
-      path: 'api-config-list',
-      title: 'title.apiConfigList',
-    },
-  ];
+  routes = routes
+    .filter(x => x.data && x.data['sidenav'])
+    .map(x => ({ path: x.path, title: x.data!['title'] }));
   list$: Observable<
     Readonly<{
       [key in ThemeHeaderType]: ThemeHeader[];
