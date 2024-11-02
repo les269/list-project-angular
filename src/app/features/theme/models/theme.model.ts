@@ -1,3 +1,5 @@
+import { ApiConfig } from '../../api-config/model';
+
 export interface ThemeHeader {
   name: string;
   version: string;
@@ -88,7 +90,7 @@ export interface ThemeCustom {
   //按鈕false跟true的圖案
   buttonIconTrue: string;
   buttonIconFalse: string;
-  apiArray: string;
+  apiConfig?: ApiConfig;
 }
 
 export enum ThemeCustomType {
@@ -100,7 +102,7 @@ export enum ThemeCustomType {
   buttonIconBoolean = 'buttonIconBoolean',
   buttonIconFill = 'buttonIconFill',
   buttonInputUrl = 'buttonInputUrl',
-  apiArray = 'apiArray',
+  apiConfig = 'apiConfig',
 }
 
 export interface CopyThemeData {

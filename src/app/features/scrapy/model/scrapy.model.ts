@@ -1,5 +1,6 @@
 export interface ScrapyConfig {
   name: string;
+  paramSize: number;
   data: ScrapyData[];
   createdTime?: Date;
   updatedTime?: Date;
@@ -42,6 +43,6 @@ export interface HtmlRequest {
 export interface ScrapyTestReq {
   scrapyData?: ScrapyData;
   scrapyDataList?: ScrapyData[];
-  json?: { [key: string]: any };
+  json?: string[];
   url?: string;
 }

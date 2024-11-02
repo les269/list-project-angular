@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { ApiConfig, ApiConfigPK } from '../model';
 import { concatMap, EMPTY, from, Observable } from 'rxjs';
 import { SnackbarService } from '../../../core/services/snackbar.service';
-import { isBlank, replaceValue } from '../../../shared/util/helper';
+import { isBlank, isNull, replaceValue } from '../../../shared/util/helper';
 
 @Injectable({ providedIn: 'root' })
 export class ApiConfigService {
@@ -23,22 +23,21 @@ export class ApiConfigService {
   getListById(req: Partial<ApiConfigPK[]>): Observable<ApiConfig[]> {
     return this.http.post<ApiConfig[]>('/api-config/all/id', req);
   }
+  getById(req: Partial<ApiConfigPK>): Observable<ApiConfig> {
+    return this.http.post<ApiConfig>('/api-config/id', req);
+  }
 
-  callApi(apiArray: string, data: any) {
-    if (isBlank(apiArray) || JSON.parse(apiArray).length === 0) {
-      this.snackbarService.openByI18N('msg.apiArrayEmtpy');
+  callSingleApi(apiConfig: ApiConfig, data: any) {
+    if (isNull(apiConfig)) {
+      this.snackbarService.openByI18N('msg.apiConfigEmtpy');
       return;
     }
-    let arr: ApiConfigPK[] = JSON.parse(apiArray).map((x: string) => {
-      let [apiName, apiLabel] = x.split(',');
-      return { apiName, apiLabel };
-    });
-    this.getListById(arr).subscribe(res => {
-      if (arr.length !== res.length) {
-        this.snackbarService.openByI18N('msg.apiArrayError');
+    this.getById(apiConfig).subscribe(res => {
+      if (isNull(res)) {
+        this.snackbarService.openByI18N('msg.apiConfigError');
         return;
       }
-      this.callByConfig(res, data);
+      this.callByConfig([res], data);
     });
   }
 

@@ -40,7 +40,7 @@
     </ng-container>
     <ng-container matColumnDef="label">
       <th mat-header-cell *matHeaderCellDef>
-        {{ 'themeDB.name' | translate }}
+        {{ 'themeCustom.labelName' | translate }}
       </th>
       <td mat-cell *matCellDef="let element; let i = dataIndex">
         <input
@@ -176,16 +176,12 @@
                 [(ngModel)]="element.openUrlByKey"
                 name="customOpenUrlByKey{{ i }}" />
             }
-            @case ('apiArray') {
-              <div class="mt-1 d-flex flex-wrap gap-3">
-                @for (
-                  apiConfig of toJsonParse(element.apiArray);
-                  track $index;
-                  let index = $index
-                ) {
+            @case ('apiConfig') {
+              <div class="mt-1 d-flex flex-wrap gap-3 align-items-center">
+                @if (element.apiConfig) {
                   <mat-chip cdkDrag
-                    >{{ apiConfig }}
-                    <button matChipRemove (click)="removeApi(element, index)">
+                    >{{ element.apiConfig.apiName }}
+                    <button matChipRemove (click)="removeApi(element)">
                       <mat-icon>cancel</mat-icon>
                     </button>
                   </mat-chip>

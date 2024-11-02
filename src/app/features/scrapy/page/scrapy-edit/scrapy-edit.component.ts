@@ -70,6 +70,7 @@ export class ScrapyEditComponent implements OnInit {
     data: [],
     testJson: '',
     testUrl: '',
+    paramSize: 1,
   };
   cookieDisplayedColumns = ['name', 'value', 'other'];
   cssSelectDisplayedColumns = ['key', 'value', 'other'];
@@ -163,11 +164,12 @@ export class ScrapyEditComponent implements OnInit {
   onTestJson() {
     if (
       isNotJson(this.model.testJson) ||
-      Array.isArray(JSON.parse(this.model.testJson))
+      !Array.isArray(JSON.parse(this.model.testJson))
     ) {
       this.snackbarService.openByI18N('msg.testJsonError');
       return;
     }
+    this.testResult = '';
     this.scrapyService
       .testScrapyJson({
         scrapyDataList: this.model.data,
@@ -192,6 +194,12 @@ export class ScrapyEditComponent implements OnInit {
   validationModel(): boolean {
     if (isBlank(this.model.name)) {
       this.snackbarService.isBlankMessage('scrapy.name');
+      return false;
+    }
+    if (
+      !(Number.isInteger(this.model.paramSize) && this.model.paramSize >= 1)
+    ) {
+      this.snackbarService.openByI18N('msg.paramSizeError');
       return false;
     }
     return true;
@@ -225,6 +233,7 @@ export class ScrapyEditComponent implements OnInit {
         );
       });
   }
+
   moveTab(list: ScrapyData[], index: number, type: 'left' | 'right') {
     const source = list[index];
     const target = list.splice(index + (type === 'left' ? -1 : 1), 1, source);

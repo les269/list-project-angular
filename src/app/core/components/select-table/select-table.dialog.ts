@@ -21,7 +21,8 @@ export interface BaseSelectTableData<O> {
   dataSource: O[];
   selectType: 'single' | 'multiple';
   title?: string;
-  selected?: O[];
+  selected?: O | O[];
+  columnFormats?: { [key: string]: (value: any) => string };
 }
 @Component({
   standalone: true,
@@ -52,6 +53,7 @@ export class SelectTableDialog<O, T extends BaseSelectTableData<O>>
   labels = this.data.labels;
   dataSource = this.data.dataSource;
   selectType = this.data.selectType;
+  columnFormats = this.data.columnFormats;
   title = this.data.title;
   selected = this.data.selected;
   selection = new SelectionModel<O>(true, []);
@@ -59,7 +61,7 @@ export class SelectTableDialog<O, T extends BaseSelectTableData<O>>
   ngOnInit(): void {
     if (this.selectType === 'multiple') {
       this.multipleDisplayedColumns = ['select', ...this.displayedColumns];
-      if (this.selected) {
+      if (this.selected && Array.isArray(this.selected)) {
         this.selection.select(...this.selected);
       }
     }

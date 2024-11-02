@@ -10,6 +10,11 @@
         [(ngModel)]="model.name"
         [disabled]="status === 'edit'" />
     </div>
+    <div class="form-group mb-2">
+      <label>{{ 'scrapy.paramSize' | translate }}</label>
+      <input class="form-control" type="number" [(ngModel)]="model.paramSize" />
+      <label class="form-text">{{ 'scrapy.paramSizeDesc' | translate }}</label>
+    </div>
     <button type="button" class="btn btn-primary" (click)="onAddData()">
       {{ 'scrapy.createScrapy' | translate }}
     </button>
@@ -45,20 +50,6 @@
             (click)="onDeleteData(index)">
             {{ 'scrapy.deleteScrapy' | translate }}
           </button>
-          @if (model.data.length !== 1 && index !== 0) {
-            <button
-              mat-icon-button
-              (click)="moveTab(model.data, index, 'left')">
-              <mat-icon>chevron_left</mat-icon>
-            </button>
-          }
-          @if (model.data.length !== 1 && index !== model.data.length - 1) {
-            <button
-              mat-icon-button
-              (click)="moveTab(model.data, index, 'right')">
-              <mat-icon>chevron_right</mat-icon>
-            </button>
-          }
 
           <div class="form-group my-2">
             <label>{{ 'scrapy.tabName' | translate }}</label>

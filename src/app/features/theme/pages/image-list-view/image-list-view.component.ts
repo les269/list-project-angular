@@ -581,6 +581,8 @@ export class ImageListViewComponent implements OnInit {
   }
 
   callApi(data: any, custom: ThemeCustom) {
-    this.apiConfigService.callApi(custom.apiArray, data);
+    if (custom.apiConfig) {
+      this.apiConfigService.callSingleApi(custom.apiConfig, data);
+    }
   }
 }

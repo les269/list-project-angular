@@ -63,3 +63,9 @@ ngx-editor.disabled > div.NgxEditor {
     max-height: unset !important;
   }
 }
+
+.require::before {
+  content: '*';
+  color: red;
+  margin-right: 4px; /* 可調整間距 */
+}

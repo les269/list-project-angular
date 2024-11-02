@@ -19,6 +19,10 @@ export class ScrapyService {
     return this.http.get<ScrapyConfig[]>('/scrapy/all');
   }
 
+  getAllName(): Observable<string[]> {
+    return this.http.get<string[]>('/scrapy/allName');
+  }
+
   updateConfig(req: Partial<ScrapyConfig>): Observable<void> {
     return this.http.post<void>('/scrapy/update', req);
   }

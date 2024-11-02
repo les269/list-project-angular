@@ -15,6 +15,7 @@ import {
   SelectTableDialog,
 } from '../../../../core/components/select-table/select-table.dialog';
 import { isBlank, isNull } from '../../../../shared/util/helper';
+import { SelectTableService } from '../../../../core/services/select-table.service';
 
 @Component({
   standalone: true,
@@ -40,7 +41,8 @@ export class CustomTableComponent implements OnInit {
   apiConfigList: ApiConfig[] = [];
   constructor(
     private apiConfigService: ApiConfigService,
-    private matDialog: MatDialog
+    private matDialog: MatDialog,
+    private selectTableService: SelectTableService
   ) {}
 
   ngOnInit() {
@@ -67,7 +69,7 @@ export class CustomTableComponent implements OnInit {
       buttonIconTrue: '',
       buttonIconFalse: '',
       apiName: '',
-      apiArray: '',
+      apiConfig: undefined,
     };
     this.themeCustomList = [...this.themeCustomList, element].map((x, i) => {
       x.seq = i + 1;
@@ -99,44 +101,11 @@ export class CustomTableComponent implements OnInit {
   }
 
   selectApi(element: ThemeCustom) {
-    const selected = this.toJsonParse(element.apiArray)
-      .map(x => {
-        let [apiName, apiLabel] = x.split(',');
-        return this.apiConfigList.find(
-          x => x.apiName === apiName && x.apiLabel === apiLabel
-        )!;
-      })
-      .filter(Boolean);
-    const data: BaseSelectTableData<ApiConfig> = {
-      displayedColumns: ['apiName', 'apiLabel', 'httpMethod', 'endpointUrl'],
-      labels: [
-        'apiConfig.apiName',
-        'apiConfig.apiLabel',
-        'apiConfig.httpMethod',
-        'apiConfig.endpointUrl',
-      ],
-      dataSource: this.apiConfigList,
-      selectType: 'single',
-      selected,
-    };
-    this.matDialog
-      .open<
-        SelectTableDialog<ApiConfig, BaseSelectTableData<ApiConfig>>,
-        BaseSelectTableData<ApiConfig>,
-        ApiConfig | ApiConfig[]
-      >(SelectTableDialog, {
-        data,
-      })
-      .afterClosed()
+    this.selectTableService
+      .selectSingleApi(this.apiConfigList)
       .subscribe(res => {
         if (res) {
-          if (Array.isArray(res)) {
-            element.apiArray = JSON.stringify(
-              res.map(x => `${x.apiName},${x.apiLabel}`)
-            );
-          } else {
-            element.apiArray = `["${res.apiName},${res.apiLabel}"]`;
-          }
+          element.apiConfig = res;
         }
       });
   }
@@ -148,9 +117,7 @@ export class CustomTableComponent implements OnInit {
     return JSON.parse(s);
   }
 
-  removeApi(element: ThemeCustom, removeIndex: number) {
-    const arr = this.toJsonParse(element.apiArray);
-    arr.splice(removeIndex, 1);
-    element.apiArray = JSON.stringify(arr);
+  removeApi(element: ThemeCustom) {
+    element.apiConfig = undefined;
   }
 }

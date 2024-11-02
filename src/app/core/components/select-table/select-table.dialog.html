@@ -21,7 +21,10 @@
     } @for (column of displayedColumns; track $index;let index = $index) {
     <ng-container matColumnDef="{{column}}">
       <th mat-header-cell *matHeaderCellDef>{{ labels[index] | translate }}</th>
-      <td mat-cell *matCellDef="let element">{{ element[column] }}</td>
+      <td mat-cell *matCellDef="let element">
+        {{ columnFormats?.[column] ? columnFormats![column](element[column]) :
+        element[column] }}
+      </td>
     </ng-container>
     } @if(selectType==='single'){
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

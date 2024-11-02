@@ -1,0 +1,121 @@
+<div class="container d-flex">
+  <div class="col-md-10 offset-md-1 col-xs-12 mt-2">
+    <button mat-icon-button (click)="onBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="form-group mb-2">
+      <label class="form-label require">{{ 'dataset.name' | translate }}</label>
+      <input
+        class="form-control"
+        [(ngModel)]="model.name"
+        [disabled]="status === 'edit'" />
+    </div>
+    <div class="form-group mb-2">
+      <label class="form-label">{{ 'dataset.filterType' | translate }}</label>
+      <select class="form-control form-select" [(ngModel)]="model.config.type">
+        <option
+          *ngFor="let type of eDatasetConfigType | keyvalue"
+          [ngValue]="type.key">
+          {{ 'dataset.' + type.key | translate }}
+        </option>
+      </select>
+      <label class="form-text">{{
+        'dataset.filterTypeDesc' | translate
+      }}</label>
+    </div>
+    <div class="form-group mb-2">
+      <label class="form-label require">{{
+        'dataset.groupName' | translate
+      }}</label>
+      <input class="form-control" [(ngModel)]="model.config.groupName" />
+      <label class="form-text">{{ 'dataset.groupNameDesc' | translate }}</label>
+    </div>
+    <div class="form-group mb-2">
+      <label class="form-label require">{{
+        'dataset.byKey' | translate
+      }}</label>
+      <input class="form-control" [(ngModel)]="model.config.byKey" />
+    </div>
+    @if (model.config.type === 'file') {
+      <div class="form-group mb-2 require">
+        <label>{{ 'dataset.filePath' | translate }}</label>
+        <input class="form-control" [(ngModel)]="model.config.filePath" />
+      </div>
+      <div class="form-group mb-2">
+        <label>{{ 'dataset.fileExtension' | translate }}</label>
+        <input class="form-control" [(ngModel)]="model.config.fileExtension" />
+      </div>
+    }
+    @if (model.config.type === 'folder') {
+      <div class="form-group mb-2 require">
+        <label>{{ 'dataset.folderPath' | translate }}</label>
+        <input class="form-control" [(ngModel)]="model.config.folderPath" />
+      </div>
+    }
+    <div class="form-group mb-2">
+      <mat-checkbox [(ngModel)]="model.config.filing">
+        {{ 'dataset.filing' | translate }}
+      </mat-checkbox>
+      <br />
+      <label class="form-text">{{ 'dataset.filingDesc' | translate }}</label>
+    </div>
+    @if (model.config.filing) {
+      <div class="form-group mb-2">
+        <label>{{ 'dataset.filingRegular' | translate }}</label>
+        <input class="form-control" [(ngModel)]="model.config.filingRegular" />
+      </div>
+    }
+
+    <div class="form-group mb-2">
+      <mat-checkbox [(ngModel)]="model.config.autoImageDownload">
+        {{ 'dataset.autoImageDownload' | translate }}
+      </mat-checkbox>
+      <br />
+      <label class="form-text">{{
+        'dataset.autoImageDownloadDesc' | translate
+      }}</label>
+    </div>
+    @if (model.config.autoImageDownload) {
+      <div class="form-group mb-2">
+        <label>{{ 'dataset.imageByKey' | translate }}</label>
+        <input class="form-control" [(ngModel)]="model.config.imageByKey" />
+      </div>
+      <div class="form-group mb-2">
+        <label>{{ 'dataset.imageSaveFolder' | translate }}</label>
+        <input
+          class="form-control"
+          [(ngModel)]="model.config.imageSaveFolder" />
+      </div>
+    }
+    <div class="h4 fw-bold">
+      {{ 'dataset.fieldTable' | translate }}
+    </div>
+    <app-dataset-field-table
+      [(fieldList)]="model.config.fieldList"></app-dataset-field-table>
+    <div class="h4 fw-bold">
+      {{ 'dataset.scrapyTable' | translate }}
+    </div>
+    <app-dataset-scrapy-table
+      [(scrapyList)]="
+        model.config.datasetScrapyList
+      "></app-dataset-scrapy-table>
+    @if (status === 'edit') {
+      <div class="my-4">
+        <button
+          type="submit"
+          class="btn btn-success w-100"
+          (click)="update(false, 'save')">
+          {{ 'g.save' | translate }}
+        </button>
+      </div>
+    }
+    <div class="my-4">
+      <button
+        type="submit"
+        class="btn btn-success w-100"
+        (click)="update(true, 'commit')">
+        {{ 'g.submit' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

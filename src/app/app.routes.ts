@@ -50,6 +50,30 @@ export const routes: Routes = [
     data: { title: 'title.scrapyEdit' },
   },
   {
+    path: 'dataset-list',
+    loadComponent: () =>
+      import(
+        './features/dataset/page/dataset-list/dataset-list.component'
+      ).then(mod => mod.DatasetListComponent),
+    data: { title: 'title.datasetList', sidenav: true },
+  },
+  {
+    path: 'dataset-edit',
+    loadComponent: () =>
+      import(
+        './features/dataset/page/dataset-edit/dataset-edit.component'
+      ).then(mod => mod.DatasetEditComponent),
+    data: { title: 'title.datasetEdit' },
+  },
+  {
+    path: 'dataset-edit/:name',
+    loadComponent: () =>
+      import(
+        './features/dataset/page/dataset-edit/dataset-edit.component'
+      ).then(mod => mod.DatasetEditComponent),
+    data: { title: 'title.datasetEdit' },
+  },
+  {
     path: 'imageList/:name/:version',
     loadComponent: () =>
       import(
