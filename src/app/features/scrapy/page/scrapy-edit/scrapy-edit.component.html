@@ -63,56 +63,7 @@
               [placeholder]="'scrapy.urlPH' | translate" />
           </div>
           <label class="h6">{{ 'scrapy.cookie' | translate }}</label>
-          <div class="card">
-            <table mat-table [dataSource]="data.cookie" multiTemplateDataRows>
-              <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef>
-                  {{ 'g.name' | translate }}
-                </th>
-                <td mat-cell *matCellDef="let element">
-                  <input class="form-control" [(ngModel)]="element.name" />
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="value">
-                <th mat-header-cell *matHeaderCellDef>
-                  {{ 'g.value' | translate }}
-                </th>
-                <td mat-cell *matCellDef="let element">
-                  <input class="form-control" [(ngModel)]="element.value" />
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="other">
-                <th mat-header-cell *matHeaderCellDef></th>
-                <td mat-cell *matCellDef="let element; let i = dataIndex">
-                  <div class="row flex-nowrap">
-                    <button mat-icon-button (click)="onDeleteCookie(data, i)">
-                      <mat-icon>delete</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="add">
-                <td
-                  mat-footer-cell
-                  *matFooterCellDef
-                  [attr.colspan]="cookieDisplayedColumns.length">
-                  <div class="row justify-content-center">
-                    <button
-                      mat-button
-                      class="rounded"
-                      (click)="onAddCookie(data)">
-                      <mat-icon>add</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </ng-container>
-              <tr mat-header-row *matHeaderRowDef="cookieDisplayedColumns"></tr>
-              <tr
-                mat-row
-                *matRowDef="let row; columns: cookieDisplayedColumns"></tr>
-              <tr mat-footer-row *matFooterRowDef="['add']"></tr>
-            </table>
-          </div>
+          <app-cookie-table [(cookieList)]="data.cookie"></app-cookie-table>
           <div class="my-2">
             <label class="form-label" for="type">{{
               'scrapy.scrapyPageType' | translate
@@ -135,94 +86,8 @@
           <label class="form-text"
             ><div [innerHTML]="'scrapy.cssSelectRemind' | translate"></div
           ></label>
-          <div class="card">
-            <table
-              mat-table
-              [dataSource]="data.cssSelectList"
-              multiTemplateDataRows>
-              <ng-container matColumnDef="key">
-                <th mat-header-cell *matHeaderCellDef>
-                  {{ 'g.key' | translate }}
-                </th>
-                <td mat-cell *matCellDef="let element">
-                  <input class="form-control" [(ngModel)]="element.key" />
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="value">
-                <th mat-header-cell *matHeaderCellDef>
-                  {{ 'scrapy.cssSelect' | translate }}
-                </th>
-                <td mat-cell *matCellDef="let element">
-                  <input class="form-control" [(ngModel)]="element.value" />
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="other">
-                <th mat-header-cell *matHeaderCellDef></th>
-                <td mat-cell *matCellDef="let element; let i = dataIndex">
-                  <div class="row flex-nowrap">
-                    <button
-                      mat-icon-button
-                      (click)="onDeleteCssSelect(data, i)">
-                      <mat-icon>delete</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="expandedDetail">
-                <td
-                  mat-cell
-                  *matCellDef="let element; let i = dataIndex"
-                  [attr.colspan]="cssSelectDisplayedColumns.length">
-                  <div class="d-flex flex-column mb-2">
-                    <mat-checkbox
-                      [checked]="element.convertToArray"
-                      [(ngModel)]="element.convertToArray">
-                      {{ 'scrapy.convertToArray' | translate }}
-                    </mat-checkbox>
-                    <div class="d-flex input-group">
-                      <input
-                        class="form-control"
-                        [matTooltip]="'scrapy.useAttr' | translate"
-                        [placeholder]="'scrapy.useAttr' | translate"
-                        [(ngModel)]="element.attr" />
-                    </div>
-                    <div class="d-flex input-group">
-                      <input
-                        class="form-control"
-                        [matTooltip]="'scrapy.useReplaceString' | translate"
-                        [placeholder]="'scrapy.useReplaceString' | translate"
-                        [(ngModel)]="element.replaceString" />
-                    </div>
-                  </div>
-                </td>
-              </ng-container>
-              <ng-container matColumnDef="add">
-                <td
-                  mat-footer-cell
-                  *matFooterCellDef
-                  [attr.colspan]="cssSelectDisplayedColumns.length">
-                  <div class="row justify-content-center">
-                    <button
-                      mat-button
-                      class="rounded"
-                      (click)="onAddCssSelect(data)">
-                      <mat-icon>add</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </ng-container>
-              <tr
-                mat-header-row
-                *matHeaderRowDef="cssSelectDisplayedColumns"></tr>
-              <tr
-                mat-row
-                *matRowDef="let row; columns: cssSelectDisplayedColumns"></tr>
-              <tr
-                mat-row
-                *matRowDef="let row; columns: ['expandedDetail']"></tr>
-              <tr mat-footer-row *matFooterRowDef="['add']"></tr>
-            </table>
-          </div>
+          <app-css-select-table
+            [(cssSelectList)]="data.cssSelectList"></app-css-select-table>
           <div class="form-group mb-2">
             <label>{{ 'scrapy.testHtml' | translate }}</label>
             <code-editor

@@ -27,14 +27,26 @@
       <label class="form-label require">{{
         'dataset.groupName' | translate
       }}</label>
-      <input class="form-control" [(ngModel)]="model.config.groupName" />
+      <div class="mt-1 d-flex flex-wrap gap-3 align-items-center">
+        @if (model.config.groupName) {
+          <mat-chip cdkDrag
+            >{{ model.config.groupName }}
+            <button matChipRemove (click)="model.config.groupName = ''">
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </mat-chip>
+        }
+        <button
+          class="btn btn-outline-primary d-flex"
+          (click)="selectGroupDataset()">
+          <mat-icon class="material-icons-outlined"
+            ><span class="material-symbols-outlined">
+              select_window_2
+            </span></mat-icon
+          >
+        </button>
+      </div>
       <label class="form-text">{{ 'dataset.groupNameDesc' | translate }}</label>
-    </div>
-    <div class="form-group mb-2">
-      <label class="form-label require">{{
-        'dataset.byKey' | translate
-      }}</label>
-      <input class="form-control" [(ngModel)]="model.config.byKey" />
     </div>
     @if (model.config.type === 'file') {
       <div class="form-group mb-2 require">
@@ -52,13 +64,16 @@
         <input class="form-control" [(ngModel)]="model.config.folderPath" />
       </div>
     }
-    <div class="form-group mb-2">
-      <mat-checkbox [(ngModel)]="model.config.filing">
-        {{ 'dataset.filing' | translate }}
-      </mat-checkbox>
-      <br />
-      <label class="form-text">{{ 'dataset.filingDesc' | translate }}</label>
-    </div>
+    @if (model.config.type !== 'all') {
+      <div class="form-group mb-2">
+        <mat-checkbox [(ngModel)]="model.config.filing">
+          {{ 'dataset.filing' | translate }}
+        </mat-checkbox>
+        <br />
+        <label class="form-text">{{ 'dataset.filingDesc' | translate }}</label>
+      </div>
+    }
+
     @if (model.config.filing) {
       <div class="form-group mb-2">
         <label>{{ 'dataset.filingRegular' | translate }}</label>
@@ -92,13 +107,6 @@
     </div>
     <app-dataset-field-table
       [(fieldList)]="model.config.fieldList"></app-dataset-field-table>
-    <div class="h4 fw-bold">
-      {{ 'dataset.scrapyTable' | translate }}
-    </div>
-    <app-dataset-scrapy-table
-      [(scrapyList)]="
-        model.config.datasetScrapyList
-      "></app-dataset-scrapy-table>
     @if (status === 'edit') {
       <div class="my-4">
         <button

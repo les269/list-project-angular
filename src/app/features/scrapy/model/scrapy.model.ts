@@ -33,6 +33,9 @@ export interface CssSelect {
   replaceString: string;
   attr: string;
   convertToArray: boolean;
+  onlyOwn: boolean;
+  replaceRegular: string;
+  replaceRegularTo: string;
 }
 
 export interface HtmlRequest {

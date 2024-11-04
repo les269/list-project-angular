@@ -25,9 +25,12 @@ import {
   DatasetConfigType,
   DatasetField,
   DatasetFieldType,
+  GroupDataset,
 } from '../../model';
 import { DatasetFieldTableComponent } from '../../components/dataset-field-table/dataset-field-table.component';
-import { DatasetScrapyTableComponent } from '../../components/dataset-scrapy-table/dataset-scrapy-table.component';
+import { MatChipsModule } from '@angular/material/chips';
+import { SelectTableService } from '../../../../core/services/select-table.service';
+import { GroupDatasetService } from '../../service/group-dataset.service';
 
 @Component({
   selector: 'app-dataset-edit',
@@ -42,10 +45,9 @@ import { DatasetScrapyTableComponent } from '../../components/dataset-scrapy-tab
     MatIconModule,
     MatCheckboxModule,
     DatasetFieldTableComponent,
-    DatasetScrapyTableComponent,
+    MatChipsModule,
   ],
   templateUrl: './dataset-edit.component.html',
-  styleUrl: './dataset-edit.component.scss',
 })
 export class DatasetEditComponent implements OnInit {
   status: 'new' | 'edit' = 'new';
@@ -54,7 +56,6 @@ export class DatasetEditComponent implements OnInit {
     config: {
       type: DatasetConfigType.all,
       groupName: '',
-      byKey: '',
       filePath: '',
       fileExtension: '',
       folderPath: '',
@@ -64,20 +65,27 @@ export class DatasetEditComponent implements OnInit {
       autoImageDownload: false,
       imageByKey: '',
       imageSaveFolder: '',
-      datasetScrapyList: [],
     },
   };
   eDatasetConfigType = DatasetConfigType;
+  groupDatasetList: GroupDataset[] = [];
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private datasetService: DatasetService,
     private translateService: TranslateService,
-    private snackbarService: SnackbarService
+    private snackbarService: SnackbarService,
+    private selectTableService: SelectTableService,
+    private groupDatasetService: GroupDatasetService
   ) {}
 
   ngOnInit() {
+    this.groupDatasetService.getAllGroupDataset().subscribe(res => {
+      if (res) {
+        this.groupDatasetList = res;
+      }
+    });
     this.route.paramMap
       .pipe(
         debounceTime(100),
@@ -108,14 +116,6 @@ export class DatasetEditComponent implements OnInit {
     }
     if (isBlank(this.model.config.groupName)) {
       this.snackbarService.isBlankMessage('dataset.groupName');
-      return false;
-    }
-    if (isBlank(this.model.config.byKey)) {
-      this.snackbarService.isBlankMessage('dataset.byKey');
-      return false;
-    }
-    if (isBlank(this.model.config.byKey)) {
-      this.snackbarService.isBlankMessage('dataset.byKey');
       return false;
     }
     if (
@@ -156,12 +156,7 @@ export class DatasetEditComponent implements OnInit {
         return false;
       }
     }
-    for (const scrapy of this.model.config.datasetScrapyList) {
-      if (isBlank(scrapy.name)) {
-        this.snackbarService.isBlankMessage('dataset.scrapyName');
-        return false;
-      }
-    }
+
     return true;
   }
 
@@ -191,6 +186,16 @@ export class DatasetEditComponent implements OnInit {
         this.snackbarService.openByI18N(
           type === 'commit' ? 'msg.commitSuccess' : 'msg.saveSuccess'
         );
+      });
+  }
+
+  selectGroupDataset() {
+    this.selectTableService
+      .selectSingleGroupDataset(this.groupDatasetList)
+      .subscribe(res => {
+        if (res) {
+          this.model.config.groupName = res.groupName;
+        }
       });
   }
 }

@@ -69,3 +69,6 @@ ngx-editor.disabled > div.NgxEditor {
   color: red;
   margin-right: 4px; /* 可調整間距 */
 }
+.expand-row > td {
+  border-bottom-width: 0;
+}

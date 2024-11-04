@@ -39,6 +39,8 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { CookieTableComponent } from '../../components/cookie-table/cookie-table.component';
+import { CssSelectTableComponent } from '../../components/css-select-table/css-select-table.component';
 
 @Component({
   standalone: true,
@@ -58,6 +60,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     MatTabsModule,
     MatTooltipModule,
     MatCheckboxModule,
+    CookieTableComponent,
+    CssSelectTableComponent,
   ],
   selector: 'app-scrapy-edit',
   templateUrl: 'scrapy-edit.component.html',
@@ -72,8 +76,7 @@ export class ScrapyEditComponent implements OnInit {
     testUrl: '',
     paramSize: 1,
   };
-  cookieDisplayedColumns = ['name', 'value', 'other'];
-  cssSelectDisplayedColumns = ['key', 'value', 'other'];
+
   eScrapyPageType = ScrapyPageType;
   languages = languages;
   selected = -1;
@@ -120,33 +123,6 @@ export class ScrapyEditComponent implements OnInit {
 
   onDeleteData(i: number) {
     this.model.data.splice(i, 1);
-  }
-  //新增cookie資料
-  onAddCookie(scrapyData: ScrapyData) {
-    scrapyData.cookie = [...scrapyData.cookie, { name: '', value: '' }];
-  }
-  //刪除cookie資料
-  onDeleteCookie(scrapyData: ScrapyData, i: number) {
-    scrapyData.cookie.splice(i, 1);
-    scrapyData.cookie = [...scrapyData.cookie];
-  }
-  //新增CssSelect
-  onAddCssSelect(scrapyData: ScrapyData) {
-    scrapyData.cssSelectList = [
-      ...scrapyData.cssSelectList,
-      {
-        key: '',
-        value: '',
-        replaceString: '',
-        attr: '',
-        convertToArray: false,
-      },
-    ];
-  }
-  //刪除CssSelect資料
-  onDeleteCssSelect(scrapyData: ScrapyData, i: number) {
-    scrapyData.cssSelectList.splice(i, 1);
-    scrapyData.cssSelectList = [...scrapyData.cssSelectList];
   }
 
   onBack() {

@@ -74,6 +74,30 @@ export const routes: Routes = [
     data: { title: 'title.datasetEdit' },
   },
   {
+    path: 'group-dataset-list',
+    loadComponent: () =>
+      import(
+        './features/dataset/page/group-dataset-list/group-dataset-list.component'
+      ).then(mod => mod.GroupDatasetListComponent),
+    data: { title: 'title.groupDataset', sidenav: true },
+  },
+  {
+    path: 'group-dataset-edit',
+    loadComponent: () =>
+      import(
+        './features/dataset/page/group-dataset-edit/group-dataset-edit.component'
+      ).then(mod => mod.GroupDatasetEditComponent),
+    data: { title: 'title.groupDatasetEdit' },
+  },
+  {
+    path: 'group-dataset-edit/:name',
+    loadComponent: () =>
+      import(
+        './features/dataset/page/group-dataset-edit/group-dataset-edit.component'
+      ).then(mod => mod.GroupDatasetEditComponent),
+    data: { title: 'title.groupDatasetEdit' },
+  },
+  {
     path: 'imageList/:name/:version',
     loadComponent: () =>
       import(

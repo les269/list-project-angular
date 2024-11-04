@@ -14,7 +14,7 @@ import { MatTableModule } from '@angular/material/table';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-dataset-field-table',
+  selector: 'app-group-dataset-field-table',
   standalone: true,
   imports: [
     MatTableModule,
@@ -26,23 +26,22 @@ import { TranslateModule } from '@ngx-translate/core';
     MatIconModule,
     MatCheckboxModule,
   ],
-  templateUrl: './dataset-field-table.component.html',
-  styleUrl: './dataset-field-table.component.scss',
+  templateUrl: './group-dataset-field-table.component.html',
+  styleUrl: './group-dataset-field-table.component.scss',
 })
-export class DatasetFieldTableComponent {
-  eDatasetFieldType = DatasetFieldType;
+export class GroupDatasetFieldTableComponent {
+  eDatasetFieldType = GroupDatasetFieldType;
   displayedColumns = ['seq', 'key', 'label', 'type', 'other'];
-  @Input({ required: true }) fieldList!: DatasetField[];
-  @Output() fieldListChange = new EventEmitter<DatasetField[]>();
+  @Input({ required: true }) fieldList!: GroupDatasetField[];
+  @Output() fieldListChange = new EventEmitter<GroupDatasetField[]>();
   onAdd() {
     this.fieldList = [
       ...this.fieldList,
       {
         seq: this.fieldList.length + 1,
-        type: DatasetFieldType.fixedString,
+        type: GroupDatasetFieldType.string,
         key: '',
         label: '',
-        fixedString: '',
       },
     ];
     this.fieldListChange.emit(this.fieldList);
@@ -54,7 +53,7 @@ export class DatasetFieldTableComponent {
   }
   //資料來源的上下移動
   onUpDown(index: number, type: 'up' | 'down') {
-    let data: DatasetField[] = JSON.parse(JSON.stringify(this.fieldList));
+    let data: GroupDatasetField[] = JSON.parse(JSON.stringify(this.fieldList));
     let source = data[index];
     let target = data.splice(index + (type === 'up' ? -1 : 1), 1, source);
     data.splice(index, 1, target[0]);

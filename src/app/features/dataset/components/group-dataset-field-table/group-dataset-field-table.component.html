@@ -1,5 +1,5 @@
 <div class="card">
-  <table mat-table [dataSource]="scrapyList" multiTemplateDataRows>
+  <table mat-table [dataSource]="fieldList" multiTemplateDataRows>
     <ng-container matColumnDef="seq">
       <th mat-header-cell *matHeaderCellDef>
         {{ 'dataset.fieldSeq' | translate }}
@@ -8,64 +8,34 @@
         {{ element.seq }}
       </td>
     </ng-container>
-    <ng-container matColumnDef="name">
+    <ng-container matColumnDef="key">
       <th mat-header-cell *matHeaderCellDef>
-        {{ 'dataset.scrapyName' | translate }}
+        {{ 'dataset.fieldKey' | translate }}
       </th>
       <td mat-cell *matCellDef="let element">
-        <div class="mt-1 d-flex flex-wrap gap-3 align-items-center">
-          @if (element.name) {
-            <mat-chip cdkDrag
-              >{{ element.name }}
-              <button matChipRemove (click)="element.name = ''">
-                <mat-icon>cancel</mat-icon>
-              </button>
-            </mat-chip>
-          }
-          <button
-            class="btn btn-outline-primary d-flex"
-            (click)="selectScrapy(element)">
-            <mat-icon class="material-icons-outlined"
-              ><span class="material-symbols-outlined">
-                select_window_2
-              </span></mat-icon
-            >
-          </button>
-        </div>
+        <input class="form-control" [(ngModel)]="element.key" />
       </td>
     </ng-container>
     <ng-container matColumnDef="label">
       <th mat-header-cell *matHeaderCellDef>
-        {{ 'dataset.scrapyLabel' | translate }}
+        {{ 'dataset.fieldLabel' | translate }}
       </th>
       <td mat-cell *matCellDef="let element">
         <input class="form-control" [(ngModel)]="element.label" />
       </td>
     </ng-container>
-    <ng-container matColumnDef="isDefault">
+    <ng-container matColumnDef="type">
       <th mat-header-cell *matHeaderCellDef>
-        {{ 'dataset.scrapyDefault' | translate }}
+        {{ 'dataset.type' | translate }}
       </th>
-      <td mat-cell *matCellDef="let element; let i = dataIndex">
-        <mat-checkbox
-          [(ngModel)]="element.isDefault"
-          (change)="changeDefaultKey($event, i)"></mat-checkbox>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="visibleJson">
-      <th mat-header-cell *matHeaderCellDef>
-        {{ 'dataset.visibleJson' | translate }}
-      </th>
-      <td mat-cell *matCellDef="let element; let i = dataIndex">
-        <mat-checkbox [(ngModel)]="element.visibleJson"></mat-checkbox>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="visibleUrl">
-      <th mat-header-cell *matHeaderCellDef>
-        {{ 'dataset.visibleUrl' | translate }}
-      </th>
-      <td mat-cell *matCellDef="let element; let i = dataIndex">
-        <mat-checkbox [(ngModel)]="element.visibleUrl"></mat-checkbox>
+      <td mat-cell *matCellDef="let element">
+        <select class="form-control form-select" [(ngModel)]="element.type">
+          <option
+            *ngFor="let type of eDatasetFieldType | keyvalue"
+            [ngValue]="type.key">
+            {{ 'dataset.' + type.key | translate }}
+          </option>
+        </select>
       </td>
     </ng-container>
     <ng-container matColumnDef="other">
@@ -78,7 +48,7 @@
                 >arrow_drop_up</mat-icon
               >
             }
-            @if (i !== scrapyList.length - 1) {
+            @if (i !== fieldList.length - 1) {
               <mat-icon
                 class="dropupdown-icon down"
                 (click)="onUpDown(i, 'down')"
@@ -104,12 +74,33 @@
         </div>
       </td>
     </ng-container>
+    <ng-container matColumnDef="expanded">
+      <td
+        mat-cell
+        *matCellDef="let element; let i = dataIndex"
+        [attr.colspan]="displayedColumns.length">
+        <div class="d-flex flex-column">
+          @if (element.type === 'fixedString') {
+            <div class="d-flex input-group my-1 align-items-center">
+              <label class="input-group-text">{{
+                'dataset.fixedString' | translate
+              }}</label>
+              <input class="form-control" [(ngModel)]="element.fixedString" />
+            </div>
+          }
+        </div>
+      </td>
+    </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr
       mat-row
       *matRowDef="let row; columns: displayedColumns"
-      class="element-row"></tr>
+      class="expand-row"></tr>
+    <tr
+      mat-row
+      *matRowDef="let row; columns: ['expanded']"
+      style="height: 0px"></tr>
     <tr mat-footer-row *matFooterRowDef="['add']"></tr>
   </table>
 </div>

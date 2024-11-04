@@ -48,6 +48,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ButtonInputUrlDialog } from '../../components/button-input-url.dialog';
 import { WriteNoteDialog } from '../../components/write-note.dialog';
 import { ApiConfigService } from '../../../api-config/service/api-config.service';
+import { DatasetService } from '../../../dataset/service/dataset.service';
 
 @Component({
   standalone: true,
@@ -101,12 +102,12 @@ export class ImageListViewComponent implements OnInit {
     private themeService: ThemeService,
     private router: Router,
     private route: ActivatedRoute,
-    private readonly http: HttpClient,
     private snackbarService: SnackbarService,
     private store: Store,
     private matDialog: MatDialog,
     private translateService: TranslateService,
-    private apiConfigService: ApiConfigService
+    private apiConfigService: ApiConfigService,
+    private datasetService: DatasetService
   ) {}
 
   ngOnInit() {
@@ -157,20 +158,19 @@ export class ImageListViewComponent implements OnInit {
    * 呼叫取得清單資料
    */
   getData() {
-    let jsonList = this.themeDBList.filter(x => x.type === 'json');
-    from(jsonList)
+    from(this.themeDBList.filter(x => x.type === 'dataset'))
       .pipe(
         //concatMap按照順序訂閱並發出,避免一次性發出而失敗
         concatMap((x, i) =>
-          this.http.get(x.source).pipe(
-            map((res: any) => {
-              res = res.map((x: any) => {
+          this.datasetService.findDatasetData(x.source).pipe(
+            map(res => {
+              res.data = res.data.map((x: any) => {
                 x[this.randomStr] = crypto.getRandomValues(
                   new Uint32Array(1)
                 )[0];
                 return x;
               });
-              return { db: x, data: res };
+              return { db: x, data: res.data };
             })
           )
         ),

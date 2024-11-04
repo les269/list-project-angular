@@ -68,7 +68,7 @@ export interface ThemeDB {
 }
 
 export enum ThemeDBType {
-  json = 'json',
+  dataset = 'dataset',
   group = 'group',
 }
 

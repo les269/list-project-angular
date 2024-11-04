@@ -18,7 +18,8 @@
           [(ngModel)]="element.type"
           name="dbType{{ i }}"
           class="form-control"
-          style="width: 120px">
+          style="width: 120px"
+          (ngModelChange)="element.source = ''">
           @for (type of eThemeDBType | keyvalue; track $index) {
             <option [value]="type.key">
               {{ 'themeDB.' + type.key | translate }}
@@ -32,11 +33,32 @@
         {{ 'themeDB.source' | translate }}
       </th>
       <td mat-cell *matCellDef="let element; let i = dataIndex">
-        <input
-          class="form-control"
-          name="dbSource{{ i }}"
-          [(ngModel)]="element.source"
-          [placeholder]="'themeDB.' + element.type + 'Ph' | translate" />
+        @if (element.type === 'dataset') {
+          <div class="mt-1 d-flex flex-wrap gap-3 align-items-center">
+            @if (element.source) {
+              <mat-chip cdkDrag
+                >{{ element.source }}
+                <button matChipRemove (click)="element.source = ''">
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip>
+            }
+            <button
+              class="btn btn-outline-primary d-flex"
+              (click)="selectDataset(element)">
+              <mat-icon class="material-icons-outlined"
+                ><span class="material-symbols-outlined">
+                  select_window_2
+                </span></mat-icon
+              >
+            </button>
+          </div>
+        } @else if (element.type === 'group') {
+          <input
+            class="form-control"
+            [(ngModel)]="element.source"
+            [placeholder]="'themeDB.groupPh' | translate" />
+        }
       </td>
     </ng-container>
     <ng-container matColumnDef="label">
@@ -116,7 +138,10 @@
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    <tr
+      mat-row
+      *matRowDef="let row; columns: displayedColumns"
+      class="expand-row"></tr>
     <tr mat-row *matRowDef="let row; columns: ['expandedDetail']"></tr>
     <tr mat-footer-row *matFooterRowDef="['add']"></tr>
   </table>

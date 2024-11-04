@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Dataset } from '../../model';
+import { GroupDataset } from '../../model';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import {
@@ -15,10 +15,10 @@ import { TranslateModule } from '@ngx-translate/core';
 import { switchMap, EMPTY } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { isBlank } from '../../../../shared/util/helper';
-import { DatasetService } from '../../service/dataset.service';
+import { GroupDatasetService } from '../../service/group-dataset.service';
 
 @Component({
-  selector: 'app-copy-dataset',
+  selector: 'app-copy-group-dataset',
   standalone: true,
   imports: [
     ReactiveFormsModule,
@@ -31,31 +31,31 @@ import { DatasetService } from '../../service/dataset.service';
     TranslateModule,
     CommonModule,
   ],
-  templateUrl: './copy-dataset.component.html',
+  templateUrl: './copy-group-dataset.component.html',
 })
-export class CopyDatasetComponent {
-  readonly dialogRef = inject(MatDialogRef<CopyDatasetComponent>);
-  readonly data = inject<{ source: Dataset }>(MAT_DIALOG_DATA);
-  source: Dataset = JSON.parse(JSON.stringify(this.data.source));
+export class CopyGroupDatasetComponent {
+  readonly dialogRef = inject(MatDialogRef<CopyGroupDatasetComponent>);
+  readonly data = inject<{ source: GroupDataset }>(MAT_DIALOG_DATA);
+  source: GroupDataset = JSON.parse(JSON.stringify(this.data.source));
   constructor(
-    private datasetService: DatasetService,
+    private groupDatasetService: GroupDatasetService,
     private snackbarService: SnackbarService
   ) {}
 
   ok() {
-    if (isBlank(this.source.name)) {
-      this.snackbarService.isBlankMessage('scrapy.name');
+    if (isBlank(this.source.groupName)) {
+      this.snackbarService.isBlankMessage('scrapy.groupName');
       return;
     }
-    this.datasetService
-      .existDataset(this.source.name)
+    this.groupDatasetService
+      .existGroupDataset(this.source.groupName)
       .pipe(
         switchMap(res => {
           if (res) {
             this.snackbarService.openByI18N('msg.scrapyExist');
             return EMPTY;
           }
-          return this.datasetService.updateDataset(this.source);
+          return this.groupDatasetService.updateGroupDataset(this.source);
         })
       )
       .subscribe(() => {

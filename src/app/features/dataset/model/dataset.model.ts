@@ -8,7 +8,6 @@ export interface Dataset {
 export interface DatasetConfig {
   type: DatasetConfigType;
   groupName: string;
-  byKey: string;
   filePath: string;
   fileExtension: string;
   folderPath: string;
@@ -18,7 +17,6 @@ export interface DatasetConfig {
   autoImageDownload: boolean;
   imageByKey: string;
   imageSaveFolder: string;
-  datasetScrapyList: DatasetScrapy[];
 }
 
 export interface DatasetField {
@@ -26,21 +24,14 @@ export interface DatasetField {
   type: DatasetFieldType;
   key: string;
   label: string;
+  fixedString: string;
 }
 
 export enum DatasetFieldType {
-  string = 'string',
-  stringArray = 'stringArray',
-  number = 'number',
-  date = 'date',
-}
-
-export interface DatasetGroup {
-  groupName: string;
-  primeValue: string;
-  json: any;
-  createdTime?: Date;
-  updatedTime?: Date;
+  path = 'path',
+  fileName = 'fileName',
+  fixedString = 'fixedString',
+  fileSize = 'fileSize',
 }
 
 export interface DatasetData {
@@ -54,13 +45,4 @@ export enum DatasetConfigType {
   file = 'file',
   folder = 'folder',
   all = 'all',
-}
-
-export interface DatasetScrapy {
-  seq: number;
-  name: string;
-  label: string;
-  isDefault: boolean;
-  visibleJson: boolean;
-  visibleUrl: boolean;
 }

@@ -3,19 +3,21 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { GroupDataset } from '../../model';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { MessageBoxComponent } from '../../../../core/components/message-box.component';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { isNotBlank } from '../../../../shared/util/helper';
-import { Dataset } from '../../model/dataset.model';
 import { DatasetService } from '../../service/dataset.service';
+import { GroupDatasetService } from '../../service/group-dataset.service';
+import { MessageBoxComponent } from '../../../../core/components/message-box.component';
+import { isNotBlank } from '../../../../shared/util/helper';
 import { CopyDatasetComponent } from '../../components/copy-dataset/copy-dataset.component';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { CopyGroupDatasetComponent } from '../../components/copy-group-dataset/copy-group-dataset.component';
 
 @Component({
-  selector: 'app-dataset-list',
+  selector: 'app-group-dataset-list',
   standalone: true,
   imports: [
     TranslateModule,
@@ -25,37 +27,30 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatIconModule,
     MatTooltipModule,
   ],
-  templateUrl: './dataset-list.component.html',
+  templateUrl: './group-dataset-list.component.html',
+  styleUrl: './group-dataset-list.component.scss',
 })
-export class DatasetListComponent {
-  displayedColumns = [
-    'name',
-    'filterType',
-    'groupName',
-    'createdTime',
-    'updatedTime',
-    'other',
-  ];
-  list: Dataset[] = [];
-  isRefreshing: boolean = false;
+export class GroupDatasetListComponent {
+  displayedColumns = ['groupName', 'createdTime', 'updatedTime', 'other'];
+  list: GroupDataset[] = [];
   constructor(
     private translateService: TranslateService,
     private matDialog: MatDialog,
     private router: Router,
     private snackbarService: SnackbarService,
-    private datasetService: DatasetService
+    private groupDatasetService: GroupDatasetService
   ) {}
 
   ngOnInit() {
     this.getList();
   }
   getList() {
-    this.datasetService.getAllDataset().subscribe(res => {
+    this.groupDatasetService.getAllGroupDataset().subscribe(res => {
       this.list = res;
     });
   }
   onAdd() {
-    this.router.navigate(['dataset-edit']);
+    this.router.navigate(['group-dataset-edit']);
   }
   onDelete(index: number) {
     this.matDialog
@@ -67,8 +62,8 @@ export class DatasetListComponent {
       .afterClosed()
       .subscribe(result => {
         if (isNotBlank(result)) {
-          this.datasetService
-            .deleteDataset(this.list[index].name)
+          this.groupDatasetService
+            .deleteGroupDataset(this.list[index].groupName)
             .subscribe(() => {
               this.snackbarService.openByI18N('msg.deletSuccess');
               this.getList();
@@ -77,11 +72,11 @@ export class DatasetListComponent {
       });
   }
   onEdit(index: number) {
-    this.router.navigate(['dataset-edit', this.list[index].name]);
+    this.router.navigate(['group-dataset-edit', this.list[index].groupName]);
   }
   onCopy(index: number) {
     this.matDialog
-      .open(CopyDatasetComponent, {
+      .open(CopyGroupDatasetComponent, {
         data: { source: this.list[index] },
       })
       .afterClosed()
@@ -91,23 +86,6 @@ export class DatasetListComponent {
           this.getList();
         }
       });
-  }
-  onRefresh(index: number) {
-    if (this.isRefreshing) {
-      return;
-    }
-    this.isRefreshing = true;
-    this.datasetService.refreshData(this.list[index].name).subscribe(
-      x => {
-        this.snackbarService.openByI18N('msg.refreshSuccess');
-      },
-      e => {
-        this.isRefreshing = false;
-      },
-      () => {
-        this.isRefreshing = false;
-      }
-    );
   }
   onEditDatasetData(index: number) {}
 }

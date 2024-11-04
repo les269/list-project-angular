@@ -20,7 +20,8 @@
     "apiConfigError": "API配置被刪除有錯誤",
     "jsonError": "請求內容轉換錯誤, 目前只支援陣列json請輸入正確的陣列json格式,最低限度為[]",
     "testJsonError": "測試用JSON轉換錯誤,請輸入正確的字串陣列",
-    "paramSizeError": "參數數量為整數且最少為1"
+    "paramSizeError": "參數數量為整數且最少為1",
+    "refreshSuccess": "刷新成功"
   },
   "g": {
     "edit": "編輯",
@@ -40,7 +41,8 @@
     "name": "名稱",
     "key": "鍵",
     "value": "值",
-    "unnamed": "未命名"
+    "unnamed": "未命名",
+    "refresh": "刷新"
   },
   "title": {
     "home": "清單列表",
@@ -48,6 +50,7 @@
     "copyTheme": "複製主題",
     "copyScrapy": "複製爬蟲",
     "copyDataset": "複製資料集",
+    "copyGroupDataset": "複製資料集群組",
     "inputUrl": "輸入網址",
     "writeEditor": "編輯Note",
     "apiConfigList": "API設定清單",
@@ -56,7 +59,9 @@
     "scrapyList": "爬蟲設定清單",
     "scrapyEdit": "編輯爬蟲",
     "datasetList": "資料集清單",
-    "datasetEdit": "資料集設定"
+    "datasetEdit": "資料集設定",
+    "groupDataset": "資料集群組清單",
+    "groupDatasetEdit": "資料集群組設定"
   },
   "home": { "createTheme": "創建主題" },
   "themeHeader": {
@@ -103,8 +108,9 @@
     "json": "設定json",
     "jsonPh": "設定資料來源限json格式",
     "group": "設定群組",
-    "groupPh": "設定要用的group，多group以,區隔",
-    "isDefault": "是否預設使用"
+    "groupPh": "合併其他來源",
+    "isDefault": "是否預設使用",
+    "dataset": "設定資料集"
   },
   "themeCustom": {
     "title": "自定義設定",
@@ -163,18 +169,21 @@
     "testUrl": "測試用網址",
     "testHtml": "測試用HTML",
     "testResult": "測試結果",
-    "cssSelectRemind": "當獲取到資料為單筆時會是保存成字串,而多筆時會保存成陣列,使用方法為Jsoup的select, 閱讀官方使用<a href='https://jsoup.org/apidocs/org/jsoup/select/Selector.html' target='_blank'>文件</a>。",
+    "cssSelectRemind": "當獲取到資料為單筆時會是保存成字串,而多筆時會保存成陣列,使用方法為Jsoup的select, 閱讀官方使用<a href='https://jsoup.org/apidocs/org/jsoup/select/Selector.html' target='_blank'>文件</a>。\n 特殊鍵'__image_referer'用來設定圖片header的Referer",
     "redirectRemind": "當使用跳轉網址時在獲取資料的方式有限定, 只會拿鍵為'__redirect'的參數。",
     "useAttr": "要取得的屬性,例如<a href='/ma-attr'>要取得href的字串輸入href即可",
-    "useReplaceString": "使用Css選擇器取得的資料來替換字串,例如替換字串要為'test:${0}${1}', 替換的地方用${x}而x由0開",
+    "useReplaceString": "最終替換成字串,例如替換字串要為'test:${0}${1}', 替換的地方用${x}而x由0開。",
     "useJsonRemind": "把資料注入'爬取頁面種類'為'跳轉網址'的爬蟲網址, 如果網址沒取得則忽略'爬取資料'直到有正確的跳轉網址可以進行爬取資料, 可以進行多個不同網頁的爬蟲。",
     "useUrlRemind": "只會把第一筆'爬取頁面種類'為'爬取資料'的用來爬蟲",
-    "convertToArray": "當為單筆資料為字串時勾選則限定為陣列, 即為固定資料型別為陣列。"
+    "convertToArray": "強制資料結果為陣列",
+    "onlyOwn": "抓取父元素中的文本（排除子元素的文本）",
+    "replaceRegular": "輸入要替換的正則",
+    "replaceRegularTo": "要替換成的字串"
   },
   "dataset": {
     "createDataset": "創建資料集",
     "name": "名稱",
-    "groupName": "資料的群組名稱",
+    "groupName": "資料群組名稱",
     "groupNameDesc": "對應資料的群組, 變更該群組名稱會讓所擁有的檔案進行變更, 例如當群組名稱為'動畫'那就只會會取'動畫'裡面的資料, 當改成'電影'那資料就變更成'電影'。",
     "filterType": "資料集過濾方式",
     "filterTypeDesc": "'全部獲取'會擁有資料集的來源的所有資料, '檔案'跟'資料夾'會使用名稱來過濾要使用的資料來源, 只會擁有對應名稱資料。",
@@ -207,6 +216,12 @@
     "stringArray": "字串陣列",
     "urlParamSize": "網址參數數量",
     "visibleJson": "顯示可輸入參數欄位",
-    "visibleUrl": "顯示可輸入網址欄位"
+    "visibleUrl": "顯示可輸入網址欄位",
+    "path": "資料路徑",
+    "fileName": "檔案全名",
+    "fixedString": "固定字串",
+    "fileSize": "檔案大小",
+    "editGroupData": "編輯群組所屬資料",
+    "createDatasetGroup": "創建資料集群組"
   }
 }

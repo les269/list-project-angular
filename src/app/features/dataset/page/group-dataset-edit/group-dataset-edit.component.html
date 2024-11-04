@@ -1,0 +1,54 @@
+<div class="container d-flex">
+  <div class="col-md-10 offset-md-1 col-xs-12 mt-2">
+    <button mat-icon-button (click)="onBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="form-group mb-2">
+      <label class="form-label require">{{
+        'dataset.groupName' | translate
+      }}</label>
+      <input
+        class="form-control"
+        [(ngModel)]="model.groupName"
+        [disabled]="status === 'edit'" />
+    </div>
+    <div class="form-group mb-2">
+      <label class="form-label require">{{
+        'dataset.byKey' | translate
+      }}</label>
+      <input class="form-control" [(ngModel)]="model.config.byKey" />
+    </div>
+    <div class="h4 fw-bold">
+      {{ 'dataset.fieldTable' | translate }}
+    </div>
+    <app-group-dataset-field-table
+      [(fieldList)]="
+        model.config.groupDatasetFieldList
+      "></app-group-dataset-field-table>
+    <div class="h4 fw-bold">
+      {{ 'dataset.scrapyTable' | translate }}
+    </div>
+    <app-group-dataset-scrapy-table
+      [(scrapyList)]="
+        model.config.groupDatasetScrapyList
+      "></app-group-dataset-scrapy-table>
+    @if (status === 'edit') {
+      <div class="my-4">
+        <button
+          type="submit"
+          class="btn btn-success w-100"
+          (click)="update(false, 'save')">
+          {{ 'g.save' | translate }}
+        </button>
+      </div>
+    }
+    <div class="my-4">
+      <button
+        type="submit"
+        class="btn btn-success w-100"
+        (click)="update(true, 'commit')">
+        {{ 'g.submit' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

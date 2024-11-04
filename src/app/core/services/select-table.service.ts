@@ -7,6 +7,7 @@ import {
 } from '../components/select-table/select-table.dialog';
 import { ScrapyConfig } from '../../features/scrapy/model';
 import { DatePipe } from '@angular/common';
+import { Dataset, GroupDataset } from '../../features/dataset/model';
 
 @Injectable({ providedIn: 'root' })
 export class SelectTableService {
@@ -54,6 +55,56 @@ export class SelectTableService {
         SelectTableDialog<ScrapyConfig, BaseSelectTableData<ScrapyConfig>>,
         BaseSelectTableData<ScrapyConfig>,
         ScrapyConfig
+      >(SelectTableDialog, {
+        data,
+      })
+      .afterClosed();
+  }
+
+  selectSingleDataset(dataSource: Dataset[]) {
+    const datePipe = new DatePipe('en-US');
+    const data: BaseSelectTableData<Dataset> = {
+      displayedColumns: ['name', 'createdTime', 'updatedTime'],
+      labels: ['dataset.name', 'g.createdTime', 'g.updatedTime'],
+      dataSource,
+      selectType: 'single',
+      columnFormats: {
+        createdTime: (value: any) =>
+          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
+        updatedTime: (value: any) =>
+          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
+      },
+    };
+    return this.matDialog
+      .open<
+        SelectTableDialog<Dataset, BaseSelectTableData<Dataset>>,
+        BaseSelectTableData<Dataset>,
+        Dataset
+      >(SelectTableDialog, {
+        data,
+      })
+      .afterClosed();
+  }
+
+  selectSingleGroupDataset(dataSource: GroupDataset[]) {
+    const datePipe = new DatePipe('en-US');
+    const data: BaseSelectTableData<GroupDataset> = {
+      displayedColumns: ['groupName', 'createdTime', 'updatedTime'],
+      labels: ['dataset.groupName', 'g.createdTime', 'g.updatedTime'],
+      dataSource,
+      selectType: 'single',
+      columnFormats: {
+        createdTime: (value: any) =>
+          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
+        updatedTime: (value: any) =>
+          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
+      },
+    };
+    return this.matDialog
+      .open<
+        SelectTableDialog<GroupDataset, BaseSelectTableData<GroupDataset>>,
+        BaseSelectTableData<GroupDataset>,
+        GroupDataset
       >(SelectTableDialog, {
         data,
       })

@@ -9,14 +9,14 @@ import {
 } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule } from '@ngx-translate/core';
-import { DatasetField, DatasetFieldType, DatasetScrapy } from '../../model';
+import { GroupDatasetScrapy } from '../../model';
 import { MatChipsModule } from '@angular/material/chips';
 import { ScrapyService } from '../../../scrapy/services/scrapy.service';
 import { ScrapyConfig } from '../../../scrapy/model';
 import { SelectTableService } from '../../../../core/services/select-table.service';
 
 @Component({
-  selector: 'app-dataset-scrapy-table',
+  selector: 'app-group-dataset-scrapy-table',
   standalone: true,
   imports: [
     MatTableModule,
@@ -29,10 +29,10 @@ import { SelectTableService } from '../../../../core/services/select-table.servi
     MatCheckboxModule,
     MatChipsModule,
   ],
-  templateUrl: './dataset-scrapy-table.component.html',
-  styleUrl: './dataset-scrapy-table.component.scss',
+  templateUrl: './group-dataset-scrapy-table.component.html',
+  styleUrl: './group-dataset-scrapy-table.component.scss',
 })
-export class DatasetScrapyTableComponent implements OnInit {
+export class GroupDatasetScrapyTableComponent implements OnInit {
   displayedColumns = [
     'seq',
     'name',
@@ -42,8 +42,8 @@ export class DatasetScrapyTableComponent implements OnInit {
     'visibleUrl',
     'other',
   ];
-  @Input({ required: true }) scrapyList!: DatasetScrapy[];
-  @Output() scrapyListChange = new EventEmitter<DatasetScrapy[]>();
+  @Input({ required: true }) scrapyList!: GroupDatasetScrapy[];
+  @Output() scrapyListChange = new EventEmitter<GroupDatasetScrapy[]>();
   scrapyConfigList: ScrapyConfig[] = [];
 
   constructor(
@@ -77,7 +77,9 @@ export class DatasetScrapyTableComponent implements OnInit {
   }
   //資料來源的上下移動
   onUpDown(index: number, type: 'up' | 'down') {
-    let data: DatasetScrapy[] = JSON.parse(JSON.stringify(this.scrapyList));
+    let data: GroupDatasetScrapy[] = JSON.parse(
+      JSON.stringify(this.scrapyList)
+    );
     let source = data[index];
     let target = data.splice(index + (type === 'up' ? -1 : 1), 1, source);
     data.splice(index, 1, target[0]);
@@ -99,7 +101,7 @@ export class DatasetScrapyTableComponent implements OnInit {
     }
     this.scrapyListChange.emit(this.scrapyList);
   }
-  selectScrapy(e: DatasetScrapy) {
+  selectScrapy(e: GroupDatasetScrapy) {
     this.selectTableService
       .selectSingleScrapy(this.scrapyConfigList)
       .subscribe(res => {

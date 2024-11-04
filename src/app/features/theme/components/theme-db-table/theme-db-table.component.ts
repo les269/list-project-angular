@@ -13,6 +13,10 @@ import { TranslateModule } from '@ngx-translate/core';
 import { CustomTableComponent } from '../custom-table/custom-table.component';
 import { ThemeDB, ThemeDBType } from '../../models';
 import { isNull } from '../../../../shared/util/helper';
+import { MatChipsModule } from '@angular/material/chips';
+import { SelectTableService } from '../../../../core/services/select-table.service';
+import { DatasetService } from '../../../dataset/service/dataset.service';
+import { Dataset } from '../../../dataset/model';
 
 @Component({
   standalone: true,
@@ -27,11 +31,12 @@ import { isNull } from '../../../../shared/util/helper';
     MatListModule,
     TranslateModule,
     CustomTableComponent,
+    MatChipsModule,
   ],
   selector: 'app-theme-db-table',
   templateUrl: 'theme-db-table.component.html',
 })
-export class ThemeDBTableComponent {
+export class ThemeDBTableComponent implements OnInit {
   @Input({ required: true }) themeDBList!: ThemeDB[];
   @Output() themeDBListChange = new EventEmitter<ThemeDB[]>();
   displayedColumns: string[] = [
@@ -43,6 +48,17 @@ export class ThemeDBTableComponent {
     'other',
   ];
   eThemeDBType = ThemeDBType;
+  datasetList: Dataset[] = [];
+
+  constructor(
+    private selectTableService: SelectTableService,
+    private datasetService: DatasetService
+  ) {}
+  ngOnInit(): void {
+    this.datasetService
+      .getAllDataset()
+      .subscribe(res => (this.datasetList = res));
+  }
 
   //新增資料來源
   onAdd() {
@@ -51,7 +67,7 @@ export class ThemeDBTableComponent {
     }
     let element: ThemeDB = {
       seq: this.themeDBList.length + 1,
-      type: ThemeDBType.json,
+      type: ThemeDBType.dataset,
       source: '',
       label: '',
       groups: '',
@@ -91,5 +107,14 @@ export class ThemeDBTableComponent {
       });
     }
     this.themeDBListChange.emit(this.themeDBList);
+  }
+  selectDataset(element: ThemeDB) {
+    this.selectTableService
+      .selectSingleDataset(this.datasetList)
+      .subscribe(x => {
+        if (x) {
+          element.source = x.name;
+        }
+      });
   }
 }

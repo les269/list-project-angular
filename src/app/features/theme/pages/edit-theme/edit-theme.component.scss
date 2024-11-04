@@ -3,14 +3,12 @@
   text-align: center;
 }
 
-.element-row td {
-  border-bottom-width: 0;
-}
-
 .dropupdown-icon {
   display: inline-block;
   cursor: pointer;
-  transition: transform 0.3s ease, color 0.3s ease; /* 0.3s 的動畫時間和過渡效果 */
+  transition:
+    transform 0.3s ease,
+    color 0.3s ease; /* 0.3s 的動畫時間和過渡效果 */
   &.up:hover {
     transform: translateY(-0.125rem); /* 向下移動 0.125rem */
     color: lightblue;
