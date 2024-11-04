@@ -132,6 +132,9 @@ export class EditGroupDatasetDataComponent implements OnInit {
 
   editChip(before: string, key: string, event: MatChipEditedEvent) {
     const after = event.value.trim();
+    if (before === after) {
+      return;
+    }
     this.json[key] = [...this.json[key], after]
       .filter(x => x !== before)
       .sort((a, b) => (a > b ? 1 : -1));
