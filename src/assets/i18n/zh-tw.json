@@ -14,6 +14,7 @@
     "sureDeleteApi": "是否要刪除該API?",
     "sureDeleteScrapy": "是否要刪除該爬蟲?",
     "sureDeleteDataset": "是否要刪除該資料集?",
+    "sureDeleteImage": "是否要刪除該圖片'{{name}}'?",
     "copyText": "以複製至剪貼簿: {{text}}",
     "repeatColumn": "{{text}} 不可以有重複欄位",
     "apiExist": "API已經存在,在API名稱跟API標籤不可以重複",
@@ -22,7 +23,9 @@
     "jsonError": "請求內容轉換錯誤, 目前只支援陣列json請輸入正確的陣列json格式,最低限度為[]",
     "testJsonError": "測試用JSON轉換錯誤,請輸入正確的字串陣列",
     "paramSizeError": "參數數量為整數且最少為1",
-    "refreshSuccess": "刷新成功"
+    "refreshSuccess": "刷新成功",
+    "deleteImageFail": "圖片未刪除",
+    "deleteImageSuccess": "成功刪除圖片 {{path}}"
   },
   "g": {
     "edit": "編輯",
@@ -45,7 +48,8 @@
     "unnamed": "未命名",
     "refresh": "刷新",
     "search": "搜尋",
-    "update": "更新"
+    "update": "更新",
+    "deleteImage": "刪除圖片"
   },
   "title": {
     "home": "清單列表",

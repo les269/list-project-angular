@@ -16,16 +16,17 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { GroupDatasetService } from '../../service/group-dataset.service';
 import { GroupDatasetDataService } from '../../service/group-dataset-data.service';
 import { ScrapyService } from '../../../scrapy/services/scrapy.service';
-import { isNotBlank } from '../../../../shared/util/helper';
+import { isBlank, isNotBlank } from '../../../../shared/util/helper';
 import { MatIconModule } from '@angular/material/icon';
 import { SelectTableService } from '../../../../core/services/select-table.service';
-import { switchMap } from 'rxjs';
+import { EMPTY, switchMap } from 'rxjs';
 import {
   MatChipEditedEvent,
   MatChipInputEvent,
   MatChipsModule,
 } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MessageBoxService } from '../../../../core/services/message-box.service';
 
 export interface EditGroupDatasetDataType {
   groupName: string;
@@ -65,7 +66,8 @@ export class EditGroupDatasetDataComponent implements OnInit {
     private groupDatasetDataService: GroupDatasetDataService,
     private groupDatasetService: GroupDatasetService,
     private scrapyService: ScrapyService,
-    private selectTableService: SelectTableService
+    private selectTableService: SelectTableService,
+    private messageBoxService: MessageBoxService
   ) {}
   ngOnInit(): void {
     this.groupDatasetService.getGroupDataset(this.groupName).subscribe(res => {
@@ -150,5 +152,34 @@ export class EditGroupDatasetDataComponent implements OnInit {
     this.groupDatasetDataService.updateGroupDatasetData(req).subscribe(() => {
       this.snackbarService.openByI18N('msg.updateSuccess');
     });
+  }
+
+  deleteImage() {
+    if (isBlank(this.primeValue)) {
+      this.snackbarService.isBlankMessage('dataset.primeValue');
+      return;
+    }
+    this.messageBoxService
+      .openI18N('msg.sureDeleteImage', { name: this.primeValue })
+      .pipe(
+        switchMap(x => {
+          if (x) {
+            return this.groupDatasetDataService.deleteGroupDatasetDataForImage(
+              this.groupName,
+              this.primeValue
+            );
+          }
+          return EMPTY;
+        })
+      )
+      .subscribe(res => {
+        if (isBlank(res)) {
+          this.snackbarService.openByI18N('msg.deleteImageFail');
+        } else {
+          this.snackbarService.openByI18N('msg.deleteImageSuccess', {
+            path: res,
+          });
+        }
+      });
   }
 }

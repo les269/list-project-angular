@@ -64,7 +64,6 @@ export class DatasetEditComponent implements OnInit {
       fieldList: [],
       autoImageDownload: false,
       imageByKey: '',
-      imageSaveFolder: '',
     },
   };
   eDatasetConfigType = DatasetConfigType;
@@ -139,10 +138,6 @@ export class DatasetEditComponent implements OnInit {
     if (this.model.config.autoImageDownload) {
       if (isBlank(this.model.config.imageByKey)) {
         this.snackbarService.isBlankMessage('dataset.imageByKey');
-        return false;
-      }
-      if (isBlank(this.model.config.imageSaveFolder)) {
-        this.snackbarService.isBlankMessage('dataset.imageSaveFolder');
         return false;
       }
     }

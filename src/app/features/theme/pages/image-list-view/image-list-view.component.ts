@@ -172,11 +172,12 @@ export class ImageListViewComponent implements OnInit {
         concatMap((x, i) =>
           this.datasetService.findDatasetData(x.source).pipe(
             map(res => {
-              res.data = res.data.map((x: any) => {
-                x[this.randomStr] = crypto.getRandomValues(
+              res.data = res.data.map((data: any) => {
+                data[this.randomStr] = crypto.getRandomValues(
                   new Uint32Array(1)
                 )[0];
-                return x;
+                data['__source'] = x.source;
+                return data;
               });
               return { db: x, data: res.data };
             })
@@ -615,19 +616,23 @@ export class ImageListViewComponent implements OnInit {
   }
 
   openEditData(data: any) {
-    if (this.useDB.type === 'group') {
-    } else {
-      this.datasetService.findDataset(this.useDB.source).subscribe(x => {
+    this.datasetService
+      .findDataset(data['__source'])
+      .pipe(
+        switchMap(x =>
+          this.groupdatasetService.getGroupDataset(x.config.groupName)
+        )
+      )
+      .subscribe(x => {
         this.matDialog.open(EditGroupDatasetDataComponent, {
           data: {
-            groupName: x.config.groupName,
-            primeValue: data[this.defaultKey],
+            groupName: x.groupName,
+            primeValue: data[x.config.byKey],
           },
           minWidth: '60vw',
           autoFocus: false,
         });
       });
-    }
   }
 
   sortArrayText(arr: any) {

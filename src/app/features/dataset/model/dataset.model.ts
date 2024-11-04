@@ -16,7 +16,6 @@ export interface DatasetConfig {
   fieldList: DatasetField[];
   autoImageDownload: boolean;
   imageByKey: string;
-  imageSaveFolder: string;
 }
 
 export interface DatasetField {

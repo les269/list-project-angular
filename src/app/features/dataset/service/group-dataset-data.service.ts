@@ -44,4 +44,14 @@ export class GroupDatasetDataService {
       `${this.prefix}/delete?groupName=${groupName}&primeValue=${primeValue}`
     );
   }
+
+  deleteGroupDatasetDataForImage(
+    groupName: string,
+    primeValue: string
+  ): Observable<string> {
+    return this.http.delete(
+      `${this.prefix}/delete-image?groupName=${groupName}&primeValue=${primeValue}`,
+      { responseType: 'text' }
+    );
+  }
 }

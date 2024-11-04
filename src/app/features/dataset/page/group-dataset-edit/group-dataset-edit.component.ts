@@ -43,6 +43,7 @@ export class GroupDatasetEditComponent implements OnInit {
       byKey: '',
       groupDatasetScrapyList: [],
       groupDatasetFieldList: [],
+      imageSaveFolder: '',
     },
   };
   eGroupDatasetFieldType = GroupDatasetFieldType;

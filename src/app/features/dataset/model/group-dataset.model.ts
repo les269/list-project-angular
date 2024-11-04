@@ -6,6 +6,7 @@ export interface GroupDataset {
 }
 export interface GroupDatasetConfig {
   byKey: string;
+  imageSaveFolder: string;
   groupDatasetScrapyList: GroupDatasetScrapy[];
   groupDatasetFieldList: GroupDatasetField[];
 }

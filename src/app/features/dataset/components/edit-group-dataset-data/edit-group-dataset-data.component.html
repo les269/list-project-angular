@@ -35,6 +35,14 @@
       {{ 'g.search' | translate }}
     </button>
   </div>
+  <div class="input-group mb-2">
+    <button
+      class="btn btn-outline-secondary"
+      type="button"
+      (click)="deleteImage()">
+      {{ 'g.deleteImage' | translate }}
+    </button>
+  </div>
   <hr />
   @if (groupDatasetConfig) {
     @for (scrapy of groupDatasetConfig.groupDatasetScrapyList; track $index) {
