@@ -1,6 +1,13 @@
+import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { SelectionModel } from '@angular/cdk/collections';
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -12,7 +19,12 @@ import {
   MatDialogRef,
   MAT_DIALOG_DATA,
 } from '@angular/material/dialog';
-import { MatTable, MatTableModule } from '@angular/material/table';
+import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
+import {
+  MatTable,
+  MatTableDataSource,
+  MatTableModule,
+} from '@angular/material/table';
 import { TranslateModule } from '@ngx-translate/core';
 
 export interface BaseSelectTableData<O> {
@@ -23,6 +35,8 @@ export interface BaseSelectTableData<O> {
   title?: string;
   selected?: O | O[];
   columnFormats?: { [key: string]: (value: any) => string };
+  columnSorts?: { [key: string]: boolean };
+  enableFilter?: boolean;
 }
 @Component({
   standalone: true,
@@ -38,25 +52,29 @@ export interface BaseSelectTableData<O> {
     TranslateModule,
     CommonModule,
     MatCheckboxModule,
+    MatSortModule,
   ],
   selector: 'app-select-dialog',
   templateUrl: 'select-table.dialog.html',
   styleUrl: 'select-table.dialog.scss',
 })
 export class SelectTableDialog<O, T extends BaseSelectTableData<O>>
-  implements OnInit
+  implements OnInit, AfterViewInit
 {
   readonly dialogRef = inject(MatDialogRef<SelectTableDialog<O, T>>);
   readonly data = inject<T>(MAT_DIALOG_DATA);
   displayedColumns = this.data.displayedColumns;
   multipleDisplayedColumns: string[] = [];
   labels = this.data.labels;
-  dataSource = this.data.dataSource;
+  dataSource = new MatTableDataSource(this.data.dataSource);
   selectType = this.data.selectType;
   columnFormats = this.data.columnFormats;
+  columnSorts = this.data.columnSorts;
   title = this.data.title;
   selected = this.data.selected;
+  enableFilter = this.data.enableFilter;
   selection = new SelectionModel<O>(true, []);
+  @ViewChild(MatSort) sort!: MatSort;
 
   ngOnInit(): void {
     if (this.selectType === 'multiple') {
@@ -66,6 +84,11 @@ export class SelectTableDialog<O, T extends BaseSelectTableData<O>>
       }
     }
   }
+
+  ngAfterViewInit(): void {
+    this.dataSource.sort = this.sort;
+  }
+
   onOk() {
     this.dialogRef.close(this.selection.selected);
   }
@@ -80,7 +103,7 @@ export class SelectTableDialog<O, T extends BaseSelectTableData<O>>
 
   isAllSelected() {
     const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.length;
+    const numRows = this.dataSource.data.length;
     return numSelected === numRows;
   }
 
@@ -91,6 +114,11 @@ export class SelectTableDialog<O, T extends BaseSelectTableData<O>>
       return;
     }
 
-    this.selection.select(...this.dataSource);
+    this.selection.select(...this.dataSource.data);
+  }
+
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 }

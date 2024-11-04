@@ -13,6 +13,7 @@ import { Dataset } from '../../model/dataset.model';
 import { DatasetService } from '../../service/dataset.service';
 import { CopyDatasetComponent } from '../../components/copy-dataset/copy-dataset.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { EditGroupDatasetDataComponent } from '../../components/edit-group-dataset-data/edit-group-dataset-data.component';
 
 @Component({
   selector: 'app-dataset-list',
@@ -109,5 +110,14 @@ export class DatasetListComponent {
       }
     );
   }
-  onEditDatasetData(index: number) {}
+  onEditDatasetData(e: Dataset) {
+    this.matDialog.open(EditGroupDatasetDataComponent, {
+      data: {
+        groupName: e.config.groupName,
+        primeValue: '',
+      },
+      minWidth: '60vw',
+      autoFocus: false,
+    });
+  }
 }

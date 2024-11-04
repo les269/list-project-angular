@@ -15,6 +15,7 @@ import { MessageBoxComponent } from '../../../../core/components/message-box.com
 import { isNotBlank } from '../../../../shared/util/helper';
 import { CopyDatasetComponent } from '../../components/copy-dataset/copy-dataset.component';
 import { CopyGroupDatasetComponent } from '../../components/copy-group-dataset/copy-group-dataset.component';
+import { EditGroupDatasetDataComponent } from '../../components/edit-group-dataset-data/edit-group-dataset-data.component';
 
 @Component({
   selector: 'app-group-dataset-list',
@@ -87,5 +88,14 @@ export class GroupDatasetListComponent {
         }
       });
   }
-  onEditDatasetData(index: number) {}
+  onEditDatasetData(e: GroupDataset) {
+    this.matDialog.open(EditGroupDatasetDataComponent, {
+      data: {
+        groupName: e.groupName,
+        primeValue: '',
+      },
+      minWidth: '60vw',
+      autoFocus: false,
+    });
+  }
 }

@@ -1,0 +1,103 @@
+<div class="d-flex justify-content-between align-items-center">
+  <h2 mat-dialog-title>
+    {{ 'title.groupDatasetDataEdit' | translate }}
+  </h2>
+  <button class="d-flex mx-2" mat-icon-button [mat-dialog-close]="true">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content class="scrollbar-primary">
+  <div class="input-group mb-2">
+    <label class="input-group-text">{{
+      'dataset.groupName' | translate
+    }}</label>
+    <input class="form-control" [(ngModel)]="groupName" [disabled]="true" />
+  </div>
+  <div class="input-group mb-2">
+    <label class="input-group-text">{{
+      'dataset.primeValue' | translate
+    }}</label>
+    <input
+      class="form-control"
+      [(ngModel)]="primeValue"
+      (keydown.enter)="searchByPrimeValue()" />
+    <button
+      class="btn btn-outline-secondary d-flex"
+      type="button"
+      (click)="selectPrimeValue()">
+      <mat-icon>content_copy</mat-icon>
+    </button>
+    <button
+      class="btn btn-outline-secondary"
+      type="button"
+      (click)="searchByPrimeValue()">
+      {{ 'g.search' | translate }}
+    </button>
+  </div>
+  <hr />
+  @if (groupDatasetConfig) {
+    @for (scrapy of groupDatasetConfig.groupDatasetScrapyList; track $index) {
+      @if (scrapy.visibleJson && scrapySize[scrapy.name] > 0) {
+        <div class="input-group mb-2">
+          <label class="input-group-text">{{
+            'dataset.scrapyJsonLabel' | translate: { label: scrapy.label }
+          }}</label>
+          @for (size of [].constructor(scrapySize[scrapy.name]); track $index) {
+            <input class="form-control" />
+          }
+          <button class="btn btn-outline-secondary" type="button">
+            {{ 'g.search' | translate }}
+          </button>
+        </div>
+      }
+      @if (scrapy.visibleUrl) {
+        <div class="input-group mb-2">
+          <label class="input-group-text">{{
+            'dataset.scrapyUrlLabel' | translate: { label: scrapy.label }
+          }}</label>
+          <input class="form-control" />
+          <button class="btn btn-outline-secondary" type="button">
+            {{ 'g.search' | translate }}
+          </button>
+        </div>
+      }
+    }
+    <hr />
+    @for (field of groupDatasetConfig.groupDatasetFieldList; track $index) {
+      @switch (field.type) {
+        @case ('string') {
+          <div class="input-group mb-2">
+            <label class="input-group-text">{{ field.label }}</label>
+            <input class="form-control" [(ngModel)]="json[field.key]" />
+          </div>
+        }
+        @case ('stringArray') {
+          <mat-form-field class="d-flex" appearance="outline">
+            <mat-label>{{ field.label }}</mat-label>
+            <mat-chip-grid #chipGrid>
+              @for (value of json[field.key]; track $index) {
+                <mat-chip-row
+                  (removed)="removeChip(value, field.key)"
+                  [editable]="true"
+                  (edited)="editChip(value, field.key, $event)">
+                  {{ value }}
+                  <button matChipRemove>
+                    <mat-icon>cancel</mat-icon>
+                  </button>
+                </mat-chip-row>
+              }
+              <input
+                [matChipInputFor]="chipGrid"
+                [matChipInputAddOnBlur]="true"
+                (matChipInputTokenEnd)="addChip($event, field.key)" />
+            </mat-chip-grid>
+          </mat-form-field>
+        }
+      }
+    }
+  }
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="onUpdate()">{{ 'g.update' | translate }}</button>
+</mat-dialog-actions>

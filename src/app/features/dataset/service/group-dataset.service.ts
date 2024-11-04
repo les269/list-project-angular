@@ -1,29 +1,36 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { GroupDataset } from '../model';
+import { GroupDataset, GroupDatasetData } from '../model';
 
 @Injectable({ providedIn: 'root' })
 export class GroupDatasetService {
+  prefix = '/group-dataset';
   constructor(private readonly http: HttpClient) {}
 
-  getGroupDataset(name: string): Observable<GroupDataset> {
-    return this.http.get<GroupDataset>(`/group-dataset/get?name=${name}`);
+  getGroupDataset(groupName: string): Observable<GroupDataset> {
+    return this.http.get<GroupDataset>(
+      `${this.prefix}/get?groupName=${groupName}`
+    );
   }
 
-  existGroupDataset(name: string): Observable<boolean> {
-    return this.http.get<boolean>(`/group-dataset/exist?name=${name}`);
+  existGroupDataset(groupName: string): Observable<boolean> {
+    return this.http.get<boolean>(
+      `${this.prefix}/exist?groupName=${groupName}`
+    );
   }
 
   getAllGroupDataset(): Observable<GroupDataset[]> {
-    return this.http.get<GroupDataset[]>('/group-dataset/all');
+    return this.http.get<GroupDataset[]>(`${this.prefix}/all`);
   }
 
   updateGroupDataset(req: Partial<GroupDataset>): Observable<void> {
-    return this.http.post<void>('/group-dataset/update', req);
+    return this.http.post<void>(`${this.prefix}/update`, req);
   }
 
-  deleteGroupDataset(name: string): Observable<void> {
-    return this.http.delete<void>(`/group-dataset/delete?name=${name}`);
+  deleteGroupDataset(groupName: string): Observable<void> {
+    return this.http.delete<void>(
+      `${this.prefix}/delete?groupName=${groupName}`
+    );
   }
 }

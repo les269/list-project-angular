@@ -7,7 +7,11 @@ import {
 } from '../components/select-table/select-table.dialog';
 import { ScrapyConfig } from '../../features/scrapy/model';
 import { DatePipe } from '@angular/common';
-import { Dataset, GroupDataset } from '../../features/dataset/model';
+import {
+  Dataset,
+  GroupDataset,
+  GroupDatasetData,
+} from '../../features/dataset/model';
 
 @Injectable({ providedIn: 'root' })
 export class SelectTableService {
@@ -105,6 +109,40 @@ export class SelectTableService {
         SelectTableDialog<GroupDataset, BaseSelectTableData<GroupDataset>>,
         BaseSelectTableData<GroupDataset>,
         GroupDataset
+      >(SelectTableDialog, {
+        data,
+      })
+      .afterClosed();
+  }
+
+  selectSingleGroupDatasetData(dataSource: GroupDatasetData[]) {
+    const datePipe = new DatePipe('en-US');
+    const data: BaseSelectTableData<GroupDatasetData> = {
+      displayedColumns: ['primeValue', 'createdTime', 'updatedTime'],
+      labels: ['dataset.primeValue', 'g.createdTime', 'g.updatedTime'],
+      dataSource,
+      selectType: 'single',
+      columnFormats: {
+        createdTime: (value: any) =>
+          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
+        updatedTime: (value: any) =>
+          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
+      },
+      columnSorts: {
+        primeValue: true,
+        createdTime: true,
+        updatedTime: true,
+      },
+      enableFilter: true,
+    };
+    return this.matDialog
+      .open<
+        SelectTableDialog<
+          GroupDatasetData,
+          BaseSelectTableData<GroupDatasetData>
+        >,
+        BaseSelectTableData<GroupDatasetData>,
+        GroupDatasetData
       >(SelectTableDialog, {
         data,
       })

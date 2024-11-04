@@ -6,6 +6,7 @@ import {
   from,
   map,
   Subscription,
+  switchMap,
   toArray,
 } from 'rxjs';
 import {
@@ -49,6 +50,10 @@ import { ButtonInputUrlDialog } from '../../components/button-input-url.dialog';
 import { WriteNoteDialog } from '../../components/write-note.dialog';
 import { ApiConfigService } from '../../../api-config/service/api-config.service';
 import { DatasetService } from '../../../dataset/service/dataset.service';
+import { MatButtonModule } from '@angular/material/button';
+import { EditGroupDatasetDataComponent } from '../../../dataset/components/edit-group-dataset-data/edit-group-dataset-data.component';
+import { GroupDatasetService } from '../../../dataset/service/group-dataset.service';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   standalone: true,
@@ -65,6 +70,8 @@ import { DatasetService } from '../../../dataset/service/dataset.service';
     ReactiveFormsModule,
     ScrollTopComponent,
     MatMenuModule,
+    MatButtonModule,
+    MatTooltipModule,
   ],
   selector: 'app-image-list-view',
   templateUrl: 'image-list-view.component.html',
@@ -91,7 +98,7 @@ export class ImageListViewComponent implements OnInit {
   sortArray: Array<SortType> = [];
   sortValue: SortType | undefined;
   sortAsc: boolean = true;
-  searchKey: string[] = [];
+  searchLabel: ThemeLabel[] = [];
   defaultKey = '';
   customValueMap: ThemeCustomValueResponse = {};
   randomStr = 'random';
@@ -107,7 +114,8 @@ export class ImageListViewComponent implements OnInit {
     private matDialog: MatDialog,
     private translateService: TranslateService,
     private apiConfigService: ApiConfigService,
-    private datasetService: DatasetService
+    private datasetService: DatasetService,
+    private groupdatasetService: GroupDatasetService
   ) {}
 
   ngOnInit() {
@@ -218,9 +226,9 @@ export class ImageListViewComponent implements OnInit {
         isNotBlank(sort) && sortValue ? sortValue : this.sortArray[0];
     }
     //設定過濾資料欄位
-    this.searchKey = this.themeLabelList
-      .filter(x => x.isSearchValue && x.type !== 'seq')
-      .map(x => x.byKey);
+    this.searchLabel = this.themeLabelList.filter(
+      x => x.isSearchValue && x.type !== 'seq'
+    );
 
     this.onSearch();
     this.changeData();
@@ -288,14 +296,34 @@ export class ImageListViewComponent implements OnInit {
     if (isBlank(this.searchValue)) {
       this.searchValue = '';
       this.filterData = this.useData;
-    } else if (this.searchKey.length > 0) {
+    } else if (this.searchLabel.length > 0) {
       // 搜尋值轉小寫搜尋, 先把搜尋資料取出並轉小寫並不能為空值
       const searchValue = this.searchValue.toLocaleLowerCase();
       this.filterData = this.useData.filter((data: any) => {
-        return this.searchKey
-          .map(key => data[key]?.trim()?.toLowerCase())
-          .filter(x => isNotBlank(x))
-          .find(x => x.indexOf(searchValue) !== -1);
+        for (const label of this.searchLabel) {
+          if (
+            label.type === 'stringArray' &&
+            Array.isArray(data[label.byKey])
+          ) {
+            var arr = data[label.byKey];
+            for (const element of arr) {
+              if (
+                isNotBlank(element) &&
+                element
+                  .toLocaleLowerCase()
+                  .indexOf(searchValue.toLocaleLowerCase()) !== -1
+              ) {
+                return true;
+              }
+            }
+          } else {
+            const value = data[label.byKey]?.trim()?.toLowerCase();
+            if (isNotBlank(value) && value.indexOf(searchValue) !== -1) {
+              return true;
+            }
+          }
+        }
+        return false;
       });
     }
     this.pages = [];
@@ -584,5 +612,46 @@ export class ImageListViewComponent implements OnInit {
     if (custom.apiConfig) {
       this.apiConfigService.callSingleApi(custom.apiConfig, data);
     }
+  }
+
+  openEditData(data: any) {
+    if (this.useDB.type === 'group') {
+    } else {
+      this.datasetService.findDataset(this.useDB.source).subscribe(x => {
+        this.matDialog.open(EditGroupDatasetDataComponent, {
+          data: {
+            groupName: x.config.groupName,
+            primeValue: data[this.defaultKey],
+          },
+          minWidth: '60vw',
+          autoFocus: false,
+        });
+      });
+    }
+  }
+
+  sortArrayText(arr: any) {
+    if (Array.isArray(arr)) {
+      return arr.sort((a, b) => (a > b ? 1 : -1));
+    }
+    return arr;
+  }
+
+  onRefresh() {
+    var allDatasetName = [];
+    if (this.useDB.type === 'group') {
+      var sources = this.useDB.source.split(',');
+      allDatasetName = this.dataSoure
+        .filter(x => x.db.type === 'dataset' && sources.includes(x.db.groups))
+        .map(x => x.db.source)
+        .filter((value, i, arr) => arr.indexOf(value) === i);
+    } else {
+      allDatasetName = [
+        this.dataSoure.find(x => x.db === this.useDB)!.db.source,
+      ];
+    }
+    this.datasetService.refreshDataByNameList(allDatasetName).subscribe(x => {
+      this.getData();
+    });
   }
 }

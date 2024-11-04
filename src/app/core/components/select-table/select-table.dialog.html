@@ -1,6 +1,10 @@
 <h2 mat-dialog-title>{{ title??'title.pleaseSelect' | translate }}</h2>
 <mat-dialog-content class="scrollbar-primary">
-  <table mat-table [dataSource]="dataSource" multiTemplateDataRows>
+  @if (enableFilter) {
+  <input class="form-control my-2" (keyup)="applyFilter($event)" />
+  }
+
+  <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort>
     @if (selectType==='multiple') {
     <ng-container matColumnDef="select">
       <th mat-header-cell *matHeaderCellDef>
@@ -20,7 +24,13 @@
     </ng-container>
     } @for (column of displayedColumns; track $index;let index = $index) {
     <ng-container matColumnDef="{{column}}">
-      <th mat-header-cell *matHeaderCellDef>{{ labels[index] | translate }}</th>
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        mat-sort-header="{{column}}"
+        [disabled]="!(columnSorts && columnSorts![column])">
+        {{ labels[index] | translate }}
+      </th>
       <td mat-cell *matCellDef="let element">
         {{ columnFormats?.[column] ? columnFormats![column](element[column]) :
         element[column] }}

@@ -242,6 +242,11 @@ div.card {
           }
         }
       }
+      > button.edit-button {
+        display: flex;
+        right: 20px;
+        position: absolute;
+      }
     }
   }
 }

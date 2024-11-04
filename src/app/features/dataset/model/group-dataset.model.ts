@@ -36,6 +36,4 @@ export interface GroupDatasetData {
 export enum GroupDatasetFieldType {
   string = 'string',
   stringArray = 'stringArray',
-  number = 'number',
-  date = 'date',
 }

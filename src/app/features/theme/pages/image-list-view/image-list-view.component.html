@@ -14,6 +14,12 @@
           }
         </select>
       }
+      <button
+        mat-icon-button
+        [matTooltip]="'g.refresh' | translate"
+        (click)="onRefresh()">
+        <mat-icon>loop</mat-icon>
+      </button>
     </div>
     <div class="header-center col-4">
       <div class="d-flex">
@@ -126,6 +132,15 @@
           }
         </div>
         <div class="detail-content">
+          @if (hoveredIndex === i) {
+            <button
+              mat-icon-button
+              class="edit-button"
+              (click)="openEditData(data)">
+              <mat-icon>edit</mat-icon>
+            </button>
+          }
+
           <div class="detail-rows scrollbar-primary">
             @for (label of themeLabelList; track $index; let idx = $index) {
               @if (label.isVisible) {
@@ -303,8 +318,15 @@
       @case ('stringSplit') {
         <ng-container
           *ngTemplateOutlet="
-            splitTextRef;
+            arrayTextRef;
             context: { $implicit: getStringSplit(label, data), label, index }
+          "></ng-container>
+      }
+      @case ('stringArray') {
+        <ng-container
+          *ngTemplateOutlet="
+            arrayTextRef;
+            context: { $implicit: data[label.byKey], label, index }
           "></ng-container>
       }
       @case ('seq') {
@@ -321,14 +343,14 @@
 </ng-template>
 <ng-template
   labelValue
-  #splitTextRef
+  #arrayTextRef
   let-label="label"
   let-array
   let-index="index">
   @if (array.length > 0) {
     @if (label.isSearchButton) {
       <div class="text-links">
-        @for (text of array; track $index; let isLast = $last) {
+        @for (text of sortArrayText(array); track $index; let isLast = $last) {
           <a
             href="javascript:void(0);"
             class="text-link"
@@ -347,7 +369,7 @@
         }
       </div>
     } @else {
-      @for (text of array; track $index; let isLast = $last) {
+      @for (text of sortArrayText(array); track $index; let isLast = $last) {
         <div href="javascript:void(0);" class="row-text">{{ text }}</div>
         @if (!isLast) {
           <ng-container>{{ label.useSpace }}</ng-container>

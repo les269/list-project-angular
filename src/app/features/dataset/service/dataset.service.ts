@@ -30,7 +30,10 @@ export class DatasetService {
   deleteDataset(name: string): Observable<void> {
     return this.http.delete<void>(`/dataset/delete?name=${name}`);
   }
-  refreshData(name: string): Observable<Dataset> {
-    return this.http.get<Dataset>(`/dataset/refresh?name=${name}`);
+  refreshData(name: string): Observable<void> {
+    return this.http.get<void>(`/dataset/refresh?name=${name}`);
+  }
+  refreshDataByNameList(nameList: Partial<string[]>): Observable<void> {
+    return this.http.post<void>(`/dataset/name-list/refresh`, nameList);
   }
 }

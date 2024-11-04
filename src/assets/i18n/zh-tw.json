@@ -5,6 +5,7 @@
     "copySuccess": "複製成功",
     "commitSuccess": "提交成功",
     "saveSuccess": "保存成功",
+    "updateSuccess": "更新成功",
     "themeExist": "主題已經存在",
     "themeNotExist": "主題不存在",
     "scrapyExist": "該名稱已經存在",
@@ -42,7 +43,9 @@
     "key": "鍵",
     "value": "值",
     "unnamed": "未命名",
-    "refresh": "刷新"
+    "refresh": "刷新",
+    "search": "搜尋",
+    "update": "更新"
   },
   "title": {
     "home": "清單列表",
@@ -61,7 +64,8 @@
     "datasetList": "資料集清單",
     "datasetEdit": "資料集設定",
     "groupDataset": "資料集群組清單",
-    "groupDatasetEdit": "資料集群組設定"
+    "groupDatasetEdit": "資料集群組設定",
+    "groupDatasetDataEdit": "編輯群組資料"
   },
   "home": { "createTheme": "創建主題" },
   "themeHeader": {
@@ -87,6 +91,7 @@
     "string": "字串",
     "stringSplit": "字串需分割",
     "fileSize": "檔案容量",
+    "stringArray": "字串陣列",
     "seq": "序列號",
     "isVisible": "是否顯示",
     "isSort": "是否用來排序",
@@ -222,6 +227,9 @@
     "fixedString": "固定字串",
     "fileSize": "檔案大小",
     "editGroupData": "編輯群組所屬資料",
-    "createDatasetGroup": "創建資料集群組"
+    "createDatasetGroup": "創建資料集群組",
+    "scrapyUrlLabel": "{{label}}網址欄位",
+    "primeValue": "關鍵值",
+    "scrapyJsonLabel": "{{label}}字串欄位"
   }
 }

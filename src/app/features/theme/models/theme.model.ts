@@ -54,8 +54,7 @@ export enum ThemeLabelType {
   stringSplit = 'stringSplit',
   seq = 'seq',
   fileSize = 'fileSize',
-  //TODO:是否有需求
-  //dateFormat = 'dateFormat',
+  stringArray = 'stringArray',
 }
 
 export interface ThemeDB {
