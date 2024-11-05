@@ -34,7 +34,7 @@ export enum DatasetFieldType {
 }
 
 export interface DatasetData {
-  datasetConfigName: string;
+  datasetName: string;
   data: any[];
   createdTime?: Date;
   updatedTime?: Date;

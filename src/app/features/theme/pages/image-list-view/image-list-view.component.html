@@ -1,15 +1,15 @@
 <div class="content">
   <div class="content-header">
     <div class="header-left col-4">
-      @if (themeDBList && themeDBList.length > 1) {
+      @if (themeDatasetList && themeDatasetList.length > 1) {
         <select
           class="list-select"
-          [compareWith]="compareDB"
-          [(ngModel)]="useDB"
+          [compareWith]="compareDataset"
+          [(ngModel)]="useDataset"
           (change)="changeQueryParams()">
-          @for (db of themeDBList; track $index) {
-            <option [ngValue]="db">
-              {{ db.label }}
+          @for (dataset of themeDatasetList; track $index) {
+            <option [ngValue]="dataset">
+              {{ dataset.label }}
             </option>
           }
         </select>

@@ -11,12 +11,12 @@ import { MatListModule } from '@angular/material/list';
 import { MatTableModule } from '@angular/material/table';
 import { TranslateModule } from '@ngx-translate/core';
 import { CustomTableComponent } from '../custom-table/custom-table.component';
-import { ThemeDB, ThemeDBType } from '../../models';
 import { isNull } from '../../../../shared/util/helper';
 import { MatChipsModule } from '@angular/material/chips';
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import { DatasetService } from '../../../dataset/service/dataset.service';
 import { Dataset } from '../../../dataset/model';
+import { ThemeDataset } from '../../models';
 
 @Component({
   standalone: true,
@@ -33,27 +33,20 @@ import { Dataset } from '../../../dataset/model';
     CustomTableComponent,
     MatChipsModule,
   ],
-  selector: 'app-theme-db-table',
-  templateUrl: 'theme-db-table.component.html',
+  selector: 'app-theme-dataset-table',
+  templateUrl: 'theme-dataset-table.component.html',
 })
-export class ThemeDBTableComponent implements OnInit {
-  @Input({ required: true }) themeDBList!: ThemeDB[];
-  @Output() themeDBListChange = new EventEmitter<ThemeDB[]>();
-  displayedColumns: string[] = [
-    'order',
-    'type',
-    'source',
-    'label',
-    'group',
-    'other',
-  ];
-  eThemeDBType = ThemeDBType;
+export class ThemeDatasetTableComponent implements OnInit {
+  @Input({ required: true }) themeDatasetList!: ThemeDataset[];
+  @Output() themeDatasetListChange = new EventEmitter<ThemeDataset[]>();
+  displayedColumns: string[] = ['order', 'dataset', 'label', 'other'];
   datasetList: Dataset[] = [];
 
   constructor(
     private selectTableService: SelectTableService,
     private datasetService: DatasetService
   ) {}
+
   ngOnInit(): void {
     this.datasetService
       .getAllDataset()
@@ -62,59 +55,68 @@ export class ThemeDBTableComponent implements OnInit {
 
   //新增資料來源
   onAdd() {
-    if (isNull(this.themeDBList)) {
-      this.themeDBList = [];
+    if (isNull(this.themeDatasetList)) {
+      this.themeDatasetList = [];
     }
-    let element: ThemeDB = {
-      seq: this.themeDBList.length + 1,
-      type: ThemeDBType.dataset,
-      source: '',
+    let element: ThemeDataset = {
+      seq: this.themeDatasetList.length + 1,
       label: '',
-      groups: '',
       isDefault: false,
+      datasetList: [],
     };
-    this.themeDBList = [...this.themeDBList, element].map((x, i) => {
+    this.themeDatasetList = [...this.themeDatasetList, element].map((x, i) => {
       x.seq = i + 1;
       return x;
     });
-    this.themeDBListChange.emit(this.themeDBList);
+    this.themeDatasetListChange.emit(this.themeDatasetList);
   }
+
   //刪除資料來源
   onDelete(index: number) {
-    this.themeDBList = this.themeDBList.filter((x, i) => i !== index);
-    this.themeDBListChange.emit(this.themeDBList);
+    this.themeDatasetList = this.themeDatasetList.filter((x, i) => i !== index);
+    this.themeDatasetListChange.emit(this.themeDatasetList);
   }
+
   //資料來源的上下移動
   onUpDown(index: number, type: 'up' | 'down') {
-    let data: ThemeDB[] = JSON.parse(JSON.stringify(this.themeDBList));
+    let data: ThemeDataset[] = JSON.parse(
+      JSON.stringify(this.themeDatasetList)
+    );
     let source = data[index];
     let target = data.splice(index + (type === 'up' ? -1 : 1), 1, source);
     data.splice(index, 1, target[0]);
-    this.themeDBList = data.map((x, i) => {
+    this.themeDatasetList = data.map((x, i) => {
       x.seq = i + 1;
       return x;
     });
-    this.themeDBListChange.emit(this.themeDBList);
+    this.themeDatasetListChange.emit(this.themeDatasetList);
   }
   //改變清單預設使用的資料來源
   changeDefaultKey(event: MatCheckboxChange, index: number) {
     if (event.checked) {
-      this.themeDBList.map((x, i) => {
+      this.themeDatasetList.map((x, i) => {
         if (i !== index) {
           x.isDefault = false;
         }
         return x;
       });
     }
-    this.themeDBListChange.emit(this.themeDBList);
+    this.themeDatasetListChange.emit(this.themeDatasetList);
   }
-  selectDataset(element: ThemeDB) {
+  selectDataset(element: ThemeDataset) {
+    const selected = this.datasetList.filter(x =>
+      element.datasetList.includes(x.name)
+    );
     this.selectTableService
-      .selectSingleDataset(this.datasetList)
+      .selectMultipleDataset(this.datasetList, selected)
       .subscribe(x => {
         if (x) {
-          element.source = x.name;
+          element.datasetList = x.map(x => x.name);
         }
       });
+  }
+
+  removeChip(element: ThemeDataset, dataset: string) {
+    element.datasetList = element.datasetList.filter(x => x !== dataset);
   }
 }

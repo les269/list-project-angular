@@ -15,7 +15,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { EMPTY, filter, switchMap, tap, throwError } from 'rxjs';
 import { CustomTableComponent } from '../../components/custom-table/custom-table.component';
 import { ThemeLabelTableComponent } from '../../components/theme-label-table/theme-label-table.component';
-import { ThemeDBTableComponent } from '../../components/theme-db-table/theme-db-table.component';
+import { ThemeDatasetTableComponent } from '../../components/theme-dataset-table/theme-dataset-table.component';
 @Component({
   standalone: true,
   imports: [
@@ -30,7 +30,7 @@ import { ThemeDBTableComponent } from '../../components/theme-db-table/theme-db-
     TranslateModule,
     CustomTableComponent,
     ThemeLabelTableComponent,
-    ThemeDBTableComponent,
+    ThemeDatasetTableComponent,
   ],
   selector: 'app-edit-theme',
   templateUrl: 'edit-theme.component.html',
@@ -49,7 +49,7 @@ export class CreateThemeComponent implements OnInit {
       imageUrl: '',
     },
     themeLabelList: [],
-    themeDBList: [],
+    themeDatasetList: [],
     themeCustomList: [],
   };
   eThemeHeaderType = ThemeHeaderType;
@@ -66,7 +66,6 @@ export class CreateThemeComponent implements OnInit {
   ngOnInit() {
     this.route.queryParams
       .pipe(
-        tap(x => console.log(x)),
         filter(
           params =>
             isNotBlank(params['name']) &&
@@ -176,15 +175,19 @@ export class CreateThemeComponent implements OnInit {
       });
       return false;
     }
-    for (let db of this.model.themeDBList) {
-      if (isBlank(db.source)) {
-        this.snackbarService.isBlankMessage('themeDB.source');
+    for (let db of this.model.themeDatasetList) {
+      if (db.datasetList.length === 0) {
+        this.snackbarService.openByI18N('themeDataset.datasetEmpty');
         return false;
       }
       if (isBlank(db.label)) {
-        this.snackbarService.isBlankMessage('themeDB.label');
+        this.snackbarService.isBlankMessage('themeDataset.label');
         return false;
       }
+    }
+    if (isRepeat(this.model.themeDatasetList.map(x => x.label))) {
+      this.snackbarService.openByI18N('themeDataset.labelRepeat');
+      return false;
     }
     //byKey不可重複
     if (isRepeat(this.model.themeCustomList.map(x => x.byKey))) {

@@ -24,7 +24,7 @@ import {
   ThemeCustom,
   ThemeCustomValue,
   ThemeCustomValueResponse,
-  ThemeDB,
+  ThemeDataset,
   ThemeHeader,
   ThemeImage,
   ThemeLabel,
@@ -54,6 +54,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { EditGroupDatasetDataComponent } from '../../../dataset/components/edit-group-dataset-data/edit-group-dataset-data.component';
 import { GroupDatasetService } from '../../../dataset/service/group-dataset.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { DatasetData } from '../../../dataset/model';
 
 @Component({
   standalone: true,
@@ -82,11 +83,12 @@ export class ImageListViewComponent implements OnInit {
   themeHeader!: ThemeHeader;
   themeImage!: ThemeImage;
   themeLabelList!: ThemeLabel[];
-  themeDBList!: ThemeDB[];
+  themeDatasetList!: ThemeDataset[];
   themeCustomList!: ThemeCustom[];
-  dataSoure: { db: ThemeDB; data: any }[] = [];
-  useDB!: ThemeDB;
-  dbSeq: number = -1;
+  dataSoure: { themeDataset: ThemeDataset; datasetDataList: DatasetData[] }[] =
+    [];
+  useDataset!: ThemeDataset;
+  datasetSeq: number = -1;
   useData: any;
   filterData: any;
   viewData: any;
@@ -101,7 +103,7 @@ export class ImageListViewComponent implements OnInit {
   searchLabel: ThemeLabel[] = [];
   defaultKey = '';
   customValueMap: ThemeCustomValueResponse = {};
-  randomStr = 'random';
+  randomStr = '__random';
   routeParamSub: Subscription | undefined;
   routeEventsSub: Subscription | undefined;
 
@@ -135,7 +137,7 @@ export class ImageListViewComponent implements OnInit {
           this.themeLabelList = res.themeLabelList.sort((a, b) =>
             a.seq > b.seq ? 1 : -1
           );
-          this.themeDBList = res.themeDBList.sort((a, b) =>
+          this.themeDatasetList = res.themeDatasetList.sort((a, b) =>
             a.seq > b.seq ? 1 : -1
           );
           this.themeCustomList = res.themeCustomList.sort((a, b) =>
@@ -166,28 +168,20 @@ export class ImageListViewComponent implements OnInit {
    * 呼叫取得清單資料
    */
   getData() {
-    from(this.themeDBList.filter(x => x.type === 'dataset'))
-      .pipe(
-        //concatMap按照順序訂閱並發出,避免一次性發出而失敗
-        concatMap((x, i) =>
-          this.datasetService.findDatasetData(x.source).pipe(
-            map(res => {
-              res.data = res.data.map((data: any) => {
-                data[this.randomStr] = crypto.getRandomValues(
-                  new Uint32Array(1)
-                )[0];
-                data['__source'] = x.source;
-                return data;
-              });
-              return { db: x, data: res.data };
-            })
-          )
-        ),
-        toArray()
-      )
+    //取得dataset的name並去除重複
+    var datasetList = this.themeDatasetList
+      .map(x => x.datasetList)
+      .flat()
+      .filter((v, i, arr) => arr.indexOf(v) === i);
+    this.datasetService
+      .findDatasetDataByNameList(datasetList)
       .subscribe(res => {
-        //全部資料
-        this.dataSoure = res;
+        this.dataSoure = this.themeDatasetList.map(themeDataset => {
+          var datasetDataList = res.filter(datasetData =>
+            themeDataset.datasetList.includes(datasetData.datasetName)
+          );
+          return { themeDataset, datasetDataList };
+        });
         this.initData();
       });
   }
@@ -248,7 +242,7 @@ export class ImageListViewComponent implements OnInit {
   //使用query param的資料來設定當前資料的來源,排序,頁數
   changeUrl() {
     const values = this.route.snapshot.queryParams;
-    let { page, searchValue, sort, asc, db } = values;
+    let { page, searchValue, sort, asc, dataset } = values;
     this.currentPage = page ? parseInt(page) : 1;
     this.searchValue = searchValue ? searchValue : '';
     if (this.sortArray.length > 0 && this.sortArray.find(x => x.key === sort)) {
@@ -258,35 +252,33 @@ export class ImageListViewComponent implements OnInit {
     }
 
     this.sortAsc = asc === undefined || asc === 'true';
-    this.dbSeq = db ? parseInt(db) : -1;
+    this.datasetSeq = dataset ? parseInt(dataset) : -1;
   }
   //更改的資料來源
   changeDataSource() {
-    //1.當query param的db數值不為-1且數值不可超過themeDBList的長度,這時使用query param的db來指定資料
-    //2.當沒有db數值或為錯誤檢查是否有預設使用的,有則使用
-    let defaultDB = this.themeDBList.find(x => x.isDefault);
-    if (this.dbSeq !== -1 && this.dbSeq <= this.themeDBList.length) {
-      this.useDB = this.themeDBList[this.dbSeq - 1];
-    } else if (defaultDB) {
-      this.useDB = defaultDB;
-    } else {
-      this.useDB = this.themeDBList[0];
+    const defaultDataset = this.themeDatasetList.find(x => x.isDefault);
+    if (
+      this.datasetSeq !== -1 &&
+      this.datasetSeq <= this.themeDatasetList.length
+    ) {
+      this.useDataset = this.themeDatasetList[this.datasetSeq - 1];
+    } else if (defaultDataset) {
+      this.useDataset = defaultDataset;
+    } else if (this.themeDatasetList.length > 0) {
+      this.useDataset = this.themeDatasetList[0];
     }
     //設定目前使用的資料
-    if (this.useDB.type === 'group') {
-      this.useData = this.useDB.source
-        .split(',')
-        .map(
-          group =>
-            this.dataSoure.find(
-              x => x.db.type !== 'group' && x.db.groups === group
-            )?.data
-        )
-        .filter(x => x)
-        .flat();
-    } else {
-      this.useData = this.dataSoure.find(x => x.db === this.useDB)!.data;
-    }
+    this.useData = this.dataSoure
+      .find(x => x.themeDataset.label === this.useDataset.label)!
+      .datasetDataList.map(x => {
+        x.data = x.data.map(data => {
+          data[this.randomStr] = crypto.getRandomValues(new Uint32Array(1))[0];
+          data['__datasetName'] = x.datasetName;
+          return data;
+        });
+        return x.data;
+      })
+      .flat();
   }
 
   /**
@@ -346,7 +338,7 @@ export class ImageListViewComponent implements OnInit {
     let queryParams: { [key: string]: any } = {
       page: this.currentPage,
       searchValue: this.searchValue,
-      db: this.useDB.seq,
+      dataset: this.useDataset.seq,
     };
     if (this.sortArray.length > 0) {
       queryParams['sort'] = this.sortValue?.key?.trim();
@@ -452,7 +444,7 @@ export class ImageListViewComponent implements OnInit {
     return a && b ? a.key === b.key : a === b;
   }
   //資料來源需要正確顯示的資料
-  compareDB(a: ThemeDB, b: ThemeDB): boolean {
+  compareDataset(a: ThemeDataset, b: ThemeDataset): boolean {
     return a && b ? a.seq === b.seq : a === b;
   }
   /**
@@ -617,7 +609,7 @@ export class ImageListViewComponent implements OnInit {
 
   openEditData(data: any) {
     this.datasetService
-      .findDataset(data['__source'])
+      .findDataset(data['__datasetName'])
       .pipe(
         switchMap(x =>
           this.groupdatasetService.getGroupDataset(x.config.groupName)
@@ -643,20 +635,10 @@ export class ImageListViewComponent implements OnInit {
   }
 
   onRefresh() {
-    var allDatasetName = [];
-    if (this.useDB.type === 'group') {
-      var sources = this.useDB.source.split(',');
-      allDatasetName = this.dataSoure
-        .filter(x => x.db.type === 'dataset' && sources.includes(x.db.groups))
-        .map(x => x.db.source)
-        .filter((value, i, arr) => arr.indexOf(value) === i);
-    } else {
-      allDatasetName = [
-        this.dataSoure.find(x => x.db === this.useDB)!.db.source,
-      ];
-    }
-    this.datasetService.refreshDataByNameList(allDatasetName).subscribe(x => {
-      this.getData();
-    });
+    this.datasetService
+      .refreshDataByNameList(this.useDataset.datasetList)
+      .subscribe(x => {
+        this.getData();
+      });
   }
 }

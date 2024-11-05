@@ -7,7 +7,7 @@ export interface ThemeHeader {
   type: ThemeHeaderType;
   themeImage: ThemeImage;
   themeLabelList: ThemeLabel[];
-  themeDBList: ThemeDB[];
+  themeDatasetList: ThemeDataset[];
   themeCustomList: ThemeCustom[];
 }
 
@@ -57,18 +57,11 @@ export enum ThemeLabelType {
   stringArray = 'stringArray',
 }
 
-export interface ThemeDB {
+export interface ThemeDataset {
   seq: number;
-  type: ThemeDBType;
-  source: string;
+  datasetList: string[];
   label: string;
-  groups: string;
   isDefault: boolean;
-}
-
-export enum ThemeDBType {
-  dataset = 'dataset',
-  group = 'group',
 }
 
 export interface ThemeCustom {
@@ -126,4 +119,9 @@ export interface ThemeCustomValueResponse {
 export interface ThemeCustomValueRequest {
   headerId: string;
   valueList: string[];
+}
+
+export interface SortType {
+  key: string;
+  label: string;
 }

@@ -49,3 +49,9 @@ export interface ScrapyTestReq {
   json?: string[];
   url?: string;
 }
+
+export interface ScrapyReq {
+  scrapyName: string;
+  json?: string[];
+  url?: string;
+}

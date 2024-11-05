@@ -48,8 +48,8 @@
 | 10           | 可以import export各清單成json檔案 (優先度最低)                                                                                           | pending |
 | 11           | table清單顯示一個table,那需要考慮到原本舊版的按鈕如何搬過來                                                                              | pending |
 | 12           | 可以在網址上給json網址然後檢查config然後顯示成清單 (優先最低)                                                                            | pending |
-| 13           | 清單需要標籤用來快速過濾,像是待看或是我的最愛這種                                                                                        | doing   |
+| 13           | 圖片清單 需要標籤用來快速過濾,像是待看或是我的最愛這種                                                                                   | doing   |
 | 14           | 是否可以讓angular跟spring包成一個執行檔案 (優先最低)                                                                                     | pending |
 | 15           | 爬蟲,資料集群組,清單設定處理日期格式 (優先最低)                                                                                          | pending |
 
-聯繫我 : pook20042004@gmail.com
+聯繫我(replay) : 6x8sckva7@mozmail.com

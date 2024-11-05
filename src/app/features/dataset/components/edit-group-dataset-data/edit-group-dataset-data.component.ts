@@ -60,6 +60,7 @@ export class EditGroupDatasetDataComponent implements OnInit {
   groupDatasetConfig!: GroupDatasetConfig;
   json: any = {};
   scrapySize: { [key in string]: number } = {};
+  scrapyInput: { [key in string]: { url: string; json: string[] } } = {};
 
   constructor(
     private snackbarService: SnackbarService,
@@ -73,7 +74,11 @@ export class EditGroupDatasetDataComponent implements OnInit {
     this.groupDatasetService.getGroupDataset(this.groupName).subscribe(res => {
       this.groupDatasetConfig = res.config;
       for (var field of res.config.groupDatasetFieldList) {
-        this.json[field.key] = '';
+        if (field.type === 'string') {
+          this.json[field.key] = '';
+        } else if (field.type === 'stringArray') {
+          this.json[field.key] = [];
+        }
       }
       this.getScrapyList();
       this.searchByPrimeValue();
@@ -98,6 +103,10 @@ export class EditGroupDatasetDataComponent implements OnInit {
       this.scrapyService.getByNameList(nameList).subscribe(res => {
         for (var x of res) {
           this.scrapySize[x.name] = x.paramSize;
+          this.scrapyInput[x.name] = {
+            url: '',
+            json: [].constructor(x.paramSize).map(() => ''),
+          };
         }
       });
     }
@@ -184,5 +193,27 @@ export class EditGroupDatasetDataComponent implements OnInit {
           });
         }
       });
+  }
+
+  scrapyByUrl(scrapyName: string, url: string) {
+    this.scrapyService.scrapyByUrl({ scrapyName, url }).subscribe(res => {
+      this.json = res;
+    });
+  }
+
+  scrapyByJson(scrapyName: string, json: string[]) {
+    this.scrapyService.scrapyByJson({ scrapyName, json }).subscribe(res => {
+      this.json = res;
+    });
+  }
+
+  clearField() {
+    for (var field of this.groupDatasetConfig.groupDatasetFieldList) {
+      if (field.type === 'string') {
+        this.json[field.key] = '';
+      } else if (field.type === 'stringArray') {
+        this.json[field.key] = [];
+      }
+    }
   }
 }

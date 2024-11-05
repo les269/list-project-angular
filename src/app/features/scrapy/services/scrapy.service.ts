@@ -1,7 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { HtmlRequest, ScrapyConfig, ScrapyData, ScrapyTestReq } from '../model';
+import {
+  HtmlRequest,
+  ScrapyConfig,
+  ScrapyData,
+  ScrapyReq,
+  ScrapyTestReq,
+} from '../model';
 
 @Injectable({ providedIn: 'root' })
 export class ScrapyService {
@@ -36,14 +42,23 @@ export class ScrapyService {
     return this.http.delete<void>(`${this.prefix}/delete?name=${name}`);
   }
 
+  testScrapyUrl(req: ScrapyTestReq): Observable<any> {
+    return this.http.post(`${this.prefix}/test/url`, req);
+  }
+
   testScrapyHtml(req: ScrapyTestReq): Observable<any> {
     return this.http.post(`${this.prefix}/test/html`, req);
   }
 
   testScrapyJson(req: ScrapyTestReq): Observable<any> {
-    return this.http.post(`${this.prefix}/test/json`, req);
+    return this.http.post(`${this.prefix}/use-json`, req);
   }
-  testScrapyUrl(req: ScrapyTestReq): Observable<any> {
-    return this.http.post(`${this.prefix}/test/url`, req);
+
+  scrapyByUrl(req: ScrapyReq): Observable<any> {
+    return this.http.post(`${this.prefix}/use-url`, req);
+  }
+
+  scrapyByJson(req: ScrapyReq): Observable<any> {
+    return this.http.post(`${this.prefix}/use-json`, req);
   }
 }

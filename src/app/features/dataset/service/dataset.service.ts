@@ -12,7 +12,14 @@ export class DatasetService {
   }
 
   findDatasetData(name: string): Observable<DatasetData> {
-    return this.http.get<DatasetData>(`/dataset/getData?name=${name}`);
+    return this.http.get<DatasetData>(`/dataset/get-data?name=${name}`);
+  }
+
+  findDatasetDataByNameList(nameList: string[]): Observable<DatasetData[]> {
+    return this.http.post<DatasetData[]>(
+      `/dataset/name-list/get-data`,
+      nameList
+    );
   }
 
   existDataset(name: string): Observable<boolean> {

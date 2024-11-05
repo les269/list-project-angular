@@ -49,7 +49,8 @@
     "refresh": "刷新",
     "search": "搜尋",
     "update": "更新",
-    "deleteImage": "刪除圖片"
+    "deleteImage": "刪除圖片",
+    "close": "關閉"
   },
   "title": {
     "home": "清單列表",
@@ -107,19 +108,14 @@
     "dateFormat": "日期格式",
     "isDefaultKey": "當為預設使用的key值,需使用唯一值且確保不為空值,改變時自定義的資料不會隨之改變或刪除"
   },
-  "themeDB": {
-    "title": "資料來源設定",
+  "themeDataset": {
+    "title": "資料集設定",
     "order": "順序",
-    "type": "類型",
-    "source": "來源",
-    "name": "名稱",
-    "groupLabel": "群組",
-    "json": "設定json",
-    "jsonPh": "設定資料來源限json格式",
-    "group": "設定群組",
-    "groupPh": "合併其他來源",
+    "label": "名稱",
+    "labelRepeat": "資料集設定名稱不能重複",
     "isDefault": "是否預設使用",
-    "dataset": "設定資料集"
+    "dataset": "設定資料集",
+    "datasetEmpty": "設定資料集不能為空"
   },
   "themeCustom": {
     "title": "自定義設定",

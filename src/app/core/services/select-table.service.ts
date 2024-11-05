@@ -90,6 +90,32 @@ export class SelectTableService {
       .afterClosed();
   }
 
+  selectMultipleDataset(dataSource: Dataset[], selected: Dataset[]) {
+    const datePipe = new DatePipe('en-US');
+    const data: BaseSelectTableData<Dataset> = {
+      displayedColumns: ['name', 'createdTime', 'updatedTime'],
+      labels: ['dataset.name', 'g.createdTime', 'g.updatedTime'],
+      dataSource,
+      selectType: 'multiple',
+      columnFormats: {
+        createdTime: (value: any) =>
+          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
+        updatedTime: (value: any) =>
+          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
+      },
+      selected,
+    };
+    return this.matDialog
+      .open<
+        SelectTableDialog<Dataset, BaseSelectTableData<Dataset>>,
+        BaseSelectTableData<Dataset>,
+        Dataset[]
+      >(SelectTableDialog, {
+        data,
+      })
+      .afterClosed();
+  }
+
   selectSingleGroupDataset(dataSource: GroupDataset[]) {
     const datePipe = new DatePipe('en-US');
     const data: BaseSelectTableData<GroupDataset> = {

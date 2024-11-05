@@ -35,37 +35,63 @@
       {{ 'g.search' | translate }}
     </button>
   </div>
-  <div class="input-group mb-2">
-    <button
-      class="btn btn-outline-secondary"
-      type="button"
-      (click)="deleteImage()">
-      {{ 'g.deleteImage' | translate }}
-    </button>
-  </div>
+  @if (groupDatasetConfig && groupDatasetConfig.imageSaveFolder) {
+    <div class="input-group mb-2">
+      <button
+        class="btn btn-outline-secondary"
+        type="button"
+        (click)="deleteImage()">
+        {{ 'g.deleteImage' | translate }}
+      </button>
+    </div>
+  }
   <hr />
   @if (groupDatasetConfig) {
     @for (scrapy of groupDatasetConfig.groupDatasetScrapyList; track $index) {
-      @if (scrapy.visibleJson && scrapySize[scrapy.name] > 0) {
+      @if (
+        scrapy.visibleJson &&
+        scrapySize[scrapy.name] > 0 &&
+        scrapyInput[scrapy.name]
+      ) {
         <div class="input-group mb-2">
           <label class="input-group-text">{{
             'dataset.scrapyJsonLabel' | translate: { label: scrapy.label }
           }}</label>
-          @for (size of [].constructor(scrapySize[scrapy.name]); track $index) {
-            <input class="form-control" />
+          @for (
+            size of [].constructor(scrapySize[scrapy.name]);
+            track $index;
+            let index = $index
+          ) {
+            <input
+              class="form-control"
+              [(ngModel)]="scrapyInput[scrapy.name].json[index]"
+              (keydown.enter)="
+                scrapyByJson(scrapy.name, scrapyInput[scrapy.name].json)
+              " />
           }
-          <button class="btn btn-outline-secondary" type="button">
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            (click)="scrapyByJson(scrapy.name, scrapyInput[scrapy.name].json)">
             {{ 'g.search' | translate }}
           </button>
         </div>
       }
-      @if (scrapy.visibleUrl) {
+      @if (scrapy.visibleUrl && scrapyInput[scrapy.name]) {
         <div class="input-group mb-2">
           <label class="input-group-text">{{
             'dataset.scrapyUrlLabel' | translate: { label: scrapy.label }
           }}</label>
-          <input class="form-control" />
-          <button class="btn btn-outline-secondary" type="button">
+          <input
+            class="form-control"
+            [(ngModel)]="scrapyInput[scrapy.name].url"
+            (keydown.enter)="
+              scrapyByUrl(scrapy.name, scrapyInput[scrapy.name].url)
+            " />
+          <button
+            class="btn btn-outline-secondary"
+            type="button"
+            (click)="scrapyByUrl(scrapy.name, scrapyInput[scrapy.name].url)">
             {{ 'g.search' | translate }}
           </button>
         </div>
@@ -107,5 +133,9 @@
   }
 </mat-dialog-content>
 <mat-dialog-actions>
+  <button mat-button [mat-dialog-close]="true">
+    {{ 'g.close' | translate }}
+  </button>
+  <button mat-button (click)="clearField()">{{ 'g.clear' | translate }}</button>
   <button mat-button (click)="onUpdate()">{{ 'g.update' | translate }}</button>
 </mat-dialog-actions>
