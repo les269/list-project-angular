@@ -1,6 +1,5 @@
 export interface ApiConfig {
   apiName: string;
-  apiLabel: string;
   httpMethod: HttpMethodType;
   endpointUrl: string;
   requestBody: string;
@@ -8,10 +7,6 @@ export interface ApiConfig {
   httpHeaders: string;
   successMessage: string;
   updatedTime?: number;
-}
-export interface ApiConfigPK {
-  apiName: string;
-  apiLabel: string;
 }
 export enum HttpMethodType {
   get = 'get',

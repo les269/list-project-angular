@@ -29,13 +29,7 @@ import { CommonModule } from '@angular/common';
   ],
 })
 export class ApiConfigListComponent implements OnInit {
-  displayedColumns = [
-    'apiName',
-    'apiLabel',
-    'httpMethod',
-    'endpointUrl',
-    'other',
-  ];
+  displayedColumns = ['apiName', 'httpMethod', 'endpointUrl', 'other'];
   list: ApiConfig[] = [];
   constructor(
     private translateService: TranslateService,
@@ -92,7 +86,6 @@ export class ApiConfigListComponent implements OnInit {
         data: {
           value: {
             apiName: '',
-            apiLabel: '',
             httpMethod: HttpMethodType.get,
             endpointUrl: '',
             requestBody: '',

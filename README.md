@@ -52,5 +52,6 @@
 | 14           | 是否可以讓angular跟spring包成一個執行檔案 (優先最低)                                                                                     | pending |
 | 15           | 爬蟲,資料集群組,清單設定處理日期格式 (優先最低)                                                                                          | pending |
 | 16           | 重構 image list                                                                                                                          | pending |
+| 16           | 資料集群組設定可以使用api為獲取資料的手段                                                                                                | doing   |
 
 聯繫我(replay) : 6x8sckva7@mozmail.com

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ApiConfig, ApiConfigPK } from '../model';
+import { ApiConfig } from '../model';
 import { concatMap, EMPTY, from, Observable } from 'rxjs';
 import { SnackbarService } from '../../../core/services/snackbar.service';
 import { isBlank, isNull, replaceValue } from '../../../shared/util/helper';
@@ -20,11 +20,11 @@ export class ApiConfigService {
   delete(req: Partial<ApiConfig>): Observable<void> {
     return this.http.post<void>('/api-config/delete', req);
   }
-  getListById(req: Partial<ApiConfigPK[]>): Observable<ApiConfig[]> {
-    return this.http.post<ApiConfig[]>('/api-config/all/id', req);
+  getListById(req: Partial<string[]>): Observable<ApiConfig[]> {
+    return this.http.post<ApiConfig[]>('/api-config/all/name', req);
   }
-  getById(req: Partial<ApiConfigPK>): Observable<ApiConfig> {
-    return this.http.post<ApiConfig>('/api-config/id', req);
+  getById(name: string): Observable<ApiConfig> {
+    return this.http.get<ApiConfig>(`/api-config/name?name${name}`);
   }
 
   callSingleApi(apiConfig: ApiConfig, data: any) {
@@ -32,7 +32,7 @@ export class ApiConfigService {
       this.snackbarService.openByI18N('msg.apiConfigEmtpy');
       return;
     }
-    this.getById(apiConfig).subscribe(res => {
+    this.getById(apiConfig.apiName).subscribe(res => {
       if (isNull(res)) {
         this.snackbarService.openByI18N('msg.apiConfigError');
         return;

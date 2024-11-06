@@ -53,7 +53,6 @@ export class ApiConfigDialog {
   onOk(): void {
     const {
       apiName,
-      apiLabel,
       httpMethod,
       endpointUrl,
       requestBody,
@@ -66,19 +65,13 @@ export class ApiConfigDialog {
       this.snackbarService.isBlankMessage('apiConfig.apiName');
       return;
     }
-    if (isBlank(apiLabel)) {
-      this.snackbarService.isBlankMessage('apiConfig.apiLabel');
-      return;
-    }
     if (isBlank(endpointUrl)) {
       this.snackbarService.isBlankMessage('apiConfig.endpointUrl');
       return;
     }
     if (
       this.type === 'add' &&
-      this.list.find(
-        x => x.apiName === apiName.trim() && x.apiLabel === apiLabel.trim()
-      )
+      this.list.find(x => x.apiName === apiName.trim())
     ) {
       this.snackbarService.openByI18N('msg.apiExist');
       return;
@@ -93,7 +86,6 @@ export class ApiConfigDialog {
     this.apiConfigService
       .update({
         apiName: apiName.trim(),
-        apiLabel: apiLabel.trim(),
         httpMethod,
         endpointUrl: endpointUrl.trim(),
         requestBody: jsonFormat(requestBody),
