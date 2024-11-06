@@ -1,0 +1,39 @@
+<div class="d-flex justify-content-between align-items-center">
+  <h2 mat-dialog-title>
+    {{ (disabled ? 'title.readNote' : 'title.writeNote') | translate }}
+  </h2>
+  <button class="d-flex mx-2" mat-icon-button (click)="onNoClick()">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+@if (disabled) {
+  <mat-dialog-content class="scrollbar-primary">
+    <div cdkFocusInitial>
+      <ngx-editor
+        [ngClass]="{ disabled: disabled }"
+        [editor]="editor"
+        [ngModel]="value"
+        (ngModelChange)="onChange($event)"
+        [disabled]="disabled"></ngx-editor>
+    </div>
+  </mat-dialog-content>
+} @else {
+  <mat-dialog-content class="scrollbar-primary">
+    <div>
+      <ngx-editor-menu class="toolbar" [editor]="editor" [toolbar]="toolbar">
+      </ngx-editor-menu>
+      <ngx-editor
+        [editor]="editor"
+        [ngModel]="value"
+        (ngModelChange)="onChange($event)"></ngx-editor>
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-button (click)="onNoClick()">
+      {{ 'g.no' | translate }}
+    </button>
+    <button mat-button cdkFocusInitial [mat-dialog-close]="value">
+      {{ 'g.ok' | translate }}
+    </button>
+  </mat-dialog-actions>
+}

@@ -47,7 +47,6 @@ import { ScrollTopComponent } from '../../../../core/components/scroll-top.compo
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDialog } from '@angular/material/dialog';
 import { ButtonInputUrlDialog } from '../../components/button-input-url.dialog';
-import { WriteNoteDialog } from '../../components/write-note.dialog';
 import { ApiConfigService } from '../../../api-config/service/api-config.service';
 import { DatasetService } from '../../../dataset/service/dataset.service';
 import { MatButtonModule } from '@angular/material/button';
@@ -55,8 +54,9 @@ import { EditGroupDatasetDataComponent } from '../../../dataset/components/edit-
 import { GroupDatasetService } from '../../../dataset/service/group-dataset.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { DatasetData } from '../../../dataset/model';
-import { MatCheckbox, MatCheckboxModule } from '@angular/material/checkbox';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { SelectTableService } from '../../../../core/services/select-table.service';
+import { ThemeNoteComponent } from '../../components/theme-note/theme-note.component';
 
 @Component({
   standalone: true,
@@ -639,18 +639,22 @@ export class ImageListViewComponent implements OnInit {
     this.openNewPage(replaceValue(custom.openUrl, data));
   }
 
-  openWriteNoteDialog(data: any, custom: ThemeCustom, disabled: boolean) {
-    const dialogRef = this.matDialog.open(WriteNoteDialog, {
-      data: { value: this.getCustomValue(data, custom) ?? '', disabled },
-      width: '60vw',
-      height: '80vh',
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (isNotNull(result)) {
-        this.changeCustomValue(data, custom, result);
-      }
-    });
+  openNoteDialog(data: any, custom: ThemeCustom, type: 'read' | 'write') {
+    this.matDialog
+      .open(ThemeNoteComponent, {
+        data: {
+          value: this.getCustomValue(data, custom) ?? '',
+          disabled: type === 'read',
+        },
+        panelClass: 'dialog-responsive',
+        height: '80vh',
+      })
+      .afterClosed()
+      .subscribe(result => {
+        if (isNotNull(result)) {
+          this.changeCustomValue(data, custom, result);
+        }
+      });
   }
 
   callApi(data: any, custom: ThemeCustom) {

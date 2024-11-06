@@ -303,13 +303,13 @@
                     <div class="custom-button-group">
                       <button
                         class="custom-button"
-                        (click)="openWriteNoteDialog(data, custom, false)">
+                        (click)="openNoteDialog(data, custom, 'write')">
                         <label class="px-2">{{ custom.label }}</label>
                       </button>
                       @if (getCustomValue(data, custom) !== '') {
                         <button
                           class="custom-button custom-icon"
-                          (click)="openWriteNoteDialog(data, custom, true)">
+                          (click)="openNoteDialog(data, custom, 'read')">
                           <mat-icon class="material-icons-outlined"
                             >description</mat-icon
                           >
