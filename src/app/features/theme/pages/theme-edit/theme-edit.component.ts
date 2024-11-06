@@ -34,11 +34,11 @@ import { ThemeTagTableComponent } from '../../components/theme-tag-table/theme-t
     ThemeDatasetTableComponent,
     ThemeTagTableComponent,
   ],
-  selector: 'app-edit-theme',
-  templateUrl: 'edit-theme.component.html',
-  styleUrls: ['edit-theme.component.scss'],
+  selector: 'app-theme-edit',
+  templateUrl: 'theme-edit.component.html',
+  styleUrls: ['theme-edit.component.scss'],
 })
-export class EditThemeComponent implements OnInit {
+export class ThemeEditComponent implements OnInit {
   status: 'new' | 'edit' = 'new';
   model: ThemeHeader = {
     name: '',

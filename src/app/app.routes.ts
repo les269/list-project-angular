@@ -4,16 +4,16 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./features/theme/pages/home/home.component').then(
-        mod => mod.HomeComponent
+      import('./features/theme/pages/theme-list/theme-list.component').then(
+        mod => mod.ThemeListComponent
       ),
     data: { title: 'title.home', sidenav: true },
   },
   {
     path: 'theme-edit',
     loadComponent: () =>
-      import('./features/theme/pages/edit-theme/edit-theme.component').then(
-        mod => mod.EditThemeComponent
+      import('./features/theme/pages/theme-edit/theme-edit.component').then(
+        mod => mod.ThemeEditComponent
       ),
     data: { title: 'title.editTheme' },
   },

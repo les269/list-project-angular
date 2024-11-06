@@ -17,11 +17,11 @@ import { Observable } from 'rxjs';
 @Component({
   standalone: true,
   imports: [CommonModule, TranslateModule],
-  selector: 'app-home',
-  templateUrl: 'home.component.html',
-  styleUrl: 'home.component.scss',
+  selector: 'app-theme-list',
+  templateUrl: 'theme-list.component.html',
+  styleUrl: 'theme-list.component.scss',
 })
-export class HomeComponent implements OnInit {
+export class ThemeListComponent implements OnInit {
   eThemeHeaderType = ThemeHeaderType;
   list$: Observable<
     Readonly<{
