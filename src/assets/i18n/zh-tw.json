@@ -50,7 +50,12 @@
     "search": "搜尋",
     "update": "更新",
     "deleteImage": "刪除圖片",
-    "close": "關閉"
+    "close": "關閉",
+    "order": "順序",
+    "random": "隨機",
+    "sort": "排序",
+    "prePage": "上一頁",
+    "nextPage": "上一頁"
   },
   "title": {
     "home": "清單列表",
@@ -115,7 +120,9 @@
     "labelRepeat": "資料集設定名稱不能重複",
     "isDefault": "是否預設使用",
     "dataset": "設定資料集",
-    "datasetEmpty": "設定資料集不能為空"
+    "datasetEmpty": "設定資料集不能為空",
+    "selectDataset": "選擇變更資料集",
+    "editData": "編輯資料"
   },
   "themeCustom": {
     "title": "自定義設定",
@@ -140,6 +147,13 @@
     "buttonInputUrl": "輸入自定義開啟網址",
     "labelName": "標籤名稱",
     "apiConfig": "呼叫API"
+  },
+  "themeTag": {
+    "title": "標籤設定",
+    "tag": "標籤名稱",
+    "tagRepeat": "標籤設定標籤名稱不能重複",
+    "selectTag": "選擇標籤",
+    "setTag": "標籤設定"
   },
   "apiConfig": {
     "apiName": "API名稱",

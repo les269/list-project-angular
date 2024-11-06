@@ -6,6 +6,7 @@
           class="list-select"
           [compareWith]="compareDataset"
           [(ngModel)]="useDataset"
+          [matTooltip]="'themeDataset.selectDataset' | translate"
           (change)="changeQueryParams()">
           @for (dataset of themeDatasetList; track $index) {
             <option [ngValue]="dataset">
@@ -14,7 +15,23 @@
           }
         </select>
       }
+      @if (themeTagListForSelect && themeTagListForSelect.length > 1) {
+        <select
+          class="list-select"
+          [compareWith]="compareTag"
+          [(ngModel)]="useTag"
+          [matTooltip]="'themeTag.selectTag' | translate"
+          (change)="changeQueryParams()">
+          @for (tag of themeTagListForSelect; track $index) {
+            <option [ngValue]="tag">
+              {{ tag.tag }}
+              {{ tag.seq === -1 ? '' : '(' + getTagValueLength(tag.tag) + ')' }}
+            </option>
+          }
+        </select>
+      }
       <button
+        class="d-flex"
         mat-icon-button
         [matTooltip]="'g.refresh' | translate"
         (click)="onRefresh()">
@@ -30,14 +47,21 @@
           (keydown.enter)="changeQueryParams()" />
         <button
           class="search-btn"
+          [matTooltip]="'g.clear' | translate"
           (click)="searchValue = ''; changeQueryParams()">
           <mat-icon>clear</mat-icon>
         </button>
-        <button class="search-btn" (click)="changeQueryParams()">
+        <button
+          class="search-btn"
+          [matTooltip]="'g.search' | translate"
+          (click)="changeQueryParams()">
           <mat-icon>search</mat-icon>
         </button>
         @if (defaultKey !== '') {
-          <button class="search-btn" (click)="randomSearch()">
+          <button
+            class="search-btn"
+            [matTooltip]="'g.random' | translate"
+            (click)="randomSearch()">
             <mat-icon>shuffle</mat-icon>
           </button>
         }
@@ -66,6 +90,7 @@
   @if (sortArray.length > 0) {
     <select
       class="list-select"
+      [matTooltip]="'g.sort' | translate"
       [compareWith]="compareSort"
       [(ngModel)]="sortValue"
       (change)="toTop(); changeQueryParams()">
@@ -94,12 +119,18 @@
     </select>
     <div class="d-flex flex-column justify-content-center" style="height: 34px">
       @if (currentPage !== 1 && pages.length !== 1) {
-        <mat-icon class="prePage" (click)="prePage()"
+        <mat-icon
+          class="prePage"
+          (click)="prePage()"
+          [matTooltip]="'g.prePage' | translate"
           >keyboard_arrow_up</mat-icon
         >
       }
       @if (currentPage !== pages.length && pages.length !== 1) {
-        <mat-icon class="nextPage" (click)="nextPage()"
+        <mat-icon
+          class="nextPage"
+          (click)="nextPage()"
+          [matTooltip]="'g.nextPage' | translate"
           >keyboard_arrow_down</mat-icon
         >
       }
@@ -132,14 +163,34 @@
           }
         </div>
         <div class="detail-content">
-          @if (hoveredIndex === i) {
-            <button
-              mat-icon-button
-              class="edit-button"
-              (click)="openEditData(data)">
-              <mat-icon>edit</mat-icon>
-            </button>
-          }
+          <div class="edit-button">
+            @if (hoveredIndex === i && themeTagList.length > 0 && defaultKey) {
+              <button
+                class="d-flex"
+                mat-icon-button
+                [matTooltip]="'themeTag.setTag' | translate"
+                (click)="onSetTag(data)">
+                <mat-icon class="material-icons-outlined"
+                  ><span class="material-symbols-outlined">
+                    bookmark
+                  </span></mat-icon
+                >
+              </button>
+            }
+            @if (hoveredIndex === i) {
+              <button
+                class="d-flex"
+                mat-icon-button
+                [matTooltip]="'themeDataset.editData' | translate"
+                (click)="openEditData(data)">
+                <mat-icon class="material-icons-outlined"
+                  ><span class="material-symbols-outlined">
+                    edit
+                  </span></mat-icon
+                >
+              </button>
+            }
+          </div>
 
           <div class="detail-rows scrollbar-primary">
             @for (label of themeLabelList; track $index; let idx = $index) {

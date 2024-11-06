@@ -12,6 +12,7 @@ import {
   GroupDataset,
   GroupDatasetData,
 } from '../../features/dataset/model';
+import { ThemeTag } from '../../features/theme/models';
 
 @Injectable({ providedIn: 'root' })
 export class SelectTableService {
@@ -169,6 +170,26 @@ export class SelectTableService {
         >,
         BaseSelectTableData<GroupDatasetData>,
         GroupDatasetData
+      >(SelectTableDialog, {
+        data,
+      })
+      .afterClosed();
+  }
+
+  selectMutipleTag(dataSource: ThemeTag[], selected: ThemeTag[]) {
+    const data: BaseSelectTableData<ThemeTag> = {
+      displayedColumns: ['tag'],
+      labels: ['themeTag.tag'],
+      dataSource,
+      selectType: 'multiple',
+      selected,
+      showTitle: false,
+    };
+    return this.matDialog
+      .open<
+        SelectTableDialog<ThemeTag, BaseSelectTableData<ThemeTag>>,
+        BaseSelectTableData<ThemeTag>,
+        ThemeTag[]
       >(SelectTableDialog, {
         data,
       })

@@ -16,6 +16,7 @@ import { EMPTY, filter, switchMap, tap, throwError } from 'rxjs';
 import { CustomTableComponent } from '../../components/custom-table/custom-table.component';
 import { ThemeLabelTableComponent } from '../../components/theme-label-table/theme-label-table.component';
 import { ThemeDatasetTableComponent } from '../../components/theme-dataset-table/theme-dataset-table.component';
+import { ThemeTagTableComponent } from '../../components/theme-tag-table/theme-tag-table.component';
 @Component({
   standalone: true,
   imports: [
@@ -31,12 +32,13 @@ import { ThemeDatasetTableComponent } from '../../components/theme-dataset-table
     CustomTableComponent,
     ThemeLabelTableComponent,
     ThemeDatasetTableComponent,
+    ThemeTagTableComponent,
   ],
   selector: 'app-edit-theme',
   templateUrl: 'edit-theme.component.html',
   styleUrls: ['edit-theme.component.scss'],
 })
-export class CreateThemeComponent implements OnInit {
+export class EditThemeComponent implements OnInit {
   status: 'new' | 'edit' = 'new';
   model: ThemeHeader = {
     name: '',
@@ -51,6 +53,7 @@ export class CreateThemeComponent implements OnInit {
     themeLabelList: [],
     themeDatasetList: [],
     themeCustomList: [],
+    themeTagList: [],
   };
   eThemeHeaderType = ThemeHeaderType;
   eThemeImageType = ThemeImageType;
@@ -168,19 +171,19 @@ export class CreateThemeComponent implements OnInit {
         return false;
       }
     }
-    //byKey不可重複
     if (isRepeat(this.model.themeLabelList.map(x => x.byKey))) {
       this.snackbarService.openByI18N('msg.repeatColumn', {
         text: this.translateService.instant('themeLabel.byKey'),
       });
       return false;
     }
-    for (let db of this.model.themeDatasetList) {
-      if (db.datasetList.length === 0) {
+    //資料集
+    for (let dataset of this.model.themeDatasetList) {
+      if (dataset.datasetList.length === 0) {
         this.snackbarService.openByI18N('themeDataset.datasetEmpty');
         return false;
       }
-      if (isBlank(db.label)) {
+      if (isBlank(dataset.label)) {
         this.snackbarService.isBlankMessage('themeDataset.label');
         return false;
       }
@@ -205,6 +208,17 @@ export class CreateThemeComponent implements OnInit {
         this.snackbarService.isBlankMessage('themeCustom.byKey');
         return false;
       }
+    }
+    //標籤
+    for (let tag of this.model.themeTagList) {
+      if (isBlank(tag.tag)) {
+        this.snackbarService.isBlankMessage('themeTag.tag');
+        return false;
+      }
+    }
+    if (isRepeat(this.model.themeTagList.map(x => x.tag))) {
+      this.snackbarService.openByI18N('themeTag.tagRepeat');
+      return false;
     }
     return true;
   }

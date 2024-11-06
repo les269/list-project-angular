@@ -37,6 +37,7 @@ export interface BaseSelectTableData<O> {
   columnFormats?: { [key: string]: (value: any) => string };
   columnSorts?: { [key: string]: boolean };
   enableFilter?: boolean;
+  showTitle?: boolean;
 }
 @Component({
   standalone: true,
@@ -73,6 +74,7 @@ export class SelectTableDialog<O, T extends BaseSelectTableData<O>>
   title = this.data.title;
   selected = this.data.selected;
   enableFilter = this.data.enableFilter;
+  showTitle = this.data.showTitle === undefined ? true : this.data.showTitle;
   selection = new SelectionModel<O>(true, []);
   @ViewChild(MatSort) sort!: MatSort;
 

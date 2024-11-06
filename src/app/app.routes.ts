@@ -13,7 +13,7 @@ export const routes: Routes = [
     path: 'theme-edit',
     loadComponent: () =>
       import('./features/theme/pages/edit-theme/edit-theme.component').then(
-        mod => mod.CreateThemeComponent
+        mod => mod.EditThemeComponent
       ),
     data: { title: 'title.editTheme' },
   },

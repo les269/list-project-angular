@@ -1,13 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-  concatMap,
   debounceTime,
-  from,
-  map,
+  EMPTY,
+  filter,
   Subscription,
   switchMap,
-  toArray,
+  tap,
 } from 'rxjs';
 import {
   dynamicSort,
@@ -28,8 +27,9 @@ import {
   ThemeHeader,
   ThemeImage,
   ThemeLabel,
+  ThemeTag,
+  ThemeTagValue,
 } from '../../models';
-import { HttpClient } from '@angular/common/http';
 import { NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
 import { LabelValueDirective } from '../../components/label-value.directive';
 import { UtilDirective } from '../../../../shared/util/util.directive';
@@ -55,6 +55,8 @@ import { EditGroupDatasetDataComponent } from '../../../dataset/components/edit-
 import { GroupDatasetService } from '../../../dataset/service/group-dataset.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { DatasetData } from '../../../dataset/model';
+import { MatCheckbox, MatCheckboxModule } from '@angular/material/checkbox';
+import { SelectTableService } from '../../../../core/services/select-table.service';
 
 @Component({
   standalone: true,
@@ -73,6 +75,8 @@ import { DatasetData } from '../../../dataset/model';
     MatMenuModule,
     MatButtonModule,
     MatTooltipModule,
+    MatCheckboxModule,
+    MatMenuModule,
   ],
   selector: 'app-image-list-view',
   templateUrl: 'image-list-view.component.html',
@@ -84,11 +88,16 @@ export class ImageListViewComponent implements OnInit {
   themeImage!: ThemeImage;
   themeLabelList!: ThemeLabel[];
   themeDatasetList!: ThemeDataset[];
+  themeTagList!: ThemeTag[];
+  themeTagListForSelect!: ThemeTag[];
   themeCustomList!: ThemeCustom[];
+  themeTagValueList: ThemeTagValue[] = [];
   dataSoure: { themeDataset: ThemeDataset; datasetDataList: DatasetData[] }[] =
     [];
   useDataset!: ThemeDataset;
   datasetSeq: number = -1;
+  useTag!: ThemeTag;
+  tagSeq: number = -1;
   useData: any;
   filterData: any;
   viewData: any;
@@ -104,6 +113,7 @@ export class ImageListViewComponent implements OnInit {
   defaultKey = '';
   customValueMap: ThemeCustomValueResponse = {};
   randomStr = '__random';
+  datasetNameStr = '__datasetName';
   routeParamSub: Subscription | undefined;
   routeEventsSub: Subscription | undefined;
 
@@ -117,7 +127,8 @@ export class ImageListViewComponent implements OnInit {
     private translateService: TranslateService,
     private apiConfigService: ApiConfigService,
     private datasetService: DatasetService,
-    private groupdatasetService: GroupDatasetService
+    private groupdatasetService: GroupDatasetService,
+    private selectTableService: SelectTableService
   ) {}
 
   ngOnInit() {
@@ -137,6 +148,13 @@ export class ImageListViewComponent implements OnInit {
           this.themeLabelList = res.themeLabelList.sort((a, b) =>
             a.seq > b.seq ? 1 : -1
           );
+          this.themeTagList = res.themeTagList.sort((a, b) =>
+            a.seq > b.seq ? 1 : -1
+          );
+          this.themeTagListForSelect = [
+            { seq: -1, tag: '' },
+            ...this.themeTagList,
+          ];
           this.themeDatasetList = res.themeDatasetList.sort((a, b) =>
             a.seq > b.seq ? 1 : -1
           );
@@ -169,12 +187,19 @@ export class ImageListViewComponent implements OnInit {
    */
   getData() {
     //取得dataset的name並去除重複
-    var datasetList = this.themeDatasetList
-      .map(x => x.datasetList)
-      .flat()
-      .filter((v, i, arr) => arr.indexOf(v) === i);
-    this.datasetService
-      .findDatasetDataByNameList(datasetList)
+    const uniqueDatasetList = Array.from(
+      new Set(this.themeDatasetList.flatMap(x => x.datasetList))
+    );
+    this.themeService
+      .getTagValueList(this.headerId)
+      .pipe(
+        tap(res => {
+          this.themeTagValueList = res;
+        }),
+        switchMap(x =>
+          this.datasetService.findDatasetDataByNameList(uniqueDatasetList)
+        )
+      )
       .subscribe(res => {
         this.dataSoure = this.themeDatasetList.map(themeDataset => {
           var datasetDataList = res.filter(datasetData =>
@@ -213,7 +238,7 @@ export class ImageListViewComponent implements OnInit {
       .map(x => ({ key: x.byKey, label: x.label }));
     if (this.sortArray.length > 0) {
       this.sortArray.push({
-        key: 'random',
+        key: this.randomStr,
         label: this.translateService.instant('g.randomSort'),
       });
       let sortValue = this.sortArray.find(x => x.key === sort);
@@ -226,6 +251,7 @@ export class ImageListViewComponent implements OnInit {
     );
 
     this.onSearch();
+    this.changePage();
     this.changeData();
     await this.changeQueryParams();
     // 監聽url params的變化
@@ -235,6 +261,7 @@ export class ImageListViewComponent implements OnInit {
         this.changeUrl();
         this.changeDataSource();
         this.onSearch();
+        this.changePage();
         this.changeData();
       });
   }
@@ -242,7 +269,7 @@ export class ImageListViewComponent implements OnInit {
   //使用query param的資料來設定當前資料的來源,排序,頁數
   changeUrl() {
     const values = this.route.snapshot.queryParams;
-    let { page, searchValue, sort, asc, dataset } = values;
+    let { page, searchValue, sort, asc, dataset, tag } = values;
     this.currentPage = page ? parseInt(page) : 1;
     this.searchValue = searchValue ? searchValue : '';
     if (this.sortArray.length > 0 && this.sortArray.find(x => x.key === sort)) {
@@ -253,6 +280,7 @@ export class ImageListViewComponent implements OnInit {
 
     this.sortAsc = asc === undefined || asc === 'true';
     this.datasetSeq = dataset ? parseInt(dataset) : -1;
+    this.tagSeq = tag ? parseInt(tag) : -1;
   }
   //更改的資料來源
   changeDataSource() {
@@ -267,13 +295,18 @@ export class ImageListViewComponent implements OnInit {
     } else if (this.themeDatasetList.length > 0) {
       this.useDataset = this.themeDatasetList[0];
     }
+    if (this.tagSeq === -1) {
+      this.useTag = { seq: -1, tag: '' };
+    } else {
+      this.useTag = this.themeTagListForSelect[this.tagSeq];
+    }
     //設定目前使用的資料
     this.useData = this.dataSoure
       .find(x => x.themeDataset.label === this.useDataset.label)!
       .datasetDataList.map(x => {
         x.data = x.data.map(data => {
           data[this.randomStr] = crypto.getRandomValues(new Uint32Array(1))[0];
-          data['__datasetName'] = x.datasetName;
+          data[this.datasetNameStr] = x.datasetName;
           return data;
         });
         return x.data;
@@ -319,6 +352,20 @@ export class ImageListViewComponent implements OnInit {
         return false;
       });
     }
+  }
+
+  changeTag() {
+    if (this.useTag.seq !== -1) {
+      const valueList = this.themeTagValueList.find(
+        tag => tag.tag === this.useTag.tag
+      )!.valueList;
+      this.filterData = this.filterData.filter((x: any) =>
+        valueList.includes(x[this.defaultKey])
+      );
+    }
+  }
+
+  changePage() {
     this.pages = [];
 
     // 設定過濾後的總頁數
@@ -339,6 +386,7 @@ export class ImageListViewComponent implements OnInit {
       page: this.currentPage,
       searchValue: this.searchValue,
       dataset: this.useDataset.seq,
+      tag: this.useTag.seq,
     };
     if (this.sortArray.length > 0) {
       queryParams['sort'] = this.sortValue?.key?.trim();
@@ -362,6 +410,7 @@ export class ImageListViewComponent implements OnInit {
 
     // 資料排序
     this.onSort();
+    this.changeTag();
     // 設定序號
     this.viewData = this.filterData
       .map((x: any, i: number) => {
@@ -445,6 +494,9 @@ export class ImageListViewComponent implements OnInit {
   }
   //資料來源需要正確顯示的資料
   compareDataset(a: ThemeDataset, b: ThemeDataset): boolean {
+    return a && b ? a.seq === b.seq : a === b;
+  }
+  compareTag(a: ThemeTag, b: ThemeTag): boolean {
     return a && b ? a.seq === b.seq : a === b;
   }
   /**
@@ -609,7 +661,7 @@ export class ImageListViewComponent implements OnInit {
 
   openEditData(data: any) {
     this.datasetService
-      .findDataset(data['__datasetName'])
+      .findDataset(data[this.datasetNameStr])
       .pipe(
         switchMap(x =>
           this.groupdatasetService.getGroupDataset(x.config.groupName)
@@ -627,6 +679,32 @@ export class ImageListViewComponent implements OnInit {
       });
   }
 
+  onSetTag(data: any) {
+    const value = data[this.defaultKey];
+    const tagList = this.themeTagValueList
+      .filter(x => x.valueList.includes(value))
+      .map(x => x.tag);
+    const selected = this.themeTagList.filter(x => tagList.includes(x.tag));
+    this.selectTableService
+      .selectMutipleTag(this.themeTagList, selected)
+      .pipe(
+        filter(res => res !== undefined),
+        switchMap(res => {
+          this.themeTagValueList = this.themeTagValueList.map(x => {
+            x.valueList = x.valueList.filter(x => x !== value);
+            if (res.find(y => x.tag === y.tag)) {
+              x.valueList.push(value);
+            }
+            return x;
+          });
+          return this.themeService.updateTagValueList(this.themeTagValueList);
+        })
+      )
+      .subscribe(() => {
+        this.changeQueryParams();
+      });
+  }
+
   sortArrayText(arr: any) {
     if (Array.isArray(arr)) {
       return arr.sort((a, b) => (a > b ? 1 : -1));
@@ -640,5 +718,13 @@ export class ImageListViewComponent implements OnInit {
       .subscribe(x => {
         this.getData();
       });
+  }
+
+  getTagValueLength(tag: string) {
+    const tagValue = this.themeTagValueList.find(x => x.tag === tag);
+    if (tagValue) {
+      return tagValue.valueList.length;
+    }
+    return 0;
   }
 }

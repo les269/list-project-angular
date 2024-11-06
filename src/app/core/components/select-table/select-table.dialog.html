@@ -1,4 +1,7 @@
+@if(showTitle){
 <h2 mat-dialog-title>{{ title??'title.pleaseSelect' | translate }}</h2>
+}
+
 <mat-dialog-content class="scrollbar-primary">
   @if (enableFilter) {
   <input class="form-control my-2" (keyup)="applyFilter($event)" />
@@ -31,7 +34,7 @@
         [disabled]="!(columnSorts && columnSorts![column])">
         {{ labels[index] | translate }}
       </th>
-      <td mat-cell *matCellDef="let element">
+      <td mat-cell *matCellDef="let element" class="user-select-none">
         {{ columnFormats?.[column] ? columnFormats![column](element[column]) :
         element[column] }}
       </td>

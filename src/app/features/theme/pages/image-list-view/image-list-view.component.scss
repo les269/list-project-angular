@@ -32,6 +32,8 @@ app-image-list-view {
   display: flex;
   padding-bottom: 1rem;
   > .header-left {
+    display: flex;
+    align-items: center;
   }
   > .header-center {
   }
@@ -242,7 +244,7 @@ div.card {
           }
         }
       }
-      > button.edit-button {
+      > div.edit-button {
         display: flex;
         right: 20px;
         position: absolute;

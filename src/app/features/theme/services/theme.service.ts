@@ -7,6 +7,8 @@ import {
   ThemeCustomValueRequest,
   ThemeCustomValueResponse,
   ThemeHeader,
+  ThemeTagValue,
+  ThemeTagValueReq,
 } from '../models';
 
 @Injectable({ providedIn: 'root' })
@@ -36,15 +38,28 @@ export class ThemeService {
   deleteTheme(req: Partial<ThemeHeader>): Observable<void> {
     return this.http.post<void>('/theme/delete', req);
   }
+
   copyTheme(req: Partial<CopyThemeRequest>): Observable<void> {
     return this.http.post<void>('/theme/copy', req);
   }
+
   findCustomValue(
     req: Partial<ThemeCustomValueRequest>
   ): Observable<ThemeCustomValueResponse> {
     return this.http.post<ThemeCustomValueResponse>('/theme/custom/value', req);
   }
-  updateCustomValue(req: Partial<ThemeCustomValue>): Observable<void> {
-    return this.http.post<void>('/theme/custom/update', req);
+
+  updateCustomValue(req: Partial<ThemeTagValueReq>): Observable<string[]> {
+    return this.http.post<string[]>('/theme/custom/update', req);
+  }
+
+  getTagValueList(headerId: string): Observable<ThemeTagValue[]> {
+    return this.http.get<ThemeTagValue[]>(
+      `/theme/tag/value?headerId=${headerId}`
+    );
+  }
+
+  updateTagValueList(req: ThemeTagValue[]): Observable<void> {
+    return this.http.post<void>(`/theme/tag/update`, req);
   }
 }
