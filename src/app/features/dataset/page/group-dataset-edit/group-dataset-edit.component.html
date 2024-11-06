@@ -31,13 +31,31 @@
       [(fieldList)]="
         model.config.groupDatasetFieldList
       "></app-group-dataset-field-table>
-    <div class="h4 fw-bold">
-      {{ 'dataset.scrapyTable' | translate }}
+
+    <div class="form-group mb-2">
+      <label class="form-label">{{ 'dataset.getDataType' | translate }}</label>
+      <select class="form-control form-select" [(ngModel)]="model.config.type">
+        <option
+          *ngFor="let type of eGroupDatasetConfigType | keyvalue"
+          [ngValue]="type.key">
+          {{ 'dataset.' + type.key | translate }}
+        </option>
+      </select>
     </div>
-    <app-group-dataset-scrapy-table
-      [(scrapyList)]="
-        model.config.groupDatasetScrapyList
-      "></app-group-dataset-scrapy-table>
+    @switch (model.config.type) {
+      @case ('scrapy') {
+        <app-group-dataset-scrapy-table
+          [(scrapyList)]="
+            model.config.groupDatasetScrapyList
+          "></app-group-dataset-scrapy-table>
+      }
+      @case ('api') {
+        <app-group-dataset-api-table
+          [(apiList)]="
+            model.config.groupDatasetApiList
+          "></app-group-dataset-api-table>
+      }
+    }
     @if (status === 'edit') {
       <div class="my-4">
         <button

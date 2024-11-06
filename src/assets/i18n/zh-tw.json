@@ -227,6 +227,9 @@
     "fieldLabel": "鍵的標籤名稱",
     "type": "資料類型",
     "scrapyTable": "爬蟲設定",
+    "apiTable": "API設定",
+    "apiName": "API名稱",
+    "apiLabel": "API標籤名",
     "scrapyName": "使用的爬蟲名稱",
     "scrapyLabel": "爬蟲標籤名",
     "scrapyDefault": "是否預設使用該爬蟲",
@@ -245,6 +248,9 @@
     "createDatasetGroup": "創建資料集群組",
     "scrapyUrlLabel": "{{label}}網址欄位",
     "primeValue": "關鍵值",
-    "scrapyJsonLabel": "{{label}}字串欄位"
+    "scrapyJsonLabel": "{{label}}字串欄位",
+    "getDataType": "資料獲取方式",
+    "api": "API",
+    "scrapy": "爬蟲"
   }
 }

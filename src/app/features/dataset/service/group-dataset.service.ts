@@ -33,4 +33,8 @@ export class GroupDatasetService {
       `${this.prefix}/delete?groupName=${groupName}`
     );
   }
+
+  refreshGroupDataset(groupName: string): Observable<void> {
+    return this.http.get<void>(`${this.prefix}/refresh?groupName=${groupName}`);
+  }
 }

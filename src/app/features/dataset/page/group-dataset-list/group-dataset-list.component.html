@@ -44,6 +44,14 @@
               (click)="onCopy(i)">
               <mat-icon>file_copy</mat-icon>
             </button>
+            @if (element.config.type === 'api') {
+              <button
+                mat-icon-button
+                [matTooltip]="'g.refresh' | translate"
+                (click)="onRefresh(element)">
+                <mat-icon>loop</mat-icon>
+              </button>
+            }
             <button
               mat-icon-button
               [matTooltip]="'dataset.editGroupData' | translate"

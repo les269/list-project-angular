@@ -6,9 +6,11 @@ export interface GroupDataset {
 }
 export interface GroupDatasetConfig {
   byKey: string;
+  type: GroupDatasetConfigType;
   imageSaveFolder: string;
   groupDatasetScrapyList: GroupDatasetScrapy[];
   groupDatasetFieldList: GroupDatasetField[];
+  groupDatasetApiList: GroupDatasetApi[];
 }
 
 export interface GroupDatasetScrapy {
@@ -37,4 +39,14 @@ export interface GroupDatasetData {
 export enum GroupDatasetFieldType {
   string = 'string',
   stringArray = 'stringArray',
+}
+export interface GroupDatasetApi {
+  seq: number;
+  apiName: string;
+  label: string;
+}
+
+export enum GroupDatasetConfigType {
+  scrapy = 'scrapy',
+  api = 'api',
 }

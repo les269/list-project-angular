@@ -1,8 +1,8 @@
 <div class="h4 fw-bold">
-  {{ 'dataset.scrapyTable' | translate }}
+  {{ 'dataset.apiTable' | translate }}
 </div>
 <div class="card">
-  <table mat-table [dataSource]="scrapyList" multiTemplateDataRows>
+  <table mat-table [dataSource]="apiList" multiTemplateDataRows>
     <ng-container matColumnDef="seq">
       <th mat-header-cell *matHeaderCellDef>
         {{ 'dataset.fieldSeq' | translate }}
@@ -11,23 +11,23 @@
         {{ element.seq }}
       </td>
     </ng-container>
-    <ng-container matColumnDef="name">
+    <ng-container matColumnDef="apiName">
       <th mat-header-cell *matHeaderCellDef>
-        {{ 'dataset.scrapyName' | translate }}
+        {{ 'dataset.apiName' | translate }}
       </th>
       <td mat-cell *matCellDef="let element">
         <div class="mt-1 d-flex flex-wrap gap-3 align-items-center">
-          @if (element.name) {
+          @if (element.apiName) {
             <mat-chip cdkDrag
-              >{{ element.name }}
-              <button matChipRemove (click)="element.name = ''">
+              >{{ element.apiName }}
+              <button matChipRemove (click)="element.apiName = ''">
                 <mat-icon>cancel</mat-icon>
               </button>
             </mat-chip>
           }
           <button
             class="btn btn-outline-primary d-flex"
-            (click)="selectScrapy(element)">
+            (click)="selectApi(element)">
             <mat-icon class="material-icons-outlined"
               ><span class="material-symbols-outlined">
                 select_window_2
@@ -39,36 +39,10 @@
     </ng-container>
     <ng-container matColumnDef="label">
       <th mat-header-cell *matHeaderCellDef>
-        {{ 'dataset.scrapyLabel' | translate }}
+        {{ 'dataset.apiLabel' | translate }}
       </th>
       <td mat-cell *matCellDef="let element">
         <input class="form-control" [(ngModel)]="element.label" />
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="isDefault">
-      <th mat-header-cell *matHeaderCellDef>
-        {{ 'dataset.scrapyDefault' | translate }}
-      </th>
-      <td mat-cell *matCellDef="let element; let i = dataIndex">
-        <mat-checkbox
-          [(ngModel)]="element.isDefault"
-          (change)="changeDefaultKey($event, i)"></mat-checkbox>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="visibleJson">
-      <th mat-header-cell *matHeaderCellDef>
-        {{ 'dataset.visibleJson' | translate }}
-      </th>
-      <td mat-cell *matCellDef="let element; let i = dataIndex">
-        <mat-checkbox [(ngModel)]="element.visibleJson"></mat-checkbox>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="visibleUrl">
-      <th mat-header-cell *matHeaderCellDef>
-        {{ 'dataset.visibleUrl' | translate }}
-      </th>
-      <td mat-cell *matCellDef="let element; let i = dataIndex">
-        <mat-checkbox [(ngModel)]="element.visibleUrl"></mat-checkbox>
       </td>
     </ng-container>
     <ng-container matColumnDef="other">
@@ -81,7 +55,7 @@
                 >arrow_drop_up</mat-icon
               >
             }
-            @if (i !== scrapyList.length - 1) {
+            @if (i !== apiList.length - 1) {
               <mat-icon
                 class="dropupdown-icon down"
                 (click)="onUpDown(i, 'down')"

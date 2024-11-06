@@ -40,7 +40,7 @@ export interface ApiConfigDialogData {
 export class ApiConfigDialog {
   readonly dialogRef = inject(MatDialogRef<ApiConfigDialog>);
   readonly data = inject<ApiConfigDialogData>(MAT_DIALOG_DATA);
-  value = this.data.value;
+  value = JSON.parse(JSON.stringify(this.data.value));
   list = this.data.list;
   type = this.data.type;
   eHttpMethodType = HttpMethodType;

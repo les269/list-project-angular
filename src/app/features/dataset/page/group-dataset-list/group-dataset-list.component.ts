@@ -29,7 +29,6 @@ import { EditGroupDatasetDataComponent } from '../../components/edit-group-datas
     MatTooltipModule,
   ],
   templateUrl: './group-dataset-list.component.html',
-  styleUrl: './group-dataset-list.component.scss',
 })
 export class GroupDatasetListComponent {
   displayedColumns = ['groupName', 'createdTime', 'updatedTime', 'other'];
@@ -97,5 +96,10 @@ export class GroupDatasetListComponent {
       minWidth: '60vw',
       autoFocus: false,
     });
+  }
+  onRefresh(element: GroupDataset) {
+    this.groupDatasetService
+      .refreshGroupDataset(element.groupName)
+      .subscribe(() => {});
   }
 }

@@ -30,7 +30,6 @@ import { SelectTableService } from '../../../../core/services/select-table.servi
     MatChipsModule,
   ],
   templateUrl: './group-dataset-scrapy-table.component.html',
-  styleUrl: './group-dataset-scrapy-table.component.scss',
 })
 export class GroupDatasetScrapyTableComponent implements OnInit {
   displayedColumns = [

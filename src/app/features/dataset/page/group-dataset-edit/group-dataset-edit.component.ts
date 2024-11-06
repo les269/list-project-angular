@@ -10,11 +10,16 @@ import { DatasetFieldTableComponent } from '../../components/dataset-field-table
 import { GroupDatasetScrapyTableComponent } from '../../components/group-dataset-scrapy-table/group-dataset-scrapy-table.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { GroupDataset, GroupDatasetFieldType } from '../../model';
+import {
+  GroupDataset,
+  GroupDatasetConfigType,
+  GroupDatasetFieldType,
+} from '../../model';
 import { GroupDatasetService } from '../../service/group-dataset.service';
 import { debounceTime, EMPTY, filter, switchMap } from 'rxjs';
 import { GroupDatasetFieldTableComponent } from '../../components/group-dataset-field-table/group-dataset-field-table.component';
-import { isNotBlank } from '../../../../shared/util/helper';
+import { isBlank, isNotBlank } from '../../../../shared/util/helper';
+import { GroupDatasetApiTableComponent } from '../../components/group-dataset-api-table/group-dataset-api-table.component';
 
 @Component({
   selector: 'app-group-dataset-edit',
@@ -31,9 +36,9 @@ import { isNotBlank } from '../../../../shared/util/helper';
     DatasetFieldTableComponent,
     GroupDatasetScrapyTableComponent,
     GroupDatasetFieldTableComponent,
+    GroupDatasetApiTableComponent,
   ],
   templateUrl: './group-dataset-edit.component.html',
-  styleUrl: './group-dataset-edit.component.scss',
 })
 export class GroupDatasetEditComponent implements OnInit {
   status: 'new' | 'edit' = 'new';
@@ -44,9 +49,12 @@ export class GroupDatasetEditComponent implements OnInit {
       groupDatasetScrapyList: [],
       groupDatasetFieldList: [],
       imageSaveFolder: '',
+      groupDatasetApiList: [],
+      type: GroupDatasetConfigType.scrapy,
     },
   };
   eGroupDatasetFieldType = GroupDatasetFieldType;
+  eGroupDatasetConfigType = GroupDatasetConfigType;
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -77,6 +85,46 @@ export class GroupDatasetEditComponent implements OnInit {
     this.router.navigate(['group-dataset-list']);
   }
   validationModel(): boolean {
+    if (isBlank(this.model.groupName)) {
+      this.snackbarService.isBlankMessage('dataset.groupName');
+      return false;
+    }
+    if (isBlank(this.model.config.byKey)) {
+      this.snackbarService.isBlankMessage('dataset.byKey');
+      return false;
+    }
+    for (const field of this.model.config.groupDatasetFieldList) {
+      if (isBlank(field.key)) {
+        this.snackbarService.isBlankMessage('dataset.fieldKey');
+        return false;
+      }
+      if (isBlank(field.label)) {
+        this.snackbarService.isBlankMessage('dataset.fieldLabel');
+        return false;
+      }
+    }
+
+    for (const scrapy of this.model.config.groupDatasetScrapyList) {
+      if (isBlank(scrapy.name)) {
+        this.snackbarService.isBlankMessage('dataset.scrapyName');
+        return false;
+      }
+      if (isBlank(scrapy.label)) {
+        this.snackbarService.isBlankMessage('dataset.scrapyLabel');
+        return false;
+      }
+    }
+
+    for (const api of this.model.config.groupDatasetApiList) {
+      if (isBlank(api.apiName)) {
+        this.snackbarService.isBlankMessage('dataset.apiName');
+        return false;
+      }
+      if (isBlank(api.label)) {
+        this.snackbarService.isBlankMessage('dataset.apiLabel');
+        return false;
+      }
+    }
     return true;
   }
   update(back: boolean, type: 'save' | 'commit') {

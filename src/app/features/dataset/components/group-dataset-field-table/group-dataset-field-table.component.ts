@@ -1,11 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  DatasetField,
-  DatasetFieldType,
-  GroupDatasetField,
-  GroupDatasetFieldType,
-} from '../../model';
+import { GroupDatasetField, GroupDatasetFieldType } from '../../model';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -27,7 +22,6 @@ import { TranslateModule } from '@ngx-translate/core';
     MatCheckboxModule,
   ],
   templateUrl: './group-dataset-field-table.component.html',
-  styleUrl: './group-dataset-field-table.component.scss',
 })
 export class GroupDatasetFieldTableComponent {
   eDatasetFieldType = GroupDatasetFieldType;
