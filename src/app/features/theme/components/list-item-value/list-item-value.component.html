@@ -1,0 +1,48 @@
+@switch (themeLabel.type) {
+  @case ('string') {
+    <div
+      class="row-text"
+      ngCopy
+      [enableCopy]="themeLabel.isCopy && !themeLabel.isSearchButton">
+      @if (themeLabel.isSearchButton) {
+        <a
+          class="text-link"
+          href="javascript:void(0);"
+          (click)="searchValue(data[themeLabel.byKey])">
+          {{ data[themeLabel.byKey] }}</a
+        >
+      } @else {
+        <ng-container>{{ data[themeLabel.byKey] }}</ng-container>
+      }
+      @if (themeLabel.isCopy && themeLabel.isSearchButton && isHover) {
+        <mat-icon
+          class="copy-icon"
+          fontIcon="content_copy"
+          [ngCopy]="data[themeLabel.byKey]"></mat-icon>
+      }
+    </div>
+  }
+  @case ('stringSplit') {
+    <app-array-text
+      [themeLabel]="themeLabel"
+      [array]="getStringSplit(themeLabel, data)"
+      [isHover]="isHover"
+      (searchChange)="searchValue($event)"></app-array-text>
+  }
+  @case ('stringArray') {
+    <app-array-text
+      [themeLabel]="themeLabel"
+      [array]="data[themeLabel.byKey]"
+      [isHover]="isHover"
+      (searchChange)="searchValue($event)"></app-array-text>
+  }
+  @case ('seq') {
+    <div>{{ data[seqKey] }}</div>
+  }
+  @case ('fileSize') {
+    <div>{{ data[themeLabel.byKey] | fileSize }}</div>
+  }
+  @default {
+    <div>{{ data[themeLabel.byKey] }}</div>
+  }
+}

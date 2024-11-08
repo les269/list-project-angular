@@ -60,6 +60,17 @@
           name="title"
           required />
       </div>
+      <div class="mb-3">
+        <label for="seq" class="form-label">{{
+          'themeHeader.seq' | translate
+        }}</label>
+        <input
+          type="number"
+          class="form-control"
+          [(ngModel)]="model.seq"
+          id="seq"
+          name="seq" />
+      </div>
 
       @if (model.type === eThemeHeaderType.imageList) {
         <div>
@@ -106,13 +117,20 @@
         }
       }
       <app-theme-label-table
-        [(themeLabelList)]="model.themeLabelList"></app-theme-label-table>
+        [(themeLabelList)]="model.themeLabelList"
+        [type]="model.type"></app-theme-label-table>
       <app-theme-dataset-table
         [(themeDatasetList)]="model.themeDatasetList"></app-theme-dataset-table>
+      <label class="h3">{{ 'themeCustom.title' | translate }}</label>
       <app-custom-table
         [(themeCustomList)]="model.themeCustomList"></app-custom-table>
       <app-theme-tag-table
         [(themeTagList)]="model.themeTagList"></app-theme-tag-table>
+      <app-theme-other-setting
+        [type]="model.type"
+        [(themeOtherSetting)]="
+          model.themeOtherSetting
+        "></app-theme-other-setting>
       @if (status === 'edit') {
         <div class="my-4">
           <button

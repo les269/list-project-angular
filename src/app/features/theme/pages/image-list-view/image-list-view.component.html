@@ -48,7 +48,7 @@
         <button
           class="search-btn"
           [matTooltip]="'g.clear' | translate"
-          (click)="searchValue = ''; changeQueryParams()">
+          (click)="searchValue = []; changeQueryParams()">
           <mat-icon>clear</mat-icon>
         </button>
         <button
@@ -197,11 +197,12 @@
               @if (label.isVisible) {
                 <div class="detail-row">
                   <div class="row-label">{{ label.label }}</div>
-                  <ng-container
-                    *ngTemplateOutlet="
-                      labelValueRef;
-                      context: { $implicit: data, label, index: i }
-                    "></ng-container>
+                  <app-list-item-value
+                    [data]="data"
+                    [themeLabel]="label"
+                    [isHover]="hoveredIndex === i"
+                    [seqKey]="seqKey"
+                    (searchChange)="searchChange($event)"></app-list-item-value>
                 </div>
               }
             }
@@ -209,224 +210,17 @@
 
           @if (defaultKey && themeCustomList.length > 0) {
             <div class="detail-buttons">
-              @for (custom of themeCustomList; track $index) {
-                @switch (custom.type) {
-                  @case ('buttonIconBoolean') {
-                    <div class="custom-button-group">
-                      <button
-                        class="custom-button"
-                        (click)="changeCustomValue(data, custom)">
-                        <label class="px-2">{{ custom.label }}</label>
-                        <mat-icon class="material-icons-outlined">{{
-                          getCustomValueForUI(data, custom)
-                        }}</mat-icon>
-                      </button>
-                    </div>
-                  }
-                  @case ('buttonIconFill') {
-                    <div class="custom-button-group">
-                      <button
-                        class="custom-button"
-                        (click)="changeCustomValue(data, custom)">
-                        <label class="px-2">{{ custom.label }}</label>
-                        <mat-icon
-                          [style.color]="
-                            getCustomValueForUI(data, custom)
-                              ? custom.buttonIconFillColor
-                              : '#000'
-                          "
-                          ><span
-                            [class]="
-                              getCustomValueForUI(data, custom)
-                                ? ''
-                                : 'material-symbols-outlined'
-                            ">
-                            {{ custom.buttonIconFill }}
-                          </span></mat-icon
-                        >
-                      </button>
-                    </div>
-                  }
-                  @case ('buttonInputUrl') {
-                    <div class="custom-button-group">
-                      <button
-                        class="custom-button"
-                        (click)="openButtonInputUrlDialog(data, custom)">
-                        <label class="px-2">{{ custom.label }}</label>
-                      </button>
-                      @if (getCustomValue(data, custom) !== '') {
-                        <button
-                          class="custom-button custom-icon"
-                          (click)="openNewPage(getCustomValue(data, custom))">
-                          <mat-icon>open_in_new</mat-icon>
-                        </button>
-                      }
-                    </div>
-                  }
-                  @case ('copyValue') {
-                    <div class="custom-button-group">
-                      <button
-                        class="custom-button"
-                        (click)="onCopyValue(data, custom)">
-                        <label class="px-2">{{ custom.label }}</label>
-                      </button>
-                    </div>
-                  }
-                  @case ('copyValueByKey') {
-                    <div class="custom-button-group">
-                      <button
-                        class="custom-button"
-                        (click)="copyText(data[custom.copyValueByKey])">
-                        <label class="px-2">{{ custom.label }}</label>
-                      </button>
-                    </div>
-                  }
-                  @case ('openUrl') {
-                    <div class="custom-button-group">
-                      <button
-                        class="custom-button"
-                        (click)="onOpenUrl(data, custom)">
-                        <label class="px-2">{{ custom.label }}</label>
-                      </button>
-                    </div>
-                  }
-                  @case ('openUrlByKey') {
-                    <div class="custom-button-group">
-                      <button
-                        class="custom-button"
-                        (click)="openNewPage(data[custom.openUrlByKey])">
-                        <label class="px-2">{{ custom.label }}</label>
-                      </button>
-                    </div>
-                  }
-                  @case ('writeNote') {
-                    <div class="custom-button-group">
-                      <button
-                        class="custom-button"
-                        (click)="openNoteDialog(data, custom, 'write')">
-                        <label class="px-2">{{ custom.label }}</label>
-                      </button>
-                      @if (getCustomValue(data, custom) !== '') {
-                        <button
-                          class="custom-button custom-icon"
-                          (click)="openNoteDialog(data, custom, 'read')">
-                          <mat-icon class="material-icons-outlined"
-                            >description</mat-icon
-                          >
-                        </button>
-                      }
-                    </div>
-                  }
-                  @case ('apiConfig') {
-                    <div class="custom-button-group">
-                      <button
-                        class="custom-button"
-                        (click)="callApi(data, custom)">
-                        <label class="px-2">{{ custom.label }}</label>
-                      </button>
-                    </div>
-                  }
-                }
-              }
+              <app-custom-buttons
+                [themeCustomList]="themeCustomList"
+                [data]="data"
+                [headerId]="headerId"
+                [defaultKey]="defaultKey"
+                [customValueMap]="customValueMap"></app-custom-buttons>
             </div>
           }
         </div>
       </div>
     </div>
-  }
-</ng-template>
-<ng-template
-  #labelValueRef
-  labelValue
-  let-data
-  let-label="label"
-  let-index="index">
-  <div>
-    @switch (label.type) {
-      @case ('string') {
-        <div
-          class="row-text"
-          ngCopy
-          [enableCopy]="label.isCopy && !label.isSearchButton">
-          @if (label.isSearchButton) {
-            <a
-              class="text-link"
-              href="javascript:void(0);"
-              (click)="searchValue = data[label.byKey]; changeQueryParams()">
-              {{ data[label.byKey] }}</a
-            >
-          } @else {
-            <ng-container>{{ data[label.byKey] }}</ng-container>
-          }
-          @if (label.isCopy && label.isSearchButton && hoveredIndex === index) {
-            <mat-icon
-              class="copy-icon"
-              fontIcon="content_copy"
-              (click)="copyText(data[label.byKey])"></mat-icon>
-          }
-        </div>
-      }
-      @case ('stringSplit') {
-        <ng-container
-          *ngTemplateOutlet="
-            arrayTextRef;
-            context: { $implicit: getStringSplit(label, data), label, index }
-          "></ng-container>
-      }
-      @case ('stringArray') {
-        <ng-container
-          *ngTemplateOutlet="
-            arrayTextRef;
-            context: { $implicit: data[label.byKey], label, index }
-          "></ng-container>
-      }
-      @case ('seq') {
-        <div>{{ data[seqKey] }}</div>
-      }
-      @case ('fileSize') {
-        <div>{{ data[label.byKey] | fileSize }}</div>
-      }
-      @default {
-        <div>{{ data[label.byKey] }}</div>
-      }
-    }
-  </div>
-</ng-template>
-<ng-template
-  labelValue
-  #arrayTextRef
-  let-label="label"
-  let-array
-  let-index="index">
-  @if (array.length > 0) {
-    @if (label.isSearchButton) {
-      <div class="text-links">
-        @for (text of sortArrayText(array); track $index; let isLast = $last) {
-          <a
-            href="javascript:void(0);"
-            class="text-link"
-            (click)="searchValue = text; changeQueryParams()"
-            >{{ text }}</a
-          >
-          @if (label.isCopy && label.isSearchButton && hoveredIndex === index) {
-            <mat-icon
-              class="copy-icon"
-              fontIcon="content_copy"
-              (click)="copyText(text)"></mat-icon>
-          }
-          @if (!isLast) {
-            <ng-container>{{ label.useSpace }}</ng-container>
-          }
-        }
-      </div>
-    } @else {
-      @for (text of sortArrayText(array); track $index; let isLast = $last) {
-        <div href="javascript:void(0);" class="row-text">{{ text }}</div>
-        @if (!isLast) {
-          <ng-container>{{ label.useSpace }}</ng-container>
-        }
-      }
-    }
   }
 </ng-template>
 

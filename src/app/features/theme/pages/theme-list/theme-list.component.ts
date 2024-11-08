@@ -8,7 +8,7 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { updateList } from '../../../../shared/state/layout.actions';
 import { Store } from '@ngrx/store';
 import { MatDialog } from '@angular/material/dialog';
-import { MessageBoxComponent } from '../../../../core/components/message-box.component';
+import { MessageBoxComponent } from '../../../../core/components/message-box/message-box.component';
 import { CopyThemeComponent } from '../../components/copy-theme.dialog';
 import { isNotBlank } from '../../../../shared/util/helper';
 import { selectLayoutByKey } from '../../../../shared/state/layout.selectors';
@@ -64,7 +64,10 @@ export class ThemeListComponent implements OnInit {
   }
 
   onEdit(item: ThemeHeader) {
-    this.router.navigate(['theme-edit'], { queryParams: item });
+    const { name, version, type } = item;
+    this.router.navigate(['theme-edit'], {
+      queryParams: { name, version, type },
+    });
   }
   onCopy(item: ThemeHeader) {
     const dialogRef = this.matDialog.open(CopyThemeComponent, {
@@ -94,6 +97,6 @@ export class ThemeListComponent implements OnInit {
   }
 
   navigateList(item: ThemeHeader) {
-    this.router.navigate(['imageList', item.name, item.version]);
+    this.router.navigate([item.type, item.name, item.version]);
   }
 }

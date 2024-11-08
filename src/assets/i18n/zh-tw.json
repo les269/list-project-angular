@@ -25,7 +25,8 @@
     "paramSizeError": "參數數量為整數且最少為1",
     "refreshSuccess": "刷新成功",
     "deleteImageFail": "圖片未刪除",
-    "deleteImageSuccess": "成功刪除圖片 {{path}}"
+    "deleteImageSuccess": "成功刪除圖片 {{path}}",
+    "lengthError": "'{{label}}'長度輸入錯誤"
   },
   "g": {
     "edit": "編輯",
@@ -55,7 +56,12 @@
     "random": "隨機",
     "sort": "排序",
     "prePage": "上一頁",
-    "nextPage": "上一頁"
+    "nextPage": "上一頁",
+    "everyPage": "每頁顯示數量",
+    "firstPage": "第一頁",
+    "lastPage": "最後一頁",
+    "noData": "無資料",
+    "rangeLabel": "第 {{start}} - {{end}} 項，共 {{length}} 項"
   },
   "title": {
     "home": "清單列表",
@@ -86,7 +92,8 @@
     "type": "清單類型",
     "imageList": "圖片清單",
     "list": "清單",
-    "table": "Table表格"
+    "table": "Table表格",
+    "seq": "順序"
   },
   "themeImage": {
     "imageKey": "圖片json key",
@@ -104,6 +111,7 @@
     "fileSize": "檔案容量",
     "stringArray": "字串陣列",
     "seq": "序列號",
+    "date": "日期",
     "isVisible": "是否顯示",
     "isSort": "是否用來排序",
     "isSearchButton": "是否為文字搜尋按鈕",
@@ -112,7 +120,11 @@
     "splitByPh": "以哪個字串做分割",
     "useSpacePh": "分格用字串",
     "dateFormat": "日期格式",
-    "isDefaultKey": "當為預設使用的key值,需使用唯一值且確保不為空值,改變時自定義的資料不會隨之改變或刪除"
+    "dateFormatPh": "日期格式化,例如:yyyy-MM-dd",
+    "isDefaultKey": "當為預設使用的key值,需使用唯一值且確保不為空值,改變時自定義的資料不會隨之改變或刪除",
+    "minWidth": "最小寬度",
+    "maxWidth": "最大寬度",
+    "width": "寬度"
   },
   "themeDataset": {
     "title": "資料集設定",
@@ -126,7 +138,7 @@
     "editData": "編輯資料"
   },
   "themeCustom": {
-    "title": "自定義設定",
+    "title": "資料自定義功能",
     "openUrl": "開啟自定義網址",
     "openUrlByKey": "開啟網址用key值",
     "writeNote": "填寫文字",
@@ -148,6 +160,14 @@
     "buttonInputUrl": "輸入自定義開啟網址",
     "labelName": "標籤名稱",
     "apiConfig": "呼叫API"
+  },
+  "otherSetting": {
+    "title": "其他設定",
+    "rowColor": "Table欄顏色設定",
+    "listPageSize": "圖片清單每頁預設顯示數量",
+    "headerButtons": "頭部按鈕設定",
+    "defaultColor": "重設為預設顏色",
+    "listPageSizeMoreZero": "圖片清單每頁預設顯示數量要大於0"
   },
   "themeTag": {
     "title": "標籤設定",

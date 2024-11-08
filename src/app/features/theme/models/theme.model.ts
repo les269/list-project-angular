@@ -10,13 +10,21 @@ export interface ThemeHeader {
   themeDatasetList: ThemeDataset[];
   themeCustomList: ThemeCustom[];
   themeTagList: ThemeTag[];
+  seq: number;
+  themeOtherSetting: ThemeOtherSetting;
 }
 
+export interface ThemeOtherSetting {
+  rowColor: string[];
+  listPageSize: number;
+  topCustomList: ThemeCustom[];
+}
 export interface ThemeHeaderCopy {
   name: string;
   version: string;
   title: string;
   type: ThemeHeaderType;
+  seq: number;
 }
 
 export enum ThemeHeaderType {
@@ -48,6 +56,10 @@ export interface ThemeLabel {
   isVisible: boolean;
   isSort: boolean;
   isDefaultKey: boolean;
+  dateFormat: string;
+  width: string;
+  maxWidth: string;
+  minWidth: string;
 }
 
 export enum ThemeLabelType {
@@ -56,6 +68,7 @@ export enum ThemeLabelType {
   seq = 'seq',
   fileSize = 'fileSize',
   stringArray = 'stringArray',
+  date = 'date',
 }
 
 export interface ThemeDataset {
@@ -96,6 +109,25 @@ export enum ThemeCustomType {
   buttonIconFill = 'buttonIconFill',
   buttonInputUrl = 'buttonInputUrl',
   apiConfig = 'apiConfig',
+}
+
+export interface ThemeTopCustom {
+  type: ThemeTopCustomType;
+  label: string; //顯示的按鈕名稱
+  byKey: string;
+  seq: number; //顯示順序
+  openUrl: string;
+  apiName: string;
+  apiConfig?: ApiConfig;
+}
+
+export enum ThemeTopCustomType {
+  openUrl = 'openUrl',
+  writeNote = 'writeNote',
+  buttonInputUrl = 'buttonInputUrl',
+  apiConfig = 'apiConfig',
+  repeatData = 'repeatData',
+  inputApi = 'inputApi',
 }
 
 export interface CopyThemeData {
@@ -148,3 +180,13 @@ export interface ThemeTagValueReq {
   tag: string;
   value: string;
 }
+
+export const DEFAULT_ROW_COLOR: string[] = [
+  '#e6c3c3e5',
+  '#e6e5c3e5',
+  '#cde6c3e5',
+  '#c3e6d9e5',
+  '#bceff3e5',
+  '#bdbcf3e5',
+  '#e2bcf3e5',
+];

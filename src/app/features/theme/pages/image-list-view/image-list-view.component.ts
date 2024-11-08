@@ -1,32 +1,22 @@
-import { Component, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import {
-  debounceTime,
-  EMPTY,
-  filter,
-  Subscription,
-  switchMap,
-  tap,
-} from 'rxjs';
+import { debounceTime, filter, Subscription, switchMap, tap } from 'rxjs';
 import {
   dynamicSort,
   getRandomInt,
   isBlank,
   isNotBlank,
-  isNotNull,
-  isNull,
-  replaceValue,
 } from '../../../../shared/util/helper';
 import { ThemeService } from '../../services/theme.service';
 import {
   SortType,
   ThemeCustom,
-  ThemeCustomValue,
   ThemeCustomValueResponse,
   ThemeDataset,
   ThemeHeader,
   ThemeImage,
   ThemeLabel,
+  ThemeOtherSetting,
   ThemeTag,
   ThemeTagValue,
 } from '../../models';
@@ -43,11 +33,9 @@ import { Store } from '@ngrx/store';
 import { updateTitle } from '../../../../shared/state/layout.actions';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ScrollTopComponent } from '../../../../core/components/scroll-top.component';
+import { ScrollTopComponent } from '../../../../core/components/scroll-top/scroll-top.component';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDialog } from '@angular/material/dialog';
-import { ButtonInputUrlDialog } from '../../components/button-input-url.dialog';
-import { ApiConfigService } from '../../../api-config/service/api-config.service';
 import { DatasetService } from '../../../dataset/service/dataset.service';
 import { MatButtonModule } from '@angular/material/button';
 import { EditGroupDatasetDataComponent } from '../../../dataset/components/edit-group-dataset-data/edit-group-dataset-data.component';
@@ -56,7 +44,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { DatasetData } from '../../../dataset/model';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { SelectTableService } from '../../../../core/services/select-table.service';
-import { ThemeNoteComponent } from '../../components/theme-note/theme-note.component';
+import { ArrayTextComponent } from '../../components/array-text/array-text.component';
+import { ListItemValueComponent } from '../../components/list-item-value/list-item-value.component';
+import { CustomButtonsComponent } from '../../components/custom-buttons/custom-buttons.component';
 
 @Component({
   standalone: true,
@@ -76,16 +66,19 @@ import { ThemeNoteComponent } from '../../components/theme-note/theme-note.compo
     MatButtonModule,
     MatTooltipModule,
     MatCheckboxModule,
-    MatMenuModule,
+    ArrayTextComponent,
+    ListItemValueComponent,
+    CustomButtonsComponent,
   ],
   selector: 'app-image-list-view',
   templateUrl: 'image-list-view.component.html',
   styleUrl: 'image-list-view.component.scss',
 })
-export class ImageListViewComponent implements OnInit {
+export class ImageListViewComponent implements OnInit, OnDestroy {
   headerId: string = '';
   themeHeader!: ThemeHeader;
   themeImage!: ThemeImage;
+  themeOtherSetting!: ThemeOtherSetting;
   themeLabelList!: ThemeLabel[];
   themeDatasetList!: ThemeDataset[];
   themeTagList!: ThemeTag[];
@@ -105,7 +98,7 @@ export class ImageListViewComponent implements OnInit {
   seqKey = '';
   pages: number[] = [];
   currentPage = 1;
-  searchValue = '';
+  searchValue: string[] = [];
   sortArray: Array<SortType> = [];
   sortValue: SortType | undefined;
   sortAsc: boolean = true;
@@ -116,6 +109,7 @@ export class ImageListViewComponent implements OnInit {
   datasetNameStr = '__datasetName';
   routeParamSub: Subscription | undefined;
   routeEventsSub: Subscription | undefined;
+  pageSize = 30;
 
   constructor(
     private themeService: ThemeService,
@@ -125,7 +119,6 @@ export class ImageListViewComponent implements OnInit {
     private store: Store,
     private matDialog: MatDialog,
     private translateService: TranslateService,
-    private apiConfigService: ApiConfigService,
     private datasetService: DatasetService,
     private groupdatasetService: GroupDatasetService,
     private selectTableService: SelectTableService
@@ -145,6 +138,8 @@ export class ImageListViewComponent implements OnInit {
           this.themeHeader = res;
 
           this.themeImage = res.themeImage;
+          this.themeOtherSetting = res.themeOtherSetting;
+          this.pageSize = this.themeOtherSetting.listPageSize;
           this.themeLabelList = res.themeLabelList.sort((a, b) =>
             a.seq > b.seq ? 1 : -1
           );
@@ -228,7 +223,7 @@ export class ImageListViewComponent implements OnInit {
     }
     //設定過濾後的頁數
     this.pages = Array.from(
-      { length: Math.ceil(this.filterData.length / 30) },
+      { length: Math.ceil(this.filterData.length / this.pageSize) },
       (_, index) => index + 1
     );
     //設定排序資料
@@ -271,7 +266,7 @@ export class ImageListViewComponent implements OnInit {
     const values = this.route.snapshot.queryParams;
     let { page, searchValue, sort, asc, dataset, tag } = values;
     this.currentPage = page ? parseInt(page) : 1;
-    this.searchValue = searchValue ? searchValue : '';
+    this.searchValue = isNotBlank(searchValue) ? searchValue.split(',') : [];
     if (this.sortArray.length > 0 && this.sortArray.find(x => x.key === sort)) {
       this.sortValue = sort
         ? { key: sort, label: this.sortArray.find(x => x.key === sort)!.label }
@@ -318,38 +313,34 @@ export class ImageListViewComponent implements OnInit {
    * 使用searchValue過濾資料
    */
   onSearch() {
-    this.searchValue = this.searchValue.trim();
-    if (isBlank(this.searchValue)) {
-      this.searchValue = '';
+    if (this.searchValue.length === 0) {
+      this.searchValue = [];
       this.filterData = this.useData;
     } else if (this.searchLabel.length > 0) {
       // 搜尋值轉小寫搜尋, 先把搜尋資料取出並轉小寫並不能為空值
-      const searchValue = this.searchValue.toLocaleLowerCase();
+      const searchValue = this.searchValue.map(x => x.toLocaleLowerCase());
       this.filterData = this.useData.filter((data: any) => {
-        for (const label of this.searchLabel) {
-          if (
-            label.type === 'stringArray' &&
-            Array.isArray(data[label.byKey])
-          ) {
-            var arr = data[label.byKey];
-            for (const element of arr) {
-              if (
-                isNotBlank(element) &&
-                element
-                  .toLocaleLowerCase()
-                  .indexOf(searchValue.toLocaleLowerCase()) !== -1
-              ) {
+        return searchValue.every(x => {
+          for (const label of this.searchLabel) {
+            if (
+              label.type === 'stringArray' &&
+              Array.isArray(data[label.byKey])
+            ) {
+              for (const element of data[label.byKey]) {
+                const value = element.toLocaleLowerCase();
+                if (isNotBlank(element) && value.includes(x)) {
+                  return true;
+                }
+              }
+            } else {
+              const value = data[label.byKey]?.trim()?.toLowerCase();
+              if (isNotBlank(value) && value.includes(x)) {
                 return true;
               }
             }
-          } else {
-            const value = data[label.byKey]?.trim()?.toLowerCase();
-            if (isNotBlank(value) && value.indexOf(searchValue) !== -1) {
-              return true;
-            }
           }
-        }
-        return false;
+          return false;
+        });
       });
     }
   }
@@ -369,7 +360,7 @@ export class ImageListViewComponent implements OnInit {
     this.pages = [];
 
     // 設定過濾後的總頁數
-    for (let i = 0; i < this.filterData.length / 30; i++) {
+    for (let i = 0; i < this.filterData.length / this.pageSize; i++) {
       this.pages.push(i + 1);
     }
     // 如果選擇頁數超過當前的頁數長度則設頁數為1
@@ -382,9 +373,12 @@ export class ImageListViewComponent implements OnInit {
    * 改變url的QueryPamas以此來改變資料
    */
   changeQueryParams() {
+    if (typeof this.searchValue === 'string') {
+      this.searchValue = (this.searchValue + '').split(',').map(x => x.trim());
+    }
     let queryParams: { [key: string]: any } = {
       page: this.currentPage,
-      searchValue: this.searchValue,
+      searchValue: this.searchValue.join(','),
       dataset: this.useDataset.seq,
       tag: this.useTag.seq,
     };
@@ -405,8 +399,8 @@ export class ImageListViewComponent implements OnInit {
    * 搜尋,頁數或排序改變
    */
   changeData() {
-    const start = (this.currentPage - 1) * 30;
-    const end = this.currentPage * 30;
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = this.currentPage * this.pageSize;
 
     // 資料排序
     this.onSort();
@@ -426,16 +420,6 @@ export class ImageListViewComponent implements OnInit {
     }
   }
 
-  getStringSplit(label: ThemeLabel, view: any): string[] {
-    if (isBlank(view[label.byKey])) {
-      return [];
-    }
-    return view[label.byKey]
-      .split(label.splitBy)
-      .filter((x: string) => isNotBlank(x))
-      .map((x: string) => x.trim());
-  }
-
   // 當滑鼠進入時更新 hover 狀態
   onMouseEnter(index: number) {
     this.hoveredIndex = index;
@@ -446,14 +430,6 @@ export class ImageListViewComponent implements OnInit {
     this.hoveredIndex = null;
   }
 
-  /**
-   * 複製到剪貼簿
-   * @param text
-   */
-  copyText(text: string) {
-    navigator.clipboard.writeText(text);
-    this.snackbarService.openByI18N('msg.copyText', { text });
-  }
   //上一頁
   prePage() {
     this.currentPage = parseInt(this.currentPage + '', 10);
@@ -504,7 +480,7 @@ export class ImageListViewComponent implements OnInit {
    */
   randomSearch() {
     const randomNo = getRandomInt(1, this.useData.length) - 1;
-    this.searchValue = this.useData[randomNo][this.defaultKey];
+    this.searchValue = [this.useData[randomNo][this.defaultKey]];
     this.changeQueryParams();
   }
 
@@ -527,140 +503,6 @@ export class ImageListViewComponent implements OnInit {
           return a;
         }, this.customValueMap);
     });
-  }
-
-  getCustomValue(data: any, custom: ThemeCustom) {
-    if (this.checkCustomValueExist(data, custom)) {
-      return this.customValueMap[data[this.defaultKey]][custom.byKey];
-    }
-    return '';
-  }
-
-  /**
-   * 取得UI要使用的自定義資料的字串
-   * @param data
-   * @param custom
-   * @returns
-   */
-  getCustomValueForUI(data: any, custom: ThemeCustom) {
-    let result: any = '';
-    let value = '';
-    if (this.checkCustomValueExist(data, custom)) {
-      value = this.customValueMap[data[this.defaultKey]][custom.byKey];
-    }
-
-    switch (custom.type) {
-      case 'buttonIconBoolean':
-        if (isBlank(value) || value === 'true') {
-          result = custom.buttonIconTrue;
-        } else {
-          result = custom.buttonIconFalse;
-        }
-        break;
-      case 'buttonIconFill':
-        result = value === 'true';
-        break;
-    }
-    return result;
-  }
-
-  /**
-   * 檢查是否有存在自訂字串
-   * @param data
-   * @param custom
-   * @returns
-   */
-  checkCustomValueExist(data: any, custom: ThemeCustom): boolean {
-    if (
-      isBlank(this.defaultKey) ||
-      isBlank(data[this.defaultKey]) ||
-      isNull(this.customValueMap[data[this.defaultKey]]) ||
-      isNull(this.customValueMap[data[this.defaultKey]][custom.byKey])
-    ) {
-      return false;
-    }
-    return true;
-  }
-
-  /**
-   * 執行更新自定義字串
-   * @param custom
-   * @param data
-   * @param value
-   */
-  changeCustomValue(data: any, custom: ThemeCustom, value?: any) {
-    let req: ThemeCustomValue = {
-      headerId: this.headerId,
-      byKey: custom.byKey,
-      correspondDataValue: data[this.defaultKey],
-      customValue: value,
-    };
-    let x = this.getCustomValue(data, custom);
-    //定義每種資料改變方式
-    switch (custom.type) {
-      case 'buttonIconBoolean':
-        req.customValue = isBlank(x) || x === 'true' ? 'false' : 'true';
-        break;
-      case 'buttonIconFill':
-        req.customValue = !(x === 'true') + '';
-        break;
-      case 'buttonInputUrl':
-        req.customValue = value;
-        break;
-    }
-
-    this.themeService.updateCustomValue(req).subscribe(() => {
-      this.customValueMap[req.correspondDataValue][req.byKey] = req.customValue;
-    });
-  }
-
-  openButtonInputUrlDialog(data: any, custom: ThemeCustom) {
-    const dialogRef = this.matDialog.open(ButtonInputUrlDialog, {
-      width: '600px',
-      data: this.getCustomValue(data, custom),
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (isNotNull(result)) {
-        this.changeCustomValue(data, custom, result);
-      }
-    });
-  }
-
-  openNewPage(text: string) {
-    window.open(text, '_blank');
-  }
-
-  onCopyValue(data: any, custom: ThemeCustom) {
-    this.copyText(replaceValue(custom.copyValue, data));
-  }
-
-  onOpenUrl(data: any, custom: ThemeCustom) {
-    this.openNewPage(replaceValue(custom.openUrl, data));
-  }
-
-  openNoteDialog(data: any, custom: ThemeCustom, type: 'read' | 'write') {
-    this.matDialog
-      .open(ThemeNoteComponent, {
-        data: {
-          value: this.getCustomValue(data, custom) ?? '',
-          disabled: type === 'read',
-        },
-        panelClass: 'dialog-responsive',
-        height: '80vh',
-      })
-      .afterClosed()
-      .subscribe(result => {
-        if (isNotNull(result)) {
-          this.changeCustomValue(data, custom, result);
-        }
-      });
-  }
-
-  callApi(data: any, custom: ThemeCustom) {
-    if (custom.apiConfig) {
-      this.apiConfigService.callSingleApi(custom.apiConfig, data);
-    }
   }
 
   openEditData(data: any) {
@@ -709,13 +551,6 @@ export class ImageListViewComponent implements OnInit {
       });
   }
 
-  sortArrayText(arr: any) {
-    if (Array.isArray(arr)) {
-      return arr.sort((a, b) => (a > b ? 1 : -1));
-    }
-    return arr;
-  }
-
   onRefresh() {
     this.datasetService
       .refreshDataByNameList(this.useDataset.datasetList)
@@ -726,9 +561,17 @@ export class ImageListViewComponent implements OnInit {
 
   getTagValueLength(tag: string) {
     const tagValue = this.themeTagValueList.find(x => x.tag === tag);
-    if (tagValue) {
-      return tagValue.valueList.length;
+    if (tagValue && this.useData) {
+      const list = this.useData.map((x: any) => x[this.defaultKey]);
+      return tagValue.valueList.filter(x => list.includes(x)).length;
     }
     return 0;
+  }
+
+  searchChange(text: string) {
+    if (!this.searchValue.includes(text)) {
+      this.searchValue = [...this.searchValue, text];
+      this.changeQueryParams();
+    }
   }
 }

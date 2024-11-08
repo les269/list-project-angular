@@ -44,12 +44,12 @@ export class SidenavComponent implements OnInit {
     this.themeService.getAllTheme().subscribe(res => {
       this.store.dispatch(
         updateList({
-          [ThemeHeaderType.imageList]: res.filter(
-            x => x.type === ThemeHeaderType.imageList
-          ),
-          [ThemeHeaderType.table]: res.filter(
-            x => x.type === ThemeHeaderType.table
-          ),
+          [ThemeHeaderType.imageList]: res
+            .filter(x => x.type === ThemeHeaderType.imageList)
+            .sort((a, b) => (a.seq > b.seq ? 1 : -1)),
+          [ThemeHeaderType.table]: res
+            .filter(x => x.type === ThemeHeaderType.table)
+            .sort((a, b) => (a.seq > b.seq ? 1 : -1)),
         })
       );
     });
@@ -59,6 +59,8 @@ export class SidenavComponent implements OnInit {
     this.store.dispatch(changeSidenav());
   }
   navigateList(item: ThemeHeader) {
-    this.router.navigate(['imageList', item.name, item.version]);
+    return this.router
+      .createUrlTree([item.type, item.name, item.version])
+      .toString();
   }
 }

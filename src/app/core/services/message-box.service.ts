@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MessageBoxComponent } from '../components/message-box.component';
+import { MessageBoxComponent } from '../components/message-box/message-box.component';
 import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({ providedIn: 'root' })

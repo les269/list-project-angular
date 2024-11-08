@@ -10,7 +10,7 @@ import {
   ApiConfigDialog,
   ApiConfigDialogData,
 } from '../../components/api-config.dialog';
-import { MessageBoxComponent } from '../../../../core/components/message-box.component';
+import { MessageBoxComponent } from '../../../../core/components/message-box/message-box.component';
 import { isNotBlank } from '../../../../shared/util/helper';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { CommonModule } from '@angular/common';

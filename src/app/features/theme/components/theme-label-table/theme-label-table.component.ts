@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ThemeLabel, ThemeLabelType } from '../../models';
+import { ThemeHeaderType, ThemeLabel, ThemeLabelType } from '../../models';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -33,6 +33,7 @@ import { isNull } from '../../../../shared/util/helper';
   styleUrl: 'theme-label-table.component.scss',
 })
 export class ThemeLabelTableComponent {
+  @Input({ required: true }) type!: ThemeHeaderType;
   @Input({ required: true }) themeLabelList!: ThemeLabel[];
   @Output() themeLabelListChange = new EventEmitter<ThemeLabel[]>();
   displayedColumns: string[] = ['seq', 'byKey', 'label', 'type', 'other'];
@@ -56,6 +57,10 @@ export class ThemeLabelTableComponent {
       isSort: false,
       isSearchValue: false,
       isDefaultKey: false,
+      dateFormat: '',
+      maxWidth: '',
+      minWidth: '',
+      width: '',
     };
     this.themeLabelList = [...this.themeLabelList, element].map((x, i) => {
       x.seq = i + 1;

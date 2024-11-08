@@ -8,10 +8,12 @@ import {
   ViewContainerRef,
 } from '@angular/core';
 import { SnackbarService } from '../../core/services/snackbar.service';
+import { isNotBlank } from './helper';
 
 @Directive({ selector: '[ngCopy]', standalone: true })
 export class UtilDirective {
   @Input() enableCopy: boolean = true; // 新增 Input 用於控制複製功能
+  @Input('ngCopy') copyValue: string = '';
   constructor(
     private el: ElementRef,
     private renderer: Renderer2,
@@ -22,10 +24,12 @@ export class UtilDirective {
     if (!this.enableCopy) {
       return;
     }
-    const text = this.el.nativeElement.innerText;
+    const text = isNotBlank(this.copyValue)
+      ? this.copyValue
+      : this.el.nativeElement.innerText;
+
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text);
-      this.snackbarService.openByI18N('msg.copyText', { text });
     } else {
       const textarea = this.renderer.createElement('textarea');
       this.renderer.setStyle(textarea, 'position', 'fixed');
@@ -35,7 +39,7 @@ export class UtilDirective {
       textarea.select();
       document.execCommand('copy');
       this.renderer.removeChild(document.body, textarea);
-      this.snackbarService.openByI18N('msg.copyText', { text: textarea });
     }
+    this.snackbarService.openByI18N('msg.copyText', { text });
   }
 }

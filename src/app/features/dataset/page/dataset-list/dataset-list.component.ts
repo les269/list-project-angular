@@ -6,7 +6,7 @@ import { MatTableModule } from '@angular/material/table';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { MessageBoxComponent } from '../../../../core/components/message-box.component';
+import { MessageBoxComponent } from '../../../../core/components/message-box/message-box.component';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { isNotBlank } from '../../../../shared/util/helper';
 import { Dataset } from '../../model/dataset.model';

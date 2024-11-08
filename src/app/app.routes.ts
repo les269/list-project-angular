@@ -104,4 +104,11 @@ export const routes: Routes = [
         './features/theme/pages/image-list-view/image-list-view.component'
       ).then(mod => mod.ImageListViewComponent),
   },
+  {
+    path: 'table/:name/:version',
+    loadComponent: () =>
+      import('./features/theme/pages/table-view/table-view.component').then(
+        mod => mod.TableViewComponent
+      ),
+  },
 ];

@@ -1,0 +1,19 @@
+div.text-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  > a.text-link {
+    font-size: 16px;
+    text-decoration: none;
+    color: black;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+mat-icon.copy-icon {
+  height: 16px;
+  font-size: 16px;
+  margin-left: 4px;
+  cursor: pointer;
+}

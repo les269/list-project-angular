@@ -103,6 +103,7 @@ export class CopyThemeComponent implements OnInit {
     version: '',
     title: '',
     type: ThemeHeaderType.imageList,
+    seq: 0,
   };
   constructor(
     private themeService: ThemeService,

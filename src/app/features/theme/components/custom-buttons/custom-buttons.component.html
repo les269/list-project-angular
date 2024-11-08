@@ -1,0 +1,107 @@
+@for (custom of themeCustomList; track $index) {
+  @switch (custom.type) {
+    @case ('buttonIconBoolean') {
+      <div class="custom-button-group">
+        <button class="custom-button" (click)="changeCustomValue(data, custom)">
+          <label class="px-2">{{ custom.label }}</label>
+          <mat-icon class="material-icons-outlined">{{
+            getCustomValueForUI(data, custom)
+          }}</mat-icon>
+        </button>
+      </div>
+    }
+    @case ('buttonIconFill') {
+      <div class="custom-button-group">
+        <button class="custom-button" (click)="changeCustomValue(data, custom)">
+          <label class="px-2">{{ custom.label }}</label>
+          <mat-icon
+            [style.color]="
+              getCustomValueForUI(data, custom)
+                ? custom.buttonIconFillColor
+                : '#000'
+            "
+            ><span
+              [class]="
+                getCustomValueForUI(data, custom)
+                  ? ''
+                  : 'material-symbols-outlined'
+              ">
+              {{ custom.buttonIconFill }}
+            </span></mat-icon
+          >
+        </button>
+      </div>
+    }
+    @case ('buttonInputUrl') {
+      <div class="custom-button-group">
+        <button
+          class="custom-button"
+          (click)="openButtonInputUrlDialog(data, custom)">
+          <label class="px-2">{{ custom.label }}</label>
+        </button>
+        @if (getCustomValue(data, custom) !== '') {
+          <button
+            class="custom-button custom-icon"
+            (click)="openNewPage(getCustomValue(data, custom))">
+            <mat-icon>open_in_new</mat-icon>
+          </button>
+        }
+      </div>
+    }
+    @case ('copyValue') {
+      <div class="custom-button-group">
+        <button
+          class="custom-button"
+          [ngCopy]="replaceValue(custom.copyValue, data)">
+          <label class="px-2">{{ custom.label }}</label>
+        </button>
+      </div>
+    }
+    @case ('copyValueByKey') {
+      <div class="custom-button-group">
+        <button class="custom-button" [ngCopy]="data[custom.copyValueByKey]">
+          <label class="px-2">{{ custom.label }}</label>
+        </button>
+      </div>
+    }
+    @case ('openUrl') {
+      <div class="custom-button-group">
+        <button class="custom-button" (click)="onOpenUrl(data, custom)">
+          <label class="px-2">{{ custom.label }}</label>
+        </button>
+      </div>
+    }
+    @case ('openUrlByKey') {
+      <div class="custom-button-group">
+        <button
+          class="custom-button"
+          (click)="openNewPage(data[custom.openUrlByKey])">
+          <label class="px-2">{{ custom.label }}</label>
+        </button>
+      </div>
+    }
+    @case ('writeNote') {
+      <div class="custom-button-group">
+        <button
+          class="custom-button"
+          (click)="openNoteDialog(data, custom, 'write')">
+          <label class="px-2">{{ custom.label }}</label>
+        </button>
+        @if (getCustomValue(data, custom) !== '') {
+          <button
+            class="custom-button custom-icon"
+            (click)="openNoteDialog(data, custom, 'read')">
+            <mat-icon class="material-icons-outlined">description</mat-icon>
+          </button>
+        }
+      </div>
+    }
+    @case ('apiConfig') {
+      <div class="custom-button-group">
+        <button class="custom-button" (click)="callApi(data, custom)">
+          <label class="px-2">{{ custom.label }}</label>
+        </button>
+      </div>
+    }
+  }
+}

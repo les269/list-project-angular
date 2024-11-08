@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { DatasetService } from '../../service/dataset.service';
 import { GroupDatasetService } from '../../service/group-dataset.service';
-import { MessageBoxComponent } from '../../../../core/components/message-box.component';
+import { MessageBoxComponent } from '../../../../core/components/message-box/message-box.component';
 import { isNotBlank } from '../../../../shared/util/helper';
 import { CopyDatasetComponent } from '../../components/copy-dataset/copy-dataset.component';
 import { CopyGroupDatasetComponent } from '../../components/copy-group-dataset/copy-group-dataset.component';

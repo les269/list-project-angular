@@ -1,5 +1,5 @@
 <div class="card mb-3">
-  <table mat-table [dataSource]="themeCustomList" multiTemplateDataRows>
+  <table mat-table [dataSource]="themeTopCustomList" multiTemplateDataRows>
     <ng-container matColumnDef="order">
       <th mat-header-cell *matHeaderCellDef>
         {{ 'g.order' | translate }}
@@ -62,7 +62,7 @@
                 >arrow_drop_up</mat-icon
               >
             }
-            @if (i !== themeCustomList.length - 1) {
+            @if (i !== themeTopCustomList.length - 1) {
               <mat-icon
                 class="dropupdown-icon down"
                 (click)="onUpDown(i, 'down')"
@@ -95,85 +95,12 @@
         [attr.colspan]="displayedColumns.length">
         <div class="d-flex flex-column mb-2">
           @switch (element.type) {
-            @case ('buttonIconBoolean') {
-              <div class="d-flex align-items-center">
-                <h6 class="mb-0">
-                  {{ 'themeCustom.writeIconName' | translate }}
-                </h6>
-                <a
-                  href="https://fonts.google.com/icons"
-                  class="card-link text-nowrap p-2"
-                  target="_blank"
-                  >{{ 'themeCustom.googleIconUrl' | translate }}</a
-                >
-              </div>
-
-              <div class="d-flex input-group">
-                <input
-                  class="form-control"
-                  [placeholder]="'themeCustom.clickBeforeIcon' | translate"
-                  [(ngModel)]="element.buttonIconTrue"
-                  name="customButtonIconTrue{{ i }}" />
-                <input
-                  class="form-control"
-                  [placeholder]="'themeCustom.clickAfterIcon' | translate"
-                  [(ngModel)]="element.buttonIconFalse"
-                  name="customButtonIconFalse{{ i }}" />
-              </div>
-            }
-            @case ('buttonIconFill') {
-              <div class="d-flex align-items-center">
-                <h6 class="mb-0">
-                  {{ 'themeCustom.writeIconName' | translate }}
-                </h6>
-                <a
-                  href="https://fonts.google.com/icons"
-                  class="card-link text-nowrap p-2"
-                  target="_blank"
-                  >{{ 'themeCustom.googleIconUrl' | translate }}</a
-                >
-              </div>
-              <div class="d-flex">
-                <input
-                  class="form-control mt-1"
-                  [placeholder]="'themeCustom.fillIcon' | translate"
-                  [(ngModel)]="element.buttonIconFill"
-                  name="customButtonIconFill{{ i }}" />
-                <input
-                  type="color"
-                  [placeholder]="'themeCustom.fillIconColor' | translate"
-                  class="form-control form-control-color mt-1"
-                  [(ngModel)]="element.buttonIconFillColor"
-                  name="customButtonIconFillColor{{ i }}" />
-              </div>
-            }
-            @case ('copyValue') {
-              <input
-                class="form-control mt-1"
-                [placeholder]="'themeCustom.copyValuePH' | translate"
-                [(ngModel)]="element.copyValue"
-                name="customCopyValue{{ i }}" />
-            }
-            @case ('copyValueByKey') {
-              <input
-                class="form-control mt-1"
-                [placeholder]="'themeCustom.copyValueByKeyPH' | translate"
-                [(ngModel)]="element.copyValueByKey"
-                name="customCopyValueByKey{{ i }}" />
-            }
             @case ('openUrl') {
               <input
                 class="form-control mt-1"
                 [placeholder]="'themeCustom.openUrlPH' | translate"
                 [(ngModel)]="element.openUrl"
                 name="customOpenUrl{{ i }}" />
-            }
-            @case ('openUrlByKey') {
-              <input
-                class="form-control mt-1"
-                [placeholder]="'themeCustom.openUrlByKeyPH' | translate"
-                [(ngModel)]="element.openUrlByKey"
-                name="customOpenUrlByKey{{ i }}" />
             }
             @case ('apiConfig') {
               <div class="mt-1 d-flex flex-wrap gap-3 align-items-center">

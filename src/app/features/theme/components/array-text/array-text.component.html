@@ -1,0 +1,29 @@
+@if (array.length > 0) {
+  @if (themeLabel.isSearchButton) {
+    <div class="text-links">
+      @for (text of sortArrayText(array); track $index; let isLast = $last) {
+        <a
+          href="javascript:void(0);"
+          class="text-link"
+          (click)="searchValue(text)"
+          >{{ text }}</a
+        >
+        @if (themeLabel.isCopy && themeLabel.isSearchButton && isHover) {
+          <mat-icon
+            class="copy-icon"
+            fontIcon="content_copy"
+            [ngCopy]="text"></mat-icon>
+        }
+
+        @if (!isLast) {
+          {{ themeLabel.useSpace }}
+        }
+      }
+    </div>
+  } @else {
+    @for (text of array; track $index; let isLast = $last) {
+      <div class="row-text">{{ text }}</div>
+      <ng-container *ngIf="!isLast">{{ themeLabel.useSpace }}</ng-container>
+    }
+  }
+}

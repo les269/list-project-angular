@@ -41,7 +41,6 @@ export class CustomTableComponent implements OnInit {
   apiConfigList: ApiConfig[] = [];
   constructor(
     private apiConfigService: ApiConfigService,
-    private matDialog: MatDialog,
     private selectTableService: SelectTableService
   ) {}
 

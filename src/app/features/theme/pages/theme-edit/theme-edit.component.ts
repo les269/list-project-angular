@@ -7,16 +7,27 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { CommonModule } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { ThemeHeader, ThemeHeaderType, ThemeImageType } from '../../models';
+import {
+  DEFAULT_ROW_COLOR,
+  ThemeHeader,
+  ThemeHeaderType,
+  ThemeImageType,
+} from '../../models';
 import { ThemeService } from '../../services/theme.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { isBlank, isNotBlank, isRepeat } from '../../../../shared/util/helper';
+import {
+  isBlank,
+  isNotBlank,
+  isRepeat,
+  isValidWidth,
+} from '../../../../shared/util/helper';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EMPTY, filter, switchMap, tap, throwError } from 'rxjs';
 import { CustomTableComponent } from '../../components/custom-table/custom-table.component';
 import { ThemeLabelTableComponent } from '../../components/theme-label-table/theme-label-table.component';
 import { ThemeDatasetTableComponent } from '../../components/theme-dataset-table/theme-dataset-table.component';
 import { ThemeTagTableComponent } from '../../components/theme-tag-table/theme-tag-table.component';
+import { ThemeOtherSettingComponent } from '../../components/theme-other-setting/theme-other-setting.component';
 @Component({
   standalone: true,
   imports: [
@@ -33,6 +44,7 @@ import { ThemeTagTableComponent } from '../../components/theme-tag-table/theme-t
     ThemeLabelTableComponent,
     ThemeDatasetTableComponent,
     ThemeTagTableComponent,
+    ThemeOtherSettingComponent,
   ],
   selector: 'app-theme-edit',
   templateUrl: 'theme-edit.component.html',
@@ -54,6 +66,12 @@ export class ThemeEditComponent implements OnInit {
     themeDatasetList: [],
     themeCustomList: [],
     themeTagList: [],
+    seq: 0,
+    themeOtherSetting: {
+      rowColor: DEFAULT_ROW_COLOR,
+      listPageSize: 30,
+      topCustomList: [],
+    },
   };
   eThemeHeaderType = ThemeHeaderType;
   eThemeImageType = ThemeImageType;
@@ -127,7 +145,6 @@ export class ThemeEditComponent implements OnInit {
   }
   //驗證資料正確
   validationModel(): boolean {
-    const { themeImage } = this.model;
     if (isBlank(this.model.name)) {
       this.snackbarService.isBlankMessage('themeHeader.name');
       return false;
@@ -140,9 +157,23 @@ export class ThemeEditComponent implements OnInit {
       this.snackbarService.isBlankMessage('themeHeader.title');
       return false;
     }
+    if (this.model.seq === null) {
+      this.model.seq = 0;
+    }
     this.model.name = this.model.name.trim();
     this.model.version = this.model.version.trim();
     this.model.title = this.model.title.trim();
+
+    return (
+      this.validationImage() &&
+      this.validationLabel() &&
+      this.validationDataset() &&
+      this.validationTag()
+    );
+  }
+
+  validationImage() {
+    const { themeImage } = this.model;
     if (this.model.type === ThemeHeaderType.imageList) {
       if (
         themeImage.type === ThemeImageType.key &&
@@ -161,6 +192,10 @@ export class ThemeEditComponent implements OnInit {
       themeImage.imageKey = themeImage.imageKey.trim();
       themeImage.imageUrl = themeImage.imageUrl.trim();
     }
+    return true;
+  }
+
+  validationLabel() {
     for (let label of this.model.themeLabelList) {
       if (isBlank(label.label)) {
         this.snackbarService.isBlankMessage('themeLabel.labelName');
@@ -170,6 +205,27 @@ export class ThemeEditComponent implements OnInit {
         this.snackbarService.isBlankMessage('themeLabel.byKey');
         return false;
       }
+
+      if (this.model.type === 'table') {
+        if (isNotBlank(label.width) && !isValidWidth(label.width)) {
+          this.snackbarService.openByI18N('msg.lengthError', {
+            label: this.translateService.instant('themeLabel.width'),
+          });
+          return false;
+        }
+        if (isNotBlank(label.minWidth) && !isValidWidth(label.minWidth)) {
+          this.snackbarService.openByI18N('msg.lengthError', {
+            label: this.translateService.instant('themeLabel.minWidth'),
+          });
+          return false;
+        }
+        if (isNotBlank(label.maxWidth) && !isValidWidth(label.maxWidth)) {
+          this.snackbarService.openByI18N('msg.lengthError', {
+            label: this.translateService.instant('themeLabel.maxWidth'),
+          });
+          return false;
+        }
+      }
     }
     if (isRepeat(this.model.themeLabelList.map(x => x.byKey))) {
       this.snackbarService.openByI18N('msg.repeatColumn', {
@@ -177,7 +233,10 @@ export class ThemeEditComponent implements OnInit {
       });
       return false;
     }
-    //資料集
+    return true;
+  }
+
+  validationDataset() {
     for (let dataset of this.model.themeDatasetList) {
       if (dataset.datasetList.length === 0) {
         this.snackbarService.openByI18N('themeDataset.datasetEmpty');
@@ -209,7 +268,10 @@ export class ThemeEditComponent implements OnInit {
         return false;
       }
     }
-    //標籤
+    return true;
+  }
+
+  validationTag() {
     for (let tag of this.model.themeTagList) {
       if (isBlank(tag.tag)) {
         this.snackbarService.isBlankMessage('themeTag.tag');
@@ -218,6 +280,17 @@ export class ThemeEditComponent implements OnInit {
     }
     if (isRepeat(this.model.themeTagList.map(x => x.tag))) {
       this.snackbarService.openByI18N('themeTag.tagRepeat');
+      return false;
+    }
+    return true;
+  }
+
+  validationOther() {
+    if (
+      this.model.type === 'imageList' &&
+      this.model.themeOtherSetting.listPageSize <= 0
+    ) {
+      this.snackbarService.openByI18N('otherSetting.listPageSizeMoreZero');
       return false;
     }
     return true;

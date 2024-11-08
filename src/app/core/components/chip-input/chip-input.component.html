@@ -1,0 +1,50 @@
+<mat-form-field appearance="outline" style="width: 100%">
+  @if (label) {
+    <mat-label>{{ label }}</mat-label>
+  }
+  <mat-chip-grid #chipGrid>
+    @if (type === 'color') {
+      <div class="d-flex align-items-center">
+        <mat-chip-row
+          *ngFor="let value of chipList; let i = index"
+          (removed)="removeChip(i)"
+          [editable]="true"
+          (edited)="editChip(i, $event.value)">
+          <div
+            [ngStyle]="{
+              'background-color': getLuminance(value) < 0.5 ? '' : '#525252',
+              color: value,
+            }">
+            {{ value }}
+          </div>
+          <button matChipRemove>
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip-row>
+        <input
+          class="form-control form-control-color"
+          style="max-width: 30px"
+          [type]="type"
+          [matChipInputFor]="chipGrid"
+          [matChipInputAddOnBlur]="true"
+          (matChipInputTokenEnd)="addChip($event)" />
+      </div>
+    } @else {
+      <mat-chip-row
+        *ngFor="let value of chipList; let i = index"
+        (removed)="removeChip(i)"
+        [editable]="true"
+        (edited)="editChip(i, $event.value)">
+        {{ value }}
+        <button matChipRemove>
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </mat-chip-row>
+      <input
+        [type]="type"
+        [matChipInputFor]="chipGrid"
+        [matChipInputAddOnBlur]="true"
+        (matChipInputTokenEnd)="addChip($event)" />
+    }
+  </mat-chip-grid>
+</mat-form-field>

@@ -6,7 +6,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class FileSizePipe implements PipeTransform {
   transform(value: number): string {
-    if (value === 0) return '0 KB';
+    if (value === 0 || value === undefined || value === null) return '0 KB';
 
     const sizes = ['KB', 'MB', 'GB', 'TB'];
     let i = Math.floor(Math.log(value) / Math.log(1024));

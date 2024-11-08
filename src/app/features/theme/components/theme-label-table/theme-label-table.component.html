@@ -89,6 +89,34 @@
                   [(ngModel)]="element.useSpace" />
               </div>
             }
+            @if (element.type === 'date') {
+              <div class="input-group">
+                <input
+                  type="text"
+                  class="form-control"
+                  [placeholder]="'themeLabel.dateFormatPh' | translate"
+                  [(ngModel)]="element.dateFormat" />
+              </div>
+            }
+            @if (type === 'table') {
+              <div class="input-group">
+                <input
+                  type="text"
+                  class="form-control"
+                  [placeholder]="'themeLabel.width' | translate"
+                  [(ngModel)]="element.width" />
+                <input
+                  type="text"
+                  class="form-control"
+                  [placeholder]="'themeLabel.minWidth' | translate"
+                  [(ngModel)]="element.minWidth" />
+                <input
+                  type="text"
+                  class="form-control"
+                  [placeholder]="'themeLabel.maxWidth' | translate"
+                  [(ngModel)]="element.maxWidth" />
+              </div>
+            }
             <mat-checkbox [(ngModel)]="element.isVisible">
               {{ 'themeLabel.isVisible' | translate }}
             </mat-checkbox>

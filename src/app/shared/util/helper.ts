@@ -95,3 +95,7 @@ export const isJson = (s: string): boolean => {
 export const isNotJson = (s: string): boolean => !isJson(s);
 export const jsonFormat = (s: string): string =>
   isNotBlank(s) && isJson(s) ? JSON.stringify(JSON.parse(s.trim())) : '';
+export const isValidWidth = (value: string) => {
+  const regex = /^(auto|0|(\d+(\.\d+)?(px|em|rem|vw|vh|%)?))$/i;
+  return regex.test(value);
+};

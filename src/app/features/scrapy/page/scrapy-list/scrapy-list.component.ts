@@ -8,7 +8,7 @@ import { ScrapyConfig, ScrapyData } from '../../model/scrapy.model';
 import { ScrapyService } from '../../services/scrapy.service';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { MessageBoxComponent } from '../../../../core/components/message-box.component';
+import { MessageBoxComponent } from '../../../../core/components/message-box/message-box.component';
 import { isNotBlank } from '../../../../shared/util/helper';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { CopyScrapyComponent } from '../../components/copy-scrapy/copy-scrapy.component';
