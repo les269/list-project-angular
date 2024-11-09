@@ -1,8 +1,64 @@
 <div class="mt-3">
-  <div class="mx-3">
-    <app-chip-input
-      [(chipList)]="searchValue"
-      [label]="'g.search' | translate"></app-chip-input>
+  <div class="d-flex mb-2">
+    <div class="d-flex col-4">
+      @if (themeDatasetList && themeDatasetList.length > 1) {
+        <select
+          class="form-select"
+          [compareWith]="compareDataset"
+          [(ngModel)]="useDataset"
+          [matTooltip]="'themeDataset.selectDataset' | translate"
+          (change)="changeDataset()">
+          @for (dataset of themeDatasetList; track $index) {
+            <option [ngValue]="dataset">
+              {{ dataset.label }}
+            </option>
+          }
+        </select>
+      }
+      @if (themeTagListForSelect && themeTagListForSelect.length > 1) {
+        <select
+          class="form-select"
+          [compareWith]="compareTag"
+          [(ngModel)]="useTag"
+          [matTooltip]="'themeTag.selectTag' | translate"
+          (change)="changeTag()">
+          @for (tag of themeTagListForSelect; track $index) {
+            <option [ngValue]="tag">
+              {{ tag.tag }}
+              {{ tag.seq === -1 ? '' : '(' + getTagValueLength(tag.tag) + ')' }}
+            </option>
+          }
+        </select>
+      }
+      <button
+        class="d-flex"
+        mat-icon-button
+        [matTooltip]="'g.refresh' | translate"
+        (click)="onRefresh()">
+        <mat-icon>loop</mat-icon>
+      </button>
+    </div>
+    <div class="d-flex col-4">
+      <input
+        type="text"
+        class="form-control"
+        [(ngModel)]="searchValue"
+        (keydown.enter)="searchChange()" />
+      <button
+        mat-icon-button
+        class="d-flex"
+        [matTooltip]="'g.clear' | translate"
+        (click)="searchValue = []; searchChange()">
+        <mat-icon>clear</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        class="d-flex"
+        [matTooltip]="'g.search' | translate"
+        (click)="searchChange()">
+        <mat-icon>search</mat-icon>
+      </button>
+    </div>
   </div>
   <mat-paginator
     class="mat-paginator"
@@ -30,35 +86,8 @@
             [themeLabel]="label"
             [data]="element"
             [isHover]="true"
-            [seqKey]="seqKey"></app-list-item-value>
-          <!-- @switch (label.type) {
-            @case ('fileSize') {
-              {{ element[label.byKey] | fileSize }}
-            }
-            @case ('date') {
-              {{
-                element[label.byKey]
-                  | date: (label.dateFormat ? label.dateFormat : 'yyyy-MM-dd')
-              }}
-            }
-            @case ('stringArray') {
-              <div class="d-flex">
-                @for (
-                  text of element[label.byKey];
-                  track $index;
-                  let isLast = $last
-                ) {
-                  <div class="row-text">{{ text }}</div>
-                  @if (!isLast) {
-                    <ng-container>{{ label.useSpace }}</ng-container>
-                  }
-                }
-              </div>
-            }
-            @default {
-              {{ element[label.byKey] }}
-            }
-          } -->
+            [seqKey]="seqKey"
+            (searchChange)="searchChange($event)"></app-list-item-value>
         </td>
         <td mat-footer-cell *matFooterCellDef>
           @switch (label.type) {
@@ -73,7 +102,30 @@
     <ng-container matColumnDef="other">
       <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
       <td mat-cell *matCellDef="let element; let i = dataIndex">
-        <div class="row flex-nowrap"></div>
+        <div class="row flex-nowrap">
+          @if (defaultKey) {
+            <button
+              class="d-flex"
+              mat-icon-button
+              [matTooltip]="'themeTag.setTag' | translate"
+              (click)="onSetTag(element)">
+              <mat-icon class="material-icons-outlined"
+                ><span class="material-symbols-outlined">
+                  bookmark
+                </span></mat-icon
+              >
+            </button>
+          }
+          <button
+            class="d-flex"
+            mat-icon-button
+            [matTooltip]="'themeDataset.editData' | translate"
+            (click)="openEditData(element)">
+            <mat-icon class="material-icons-outlined"
+              ><span class="material-symbols-outlined"> edit </span></mat-icon
+            >
+          </button>
+        </div>
       </td>
       <td mat-footer-cell *matFooterCellDef></td>
     </ng-container>

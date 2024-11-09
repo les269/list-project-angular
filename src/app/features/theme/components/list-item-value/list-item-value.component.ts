@@ -4,14 +4,14 @@ import { ArrayTextComponent } from '../array-text/array-text.component';
 import { FileSizePipe } from '../../../../shared/util/util.pipe';
 import { ThemeLabel } from '../../models/theme.model';
 import { MatIconModule } from '@angular/material/icon';
-import { UtilDirective } from '../../../../shared/util/util.directive';
+import { CopyDirective } from '../../../../shared/util/util.directive';
 import { isBlank, isNotBlank } from '../../../../shared/util/helper';
 
 @Component({
   selector: 'app-list-item-value',
   standalone: true,
   imports: [
-    UtilDirective,
+    CopyDirective,
     CommonModule,
     ArrayTextComponent,
     FileSizePipe,

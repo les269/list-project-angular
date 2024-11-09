@@ -99,3 +99,6 @@ export const isValidWidth = (value: string) => {
   const regex = /^(auto|0|(\d+(\.\d+)?(px|em|rem|vw|vh|%)?))$/i;
   return regex.test(value);
 };
+
+export const isNumber = (value: any) =>
+  !isNaN(value) && !isNaN(parseFloat(value));

@@ -17,12 +17,12 @@ import { ButtonInputUrlDialog } from '../button-input-url.dialog';
 import { MatDialog } from '@angular/material/dialog';
 import { ThemeNoteComponent } from '../theme-note/theme-note.component';
 import { ApiConfigService } from '../../../api-config/service/api-config.service';
-import { UtilDirective } from '../../../../shared/util/util.directive';
+import { CopyDirective } from '../../../../shared/util/util.directive';
 
 @Component({
   selector: 'app-custom-buttons',
   standalone: true,
-  imports: [CommonModule, MatIconModule, UtilDirective],
+  imports: [CommonModule, MatIconModule, CopyDirective],
   templateUrl: './custom-buttons.component.html',
   styleUrl: './custom-buttons.component.scss',
 })

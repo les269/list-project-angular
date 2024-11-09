@@ -3,15 +3,13 @@ import {
   ElementRef,
   HostListener,
   Input,
-  OnInit,
   Renderer2,
-  ViewContainerRef,
 } from '@angular/core';
 import { SnackbarService } from '../../core/services/snackbar.service';
 import { isNotBlank } from './helper';
 
 @Directive({ selector: '[ngCopy]', standalone: true })
-export class UtilDirective {
+export class CopyDirective {
   @Input() enableCopy: boolean = true; // 新增 Input 用於控制複製功能
   @Input('ngCopy') copyValue: string = '';
   constructor(

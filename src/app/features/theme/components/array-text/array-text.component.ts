@@ -2,12 +2,12 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { ThemeLabel } from '../../models';
-import { UtilDirective } from '../../../../shared/util/util.directive';
+import { CopyDirective } from '../../../../shared/util/util.directive';
 
 @Component({
   selector: 'app-array-text',
   standalone: true,
-  imports: [CommonModule, MatIconModule, UtilDirective],
+  imports: [CommonModule, MatIconModule, CopyDirective],
   templateUrl: './array-text.component.html',
   styleUrl: './array-text.component.scss',
 })

@@ -141,8 +141,8 @@
   @for (data of viewData; track $index; let i = $index) {
     <div
       class="d-flex card"
-      (mouseenter)="onMouseEnter(i)"
-      (mouseleave)="onMouseLeave(i)">
+      (mouseenter)="hoveredIndex = i"
+      (mouseleave)="hoveredIndex = null">
       <div class="card-body">
         <div class="img-content">
           @switch (themeImage.type) {
