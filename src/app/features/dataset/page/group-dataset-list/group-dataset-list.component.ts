@@ -65,7 +65,7 @@ export class GroupDatasetListComponent {
           this.groupDatasetService
             .deleteGroupDataset(this.list[index].groupName)
             .subscribe(() => {
-              this.snackbarService.openByI18N('msg.deletSuccess');
+              this.snackbarService.openByI18N('msg.deleteSuccess');
               this.getList();
             });
         }

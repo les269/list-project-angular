@@ -89,7 +89,7 @@ export class ThemeListComponent implements OnInit {
       .subscribe(result => {
         if (isNotBlank(result)) {
           this.themeService.deleteTheme(item).subscribe(() => {
-            this.snackbarService.openByI18N('msg.deletSuccess');
+            this.snackbarService.openByI18N('msg.deleteSuccess');
             this.getList();
           });
         }

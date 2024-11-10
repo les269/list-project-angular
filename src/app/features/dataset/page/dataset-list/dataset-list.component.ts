@@ -71,7 +71,7 @@ export class DatasetListComponent {
           this.datasetService
             .deleteDataset(this.list[index].name)
             .subscribe(() => {
-              this.snackbarService.openByI18N('msg.deletSuccess');
+              this.snackbarService.openByI18N('msg.deleteSuccess');
               this.getList();
             });
         }

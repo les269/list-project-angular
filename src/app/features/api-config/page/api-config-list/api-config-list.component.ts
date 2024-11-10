@@ -74,7 +74,7 @@ export class ApiConfigListComponent implements OnInit {
       .subscribe(result => {
         if (isNotBlank(result)) {
           this.apiConfigService.delete(this.list[index]).subscribe(() => {
-            this.snackbarService.openByI18N('msg.deletSuccess');
+            this.snackbarService.openByI18N('msg.deleteSuccess');
             this.getList();
           });
         }

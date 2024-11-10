@@ -1,0 +1,84 @@
+<div class="col-md-10 offset-md-1 col-xs-12">
+  <div class="input-group my-2 w-50">
+    <label class="input-group-text">{{
+      'replaceValueMap.searchName' | translate
+    }}</label>
+    <input
+      class="form-control"
+      [(ngModel)]="searchName"
+      (keydown.enter)="search()" />
+    <button
+      class="btn btn-outline-secondary d-flex"
+      type="button"
+      (click)="selectMap()">
+      <mat-icon>content_copy</mat-icon>
+    </button>
+    <button class="btn btn-outline-secondary" type="button" (click)="search()">
+      {{ 'g.search' | translate }}
+    </button>
+  </div>
+  <div>
+    <input
+      type="file"
+      accept=".json"
+      (change)="onFileSelected($event)"
+      hidden
+      #fileInput />
+    <button class="btn btn-outline-primary d-flex" (click)="fileInput.click()">
+      {{ 'replaceValueMap.importJson' | translate }}
+    </button>
+  </div>
+  <div class="d-flex justify-content-between">
+    <button class="btn btn-outline-primary d-flex" (click)="add()">
+      {{ 'replaceValueMap.add' | translate }}
+    </button>
+    <div class="d-flex">
+      <button class="btn btn-outline-primary d-flex" (click)="delete()">
+        {{ 'g.delete' | translate }}
+      </button>
+      <button class="btn btn-outline-primary d-flex" (click)="update()">
+        {{ 'g.update' | translate }}
+      </button>
+    </div>
+  </div>
+  <div class="input-group mt-2">
+    <input class="form-control" (keyup)="applyFilter($event)" />
+  </div>
+
+  <mat-paginator
+    class="mat-paginator"
+    [pageSizeOptions]="[100, 300, 500]"
+    [showFirstLastButtons]="true"></mat-paginator>
+  <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort>
+    <ng-container matColumnDef="match">
+      <th mat-header-cell *matHeaderCellDef [mat-sort-header]="'match'">
+        {{ 'replaceValueMap.match' | translate }}
+      </th>
+      <td mat-cell *matCellDef="let element">
+        <input class="form-control" [(ngModel)]="element.match" />
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="replaceValue">
+      <th mat-header-cell *matHeaderCellDef [mat-sort-header]="'replaceValue'">
+        {{ 'replaceValueMap.replaceValue' | translate }}
+      </th>
+      <td mat-cell *matCellDef="let element">
+        <input class="form-control" [(ngModel)]="element.replaceValue" />
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="other">
+      <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
+      <td mat-cell *matCellDef="let element; let i = dataIndex">
+        <div class="row flex-nowrap">
+          <button mat-icon-button (click)="onDelete(element)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+</div>
+<app-scrollTop></app-scrollTop>

@@ -111,4 +111,12 @@ export const routes: Routes = [
         mod => mod.TableViewComponent
       ),
   },
+  {
+    path: 'replace-value-map',
+    loadComponent: () =>
+      import(
+        './features/replace-value-map/page/replace-value-map/replace-value-map.component'
+      ).then(mod => mod.ReplaceValueMapComponent),
+    data: { title: 'title.replaceValueMap', sidenav: true },
+  },
 ];

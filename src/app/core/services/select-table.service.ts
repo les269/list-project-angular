@@ -13,6 +13,7 @@ import {
   GroupDatasetData,
 } from '../../features/dataset/model';
 import { ThemeTag } from '../../features/theme/models';
+import { ReplaceValueMap } from '../../features/replace-value-map/model';
 
 @Injectable({ providedIn: 'root' })
 export class SelectTableService {
@@ -190,6 +191,40 @@ export class SelectTableService {
         SelectTableDialog<ThemeTag, BaseSelectTableData<ThemeTag>>,
         BaseSelectTableData<ThemeTag>,
         ThemeTag[]
+      >(SelectTableDialog, {
+        data,
+      })
+      .afterClosed();
+  }
+
+  selectSingleReplaceValueMap(dataSource: ReplaceValueMap[]) {
+    const datePipe = new DatePipe('en-US');
+    const data: BaseSelectTableData<ReplaceValueMap> = {
+      displayedColumns: ['name', 'createdTime', 'updatedTime'],
+      labels: ['dataset.name', 'g.createdTime', 'g.updatedTime'],
+      dataSource,
+      selectType: 'single',
+      columnFormats: {
+        createdTime: (value: any) =>
+          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
+        updatedTime: (value: any) =>
+          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
+      },
+      columnSorts: {
+        primeValue: true,
+        createdTime: true,
+        updatedTime: true,
+      },
+      enableFilter: true,
+    };
+    return this.matDialog
+      .open<
+        SelectTableDialog<
+          ReplaceValueMap,
+          BaseSelectTableData<ReplaceValueMap>
+        >,
+        BaseSelectTableData<ReplaceValueMap>,
+        ReplaceValueMap
       >(SelectTableDialog, {
         data,
       })

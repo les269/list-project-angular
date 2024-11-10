@@ -1,7 +1,7 @@
 {
   "msg": {
     "blank": "{{name}} 不可以為空",
-    "deletSuccess": "刪除成功",
+    "deleteSuccess": "刪除成功",
     "copySuccess": "複製成功",
     "commitSuccess": "提交成功",
     "saveSuccess": "保存成功",
@@ -12,6 +12,7 @@
     "scrapyNotExist": "該名稱不存在",
     "sureDeleteTheme": "是否要刪除該主題?",
     "sureDeleteApi": "是否要刪除該API?",
+    "sureDeleteMap": "是否要刪除該替換文字清單?",
     "sureDeleteScrapy": "是否要刪除該爬蟲?",
     "sureDeleteDataset": "是否要刪除該資料集?",
     "sureDeleteImage": "是否要刪除該圖片'{{name}}'?",
@@ -82,7 +83,8 @@
     "datasetEdit": "資料集設定",
     "groupDataset": "資料集群組清單",
     "groupDatasetEdit": "資料集群組設定",
-    "groupDatasetDataEdit": "編輯群組資料"
+    "groupDatasetDataEdit": "編輯群組資料",
+    "replaceValueMap": "替換文字清單"
   },
   "home": { "createTheme": "創建主題" },
   "themeHeader": {
@@ -284,5 +286,12 @@
     "getDataType": "資料獲取方式",
     "api": "API",
     "scrapy": "爬蟲"
+  },
+  "replaceValueMap": {
+    "searchName": "搜尋名稱",
+    "importJson": "匯入json檔案",
+    "match": "被替換值",
+    "replaceValue": "替換值",
+    "add": "新增"
   }
 }
