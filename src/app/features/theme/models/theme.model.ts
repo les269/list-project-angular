@@ -17,7 +17,8 @@ export interface ThemeHeader {
 export interface ThemeOtherSetting {
   rowColor: string[];
   listPageSize: number;
-  topCustomList: ThemeCustom[];
+  showDuplicate: boolean;
+  themeTopCustomList: ThemeTopCustom[];
 }
 export interface ThemeHeaderCopy {
   name: string;
@@ -124,10 +125,7 @@ export interface ThemeTopCustom {
 export enum ThemeTopCustomType {
   openUrl = 'openUrl',
   writeNote = 'writeNote',
-  buttonInputUrl = 'buttonInputUrl',
   apiConfig = 'apiConfig',
-  repeatData = 'repeatData',
-  inputApi = 'inputApi',
 }
 
 export interface CopyThemeData {
@@ -190,3 +188,12 @@ export const DEFAULT_ROW_COLOR: string[] = [
   '#bdbcf3e5',
   '#e2bcf3e5',
 ];
+
+export interface ThemeTopCustomValue {
+  headerId: string;
+  byKey: string;
+  customValue: string;
+}
+export interface ThemeTopCustomValueResponse {
+  [byKey: string]: string;
+}

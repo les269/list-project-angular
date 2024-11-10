@@ -10,7 +10,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatTableModule } from '@angular/material/table';
 import { TranslateModule } from '@ngx-translate/core';
-import { CustomTableComponent } from '../custom-table/custom-table.component';
 import { isNull } from '../../../../shared/util/helper';
 import { MatChipsModule } from '@angular/material/chips';
 import { SelectTableService } from '../../../../core/services/select-table.service';
@@ -30,7 +29,6 @@ import { ThemeDataset } from '../../models';
     CommonModule,
     MatListModule,
     TranslateModule,
-    CustomTableComponent,
     MatChipsModule,
   ],
   selector: 'app-theme-dataset-table',

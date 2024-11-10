@@ -1,40 +1,23 @@
 import {
   AfterViewInit,
   Component,
-  OnDestroy,
+  Injector,
   OnInit,
   ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, ActivatedRoute } from '@angular/router';
-import { debounceTime, Subscription, switchMap, tap } from 'rxjs';
-import { updateTitle } from '../../../../shared/state/layout.actions';
-import {
-  isBlank,
-  isNotBlank,
-  isValidWidth,
-} from '../../../../shared/util/helper';
-import { ThemeService } from '../../services/theme.service';
+import { isNotBlank, isValidWidth } from '../../../../shared/util/helper';
 import {
   DEFAULT_ROW_COLOR,
-  ThemeCustom,
-  ThemeDataset,
-  ThemeHeader,
+  ThemeCustomValueResponse,
   ThemeHeaderType,
-  ThemeImage,
   ThemeLabel,
-  ThemeOtherSetting,
-  ThemeTag,
-  ThemeTagValue,
 } from '../../models';
-import { Store } from '@ngrx/store';
-import { DatasetService } from '../../../dataset/service/dataset.service';
-import { DatasetData } from '../../../dataset/model';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { ScrollTopComponent } from '../../../../core/components/scroll-top/scroll-top.component';
 import { FileSizePipe } from '../../../../shared/util/util.pipe';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import {
   MatPaginator,
@@ -43,14 +26,20 @@ import {
 } from '@angular/material/paginator';
 import { CustomMatPaginatorIntl } from '../../../../core/components/custom-mat-paginatorIntl/custom-mat-paginatorIntl';
 import { MatIconModule } from '@angular/material/icon';
-import { ChipInputComponent } from '../../../../core/components/chip-input/chip-input.component';
 import { ListItemValueComponent } from '../../components/list-item-value/list-item-value.component';
 import { ListBaseViewComponent } from '../../components/list-base-view.component';
-import { MatDialog } from '@angular/material/dialog';
-import { SelectTableService } from '../../../../core/services/select-table.service';
-import { GroupDatasetService } from '../../../dataset/service/group-dataset.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonModule } from '@angular/material/button';
+import { CustomButtonsComponent } from '../../components/custom-buttons/custom-buttons.component';
+import {
+  trigger,
+  state,
+  style,
+  transition,
+  animate,
+} from '@angular/animations';
+import { TopCustomButtonsComponent } from '../../components/top-custom-buttons/top-custom-buttons.component';
+import { concatMap, filter, from, groupBy, mergeMap, toArray } from 'rxjs';
 
 @Component({
   selector: 'app-table-view',
@@ -66,10 +55,21 @@ import { MatButtonModule } from '@angular/material/button';
     MatSortModule,
     MatPaginatorModule,
     MatIconModule,
-    ChipInputComponent,
     ListItemValueComponent,
     MatTooltipModule,
     MatButtonModule,
+    CustomButtonsComponent,
+    TopCustomButtonsComponent,
+  ],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed,void', style({ height: '0px', minHeight: '0' })),
+      state('expanded', style({ height: '*' })),
+      transition(
+        'expanded <=> collapsed',
+        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')
+      ),
+    ]),
   ],
   providers: [{ provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl }],
   templateUrl: './table-view.component.html',
@@ -81,34 +81,16 @@ export class TableViewComponent
 {
   override themeHeaderType: ThemeHeaderType = ThemeHeaderType.table;
   list = new MatTableDataSource<any>();
+  isExpand = false;
 
   rowColor: string[] = DEFAULT_ROW_COLOR;
 
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
+  customValueMap: ThemeCustomValueResponse = {};
 
-  constructor(
-    public override themeService: ThemeService,
-    public override router: Router,
-    public override route: ActivatedRoute,
-    public override store: Store,
-    public override datasetService: DatasetService,
-    public override matDialog: MatDialog,
-    public override groupdatasetService: GroupDatasetService,
-    public override selectTableService: SelectTableService,
-    public override translateService: TranslateService
-  ) {
-    super(
-      themeService,
-      router,
-      route,
-      store,
-      datasetService,
-      matDialog,
-      groupdatasetService,
-      selectTableService,
-      translateService
-    );
+  constructor(injector: Injector) {
+    super(injector);
   }
 
   ngAfterViewInit(): void {
@@ -146,6 +128,7 @@ export class TableViewComponent
       .flat();
     this.list.data = this.useData;
     this.doTableColor();
+    this.getCustomValueMap();
   }
 
   override onSearch() {
@@ -180,6 +163,7 @@ export class TableViewComponent
       });
     }
     this.doTableColor();
+    this.getCustomValueMap();
   }
 
   override changeTag() {
@@ -255,5 +239,53 @@ export class TableViewComponent
     this.openSelectTag(data).subscribe(() => {
       this.changeTag();
     });
+  }
+  /**
+   * 從資料庫取得當前頁面的自定義資料
+   */
+  getCustomValueMap() {
+    if (isNotBlank(this.defaultKey)) {
+      const req = {
+        headerId: this.headerId,
+        valueList: this.list.data.map((x: any) => x[this.defaultKey]),
+      };
+      this.themeService.findCustomValue(req).subscribe(res => {
+        this.customValueMap = res;
+        this.customValueMap = this.list.data
+          .map((x: any) => x[this.defaultKey])
+          .reduce((a: ThemeCustomValueResponse, b: string) => {
+            if (!a.hasOwnProperty(b)) {
+              a[b] = {};
+            }
+            return a;
+          }, this.customValueMap);
+      });
+    }
+  }
+
+  showDuplicate() {
+    const dataList = this.datasetDataMap
+      .flatMap(x => x.datasetDataList)
+      .filter(
+        (v, i, arr) => arr.findIndex(z => z.datasetName === v.datasetName) === i
+      )
+      .flatMap(x => x.data);
+    from(dataList)
+      .pipe(
+        // 排序-檔名
+        groupBy(data => data[this.defaultKey]),
+        // 每筆資料轉為陣列
+        mergeMap(group => group.pipe(toArray())),
+        // 資料大於為重複
+        filter(data => data.length > 1),
+        // 取出所有陣列資料
+        concatMap(data => from(data)),
+        // 將所有資料合併為同一陣列
+        toArray()
+      )
+      .subscribe((data: any[]) => {
+        this.list.data = data;
+        this.doTableColor();
+      });
   }
 }

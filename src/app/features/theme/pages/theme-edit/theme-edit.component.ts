@@ -18,12 +18,13 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
 import {
   isBlank,
   isNotBlank,
-  isRepeat,
+  isNull,
+  isDuplicate,
   isValidWidth,
 } from '../../../../shared/util/helper';
 import { ActivatedRoute, Router } from '@angular/router';
-import { EMPTY, filter, switchMap, tap, throwError } from 'rxjs';
-import { CustomTableComponent } from '../../components/custom-table/custom-table.component';
+import { EMPTY, filter, switchMap } from 'rxjs';
+import { ThemeCustomTableComponent } from '../../components/theme-custom-table/theme-custom-table.component';
 import { ThemeLabelTableComponent } from '../../components/theme-label-table/theme-label-table.component';
 import { ThemeDatasetTableComponent } from '../../components/theme-dataset-table/theme-dataset-table.component';
 import { ThemeTagTableComponent } from '../../components/theme-tag-table/theme-tag-table.component';
@@ -40,11 +41,11 @@ import { ThemeOtherSettingComponent } from '../../components/theme-other-setting
     CommonModule,
     MatListModule,
     TranslateModule,
-    CustomTableComponent,
     ThemeLabelTableComponent,
     ThemeDatasetTableComponent,
     ThemeTagTableComponent,
     ThemeOtherSettingComponent,
+    ThemeCustomTableComponent,
   ],
   selector: 'app-theme-edit',
   templateUrl: 'theme-edit.component.html',
@@ -70,7 +71,8 @@ export class ThemeEditComponent implements OnInit {
     themeOtherSetting: {
       rowColor: DEFAULT_ROW_COLOR,
       listPageSize: 30,
-      topCustomList: [],
+      themeTopCustomList: [],
+      showDuplicate: false,
     },
   };
   eThemeHeaderType = ThemeHeaderType;
@@ -168,7 +170,9 @@ export class ThemeEditComponent implements OnInit {
       this.validationImage() &&
       this.validationLabel() &&
       this.validationDataset() &&
-      this.validationTag()
+      this.validCustom() &&
+      this.validationTag() &&
+      this.validationOther()
     );
   }
 
@@ -227,8 +231,8 @@ export class ThemeEditComponent implements OnInit {
         }
       }
     }
-    if (isRepeat(this.model.themeLabelList.map(x => x.byKey))) {
-      this.snackbarService.openByI18N('msg.repeatColumn', {
+    if (isDuplicate(this.model.themeLabelList.map(x => x.byKey))) {
+      this.snackbarService.openByI18N('msg.duplicateColumn', {
         text: this.translateService.instant('themeLabel.byKey'),
       });
       return false;
@@ -247,13 +251,31 @@ export class ThemeEditComponent implements OnInit {
         return false;
       }
     }
-    if (isRepeat(this.model.themeDatasetList.map(x => x.label))) {
-      this.snackbarService.openByI18N('themeDataset.labelRepeat');
+    if (isDuplicate(this.model.themeDatasetList.map(x => x.label))) {
+      this.snackbarService.openByI18N('themeDataset.labelDuplicate');
       return false;
     }
+
+    return true;
+  }
+
+  validationTag() {
+    for (let tag of this.model.themeTagList) {
+      if (isBlank(tag.tag)) {
+        this.snackbarService.isBlankMessage('themeTag.tag');
+        return false;
+      }
+    }
+    if (isDuplicate(this.model.themeTagList.map(x => x.tag))) {
+      this.snackbarService.openByI18N('themeTag.tagDuplicate');
+      return false;
+    }
+    return true;
+  }
+  validCustom() {
     //byKey不可重複
-    if (isRepeat(this.model.themeCustomList.map(x => x.byKey))) {
-      this.snackbarService.openByI18N('msg.repeatColumn', {
+    if (isDuplicate(this.model.themeCustomList.map(x => x.byKey))) {
+      this.snackbarService.openByI18N('msg.duplicateColumn', {
         text: this.translateService.instant('themeCustom.byKey'),
       });
       return false;
@@ -267,20 +289,53 @@ export class ThemeEditComponent implements OnInit {
         this.snackbarService.isBlankMessage('themeCustom.byKey');
         return false;
       }
-    }
-    return true;
-  }
-
-  validationTag() {
-    for (let tag of this.model.themeTagList) {
-      if (isBlank(tag.tag)) {
-        this.snackbarService.isBlankMessage('themeTag.tag');
-        return false;
+      switch (custom.type) {
+        case 'openUrl':
+          if (isBlank(custom.openUrl)) {
+            this.snackbarService.isBlankMessage('themeCustom.openUrl');
+            return false;
+          }
+          break;
+        case 'openUrlByKey':
+          if (isBlank(custom.openUrlByKey)) {
+            this.snackbarService.isBlankMessage('themeCustom.openUrlByKey');
+            return false;
+          }
+          break;
+        case 'copyValue':
+          if (isBlank(custom.copyValue)) {
+            this.snackbarService.isBlankMessage('themeCustom.copyValue');
+            return false;
+          }
+          break;
+        case 'copyValueByKey':
+          if (isBlank(custom.copyValueByKey)) {
+            this.snackbarService.isBlankMessage('themeCustom.copyValueByKey');
+            return false;
+          }
+          break;
+        case 'buttonIconBoolean':
+          if (
+            isBlank(custom.buttonIconTrue) ||
+            isBlank(custom.buttonIconFalse)
+          ) {
+            this.snackbarService.isBlankMessage('themeCustom.buttonIconTrue');
+            return false;
+          }
+          break;
+        case 'buttonIconFill':
+          if (isBlank(custom.buttonIconFill)) {
+            this.snackbarService.isBlankMessage('themeCustom.buttonIconFill');
+            return false;
+          }
+          break;
+        case 'apiConfig':
+          if (isNull(custom.apiConfig)) {
+            this.snackbarService.isBlankMessage('themeCustom.apiConfig');
+            return false;
+          }
+          break;
       }
-    }
-    if (isRepeat(this.model.themeTagList.map(x => x.tag))) {
-      this.snackbarService.openByI18N('themeTag.tagRepeat');
-      return false;
     }
     return true;
   }
@@ -292,6 +347,30 @@ export class ThemeEditComponent implements OnInit {
     ) {
       this.snackbarService.openByI18N('otherSetting.listPageSizeMoreZero');
       return false;
+    }
+    for (let custom of this.model.themeOtherSetting.themeTopCustomList) {
+      if (isBlank(custom.label)) {
+        this.snackbarService.isBlankMessage('themeOtherSetting.labelName');
+        return false;
+      }
+      if (isBlank(custom.byKey)) {
+        this.snackbarService.isBlankMessage('themeOtherSetting.byKey');
+        return false;
+      }
+      switch (custom.type) {
+        case 'openUrl':
+          if (isBlank(custom.openUrl)) {
+            this.snackbarService.isBlankMessage('themeTopCustom.openUrl');
+            return false;
+          }
+          break;
+        case 'apiConfig':
+          if (isNull(custom.apiConfig)) {
+            this.snackbarService.isBlankMessage('themeTopCustom.apiConfig');
+            return false;
+          }
+          break;
+      }
     }
     return true;
   }

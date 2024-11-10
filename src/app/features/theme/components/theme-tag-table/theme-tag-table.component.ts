@@ -7,7 +7,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatTableModule } from '@angular/material/table';
 import { TranslateModule } from '@ngx-translate/core';
-import { CustomTableComponent } from '../custom-table/custom-table.component';
 import { ThemeTag } from '../../models';
 import { isNull } from '../../../../shared/util/helper';
 
@@ -24,7 +23,6 @@ import { isNull } from '../../../../shared/util/helper';
     CommonModule,
     MatListModule,
     TranslateModule,
-    CustomTableComponent,
   ],
   templateUrl: './theme-tag-table.component.html',
   styleUrl: './theme-tag-table.component.scss',

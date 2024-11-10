@@ -71,6 +71,12 @@
       <ng-container *ngTemplateOutlet="headerRight"></ng-container>
     </div>
   </div>
+  <div class="d-flex mb-2">
+    <app-top-custom-buttons
+      [themeTopCustomList]="themeTopCustomList"
+      [headerId]="headerId"
+      [topCustomValueMap]="topCustomValueMap"></app-top-custom-buttons>
+  </div>
   <div class="list-content">
     <div class="py-2">
       {{ 'g.totalNum' | translate }}: {{ filterData?.length }}
@@ -209,7 +215,7 @@
           </div>
 
           @if (defaultKey && themeCustomList.length > 0) {
-            <div class="detail-buttons">
+            <div class="buttons-panel">
               <app-custom-buttons
                 [themeCustomList]="themeCustomList"
                 [data]="data"

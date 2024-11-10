@@ -24,9 +24,6 @@ app-image-list-view {
   .card-body {
     flex-direction: column;
   }
-  .detail-buttons {
-    justify-content: space-between !important;
-  }
 }
 .content-header {
   display: flex;
@@ -34,8 +31,6 @@ app-image-list-view {
   > .header-left {
     display: flex;
     align-items: center;
-  }
-  > .header-center {
   }
   > .header-right {
     display: flex;
@@ -46,10 +41,6 @@ app-image-list-view {
   display: flex;
   padding-top: 1rem;
   padding-bottom: 1rem;
-  > .footer-left {
-  }
-  > .footer-center {
-  }
   > .footer-right {
     display: flex;
     justify-content: flex-end;
@@ -161,13 +152,9 @@ div.card {
           }
         }
       }
-      > div.detail-buttons {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-around;
+      > div.buttons-panel {
         background-color: #f0f7f9;
         border: 1px solid #dee2e6;
-        gap: 4px;
       }
       > div.edit-button {
         display: flex;

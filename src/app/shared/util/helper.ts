@@ -1,4 +1,4 @@
-import { ThemeHeader } from '../../features/theme/models';
+import { ThemeHeader, ThemeHeaderType } from '../../features/theme/models';
 
 //是否為空值
 export const isBlank = (s: any): boolean =>
@@ -10,11 +10,27 @@ export const isNull = (s: any): boolean => s === undefined || s === null;
 export const isNotNull = (s: any): boolean => !isNull(s);
 
 //陣列是否有重複值
-export const isRepeat = (arr: any[]): boolean =>
+export const isDuplicate = (arr: any[]): boolean =>
   arr.length !== arr.filter((e, i, arr2) => arr2.indexOf(e) === i).length;
 
 export const getHeaderId = ({ name, version, type }: ThemeHeader) =>
   'ThemeHeader:' + name + ',' + version + ',' + type;
+export const parseHeaderId = (
+  headerId: string
+): { name: string; version: string; type: ThemeHeaderType } | null => {
+  const prefix = 'ThemeHeader:';
+
+  if (!headerId.startsWith(prefix)) {
+    return null;
+  }
+
+  const [name, version, type] = headerId.slice(prefix.length).split(',');
+  if (isNotBlank(name) && isNotBlank(version) && isNotBlank(type)) {
+    return { name, version, type: type as ThemeHeaderType };
+  }
+  return null;
+};
+
 /**
  * 給陣列使用來進行排序 => [].sort(dynamicSort(key,flag))
  * @param key 排序用的key

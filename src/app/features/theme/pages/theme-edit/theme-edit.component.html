@@ -122,8 +122,8 @@
       <app-theme-dataset-table
         [(themeDatasetList)]="model.themeDatasetList"></app-theme-dataset-table>
       <label class="h3">{{ 'themeCustom.title' | translate }}</label>
-      <app-custom-table
-        [(themeCustomList)]="model.themeCustomList"></app-custom-table>
+      <app-theme-custom-table
+        [(themeCustomList)]="model.themeCustomList"></app-theme-custom-table>
       <app-theme-tag-table
         [(themeTagList)]="model.themeTagList"></app-theme-tag-table>
       <app-theme-other-setting
@@ -131,24 +131,26 @@
         [(themeOtherSetting)]="
           model.themeOtherSetting
         "></app-theme-other-setting>
-      @if (status === 'edit') {
+      <div>
+        @if (status === 'edit') {
+          <div class="my-4">
+            <button
+              type="submit"
+              class="btn btn-success w-100"
+              (click)="update(false, 'save')">
+              {{ 'g.save' | translate }}
+            </button>
+          </div>
+        }
+
         <div class="my-4">
           <button
             type="submit"
             class="btn btn-success w-100"
-            (click)="update(false, 'save')">
-            {{ 'g.save' | translate }}
+            (click)="update(true, 'commit')">
+            {{ 'g.submit' | translate }}
           </button>
         </div>
-      }
-
-      <div class="my-4">
-        <button
-          type="submit"
-          class="btn btn-success w-100"
-          (click)="update(true, 'commit')">
-          {{ 'g.submit' | translate }}
-        </button>
       </div>
     </form>
   </div>

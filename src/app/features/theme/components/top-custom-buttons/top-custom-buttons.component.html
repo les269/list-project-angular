@@ -1,0 +1,34 @@
+<div class="buttons">
+  @for (custom of themeTopCustomList; track $index) {
+    @switch (custom.type) {
+      @case ('openUrl') {
+        <button
+          class="btn btn-outline-primary"
+          (click)="openNewPage(custom.openUrl)">
+          <label class="px-2">{{ custom.label }}</label>
+        </button>
+      }
+      @case ('writeNote') {
+        <div class="btn-group">
+          <button
+            class="btn btn-outline-primary"
+            (click)="openNoteDialog(custom, 'write')">
+            <label class="px-2">{{ custom.label }}</label>
+          </button>
+          @if (getCustomValue(custom) !== '') {
+            <button
+              class="btn btn-outline-primary d-flex"
+              (click)="openNoteDialog(custom, 'read')">
+              <mat-icon class="material-icons-outlined">description</mat-icon>
+            </button>
+          }
+        </div>
+      }
+      @case ('apiConfig') {
+        <button class="btn btn-outline-primary" (click)="callApi(custom)">
+          <label class="px-2">{{ custom.label }}</label>
+        </button>
+      }
+    }
+  }
+</div>

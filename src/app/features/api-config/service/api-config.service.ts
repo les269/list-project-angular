@@ -24,7 +24,7 @@ export class ApiConfigService {
     return this.http.post<ApiConfig[]>('/api-config/all/name', req);
   }
   getById(name: string): Observable<ApiConfig> {
-    return this.http.get<ApiConfig>(`/api-config/name?name${name}`);
+    return this.http.get<ApiConfig>(`/api-config/name?name=${name}`);
   }
 
   callSingleApi(apiConfig: ApiConfig, data: any) {

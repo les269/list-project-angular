@@ -4,7 +4,7 @@
   }
   <mat-chip-grid #chipGrid>
     @if (type === 'color') {
-      <div class="d-flex align-items-center">
+      <div class="d-flex align-items-center flex-wrap">
         <mat-chip-row
           *ngFor="let value of chipList; let i = index"
           (removed)="removeChip(i)"

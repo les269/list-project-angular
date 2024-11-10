@@ -22,14 +22,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatTableModule } from '@angular/material/table';
 import { TranslateModule } from '@ngx-translate/core';
-import { CustomTableComponent } from '../custom-table/custom-table.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import {
-  MatChipEditedEvent,
-  MatChipInputEvent,
-  MatChipsModule,
-} from '@angular/material/chips';
+import { MatChipsModule } from '@angular/material/chips';
 import { ChipInputComponent } from '../../../../core/components/chip-input/chip-input.component';
+import { ThemeTopCustomTableComponent } from '../theme-top-custom-table/theme-top-custom-table.component';
 
 @Component({
   selector: 'app-theme-other-setting',
@@ -44,10 +40,10 @@ import { ChipInputComponent } from '../../../../core/components/chip-input/chip-
     CommonModule,
     MatListModule,
     TranslateModule,
-    CustomTableComponent,
     MatFormFieldModule,
     MatChipsModule,
     ChipInputComponent,
+    ThemeTopCustomTableComponent,
   ],
   templateUrl: './theme-other-setting.component.html',
   styleUrl: './theme-other-setting.component.scss',

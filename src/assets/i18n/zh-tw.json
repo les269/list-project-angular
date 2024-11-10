@@ -16,7 +16,7 @@
     "sureDeleteDataset": "是否要刪除該資料集?",
     "sureDeleteImage": "是否要刪除該圖片'{{name}}'?",
     "copyText": "以複製至剪貼簿: {{text}}",
-    "repeatColumn": "{{text}} 不可以有重複欄位",
+    "duplicateColumn": "{{text}} 不可以有重複欄位",
     "apiExist": "API已經存在,在API名稱跟API標籤不可以重複",
     "apiConfigEmtpy": "API未配置",
     "apiConfigError": "API配置被刪除有錯誤",
@@ -130,7 +130,7 @@
     "title": "資料集設定",
     "order": "順序",
     "label": "名稱",
-    "labelRepeat": "資料集設定名稱不能重複",
+    "labelDuplicate": "資料集設定名稱不能重複",
     "isDefault": "是否預設使用",
     "dataset": "設定資料集",
     "datasetEmpty": "設定資料集不能為空",
@@ -159,7 +159,19 @@
     "openUrlByKeyPH": "對應data的key",
     "buttonInputUrl": "輸入自定義開啟網址",
     "labelName": "標籤名稱",
-    "apiConfig": "呼叫API"
+    "apiConfig": "呼叫API",
+    "showCustomButton": "顯示自定義按鈕"
+  },
+  "themeTopCustom": {
+    "duplicateData": "顯示重複資料",
+    "writeNote": "編輯Note",
+    "openUrl": "開啟自定義網址",
+    "byKey": "命名key值",
+    "openUrlPH": "自定義開啟網址 ex: https://www.google.com/search",
+    "labelName": "標籤名稱",
+    "apiConfig": "呼叫API",
+    "showDuplicate": "顯示重複資料",
+    "displayDuplicateButton": "是否顯示重複資料按鈕"
   },
   "otherSetting": {
     "title": "其他設定",
@@ -172,7 +184,7 @@
   "themeTag": {
     "title": "標籤設定",
     "tag": "標籤名稱",
-    "tagRepeat": "標籤設定標籤名稱不能重複",
+    "tagDuplicate": "標籤設定標籤名稱不能重複",
     "selectTag": "選擇標籤",
     "setTag": "標籤設定"
   },

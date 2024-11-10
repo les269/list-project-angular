@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Injector, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { debounceTime, filter, Subscription, switchMap, tap } from 'rxjs';
 import {
@@ -50,6 +50,7 @@ import { ArrayTextComponent } from '../../components/array-text/array-text.compo
 import { ListItemValueComponent } from '../../components/list-item-value/list-item-value.component';
 import { CustomButtonsComponent } from '../../components/custom-buttons/custom-buttons.component';
 import { ListBaseViewComponent } from '../../components/list-base-view.component';
+import { TopCustomButtonsComponent } from '../../components/top-custom-buttons/top-custom-buttons.component';
 
 @Component({
   standalone: true,
@@ -72,6 +73,7 @@ import { ListBaseViewComponent } from '../../components/list-base-view.component
     ArrayTextComponent,
     ListItemValueComponent,
     CustomButtonsComponent,
+    TopCustomButtonsComponent,
   ],
   selector: 'app-image-list-view',
   templateUrl: 'image-list-view.component.html',
@@ -90,28 +92,8 @@ export class ImageListViewComponent extends ListBaseViewComponent {
 
   customValueMap: ThemeCustomValueResponse = {};
 
-  constructor(
-    public override themeService: ThemeService,
-    public override router: Router,
-    public override route: ActivatedRoute,
-    public override store: Store,
-    public override datasetService: DatasetService,
-    public override matDialog: MatDialog,
-    public override groupdatasetService: GroupDatasetService,
-    public override selectTableService: SelectTableService,
-    public override translateService: TranslateService
-  ) {
-    super(
-      themeService,
-      router,
-      route,
-      store,
-      datasetService,
-      matDialog,
-      groupdatasetService,
-      selectTableService,
-      translateService
-    );
+  constructor(injector: Injector) {
+    super(injector);
   }
 
   //資料初始化

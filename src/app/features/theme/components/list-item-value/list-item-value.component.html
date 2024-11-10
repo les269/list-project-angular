@@ -42,6 +42,17 @@
   @case ('fileSize') {
     <div>{{ data[themeLabel.byKey] | fileSize }}</div>
   }
+  @case ('date') {
+    <div>
+      {{
+        data[themeLabel.byKey]
+          | date
+            : (themeLabel.dateFormat !== ''
+                ? themeLabel.dateFormat
+                : 'yyyy-MM-dd')
+      }}
+    </div>
+  }
   @default {
     <div>{{ data[themeLabel.byKey] }}</div>
   }

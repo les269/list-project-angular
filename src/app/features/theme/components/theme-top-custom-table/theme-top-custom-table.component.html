@@ -18,9 +18,9 @@
           name="customType{{ i }}"
           class="form-control"
           style="min-width: 200px">
-          @for (type of eThemeCustomType | keyvalue; track $index) {
+          @for (type of eThemeTopCustomType | keyvalue; track $index) {
             <option [value]="type.key">
-              {{ 'themeCustom.' + type.key | translate }}
+              {{ 'themeTopCustom.' + type.key | translate }}
             </option>
           }
         </select>
@@ -28,7 +28,7 @@
     </ng-container>
     <ng-container matColumnDef="byKey">
       <th mat-header-cell *matHeaderCellDef>
-        {{ 'themeCustom.byKey' | translate }}
+        {{ 'themeTopCustom.byKey' | translate }}
       </th>
       <td mat-cell *matCellDef="let element; let i = dataIndex">
         <input
@@ -39,7 +39,7 @@
     </ng-container>
     <ng-container matColumnDef="label">
       <th mat-header-cell *matHeaderCellDef>
-        {{ 'themeCustom.labelName' | translate }}
+        {{ 'themeTopCustom.labelName' | translate }}
       </th>
       <td mat-cell *matCellDef="let element; let i = dataIndex">
         <input
@@ -98,7 +98,7 @@
             @case ('openUrl') {
               <input
                 class="form-control mt-1"
-                [placeholder]="'themeCustom.openUrlPH' | translate"
+                [placeholder]="'themeTopCustom.openUrlPH' | translate"
                 [(ngModel)]="element.openUrl"
                 name="customOpenUrl{{ i }}" />
             }

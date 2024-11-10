@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Injector, OnDestroy, OnInit } from '@angular/core';
 import { debounceTime, filter, Subscription, switchMap, tap } from 'rxjs';
 import { updateTitle } from '../../../shared/state/layout.actions';
 import { isBlank, isNotBlank } from '../../../shared/util/helper';
@@ -13,6 +13,8 @@ import {
   ThemeTagValue,
   ThemeHeaderType,
   SortType,
+  ThemeTopCustomValueResponse,
+  ThemeTopCustom,
 } from '../models';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ThemeService } from '../services/theme.service';
@@ -24,6 +26,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { GroupDatasetService } from '../../dataset/service/group-dataset.service';
 import { SelectTableService } from '../../../core/services/select-table.service';
 import { TranslateService } from '@ngx-translate/core';
+import { SnackbarService } from '../../../core/services/snackbar.service';
 
 @Component({
   standalone: true,
@@ -42,6 +45,7 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
   themeTagList!: ThemeTag[];
   themeTagListForSelect!: ThemeTag[];
   themeCustomList!: ThemeCustom[];
+  themeTopCustomList!: ThemeTopCustom[];
   themeTagValueList: ThemeTagValue[] = [];
   displayedColumns: string[] = [];
   datasetDataMap: {
@@ -55,9 +59,9 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
   tagSeq: number = -1;
   useTag!: ThemeTag;
   useData: any;
+  topCustomValueMap: ThemeTopCustomValueResponse = {};
 
   seqKey = '';
-
   defaultKey: string = '';
   pageSize: number = 30;
 
@@ -68,17 +72,28 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
   routeParamSub: Subscription | undefined;
   routeEventsSub: Subscription | undefined;
 
-  constructor(
-    public themeService: ThemeService,
-    public router: Router,
-    public route: ActivatedRoute,
-    public store: Store,
-    public datasetService: DatasetService,
-    public matDialog: MatDialog,
-    public groupdatasetService: GroupDatasetService,
-    public selectTableService: SelectTableService,
-    public translateService: TranslateService
-  ) {}
+  themeService: ThemeService;
+  router: Router;
+  route: ActivatedRoute;
+  store: Store;
+  datasetService: DatasetService;
+  matDialog: MatDialog;
+  groupdatasetService: GroupDatasetService;
+  selectTableService: SelectTableService;
+  translateService: TranslateService;
+  snackbarService: SnackbarService;
+  constructor(protected injector: Injector) {
+    this.themeService = this.injector.get(ThemeService);
+    this.router = this.injector.get(Router);
+    this.route = this.injector.get(ActivatedRoute);
+    this.store = this.injector.get(Store);
+    this.datasetService = this.injector.get(DatasetService);
+    this.matDialog = this.injector.get(MatDialog);
+    this.groupdatasetService = this.injector.get(GroupDatasetService);
+    this.selectTableService = this.injector.get(SelectTableService);
+    this.translateService = this.injector.get(TranslateService);
+    this.snackbarService = this.injector.get(SnackbarService);
+  }
 
   ngOnInit() {
     this.routeParamSub = this.route.paramMap
@@ -120,6 +135,10 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
           this.themeCustomList = res.themeCustomList.sort((a, b) =>
             a.seq > b.seq ? 1 : -1
           );
+          this.themeTopCustomList =
+            res.themeOtherSetting.themeTopCustomList.sort((a, b) =>
+              a.seq > b.seq ? 1 : -1
+            );
           this.defaultKey =
             this.themeLabelList.find(x => x.isDefaultKey)?.byKey ?? '';
           //設定標題
@@ -127,6 +146,7 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
           this.store.dispatch(updateTitle({ title: this.themeHeader.title }));
           //呼叫取得清單資料
           this.getDataSoure();
+          this.getTopCustomValueMap();
         });
       });
   }
@@ -168,6 +188,12 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
         );
         this.initData();
       });
+  }
+
+  getTopCustomValueMap() {
+    this.themeService.findTopCustomValue(this.headerId).subscribe(x => {
+      this.topCustomValueMap = x;
+    });
   }
 
   changeDataset() {
@@ -240,6 +266,7 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
       .refreshDataByNameList(this.useDataset.datasetList)
       .subscribe(x => {
         this.getDataSoure();
+        this.snackbarService.openByI18N('msg.refreshSuccess');
       });
   }
 

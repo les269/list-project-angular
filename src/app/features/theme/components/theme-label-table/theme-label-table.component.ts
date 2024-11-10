@@ -11,7 +11,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatTableModule } from '@angular/material/table';
 import { TranslateModule } from '@ngx-translate/core';
-import { CustomTableComponent } from '../custom-table/custom-table.component';
 import { isNull } from '../../../../shared/util/helper';
 
 @Component({
@@ -26,7 +25,6 @@ import { isNull } from '../../../../shared/util/helper';
     CommonModule,
     MatListModule,
     TranslateModule,
-    CustomTableComponent,
   ],
   selector: 'app-theme-label-table',
   templateUrl: 'theme-label-table.component.html',

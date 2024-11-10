@@ -9,6 +9,9 @@ import {
   ThemeHeader,
   ThemeTagValue,
   ThemeTagValueReq,
+  ThemeTopCustom,
+  ThemeTopCustomValue,
+  ThemeTopCustomValueResponse,
 } from '../models';
 
 @Injectable({ providedIn: 'root' })
@@ -44,22 +47,33 @@ export class ThemeService {
   }
 
   findCustomValue(
-    req: Partial<ThemeCustomValueRequest>
+    req: ThemeCustomValueRequest
   ): Observable<ThemeCustomValueResponse> {
     return this.http.post<ThemeCustomValueResponse>('/theme/custom/value', req);
   }
-
-  updateCustomValue(req: Partial<ThemeTagValueReq>): Observable<string[]> {
-    return this.http.post<string[]>('/theme/custom/update', req);
+  //更新custom value
+  updateCustomValue(req: ThemeCustomValue): Observable<void> {
+    return this.http.post<void>('/theme/custom/update', req);
   }
 
+  //取得tag list
   getTagValueList(headerId: string): Observable<ThemeTagValue[]> {
     return this.http.get<ThemeTagValue[]>(
       `/theme/tag/value?headerId=${headerId}`
     );
   }
-
+  //更新tag value
   updateTagValueList(req: ThemeTagValue[]): Observable<void> {
     return this.http.post<void>(`/theme/tag/update`, req);
+  }
+
+  findTopCustomValue(req: string): Observable<ThemeTopCustomValueResponse> {
+    return this.http.get<ThemeTopCustomValueResponse>(
+      `/theme/top-custom/value?headerId=${req}`
+    );
+  }
+
+  updateTopCustomValue(req: ThemeTopCustomValue): Observable<void> {
+    return this.http.post<void>('/theme/top-custom/update', req);
   }
 }

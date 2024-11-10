@@ -15,7 +15,6 @@
       <td mat-cell *matCellDef="let element; let i = dataIndex">
         <select
           [(ngModel)]="element.type"
-          name="customType{{ i }}"
           class="form-control"
           style="min-width: 200px">
           @for (type of eThemeCustomType | keyvalue; track $index) {
@@ -31,10 +30,7 @@
         {{ 'themeCustom.byKey' | translate }}
       </th>
       <td mat-cell *matCellDef="let element; let i = dataIndex">
-        <input
-          class="form-control"
-          name="customByKey{{ i }}"
-          [(ngModel)]="element.byKey" />
+        <input class="form-control" [(ngModel)]="element.byKey" />
       </td>
     </ng-container>
     <ng-container matColumnDef="label">
@@ -42,10 +38,7 @@
         {{ 'themeCustom.labelName' | translate }}
       </th>
       <td mat-cell *matCellDef="let element; let i = dataIndex">
-        <input
-          class="form-control"
-          name="customLabel{{ i }}"
-          [(ngModel)]="element.label" />
+        <input class="form-control" [(ngModel)]="element.label" />
       </td>
     </ng-container>
     <ng-container matColumnDef="other">
@@ -112,13 +105,11 @@
                 <input
                   class="form-control"
                   [placeholder]="'themeCustom.clickBeforeIcon' | translate"
-                  [(ngModel)]="element.buttonIconTrue"
-                  name="customButtonIconTrue{{ i }}" />
+                  [(ngModel)]="element.buttonIconTrue" />
                 <input
                   class="form-control"
                   [placeholder]="'themeCustom.clickAfterIcon' | translate"
-                  [(ngModel)]="element.buttonIconFalse"
-                  name="customButtonIconFalse{{ i }}" />
+                  [(ngModel)]="element.buttonIconFalse" />
               </div>
             }
             @case ('buttonIconFill') {
@@ -137,43 +128,37 @@
                 <input
                   class="form-control mt-1"
                   [placeholder]="'themeCustom.fillIcon' | translate"
-                  [(ngModel)]="element.buttonIconFill"
-                  name="customButtonIconFill{{ i }}" />
+                  [(ngModel)]="element.buttonIconFill" />
                 <input
                   type="color"
                   [placeholder]="'themeCustom.fillIconColor' | translate"
                   class="form-control form-control-color mt-1"
-                  [(ngModel)]="element.buttonIconFillColor"
-                  name="customButtonIconFillColor{{ i }}" />
+                  [(ngModel)]="element.buttonIconFillColor" />
               </div>
             }
             @case ('copyValue') {
               <input
                 class="form-control mt-1"
                 [placeholder]="'themeCustom.copyValuePH' | translate"
-                [(ngModel)]="element.copyValue"
-                name="customCopyValue{{ i }}" />
+                [(ngModel)]="element.copyValue" />
             }
             @case ('copyValueByKey') {
               <input
                 class="form-control mt-1"
                 [placeholder]="'themeCustom.copyValueByKeyPH' | translate"
-                [(ngModel)]="element.copyValueByKey"
-                name="customCopyValueByKey{{ i }}" />
+                [(ngModel)]="element.copyValueByKey" />
             }
             @case ('openUrl') {
               <input
                 class="form-control mt-1"
                 [placeholder]="'themeCustom.openUrlPH' | translate"
-                [(ngModel)]="element.openUrl"
-                name="customOpenUrl{{ i }}" />
+                [(ngModel)]="element.openUrl" />
             }
             @case ('openUrlByKey') {
               <input
                 class="form-control mt-1"
                 [placeholder]="'themeCustom.openUrlByKeyPH' | translate"
-                [(ngModel)]="element.openUrlByKey"
-                name="customOpenUrlByKey{{ i }}" />
+                [(ngModel)]="element.openUrlByKey" />
             }
             @case ('apiConfig') {
               <div class="mt-1 d-flex flex-wrap gap-3 align-items-center">

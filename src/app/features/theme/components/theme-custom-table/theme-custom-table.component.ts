@@ -29,11 +29,11 @@ import { SelectTableService } from '../../../../core/services/select-table.servi
     MatButtonModule,
     MatChipsModule,
   ],
-  selector: 'app-custom-table',
-  templateUrl: 'custom-table.component.html',
-  styleUrl: 'custom-table.component.scss',
+  selector: 'app-theme-custom-table',
+  templateUrl: 'theme-custom-table.component.html',
+  styleUrl: 'theme-custom-table.component.scss',
 })
-export class CustomTableComponent implements OnInit {
+export class ThemeCustomTableComponent implements OnInit {
   @Input({ required: true }) themeCustomList!: ThemeCustom[];
   @Output() themeCustomListChange = new EventEmitter<ThemeCustom[]>();
   displayedColumns = ['order', 'type', 'byKey', 'label', 'other'];

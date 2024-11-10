@@ -8,6 +8,11 @@
   <button class="btn btn-primary" (click)="setDefaultColor()">
     {{ 'otherSetting.defaultColor' | translate }}
   </button>
+  <div class="my-2">
+    <mat-checkbox [(ngModel)]="themeOtherSetting.showDuplicate">
+      {{ 'themeTopCustom.displayDuplicateButton' | translate }}
+    </mat-checkbox>
+  </div>
 }
 @if (type === 'imageList') {
   <div class="mb-3">
@@ -20,5 +25,7 @@
       [(ngModel)]="themeOtherSetting.listPageSize" />
   </div>
 }
-<app-custom-table
-  [(themeCustomList)]="themeOtherSetting.topCustomList"></app-custom-table>
+<app-theme-top-custom-table
+  [(themeTopCustomList)]="
+    themeOtherSetting.themeTopCustomList
+  "></app-theme-top-custom-table>

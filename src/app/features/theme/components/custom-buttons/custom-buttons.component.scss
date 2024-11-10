@@ -1,3 +1,14 @@
+@media (max-width: 768px) {
+  .buttons {
+    justify-content: space-between !important;
+  }
+}
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 4px;
+}
 .custom-button-group {
   display: flex;
   flex-direction: row;
@@ -26,6 +37,7 @@
     padding: 0px 12px;
     font-size: 1rem;
     border-radius: 0.125rem;
+    align-items: center;
     > label {
       cursor: pointer;
     }

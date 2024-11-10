@@ -39,7 +39,7 @@ export class ThemeTopCustomTableComponent {
   @Input({ required: true }) themeTopCustomList!: ThemeTopCustom[];
   @Output() themeTopCustomListChange = new EventEmitter<ThemeTopCustom[]>();
   displayedColumns = ['order', 'type', 'byKey', 'label', 'other'];
-  eThemeCustomType = ThemeCustomType;
+  eThemeTopCustomType = ThemeTopCustomType;
   apiConfigList: ApiConfig[] = [];
 
   constructor(
