@@ -28,12 +28,12 @@
 
 ## 配置
 
-[清單列表](./public/md/list.md)
-[資料集群組](./public/md/dataset-group.md)
-[資料集](./public/md/dataset.md)
-[爬蟲設定清單](./public/md/scrapy.md)
-[API設定清單](./public/md/api.md)
-[替換文字清單](./public/md/replace-value-map.md)
+- [清單列表](./public/md/list.md)
+- [資料集群組](./public/md/dataset-group.md)
+- [資料集](./public/md/dataset.md)
+- [爬蟲設定清單](./public/md/scrapy.md)
+- [API設定清單](./public/md/api.md)
+- [替換文字清單](./public/md/replace-value-map.md)
 
 ## 呈現畫面
 
