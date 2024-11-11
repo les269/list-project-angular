@@ -86,7 +86,8 @@
     "groupDataset": "資料集群組清單",
     "groupDatasetEdit": "資料集群組設定",
     "groupDatasetDataEdit": "編輯群組資料",
-    "replaceValueMap": "替換文字清單"
+    "replaceValueMap": "替換文字清單",
+    "topCustom": "頂部自定義功能"
   },
   "home": { "createTheme": "創建主題" },
   "themeHeader": {
@@ -240,14 +241,14 @@
   "dataset": {
     "createDataset": "創建資料集",
     "name": "名稱",
-    "groupName": "資料群組名稱",
+    "groupName": "資料集群組名稱",
     "groupNameDesc": "對應資料的群組, 變更該群組名稱會讓所擁有的檔案進行變更, 例如當群組名稱為'動畫'那就只會會取'動畫'裡面的資料, 當改成'電影'那資料就變更成'電影'。",
     "filterType": "資料集過濾方式",
     "filterTypeDesc": "'全部獲取'會擁有資料集的來源的所有資料, '檔案'跟'資料夾'會使用名稱來過濾要使用的資料來源, 只會擁有對應名稱資料。",
     "file": "檔案名稱",
     "folder": "資料夾名稱",
     "all": "全部獲取",
-    "byKey": "資料對應的必要鍵值",
+    "byKey": "資料對應的必要鍵",
     "filePath": "檔案路徑",
     "fileExtension": "檔案副檔名",
     "folderPath": "資料夾路徑",
@@ -255,7 +256,7 @@
     "filingDesc": "會根據輸入的正則進行把檔案放入正則第一結果的資料夾裡面, 例如:電影-01 使用正則:^[^-]+(?=-) 會把檔案放入電影的資料夾, 而不符合的資料則放在原本的資料夾不會變動。 ",
     "filingRegular": "歸檔用正則表達式",
     "autoImageDownload": "是否自動下載圖片",
-    "autoImageDownloadDesc": "下載檔案的名稱會用'資料對應的必要鍵值'的值進行命名, 且不會給副檔名。",
+    "autoImageDownloadDesc": "下載檔案的名稱會用'資料對應的必要鍵'的值進行命名, 且不會給副檔名。",
     "imageByKey": "圖片網址的鍵值",
     "imageSaveFolder": "圖片保存的資料夾路徑",
     "fieldTable": "編輯資料用設定",

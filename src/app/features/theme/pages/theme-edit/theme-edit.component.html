@@ -5,7 +5,7 @@
     </button>
     <form #themeForm="ngForm">
       <div class="mb-3">
-        <label for="name" class="form-label">{{
+        <label for="name" class="form-label require">{{
           'themeHeader.name' | translate
         }}</label>
         <input
@@ -19,7 +19,7 @@
           [disabled]="status === 'edit'" />
       </div>
       <div class="mb-3">
-        <label for="version" class="form-label">{{
+        <label for="version" class="form-label require">{{
           'themeHeader.version' | translate
         }}</label>
         <input
@@ -49,7 +49,7 @@
         </select>
       </div>
       <div class="mb-3">
-        <label for="title" class="form-label">{{
+        <label for="title" class="form-label require">{{
           'themeHeader.title' | translate
         }}</label>
         <input

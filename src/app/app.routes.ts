@@ -119,4 +119,5 @@ export const routes: Routes = [
       ).then(mod => mod.ReplaceValueMapComponent),
     data: { title: 'title.replaceValueMap', sidenav: true },
   },
+  { path: '**', redirectTo: '' },
 ];

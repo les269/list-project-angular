@@ -2,16 +2,16 @@
 
 ## 描述
 
-這是一個來顯示清單的系統，需要配置清單主題、資料欄位、資料來源，可以配置自定義設定來執行一些功能像是開啟新頁視窗或複製值
-當需要呼叫其他系統的API可以到配置API清單
+這是一個來顯示清單的系統，需要配置清單主題、資料欄位、資料集，可以配置自定義設定來執行一些功能。
 需搭配後端 https://github.com/les269/listProjectBackend
 
 ## 目錄
 
-- [安裝](#安裝)
 - [使用方法](#使用方法)
+- [配置](#配置)
+- [呈現畫面](#呈現畫面)
 
-## 安裝
+## 使用方法
 
 1. clone：
    ```bash
@@ -21,16 +21,27 @@
    ```bash
    npm install
    ```
-
-## 使用方法
-
-執行程式：
-
-```bash
+3. run
+   ```bash
    nx serve
-```
+   ```
 
-## 預覽
+## 配置
+
+[清單列表](./public/md/list.md)
+[資料集群組](./public/md/dataset-group.md)
+[資料集](./public/md/dataset.md)
+[爬蟲設定清單](./public/md/scrapy.md)
+[API設定清單](./public/md/api.md)
+[替換文字清單](./public/md/replace-value-map.md)
+
+## 呈現畫面
+
+- **圖片清單**
+  ![動畫清單](./public/md-img/動畫清單.png)
+
+- **table表格**
+  ![動畫清單](./public/md-img/動畫清單-table.png)
 
 ## 新功能
 
