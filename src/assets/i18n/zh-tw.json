@@ -233,7 +233,8 @@
     "convertToArray": "強制資料結果為陣列",
     "onlyOwn": "抓取父元素中的文本（排除子元素的文本）",
     "replaceRegular": "輸入要替換的正則",
-    "replaceRegularTo": "要替換成的字串"
+    "replaceRegularTo": "要替換成的字串",
+    "replaceValueMap": "選擇替換表"
   },
   "dataset": {
     "createDataset": "創建資料集",

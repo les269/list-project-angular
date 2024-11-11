@@ -69,6 +69,9 @@
               [(ngModel)]="element.replaceString" />
           </div>
           <div class="mt-1 d-flex flex-wrap gap-3 align-items-center">
+            <label class="form-text">{{
+              'scrapy.replaceValueMap' | translate
+            }}</label>
             @if (element.replaceValueMapName) {
               <mat-chip cdkDrag
                 >{{ element.replaceValueMapName }}
