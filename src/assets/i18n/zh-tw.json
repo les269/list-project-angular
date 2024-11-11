@@ -27,7 +27,8 @@
     "refreshSuccess": "刷新成功",
     "deleteImageFail": "圖片未刪除",
     "deleteImageSuccess": "成功刪除圖片 {{path}}",
-    "lengthError": "'{{label}}'長度輸入錯誤"
+    "lengthError": "'{{label}}'長度輸入錯誤",
+    "dataNotExist": "該資料不存在"
   },
   "g": {
     "edit": "編輯",
@@ -258,6 +259,7 @@
     "imageByKey": "圖片網址的鍵值",
     "imageSaveFolder": "圖片保存的資料夾路徑",
     "fieldTable": "編輯資料用設定",
+    "fixedFieldTable": "編輯固定資料設定",
     "fieldSeq": "順序",
     "fieldKey": "資料對應鍵",
     "fieldLabel": "鍵的標籤名稱",

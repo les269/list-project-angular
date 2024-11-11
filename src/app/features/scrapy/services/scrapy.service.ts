@@ -51,7 +51,7 @@ export class ScrapyService {
   }
 
   testScrapyJson(req: ScrapyTestReq): Observable<any> {
-    return this.http.post(`${this.prefix}/use-json`, req);
+    return this.http.post(`${this.prefix}/test/json`, req);
   }
 
   scrapyByUrl(req: ScrapyReq): Observable<any> {

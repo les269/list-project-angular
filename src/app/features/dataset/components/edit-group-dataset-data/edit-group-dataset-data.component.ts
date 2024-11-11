@@ -19,7 +19,7 @@ import { ScrapyService } from '../../../scrapy/services/scrapy.service';
 import { isBlank, isNotBlank } from '../../../../shared/util/helper';
 import { MatIconModule } from '@angular/material/icon';
 import { SelectTableService } from '../../../../core/services/select-table.service';
-import { EMPTY, switchMap } from 'rxjs';
+import { EMPTY, filter, switchMap, tap } from 'rxjs';
 import {
   MatChipEditedEvent,
   MatChipInputEvent,
@@ -81,18 +81,36 @@ export class EditGroupDatasetDataComponent implements OnInit {
         }
       }
       this.getScrapyList();
-      this.searchByPrimeValue();
+      if (isNotBlank(this.primeValue)) {
+        this.searchByPrimeValue();
+      }
     });
   }
 
   searchByPrimeValue() {
-    if (isNotBlank(this.primeValue)) {
-      this.groupDatasetDataService
-        .getGroupDatasetData(this.groupName, this.primeValue)
-        .subscribe(res => {
-          this.json = res.json;
-        });
+    if (isBlank(this.primeValue)) {
+      this.snackbarService.isBlankMessage('dataset.primeValue');
+      return;
     }
+    this.groupDatasetDataService
+      .existGroupDatasetData(this.groupName, this.primeValue)
+      .pipe(
+        tap(x => {
+          if (!x) {
+            this.snackbarService.openByI18N('msg.dataNotExist');
+          }
+        }),
+        filter(x => x),
+        switchMap(x =>
+          this.groupDatasetDataService.getGroupDatasetData(
+            this.groupName,
+            this.primeValue
+          )
+        )
+      )
+      .subscribe(res => {
+        this.json = { ...this.json, ...res.json };
+      });
   }
 
   getScrapyList() {

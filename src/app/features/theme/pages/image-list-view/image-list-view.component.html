@@ -155,7 +155,9 @@
             @case ('key') {
               <img
                 alt=""
-                [ngSrc]="data[themeImage.imageKey]"
+                [ngSrc]="
+                  webApi + '/proxy-image?url=' + data[themeImage.imageKey]
+                "
                 fill
                 priority="{{ i === 0 }}" />
             }

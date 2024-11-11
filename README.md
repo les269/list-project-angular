@@ -40,6 +40,6 @@
 | 12   | 可以在網址上給json網址然後檢查config然後顯示成清單 (優先度最低) | pending |      |
 | 14   | 是否可以讓angular跟spring包成一個執行檔案 (優先度最低)          | pending |      |
 | 15   | 爬蟲,資料集群組,清單設定處理日期格式 (優先度最低)               | pending |      |
-| 21   | 清單搜尋可以根據label配置autocomplete                           | doing   |      |
+| 21   | 清單搜尋可以根據label勾選來配置autocomplete                     | doing   |      |
 
 聯繫我(replay) : 6x8sckva7@mozmail.com

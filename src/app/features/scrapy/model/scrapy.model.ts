@@ -28,6 +28,7 @@ export interface Cookie {
   value: string;
 }
 export interface CssSelect {
+  seq: number;
   key: string;
   value: string;
   replaceString: string;

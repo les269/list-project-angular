@@ -27,6 +27,7 @@ import { GroupDatasetService } from '../../dataset/service/group-dataset.service
 import { SelectTableService } from '../../../core/services/select-table.service';
 import { TranslateService } from '@ngx-translate/core';
 import { SnackbarService } from '../../../core/services/snackbar.service';
+import { api } from '../../../../environments/environments';
 
 @Component({
   standalone: true,
@@ -68,6 +69,8 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
   randomStr = '__random';
   datasetNameStr = '__datasetName';
   colorStr = '__color';
+
+  webApi = api;
 
   routeParamSub: Subscription | undefined;
   routeEventsSub: Subscription | undefined;

@@ -33,7 +33,7 @@ import { isNotNull } from '../../../../shared/util/helper';
   styleUrl: './css-select-table.component.scss',
 })
 export class CssSelectTableComponent {
-  displayedColumns = ['key', 'value', 'other'];
+  displayedColumns = ['seq', 'key', 'value', 'other'];
   @Input({ required: true }) cssSelectList!: CssSelect[];
   @Output() cssSelectListChange = new EventEmitter<CssSelect[]>();
 
@@ -56,6 +56,7 @@ export class CssSelectTableComponent {
         replaceRegular: '',
         replaceRegularTo: '',
         replaceValueMapName: '',
+        seq: this.cssSelectList.length + 1,
       },
     ];
     this.cssSelectListChange.emit(this.cssSelectList);
@@ -82,5 +83,16 @@ export class CssSelectTableComponent {
           this.cssSelectListChange.emit(this.cssSelectList);
         }
       });
+  }
+  onUpDown(index: number, type: 'up' | 'down') {
+    let data: CssSelect[] = JSON.parse(JSON.stringify(this.cssSelectList));
+    let source = data[index];
+    let target = data.splice(index + (type === 'up' ? -1 : 1), 1, source);
+    data.splice(index, 1, target[0]);
+    this.cssSelectList = data.map((x, i) => {
+      x.seq = i + 1;
+      return x;
+    });
+    this.cssSelectListChange.emit(this.cssSelectList);
   }
 }

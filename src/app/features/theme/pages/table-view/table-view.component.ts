@@ -210,21 +210,15 @@ export class TableViewComponent
 
   doTableColor() {
     if (isNotBlank(this.defaultKey) && this.rowColor.length > 0) {
-      const arr = this.list.data
-        .map(a => a[this.defaultKey].toUpperCase())
-        .filter((element, index, array) => array.indexOf(element) === index)
-        .map((value, index) => {
-          return {
-            key: value,
-            color: index % this.rowColor.length,
-          };
-        });
-      arr.forEach(value => {
-        this.list.data.forEach(data => {
-          if (value.key === data[this.defaultKey]) {
-            data[this.colorStr] = this.rowColor[value.color];
-          }
-        });
+      const seenKeys = new Set<string>();
+
+      this.list.data.forEach((data, index) => {
+        const key = data[this.defaultKey].toUpperCase();
+
+        if (!seenKeys.has(key)) {
+          seenKeys.add(key);
+          data[this.colorStr] = this.rowColor[index % this.rowColor.length];
+        }
       });
     }
   }
