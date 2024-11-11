@@ -36,6 +36,7 @@ export interface CssSelect {
   onlyOwn: boolean;
   replaceRegular: string;
   replaceRegularTo: string;
+  replaceValueMapName: string;
 }
 
 export interface HtmlRequest {

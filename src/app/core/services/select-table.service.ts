@@ -14,10 +14,14 @@ import {
 } from '../../features/dataset/model';
 import { ThemeTag } from '../../features/theme/models';
 import { ReplaceValueMap } from '../../features/replace-value-map/model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({ providedIn: 'root' })
 export class SelectTableService {
-  constructor(private matDialog: MatDialog) {}
+  constructor(
+    private matDialog: MatDialog,
+    private translateService: TranslateService
+  ) {}
 
   selectSingleApi(dataSource: ApiConfig[]) {
     const data: BaseSelectTableData<ApiConfig> = {
@@ -216,6 +220,7 @@ export class SelectTableService {
         updatedTime: true,
       },
       enableFilter: true,
+      title: this.translateService.instant('title.selectReplaceValueMap'),
     };
     return this.matDialog
       .open<

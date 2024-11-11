@@ -8,6 +8,11 @@ import { TranslateModule } from '@ngx-translate/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { CssSelect } from '../../model';
+import { MatChipsModule } from '@angular/material/chips';
+import { SelectTableService } from '../../../../core/services/select-table.service';
+import { ReplaceValueMapService } from '../../../replace-value-map/service/replace-value-map.service';
+import { filter, switchMap } from 'rxjs';
+import { isNotNull } from '../../../../shared/util/helper';
 
 @Component({
   selector: 'app-css-select-table',
@@ -22,6 +27,7 @@ import { CssSelect } from '../../model';
     MatButtonModule,
     MatTooltipModule,
     MatCheckboxModule,
+    MatChipsModule,
   ],
   templateUrl: './css-select-table.component.html',
   styleUrl: './css-select-table.component.scss',
@@ -30,6 +36,11 @@ export class CssSelectTableComponent {
   displayedColumns = ['key', 'value', 'other'];
   @Input({ required: true }) cssSelectList!: CssSelect[];
   @Output() cssSelectListChange = new EventEmitter<CssSelect[]>();
+
+  constructor(
+    private selectTableService: SelectTableService,
+    private replaceValueMapService: ReplaceValueMapService
+  ) {}
 
   //新增CssSelect
   onAddCssSelect() {
@@ -44,6 +55,7 @@ export class CssSelectTableComponent {
         onlyOwn: false,
         replaceRegular: '',
         replaceRegularTo: '',
+        replaceValueMapName: '',
       },
     ];
     this.cssSelectListChange.emit(this.cssSelectList);
@@ -53,5 +65,22 @@ export class CssSelectTableComponent {
     this.cssSelectList.splice(i, 1);
     this.cssSelectList = [...this.cssSelectList];
     this.cssSelectListChange.emit(this.cssSelectList);
+  }
+
+  selectReplaceValueMap(element: CssSelect) {
+    this.replaceValueMapService
+      .getNameList()
+      .pipe(
+        switchMap(res =>
+          this.selectTableService.selectSingleReplaceValueMap(res)
+        ),
+        filter(x => isNotNull(x))
+      )
+      .subscribe(res => {
+        if (res) {
+          element.replaceValueMapName = res.name;
+          this.cssSelectListChange.emit(this.cssSelectList);
+        }
+      });
   }
 }
