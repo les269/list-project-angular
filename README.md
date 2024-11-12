@@ -64,5 +64,6 @@
 | 清單搜尋可以根據label勾選來配置autocomplete                     | done    |      |
 | 檔案或資料夾存在與否影響自定義是否可以使用或在前端可以得知      | doing   |      |
 | 刷新資料集前呼叫API                                             | doing   |      |
+| label 可使用替換表,需使用store                                  | pending |      |
 
 聯繫我(replay) : 6x8sckva7@mozmail.com

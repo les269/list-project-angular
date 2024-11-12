@@ -53,17 +53,19 @@
             <mat-option [value]="option">{{ option }}</mat-option>
           }
         </mat-autocomplete>
-        <button
-          mat-icon-button
-          class="d-flex"
-          [matTooltip]="'g.popupSelect' | translate"
-          (click)="selectMultipleValue()">
-          <mat-icon class="material-icons-outlined"
-            ><span class="material-symbols-outlined">
-              select_window_2
-            </span></mat-icon
-          >
-        </button>
+        @if (autoCompleteList.length > 0) {
+          <button
+            mat-icon-button
+            class="d-flex"
+            [matTooltip]="'g.popupSelect' | translate"
+            (click)="selectMultipleValue()">
+            <mat-icon class="material-icons-outlined"
+              ><span class="material-symbols-outlined">
+                select_window_2
+              </span></mat-icon
+            >
+          </button>
+        }
         <button
           mat-icon-button
           class="d-flex"
