@@ -43,23 +43,45 @@
         <input
           type="text"
           class="form-control"
+          [matAutocomplete]="auto"
           [(ngModel)]="searchValue"
           (keydown.enter)="changeQueryParams()" />
+        <mat-autocomplete
+          #auto="matAutocomplete"
+          (optionSelected)="searchChange()">
+          @for (option of filterAutoCompleteList(); track option) {
+            <mat-option [value]="option">{{ option }}</mat-option>
+          }
+        </mat-autocomplete>
         <button
-          class="search-btn"
+          mat-icon-button
+          class="d-flex"
+          [matTooltip]="'g.popupSelect' | translate"
+          (click)="selectMultipleValue()">
+          <mat-icon class="material-icons-outlined"
+            ><span class="material-symbols-outlined">
+              select_window_2
+            </span></mat-icon
+          >
+        </button>
+        <button
+          mat-icon-button
+          class="d-flex"
           [matTooltip]="'g.clear' | translate"
           (click)="searchValue = []; changeQueryParams()">
           <mat-icon>clear</mat-icon>
         </button>
         <button
-          class="search-btn"
+          mat-icon-button
+          class="d-flex"
           [matTooltip]="'g.search' | translate"
           (click)="changeQueryParams()">
           <mat-icon>search</mat-icon>
         </button>
         @if (defaultKey !== '') {
           <button
-            class="search-btn"
+            mat-icon-button
+            class="d-flex"
             [matTooltip]="'g.random' | translate"
             (click)="randomSearch()">
             <mat-icon>shuffle</mat-icon>

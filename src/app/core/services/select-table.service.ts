@@ -15,6 +15,7 @@ import {
 import { ThemeTag } from '../../features/theme/models';
 import { ReplaceValueMap } from '../../features/replace-value-map/model';
 import { TranslateService } from '@ngx-translate/core';
+import { isNotBlank } from '../../shared/util/helper';
 
 @Injectable({ providedIn: 'root' })
 export class SelectTableService {
@@ -230,6 +231,43 @@ export class SelectTableService {
         >,
         BaseSelectTableData<ReplaceValueMap>,
         ReplaceValueMap
+      >(SelectTableDialog, {
+        data,
+      })
+      .afterClosed();
+  }
+
+  selectMultipleValue(valueList: string[], selectedValue: string[] | string) {
+    const dataSource = valueList.map(x => ({ value: x }));
+    let selected: { value: string }[] = [];
+    if (Array.isArray(selectedValue)) {
+      selected = selectedValue
+        .map(x => dataSource.find(y => y.value === x))
+        .filter(x => x !== undefined);
+    } else if (typeof selectedValue === 'string') {
+      selected = selectedValue
+        .split(',')
+        .filter(x => isNotBlank(x))
+        .map(x => dataSource.find(y => y.value === x))
+        .filter(x => x !== undefined);
+    }
+    const data: BaseSelectTableData<{ value: string }> = {
+      displayedColumns: ['value'],
+      labels: ['g.value'],
+      dataSource,
+      selectType: 'multiple',
+      selected,
+      showTitle: false,
+      enableFilter: true,
+    };
+    return this.matDialog
+      .open<
+        SelectTableDialog<
+          { value: string },
+          BaseSelectTableData<{ value: string }>
+        >,
+        BaseSelectTableData<{ value: string }>,
+        { value: string }[]
       >(SelectTableDialog, {
         data,
       })

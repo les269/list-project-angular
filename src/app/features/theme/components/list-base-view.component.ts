@@ -61,6 +61,7 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
   useTag!: ThemeTag;
   useData: any;
   topCustomValueMap: ThemeTopCustomValueResponse = {};
+  autoCompleteList: string[] = [];
 
   seqKey = '';
   defaultKey: string = '';
@@ -217,7 +218,17 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
     } else {
       this.useTag = this.themeTagListForSelect[this.tagSeq];
     }
-
+    this.useData = this.datasetDataMap
+      .find(x => x.themeDataset.label === this.useDataset.label)!
+      .datasetDataList.map(x => {
+        x.data = x.data.map(data => {
+          data[this.randomStr] = crypto.getRandomValues(new Uint32Array(1))[0];
+          data[this.datasetNameStr] = x.datasetName;
+          return data;
+        });
+        return x.data;
+      })
+      .flat();
     this.changeDatasetAfter();
   }
 
@@ -291,6 +302,69 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
     }
     return 0;
   }
+
+  getAutoComplete(data: any[]): string[] {
+    const autoCompleteSet = new Set<string>();
+    for (const label of this.themeLabelList) {
+      if (label.isSearchValue && label.autoComplete) {
+        switch (label.type) {
+          case 'stringArray':
+            data.forEach(item => {
+              const values = item[label.byKey];
+              if (Array.isArray(values)) {
+                values.forEach(value => autoCompleteSet.add(value));
+              }
+            });
+            break;
+
+          case 'stringSplit':
+            data.forEach(item => {
+              const value = item[label.byKey];
+              if (typeof value === 'string') {
+                value
+                  .split(label.splitBy)
+                  .forEach(splitValue => autoCompleteSet.add(splitValue));
+              }
+            });
+            break;
+
+          default:
+            data.forEach(item => {
+              const value = item[label.byKey];
+              if (isNotBlank(value)) {
+                autoCompleteSet.add(value);
+              }
+            });
+            break;
+        }
+      }
+    }
+    return Array.from(autoCompleteSet);
+  }
+
+  filterAutoCompleteList(): string[] {
+    let lastElement = '';
+    if (typeof this.searchValue === 'string') {
+      lastElement = (this.searchValue + '').split(',').slice(-1)[0]!;
+    } else if (this.searchValue.length > 0) {
+      lastElement = this.searchValue.slice(-1)[0];
+    }
+    lastElement = lastElement.toLocaleLowerCase();
+    return this.autoCompleteList.filter(x =>
+      x.toLowerCase().includes(lastElement)
+    );
+  }
+
+  selectMultipleValue() {
+    this.selectTableService
+      .selectMultipleValue(this.autoCompleteList, this.searchValue)
+      .pipe(filter(res => res !== undefined))
+      .subscribe(res => {
+        this.searchValue = res.map(x => x.value);
+        this.searchChange();
+      });
+  }
+
   initData() {
     // This method is intentionally left blank for child classes to override.
   }
@@ -309,4 +383,6 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
   changeUrl() {
     // This method is intentionally left blank for child classes to override.
   }
+
+  searchChange(text?: string) {}
 }

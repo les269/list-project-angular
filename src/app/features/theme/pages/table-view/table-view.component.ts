@@ -6,7 +6,12 @@ import {
   ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { isNotBlank, isValidWidth } from '../../../../shared/util/helper';
+import {
+  isBlank,
+  isNotBlank,
+  isNotNull,
+  isValidWidth,
+} from '../../../../shared/util/helper';
 import {
   DEFAULT_ROW_COLOR,
   ThemeCustomValueResponse,
@@ -39,7 +44,20 @@ import {
   animate,
 } from '@angular/animations';
 import { TopCustomButtonsComponent } from '../../components/top-custom-buttons/top-custom-buttons.component';
-import { concatMap, filter, from, groupBy, mergeMap, toArray } from 'rxjs';
+import {
+  concatMap,
+  filter,
+  from,
+  groupBy,
+  mergeMap,
+  pipe,
+  toArray,
+} from 'rxjs';
+import {
+  MatAutocompleteActivatedEvent,
+  MatAutocompleteModule,
+  MatAutocompleteSelectedEvent,
+} from '@angular/material/autocomplete';
 
 @Component({
   selector: 'app-table-view',
@@ -60,6 +78,7 @@ import { concatMap, filter, from, groupBy, mergeMap, toArray } from 'rxjs';
     MatButtonModule,
     CustomButtonsComponent,
     TopCustomButtonsComponent,
+    MatAutocompleteModule,
   ],
   animations: [
     trigger('detailExpand', [
@@ -116,17 +135,8 @@ export class TableViewComponent
       : -1;
   }
   override changeDatasetAfter() {
-    this.useData = this.datasetDataMap
-      .find(x => x.themeDataset.label === this.useDataset.label)!
-      .datasetDataList.map(x => {
-        x.data = x.data.map(data => {
-          data[this.datasetNameStr] = x.datasetName;
-          return data;
-        });
-        return x.data;
-      })
-      .flat();
     this.list.data = this.useData;
+    this.autoCompleteList = this.getAutoComplete(this.list.data);
     this.doTableColor();
     this.getCustomValueMap();
   }
@@ -178,7 +188,7 @@ export class TableViewComponent
     }
   }
 
-  searchChange(text?: string) {
+  override searchChange(text?: string) {
     if (typeof this.searchValue === 'string') {
       this.searchValue = (this.searchValue + '')
         .split(',')
@@ -210,15 +220,14 @@ export class TableViewComponent
 
   doTableColor() {
     if (isNotBlank(this.defaultKey) && this.rowColor.length > 0) {
-      const seenKeys = new Set<string>();
+      const keyMap: { [key in string]: string } = {};
 
       this.list.data.forEach((data, index) => {
         const key = data[this.defaultKey].toUpperCase();
-
-        if (!seenKeys.has(key)) {
-          seenKeys.add(key);
-          data[this.colorStr] = this.rowColor[index % this.rowColor.length];
+        if (isBlank(keyMap[key])) {
+          keyMap[key] = this.rowColor[index % this.rowColor.length];
         }
+        data[this.colorStr] = keyMap[key];
       });
     }
   }

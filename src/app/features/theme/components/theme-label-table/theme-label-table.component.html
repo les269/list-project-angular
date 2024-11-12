@@ -142,6 +142,9 @@
               (change)="changeDefaultKey($event, i)"
               >{{ 'themeLabel.isDefaultKey' | translate }}</mat-checkbox
             >
+            <mat-checkbox [(ngModel)]="element.autoComplete">{{
+              'themeLabel.autoComplete' | translate
+            }}</mat-checkbox>
           </div>
         </div>
       </td>

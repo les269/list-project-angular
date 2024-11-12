@@ -59,6 +59,7 @@ export class ThemeLabelTableComponent {
       maxWidth: '',
       minWidth: '',
       width: '',
+      autoComplete: false,
     };
     this.themeLabelList = [...this.themeLabelList, element].map((x, i) => {
       x.seq = i + 1;

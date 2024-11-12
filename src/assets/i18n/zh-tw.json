@@ -63,7 +63,8 @@
     "firstPage": "第一頁",
     "lastPage": "最後一頁",
     "noData": "無資料",
-    "rangeLabel": "第 {{start}} - {{end}} 項，共 {{length}} 項"
+    "rangeLabel": "第 {{start}} - {{end}} 項，共 {{length}} 項",
+    "popupSelect": "視窗選擇"
   },
   "title": {
     "home": "清單列表",
@@ -129,7 +130,8 @@
     "isDefaultKey": "當為預設使用的key值,需使用唯一值且確保不為空值,改變時自定義的資料不會隨之改變或刪除",
     "minWidth": "最小寬度",
     "maxWidth": "最大寬度",
-    "width": "寬度"
+    "width": "寬度",
+    "autoComplete": "加入快速輸入"
   },
   "themeDataset": {
     "title": "資料集設定",

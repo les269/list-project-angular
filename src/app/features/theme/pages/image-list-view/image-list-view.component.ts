@@ -1,79 +1,47 @@
-import { Component, Injector, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { debounceTime, filter, Subscription, switchMap, tap } from 'rxjs';
+import { Component, Injector } from '@angular/core';
+import { debounceTime } from 'rxjs';
 import {
   dynamicSort,
   getRandomInt,
-  isBlank,
   isNotBlank,
   isNumber,
 } from '../../../../shared/util/helper';
-import { ThemeService } from '../../services/theme.service';
 import {
   SortType,
-  ThemeCustom,
   ThemeCustomValueResponse,
-  ThemeDataset,
-  ThemeHeader,
   ThemeHeaderType,
-  ThemeImage,
-  ThemeLabel,
-  ThemeOtherSetting,
-  ThemeTag,
-  ThemeTagValue,
 } from '../../models';
 import { NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { LabelValueDirective } from '../../components/label-value.directive';
-import { CopyDirective } from '../../../../shared/util/util.directive';
 import { MatIconModule } from '@angular/material/icon';
-import { SnackbarService } from '../../../../core/services/snackbar.service';
-import {
-  FileSizePipe,
-  ReplaceValuePipe,
-} from '../../../../shared/util/util.pipe';
-import { Store } from '@ngrx/store';
-import { updateTitle } from '../../../../shared/state/layout.actions';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ReplaceValuePipe } from '../../../../shared/util/util.pipe';
+import { TranslateModule } from '@ngx-translate/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ScrollTopComponent } from '../../../../core/components/scroll-top/scroll-top.component';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatDialog } from '@angular/material/dialog';
-import { DatasetService } from '../../../dataset/service/dataset.service';
 import { MatButtonModule } from '@angular/material/button';
-import { EditGroupDatasetDataComponent } from '../../../dataset/components/edit-group-dataset-data/edit-group-dataset-data.component';
-import { GroupDatasetService } from '../../../dataset/service/group-dataset.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { DatasetData } from '../../../dataset/model';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { SelectTableService } from '../../../../core/services/select-table.service';
-import { ArrayTextComponent } from '../../components/array-text/array-text.component';
 import { ListItemValueComponent } from '../../components/list-item-value/list-item-value.component';
 import { CustomButtonsComponent } from '../../components/custom-buttons/custom-buttons.component';
 import { ListBaseViewComponent } from '../../components/list-base-view.component';
 import { TopCustomButtonsComponent } from '../../components/top-custom-buttons/top-custom-buttons.component';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 @Component({
   standalone: true,
   imports: [
-    NgTemplateOutlet,
-    LabelValueDirective,
-    CopyDirective,
     MatIconModule,
-    FileSizePipe,
     ReplaceValuePipe,
     NgOptimizedImage,
     TranslateModule,
     FormsModule,
     ReactiveFormsModule,
     ScrollTopComponent,
-    MatMenuModule,
     MatButtonModule,
     MatTooltipModule,
-    MatCheckboxModule,
-    ArrayTextComponent,
     ListItemValueComponent,
     CustomButtonsComponent,
     TopCustomButtonsComponent,
+    MatAutocompleteModule,
+    NgTemplateOutlet,
   ],
   selector: 'app-image-list-view',
   templateUrl: 'image-list-view.component.html',
@@ -142,17 +110,7 @@ export class ImageListViewComponent extends ListBaseViewComponent {
 
   override changeDatasetAfter() {
     //設定目前使用的資料
-    this.useData = this.datasetDataMap
-      .find(x => x.themeDataset.label === this.useDataset.label)!
-      .datasetDataList.map(x => {
-        x.data = x.data.map(data => {
-          data[this.randomStr] = crypto.getRandomValues(new Uint32Array(1))[0];
-          data[this.datasetNameStr] = x.datasetName;
-          return data;
-        });
-        return x.data;
-      })
-      .flat();
+    this.autoCompleteList = this.getAutoComplete(this.useData);
   }
 
   override onSearch() {
@@ -357,17 +315,17 @@ export class ImageListViewComponent extends ListBaseViewComponent {
     }
   }
 
-  searchChange(text: string) {
+  override searchChange(text?: string) {
     if (typeof this.searchValue === 'string') {
       this.searchValue = (this.searchValue + '')
         .split(',')
         .map(x => x.trim())
         .filter(x => isNotBlank(x));
     }
-    if (!this.searchValue.includes(text)) {
+    if (text && !this.searchValue.includes(text)) {
       this.searchValue = [...this.searchValue, text];
-      this.changeQueryParams();
     }
+    this.changeQueryParams();
   }
 
   //scroll到最上面

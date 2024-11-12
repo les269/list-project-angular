@@ -42,8 +42,25 @@
       <input
         type="text"
         class="form-control"
+        [matAutocomplete]="auto"
         [(ngModel)]="searchValue"
         (keydown.enter)="searchChange()" />
+      <mat-autocomplete #auto="matAutocomplete">
+        @for (option of filterAutoCompleteList(); track option) {
+          <mat-option [value]="option">{{ option }}</mat-option>
+        }
+      </mat-autocomplete>
+      <button
+        mat-icon-button
+        class="d-flex"
+        [matTooltip]="'g.popupSelect' | translate"
+        (click)="selectMultipleValue()">
+        <mat-icon class="material-icons-outlined"
+          ><span class="material-symbols-outlined">
+            select_window_2
+          </span></mat-icon
+        >
+      </button>
       <button
         mat-icon-button
         class="d-flex"

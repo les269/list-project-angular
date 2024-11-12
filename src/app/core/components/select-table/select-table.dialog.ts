@@ -47,8 +47,6 @@ export interface BaseSelectTableData<O> {
     FormsModule,
     MatButtonModule,
     MatDialogActions,
-    MatDialogClose,
-    MatDialogTitle,
     MatDialogContent,
     TranslateModule,
     CommonModule,

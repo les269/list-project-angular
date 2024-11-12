@@ -3,7 +3,7 @@
 ## 描述
 
 這是一個來顯示清單的系統，需要配置清單主題、資料欄位、資料集，可以配置自定義設定來執行一些功能。
-需搭配後端 https://github.com/les269/listProjectBackend
+需搭配後端 [List Project Backend](https://github.com/les269/listProjectBackend)
 
 ## 目錄
 
@@ -55,12 +55,14 @@
 
 ## 新功能
 
-| 順序 | 新功能                                                          | 進度    | 備註 |
-| ---- | --------------------------------------------------------------- | ------- | ---- |
-| 10   | 可以import export各清單成json檔案 (優先度最低)                  | pending |      |
-| 12   | 可以在網址上給json網址然後檢查config然後顯示成清單 (優先度最低) | pending |      |
-| 14   | 是否可以讓angular跟spring包成一個執行檔案 (優先度最低)          | pending |      |
-| 15   | 爬蟲,資料集群組,清單設定處理日期格式 (優先度最低)               | pending |      |
-| 21   | 清單搜尋可以根據label勾選來配置autocomplete                     | doing   |      |
+| 新功能                                                          | 進度    | 備註 |
+| --------------------------------------------------------------- | ------- | ---- |
+| 可以import export各清單成json檔案 (優先度最低)                  | pending |      |
+| 可以在網址上給json網址然後檢查config然後顯示成清單 (優先度最低) | pending |      |
+| 是否可以讓angular跟spring包成一個執行檔案 (優先度最低)          | pending |      |
+| 爬蟲,資料集群組,清單設定處理日期格式 (優先度最低)               | pending |      |
+| 清單搜尋可以根據label勾選來配置autocomplete                     | done    |      |
+| 檔案或資料夾存在與否影響自定義是否可以使用或在前端可以得知      | doing   |      |
+| 刷新資料集前呼叫API                                             | doing   |      |
 
 聯繫我(replay) : 6x8sckva7@mozmail.com
