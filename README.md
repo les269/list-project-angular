@@ -55,15 +55,14 @@
 
 ## 新功能
 
-| 新功能                                                          | 進度    | 備註 |
-| --------------------------------------------------------------- | ------- | ---- |
-| 可以import export各清單成json檔案 (優先度最低)                  | pending |      |
-| 可以在網址上給json網址然後檢查config然後顯示成清單 (優先度最低) | pending |      |
-| 是否可以讓angular跟spring包成一個執行檔案 (優先度最低)          | pending |      |
-| 爬蟲,資料集群組,清單設定處理日期格式 (優先度最低)               | pending |      |
-| 清單搜尋可以根據label勾選來配置autocomplete                     | done    |      |
-| 檔案或資料夾存在與否影響自定義是否可以使用或在前端可以得知      | doing   |      |
-| 刷新資料集前呼叫API                                             | doing   |      |
-| label 可使用替換表,需使用store                                  | pending |      |
+| 新功能                                                     | 進度    | 備註 |
+| ---------------------------------------------------------- | ------- | ---- |
+| 可以import export各清單成json檔案 (優先度最低)             | pending |      |
+| 是否可以讓angular跟spring包成一個執行檔案 (優先度最低)     | pending |      |
+| 爬蟲,資料集群組,清單設定處理日期格式 (優先度最低)          | pending |      |
+| 清單搜尋可以根據label勾選來配置autocomplete                | done    |      |
+| 檔案或資料夾存在與否影響自定義是否可以使用或在前端可以得知 | doing   |      |
+| 刷新資料集前呼叫API                                        | doing   |      |
+| label 可使用替換表, 多一個store存替換表                    | pending |      |
 
 聯繫我(replay) : 6x8sckva7@mozmail.com

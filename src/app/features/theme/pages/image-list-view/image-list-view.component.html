@@ -175,24 +175,17 @@
       (mouseleave)="hoveredIndex = null">
       <div class="card-body">
         <div class="img-content">
-          @switch (themeImage.type) {
-            @case ('key') {
-              <img
-                alt=""
-                [ngSrc]="
-                  webApi + '/proxy-image?url=' + data[themeImage.imageKey]
-                "
-                fill
-                priority="{{ i === 0 }}" />
-            }
-            @case ('url') {
-              <img
-                alt=""
-                [ngSrc]="themeImage.imageUrl | replaceValue: data"
-                fill
-                priority="{{ i === 0 }}" />
-            }
-          }
+          <img
+            alt=""
+            [ngSrc]="getImageUrl(data, themeImage)"
+            fill
+            [priority]="i === 0"
+            (mouseout)="fixedImage.hidden()"
+            (mouseover)="delayViewImg($event, getImageUrl(data, themeImage))"
+            (click)="
+              fixedImage.visible();
+              fixedImagePath = getImageUrl(data, themeImage)
+            " />
         </div>
         <div class="detail-content">
           <div class="edit-button">
@@ -257,3 +250,6 @@
 </ng-template>
 
 <app-scrollTop></app-scrollTop>
+<app-fixed-image
+  #fixedImage
+  [fixedImagePath]="fixedImagePath"></app-fixed-image>

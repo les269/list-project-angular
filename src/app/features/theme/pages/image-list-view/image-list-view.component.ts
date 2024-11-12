@@ -1,15 +1,26 @@
-import { Component, Injector } from '@angular/core';
-import { debounceTime } from 'rxjs';
+import { Component, Injector, OnDestroy, ViewChild } from '@angular/core';
+import {
+  debounceTime,
+  fromEvent,
+  Subject,
+  switchMap,
+  take,
+  takeUntil,
+  timer,
+} from 'rxjs';
 import {
   dynamicSort,
   getRandomInt,
   isNotBlank,
   isNumber,
+  replaceValue,
 } from '../../../../shared/util/helper';
 import {
   SortType,
   ThemeCustomValueResponse,
   ThemeHeaderType,
+  ThemeImage,
+  ThemeImageType,
 } from '../../models';
 import { NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
@@ -24,6 +35,7 @@ import { CustomButtonsComponent } from '../../components/custom-buttons/custom-b
 import { ListBaseViewComponent } from '../../components/list-base-view.component';
 import { TopCustomButtonsComponent } from '../../components/top-custom-buttons/top-custom-buttons.component';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { FixedImageComponent } from '../../../../core/components/fixed-image/fixed-image.component';
 
 @Component({
   standalone: true,
@@ -42,12 +54,16 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
     TopCustomButtonsComponent,
     MatAutocompleteModule,
     NgTemplateOutlet,
+    FixedImageComponent,
   ],
   selector: 'app-image-list-view',
   templateUrl: 'image-list-view.component.html',
   styleUrl: 'image-list-view.component.scss',
 })
-export class ImageListViewComponent extends ListBaseViewComponent {
+export class ImageListViewComponent
+  extends ListBaseViewComponent
+  implements OnDestroy
+{
   override themeHeaderType: ThemeHeaderType = ThemeHeaderType.imageList;
   hoveredIndex: number | null = null;
   pages: number[] = [];
@@ -57,8 +73,13 @@ export class ImageListViewComponent extends ListBaseViewComponent {
   sortAsc: boolean = true;
   filterData: any;
   viewData: any;
+  fixedImagePath = '';
 
   customValueMap: ThemeCustomValueResponse = {};
+
+  replaceImageUrl = replaceValue;
+
+  @ViewChild('fixedImage') fixedImage!: FixedImageComponent;
 
   constructor(injector: Injector) {
     super(injector);
@@ -331,5 +352,33 @@ export class ImageListViewComponent extends ListBaseViewComponent {
   //scroll到最上面
   toTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  delayViewImg(event: MouseEvent, path: string) {
+    const img = event.target as HTMLImageElement;
+    this.fixedImagePath = path;
+    // 當滑鼠移出圖片時取消顯示計時
+    const mouseOut$ = fromEvent(img, 'mouseout');
+    timer(1000)
+      .pipe(takeUntil(mouseOut$))
+      .subscribe(() => {
+        this.fixedImage.visible();
+      });
+  }
+
+  getImageUrl(data: any, themeImage: ThemeImage) {
+    let url = '';
+    switch (themeImage.type) {
+      case 'key':
+        url = this.webApi + '/proxy-image?url=' + data[themeImage.imageKey];
+        break;
+      case 'url':
+        url =
+          this.webApi +
+          '/proxy-image?url=' +
+          this.replaceImageUrl(themeImage.imageUrl, data);
+        break;
+    }
+    return url;
   }
 }

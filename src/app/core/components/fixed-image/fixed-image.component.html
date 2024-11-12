@@ -1,0 +1,8 @@
+<div
+  #fixedImage
+  class="fixedImage"
+  (mouseout)="fixedImage.style.visibility = 'hidden'"
+  (mouseover)="fixedImage.style.visibility = 'visible'"
+  (click)="fixedImage.style.visibility = 'hidden'">
+  <img alt="" [ngSrc]="fixedImagePath" />
+</div>
