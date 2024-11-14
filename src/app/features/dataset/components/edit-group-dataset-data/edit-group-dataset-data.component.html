@@ -34,6 +34,12 @@
       (click)="searchByPrimeValue()">
       {{ 'g.search' | translate }}
     </button>
+    <button
+      class="btn btn-outline-secondary"
+      type="button"
+      (click)="deleteByPrimeValue()">
+      {{ 'g.delete' | translate }}
+    </button>
   </div>
   @if (groupDatasetConfig && groupDatasetConfig.imageSaveFolder) {
     <div class="input-group mb-2">

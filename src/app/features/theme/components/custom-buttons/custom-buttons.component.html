@@ -108,6 +108,26 @@
           </button>
         </div>
       }
+      @case ('deleteFile') {
+        <div class="custom-button-group">
+          <button
+            class="custom-button"
+            (click)="deleteFile(data, custom)"
+            [disabled]="!fileExist[data[defaultKey]]">
+            <label class="px-2">{{ custom.label }}</label>
+          </button>
+        </div>
+      }
+      @case ('moveTo') {
+        <div class="custom-button-group">
+          <button
+            class="custom-button"
+            (click)="moveTo(data, custom)"
+            [disabled]="!fileExist[data[defaultKey]]">
+            <label class="px-2">{{ custom.label }}</label>
+          </button>
+        </div>
+      }
     }
   }
 </div>

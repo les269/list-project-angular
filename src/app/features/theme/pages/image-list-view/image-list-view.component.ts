@@ -96,6 +96,7 @@ export class ImageListViewComponent
     this.updateViewData();
     this.getCustomValueMap();
     this.changeQueryParams(); //初始化query params
+    this.getFileExist();
     // 監聽query params的變化
     this.routeEventsSub = this.router.events
       .pipe(debounceTime(100))
@@ -108,6 +109,7 @@ export class ImageListViewComponent
         this.changeTag();
         this.updateViewData();
         this.getCustomValueMap();
+        this.getFileExist();
       });
   }
 

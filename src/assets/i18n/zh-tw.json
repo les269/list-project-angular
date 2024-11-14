@@ -16,6 +16,7 @@
     "sureDeleteScrapy": "是否要刪除該爬蟲?",
     "sureDeleteDataset": "是否要刪除該資料集?",
     "sureDeleteImage": "是否要刪除該圖片'{{name}}'?",
+    "sureDeleteDatasetData": "是否要刪除該資料'{{name}}'?",
     "copyText": "以複製至剪貼簿: {{text}}",
     "duplicateColumn": "{{text}} 不可以有重複欄位",
     "apiExist": "API已經存在,在API名稱跟API標籤不可以重複",
@@ -28,7 +29,11 @@
     "deleteImageFail": "圖片未刪除",
     "deleteImageSuccess": "成功刪除圖片 {{path}}",
     "lengthError": "'{{label}}'長度輸入錯誤",
-    "dataNotExist": "該資料不存在"
+    "dataNotExist": "該資料不存在",
+    "deleteFileSuccess": "刪除檔案成功",
+    "deleteFail": "刪除檔案失敗",
+    "moveToFileSuccess": "移動檔案成功",
+    "moveToFileFail": "移動檔案失敗"
   },
   "g": {
     "edit": "編輯",
@@ -167,7 +172,12 @@
     "buttonInputUrl": "輸入自定義開啟網址",
     "labelName": "標籤名稱",
     "apiConfig": "呼叫API",
-    "showCustomButton": "顯示自定義按鈕"
+    "showCustomButton": "顯示自定義按鈕",
+    "deleteFile": "刪除檔案",
+    "deleteFilePH": "刪除檔案設定 ex: C:\\file\\${fileName} ${fileName}=>id是指data的fileName",
+    "filePathForMoveToPH": "要移動的檔案路徑 ex: C:\\file\\${fileName} ${fileName}=>id是指data的fileName",
+    "moveTo": "移動檔案",
+    "moveToPH": "移動到的資料夾 ex: C:\\file\\${name} ${name}=>id是指data的name"
   },
   "themeTopCustom": {
     "duplicateData": "顯示重複資料",
@@ -186,7 +196,9 @@
     "listPageSize": "圖片清單每頁預設顯示數量",
     "headerButtons": "頭部按鈕設定",
     "defaultColor": "重設為預設顏色",
-    "listPageSizeMoreZero": "圖片清單每頁預設顯示數量要大於0"
+    "listPageSizeMoreZero": "圖片清單每頁預設顯示數量要大於0",
+    "checkFileExist": "檢查檔案是否存在",
+    "checkFileExistPH": "ex: C:\\file\\${fileName} ${fileName}=>id是指data的fileName"
   },
   "themeTag": {
     "title": "標籤設定",

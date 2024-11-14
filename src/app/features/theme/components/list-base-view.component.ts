@@ -1,7 +1,7 @@
 import { Component, Injector, OnDestroy, OnInit } from '@angular/core';
 import { debounceTime, filter, Subscription, switchMap, tap } from 'rxjs';
 import { updateTitle } from '../../../shared/state/layout.actions';
-import { isBlank, isNotBlank } from '../../../shared/util/helper';
+import { isBlank, isNotBlank, replaceValue } from '../../../shared/util/helper';
 import {
   ThemeHeader,
   ThemeImage,
@@ -28,6 +28,7 @@ import { SelectTableService } from '../../../core/services/select-table.service'
 import { TranslateService } from '@ngx-translate/core';
 import { SnackbarService } from '../../../core/services/snackbar.service';
 import { api } from '../../../../environments/environments';
+import { FileService } from '../../../core/services/file.service';
 
 @Component({
   standalone: true,
@@ -62,6 +63,7 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
   useData: any;
   topCustomValueMap: ThemeTopCustomValueResponse = {};
   autoCompleteList: string[] = [];
+  fileExist: { [key in string]: boolean } = {};
 
   seqKey = '';
   defaultKey: string = '';
@@ -86,6 +88,7 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
   selectTableService: SelectTableService;
   translateService: TranslateService;
   snackbarService: SnackbarService;
+  fileService: FileService;
   constructor(protected injector: Injector) {
     this.themeService = this.injector.get(ThemeService);
     this.router = this.injector.get(Router);
@@ -97,6 +100,7 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
     this.selectTableService = this.injector.get(SelectTableService);
     this.translateService = this.injector.get(TranslateService);
     this.snackbarService = this.injector.get(SnackbarService);
+    this.fileService = this.injector.get(FileService);
   }
 
   ngOnInit() {
@@ -363,6 +367,19 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
         this.searchValue = res.map(x => x.value);
         this.searchChange();
       });
+  }
+
+  getFileExist() {
+    const { checkFileExist } = this.themeOtherSetting;
+    if (isNotBlank(checkFileExist) && isNotBlank(this.defaultKey)) {
+      const req = this.useData.map((x: any) => ({
+        path: replaceValue(checkFileExist, x),
+        name: x[this.defaultKey],
+      }));
+      this.fileService.fileExist(req).subscribe(x => {
+        this.fileExist = x;
+      });
+    }
   }
 
   initData() {

@@ -24,6 +24,15 @@
       class="form-control"
       [(ngModel)]="themeOtherSetting.listPageSize" />
   </div>
+  <div class="mb-3">
+    <label class="form-label">{{
+      'otherSetting.checkFileExist' | translate
+    }}</label>
+    <input
+      class="form-control"
+      [placeholder]="'otherSetting.checkFileExistPH' | translate"
+      [(ngModel)]="themeOtherSetting.checkFileExist" />
+  </div>
 }
 <label class="h3">{{ 'title.topCustom' | translate }}</label>
 <app-theme-top-custom-table

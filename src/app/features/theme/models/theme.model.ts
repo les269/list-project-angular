@@ -19,6 +19,7 @@ export interface ThemeOtherSetting {
   listPageSize: number;
   showDuplicate: boolean;
   themeTopCustomList: ThemeTopCustom[];
+  checkFileExist: string;
 }
 export interface ThemeHeaderCopy {
   name: string;
@@ -99,6 +100,9 @@ export interface ThemeCustom {
   buttonIconTrue: string;
   buttonIconFalse: string;
   apiConfig?: ApiConfig;
+  moveTo: string;
+  filePathForMoveTo: string;
+  deleteFile: string;
 }
 
 export enum ThemeCustomType {
@@ -111,6 +115,8 @@ export enum ThemeCustomType {
   buttonIconFill = 'buttonIconFill',
   buttonInputUrl = 'buttonInputUrl',
   apiConfig = 'apiConfig',
+  deleteFile = 'deleteFile',
+  moveTo = 'moveTo',
 }
 
 export interface ThemeTopCustom {

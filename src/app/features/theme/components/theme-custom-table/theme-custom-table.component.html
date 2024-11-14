@@ -181,6 +181,24 @@
                 </button>
               </div>
             }
+            @case ('deleteFile') {
+              <input
+                class="form-control mt-1"
+                [placeholder]="'themeCustom.deleteFilePH' | translate"
+                [(ngModel)]="element.deleteFile" />
+            }
+            @case ('moveTo') {
+              <div class="d-flex input-group">
+                <input
+                  class="form-control"
+                  [placeholder]="'themeCustom.filePathForMoveToPH' | translate"
+                  [(ngModel)]="element.filePathForMoveTo" />
+                <input
+                  class="form-control"
+                  [placeholder]="'themeCustom.moveToPH' | translate"
+                  [(ngModel)]="element.moveTo" />
+              </div>
+            }
           }
         </div>
       </td>

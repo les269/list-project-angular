@@ -1,4 +1,4 @@
-@if (array.length > 0) {
+@if (array && array.length > 0) {
   @if (themeLabel.isSearchButton) {
     <div class="text-links">
       @for (text of sortArrayText(array); track $index; let isLast = $last) {

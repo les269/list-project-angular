@@ -48,6 +48,7 @@ export interface BaseSelectTableData<O> {
     MatButtonModule,
     MatDialogActions,
     MatDialogContent,
+    MatDialogTitle,
     TranslateModule,
     CommonModule,
     MatCheckboxModule,

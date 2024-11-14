@@ -69,6 +69,9 @@ export class ThemeCustomTableComponent implements OnInit {
       buttonIconFalse: '',
       apiName: '',
       apiConfig: undefined,
+      moveTo: '',
+      filePathForMoveTo: '',
+      deleteFile: '',
     };
     this.themeCustomList = [...this.themeCustomList, element].map((x, i) => {
       x.seq = i + 1;

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import {
@@ -8,6 +8,7 @@ import {
 } from '../../models';
 import {
   isBlank,
+  isNotBlank,
   isNotNull,
   isNull,
   replaceValue,
@@ -18,6 +19,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { ThemeNoteComponent } from '../theme-note/theme-note.component';
 import { ApiConfigService } from '../../../api-config/service/api-config.service';
 import { CopyDirective } from '../../../../shared/util/util.directive';
+import { FileService } from '../../../../core/services/file.service';
+import { SnackbarService } from '../../../../core/services/snackbar.service';
 
 @Component({
   selector: 'app-custom-buttons',
@@ -32,12 +35,15 @@ export class CustomButtonsComponent {
   @Input({ required: true }) headerId: string = '';
   @Input({ required: true }) defaultKey: string = '';
   @Input({ required: true }) customValueMap: ThemeCustomValueResponse = {};
+  @Input({ required: true }) fileExist: { [key in string]: boolean } = {};
   replaceValue = replaceValue;
 
   constructor(
     private themeService: ThemeService,
     private matDialog: MatDialog,
-    private apiConfigService: ApiConfigService
+    private apiConfigService: ApiConfigService,
+    private fileService: FileService,
+    private snackbarService: SnackbarService
   ) {}
 
   /**
@@ -167,6 +173,35 @@ export class CustomButtonsComponent {
   callApi(data: any, custom: ThemeCustom) {
     if (custom.apiConfig) {
       this.apiConfigService.callSingleApi(custom.apiConfig, data);
+    }
+  }
+
+  deleteFile(data: any, custom: ThemeCustom) {
+    if (isNotBlank(custom.deleteFile)) {
+      this.fileService
+        .delete({ path: replaceValue(custom.deleteFile, data) })
+        .subscribe(x => {
+          this.fileExist[this.data[this.defaultKey]] = !x;
+          this.snackbarService.openByI18N(
+            x ? 'msg.deleteFileSuccess' : 'msg.deleteFail'
+          );
+        });
+    }
+  }
+
+  moveTo(data: any, custom: ThemeCustom) {
+    if (isNotBlank(custom.moveTo) && isNotBlank(custom.filePathForMoveTo)) {
+      this.fileService
+        .moveTo({
+          path: replaceValue(custom.filePathForMoveTo, data),
+          moveTo: replaceValue(custom.moveTo, data),
+        })
+        .subscribe(x => {
+          this.fileExist[this.data[this.defaultKey]] = !x;
+          this.snackbarService.openByI18N(
+            x ? 'msg.moveToFileSuccess' : 'msg.moveToFileFail'
+          );
+        });
     }
   }
 }

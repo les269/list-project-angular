@@ -113,6 +113,37 @@ export class EditGroupDatasetDataComponent implements OnInit {
       });
   }
 
+  deleteByPrimeValue() {
+    if (isBlank(this.primeValue)) {
+      this.snackbarService.isBlankMessage('dataset.primeValue');
+      return;
+    }
+    this.messageBoxService
+      .openI18N('msg.sureDeleteDatasetData', {
+        name: this.primeValue,
+      })
+      .pipe(
+        filter(x => x),
+        switchMap(x =>
+          this.groupDatasetDataService.existGroupDatasetData(
+            this.groupName,
+            this.primeValue
+          )
+        ),
+        filter(x => x),
+        switchMap(x =>
+          this.groupDatasetDataService.deleteGroupDatasetData(
+            this.groupName,
+            this.primeValue
+          )
+        )
+      )
+      .subscribe(() => {
+        this.primeValue = '';
+        this.clearField();
+      });
+  }
+
   getScrapyList() {
     var nameList = this.groupDatasetConfig.groupDatasetScrapyList
       .filter(x => x.visibleJson)

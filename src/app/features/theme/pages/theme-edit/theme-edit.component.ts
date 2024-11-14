@@ -73,6 +73,7 @@ export class ThemeEditComponent implements OnInit {
       listPageSize: 30,
       themeTopCustomList: [],
       showDuplicate: false,
+      checkFileExist: '',
     },
   };
   eThemeHeaderType = ThemeHeaderType;
