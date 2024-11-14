@@ -15,6 +15,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { SnackbarService } from '../../../core/services/snackbar.service';
 import { isBlank, isNotJson, jsonFormat } from '../../../shared/util/helper';
 import { ApiConfigService } from '../service/api-config.service';
+import { languages } from '@codemirror/language-data';
+import { CodeEditor } from '@acrodata/code-editor';
 
 export interface ApiConfigDialogData {
   value: ApiConfig;
@@ -28,11 +30,11 @@ export interface ApiConfigDialogData {
     FormsModule,
     MatButtonModule,
     MatDialogActions,
-    MatDialogClose,
     MatDialogTitle,
     MatDialogContent,
     TranslateModule,
     CommonModule,
+    CodeEditor,
   ],
   selector: 'app-api-config-dialog',
   templateUrl: 'api-config.dialog.html',
@@ -44,6 +46,7 @@ export class ApiConfigDialog {
   list = this.data.list;
   type = this.data.type;
   eHttpMethodType = HttpMethodType;
+  languages = languages;
 
   constructor(
     private snackbarService: SnackbarService,

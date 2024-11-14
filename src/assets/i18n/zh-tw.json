@@ -296,6 +296,7 @@
     "path": "資料路徑",
     "fileName": "檔案全名",
     "fixedString": "固定字串",
+    "fixedStringPH": "固定字串 ex:${dataName}",
     "fileSize": "檔案大小",
     "editGroupData": "編輯群組所屬資料",
     "createDatasetGroup": "創建資料集群組",
@@ -304,7 +305,8 @@
     "scrapyJsonLabel": "{{label}}字串欄位",
     "getDataType": "資料獲取方式",
     "api": "API",
-    "scrapy": "爬蟲"
+    "scrapy": "爬蟲",
+    "replaceValueMap": "選擇替換表"
   },
   "replaceValueMap": {
     "searchName": "搜尋名稱",

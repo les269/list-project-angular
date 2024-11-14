@@ -80,14 +80,30 @@
         *matCellDef="let element; let i = dataIndex"
         [attr.colspan]="displayedColumns.length">
         <div class="d-flex flex-column">
-          @if (element.type === 'fixedString') {
-            <div class="d-flex input-group my-1 align-items-center">
+          <div class="d-flex input-group my-1 align-items-center">
+            <label class="input-group-text">{{
+              'dataset.replaceValueMap' | translate
+            }}</label>
+            @if (element.replaceValueMapName) {
               <label class="input-group-text">{{
-                'dataset.fixedString' | translate
+                element.replaceValueMapName
               }}</label>
-              <input class="form-control" [(ngModel)]="element.fixedString" />
-            </div>
-          }
+              <button
+                class="btn btn-outline-primary d-flex"
+                (click)="element.replaceValueMapName = ''">
+                <mat-icon>cancel</mat-icon>
+              </button>
+            }
+            <button
+              class="btn btn-outline-primary d-flex"
+              (click)="selectReplaceValueMap(element)">
+              <mat-icon class="material-icons-outlined"
+                ><span class="material-symbols-outlined">
+                  select_window_2
+                </span></mat-icon
+              >
+            </button>
+          </div>
         </div>
       </td>
     </ng-container>

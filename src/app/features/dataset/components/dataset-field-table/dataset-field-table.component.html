@@ -85,7 +85,10 @@
               <label class="input-group-text">{{
                 'dataset.fixedString' | translate
               }}</label>
-              <input class="form-control" [(ngModel)]="element.fixedString" />
+              <input
+                class="form-control"
+                [placeholder]="'dataset.fixedStringPH' | translate"
+                [(ngModel)]="element.fixedString" />
             </div>
           }
         </div>

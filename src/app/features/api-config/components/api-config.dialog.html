@@ -34,13 +34,13 @@
     </div>
     <div class="form-group mb-2">
       <label for="requestBody">{{'apiConfig.requestBody'|translate}}</label>
-      <textarea
-        class="form-control"
-        id="requestBody"
+
+      <code-editor
         name="requestBody"
-        [placeholder]="'apiConfig.requestBodyPH'|translate"
         [(ngModel)]="value.requestBody"
-        [rows]="5"></textarea>
+        [language]="'json'"
+        [indentWithTab]="true"
+        [languages]="languages" />
       <div class="d-flex justify-content-end">
         <button mat-button class="rounded" (click)="formatBody()">
           format

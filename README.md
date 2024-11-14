@@ -62,8 +62,9 @@
 | 爬蟲,資料集群組,清單設定處理日期格式 (優先度最低)          | pending |      |
 | 清單搜尋可以根據label勾選來配置autocomplete                | done    |      |
 | 檔案或資料夾存在與否影響自定義是否可以使用或在前端可以得知 | done    |      |
-| 刷新資料集前呼叫API                                        | doing   |      |
-| label 可使用替換表, 多一個store存替換表                    | pending |      |
+| 刷新資料集前呼叫API                                        | done    |      |
+| label 可使用替換表, 多一個store存替換表                    | cancel  |      |
+| 刷新資料集會針對舊資料進行替換表更新                       | done    |      |
 | 資料集可以用txt,csv讀檔以,分隔                             | pending |      |
 | 取代舊版正式使用 轉移舊版資料至新版                        | pending |      |
 
