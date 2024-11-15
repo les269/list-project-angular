@@ -65,7 +65,7 @@
 | 刷新資料集前呼叫API                                        | done    |      |
 | label 可使用替換表, 多一個store存替換表                    | cancel  |      |
 | 刷新資料集會針對舊資料進行替換表更新                       | done    |      |
-| 資料集可以用txt,csv讀檔以,分隔                             | pending |      |
-| 取代舊版正式使用 轉移舊版資料至新版                        | pending |      |
+| 資料集可以用txt,csv讀檔以,分隔                             | done    |      |
+| 取代舊版正式使用 轉移舊版資料至新版                        | doing   |      |
 
 聯繫我(replay) : 6x8sckva7@mozmail.com

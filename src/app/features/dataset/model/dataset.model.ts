@@ -16,6 +16,7 @@ export interface DatasetConfig {
   fieldList: DatasetField[];
   autoImageDownload: boolean;
   imageByKey: string;
+  scrapyText: string;
 }
 
 export interface DatasetField {
@@ -44,4 +45,5 @@ export enum DatasetConfigType {
   file = 'file',
   folder = 'folder',
   all = 'all',
+  text = 'text',
 }

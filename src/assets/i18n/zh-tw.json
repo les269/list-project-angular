@@ -258,7 +258,7 @@
     "groupName": "資料集群組名稱",
     "groupNameDesc": "對應資料的群組, 變更該群組名稱會讓所擁有的檔案進行變更, 例如當群組名稱為'動畫'那就只會會取'動畫'裡面的資料, 當改成'電影'那資料就變更成'電影'。",
     "filterType": "資料集過濾方式",
-    "filterTypeDesc": "'全部獲取'會擁有資料集的來源的所有資料, '檔案'跟'資料夾'會使用名稱來過濾要使用的資料來源, 只會擁有對應名稱資料。",
+    "filterTypeDesc": "'全部獲取'會擁有資料集的來源的所有資料\n'檔案'跟'資料夾'會使用名稱來過濾要使用的資料來源, 只會擁有對應名稱資料\n'文字文本'每行文字使用','分隔跟csv相同可以直接匯入txt或csv,分隔第一個文字是鍵(key)",
     "file": "檔案名稱",
     "folder": "資料夾名稱",
     "all": "全部獲取",
@@ -306,7 +306,9 @@
     "getDataType": "資料獲取方式",
     "api": "API",
     "scrapy": "爬蟲",
-    "replaceValueMap": "選擇替換表"
+    "replaceValueMap": "選擇替換表",
+    "text": "文字文本",
+    "importCsvTxt": "匯入csv,txt檔案"
   },
   "replaceValueMap": {
     "searchName": "搜尋名稱",

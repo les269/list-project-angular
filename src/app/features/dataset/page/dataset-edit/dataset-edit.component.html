@@ -19,10 +19,31 @@
           {{ 'dataset.' + type.key | translate }}
         </option>
       </select>
-      <label class="form-text">{{
+      <label class="form-text" [style]="{ 'white-space': 'pre-wrap' }">{{
         'dataset.filterTypeDesc' | translate
       }}</label>
     </div>
+    @if (model.config.type === 'text') {
+      <div class="form-group mb-2">
+        <code-editor
+          [style.height]="'400px'"
+          [(ngModel)]="model.config.scrapyText"
+          [language]="'textile'"
+          [indentWithTab]="true"
+          [languages]="languages" />
+      </div>
+      <input
+        type="file"
+        accept=".csv,.txt"
+        (change)="importCsvTxt($event)"
+        hidden
+        #fileInput />
+      <button
+        class="btn btn-outline-secondary d-flex"
+        (click)="fileInput.click()">
+        {{ 'dataset.importCsvTxt' | translate }}
+      </button>
+    }
     <div class="form-group mb-2">
       <label class="form-label require">{{
         'dataset.groupName' | translate

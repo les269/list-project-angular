@@ -6,31 +6,18 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { DatasetService } from '../../service/dataset.service';
 import { debounceTime, EMPTY, filter, switchMap } from 'rxjs';
 import { isBlank, isNotBlank } from '../../../../shared/util/helper';
-import { CodeEditor } from '@acrodata/code-editor';
+import { CodeEditor, CodeEditorModule } from '@acrodata/code-editor';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import {
-  MatDialogActions,
-  MatDialogClose,
-  MatDialogTitle,
-  MatDialogContent,
-} from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import {
-  Dataset,
-  DatasetConfigType,
-  DatasetField,
-  DatasetFieldType,
-  GroupDataset,
-} from '../../model';
+import { Dataset, DatasetConfigType, GroupDataset } from '../../model';
 import { DatasetFieldTableComponent } from '../../components/dataset-field-table/dataset-field-table.component';
 import { MatChipsModule } from '@angular/material/chips';
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import { GroupDatasetService } from '../../service/group-dataset.service';
+import { languages } from '@codemirror/language-data';
 
 @Component({
   selector: 'app-dataset-edit',
@@ -46,6 +33,7 @@ import { GroupDatasetService } from '../../service/group-dataset.service';
     MatCheckboxModule,
     DatasetFieldTableComponent,
     MatChipsModule,
+    CodeEditorModule,
   ],
   templateUrl: './dataset-edit.component.html',
 })
@@ -64,10 +52,12 @@ export class DatasetEditComponent implements OnInit {
       fieldList: [],
       autoImageDownload: false,
       imageByKey: '',
+      scrapyText: '',
     },
   };
   eDatasetConfigType = DatasetConfigType;
   groupDatasetList: GroupDataset[] = [];
+  languages = languages;
 
   constructor(
     private router: Router,
@@ -192,5 +182,29 @@ export class DatasetEditComponent implements OnInit {
           this.model.config.groupName = res.groupName;
         }
       });
+  }
+
+  importCsvTxt(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      this.readJsonFile(file);
+      input.value = '';
+    }
+  }
+
+  readJsonFile(file: File): void {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        this.model.config.scrapyText = reader.result as string;
+      } catch (error) {
+        console.error('Invalid JSON file', error);
+      }
+    };
+    reader.onerror = () => {
+      console.error('Error reading file');
+    };
+    reader.readAsText(file);
   }
 }
