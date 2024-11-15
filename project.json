@@ -16,9 +16,7 @@
         "outputPath": "dist/list-project-angular",
         "index": "src/index.html",
         "browser": "src/main.ts",
-        "polyfills": [
-          "zone.js"
-        ],
+        "polyfills": ["zone.js"],
         "tsConfig": "tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": [
@@ -48,7 +46,13 @@
               "maximumError": "4kB"
             }
           ],
-          "outputHashing": "all"
+          "outputHashing": "all",
+          "fileReplacements": [
+            {
+              "replace": "src/environments/environment.ts",
+              "with": "src/environments/environment.prod.ts"
+            }
+          ]
         },
         "development": {
           "optimization": false,
@@ -57,6 +61,14 @@
         }
       },
       "defaultConfiguration": "production"
+    },
+    "post-build": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "command": "node move-files.ts",
+        "source": "dist/list-project-angular/browser",
+        "destination": "C:/code/nginx/html/list-project-angular"
+      }
     },
     "serve": {
       "executor": "@angular-devkit/build-angular:dev-server",
@@ -76,10 +88,7 @@
     "test": {
       "executor": "@angular-devkit/build-angular:karma",
       "options": {
-        "polyfills": [
-          "zone.js",
-          "zone.js/testing"
-        ],
+        "polyfills": ["zone.js", "zone.js/testing"],
         "tsConfig": "tsconfig.spec.json",
         "inlineStyleLanguage": "scss",
         "assets": [
@@ -88,9 +97,7 @@
             "input": "public"
           }
         ],
-        "styles": [
-          "src/styles.scss"
-        ],
+        "styles": ["src/styles.scss"],
         "scripts": []
       }
     }

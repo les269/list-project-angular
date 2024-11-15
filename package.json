@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "nx serve",
     "build": "nx build",
+    "postbuild": "nx build list-project-angular && nx run list-project-angular:postbuild",
     "watch": "nx build --watch --configuration development",
     "test": "nx test"
   },
@@ -25,6 +26,7 @@
     "@ngrx/store": "^18.0.2",
     "@ngx-translate/core": "^15.0.0",
     "@ngx-translate/http-loader": "^8.0.0",
+    "@nrwl/devkit": "^19.8.4",
     "bootstrap": "^5.3.3",
     "ngx-editor": "^18.0.0",
     "rxjs": "~7.8.0",
@@ -40,6 +42,7 @@
     "@nx/angular": "^19.8.2",
     "@nx/workspace": "19.8.2",
     "@schematics/angular": "^18.2.4",
+    "@types/fs-extra": "^11.0.4",
     "@types/jasmine": "~5.1.0",
     "jasmine-core": "~5.2.0",
     "karma": "~6.4.0",
