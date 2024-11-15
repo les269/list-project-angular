@@ -1,14 +1,14 @@
 {
-  "$schema": "node_modules/nx/schemas/project-schema.json",
   "name": "list-project-angular",
+  "$schema": "node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
+  "sourceRoot": "src",
+  "prefix": "app",
   "generators": {
     "@schematics/angular:component": {
       "style": "scss"
     }
   },
-  "sourceRoot": "src",
-  "prefix": "app",
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:application",
@@ -16,7 +16,9 @@
         "outputPath": "dist/list-project-angular",
         "index": "src/index.html",
         "browser": "src/main.ts",
-        "polyfills": ["zone.js"],
+        "polyfills": [
+          "zone.js"
+        ],
         "tsConfig": "tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": [
@@ -63,9 +65,11 @@
       "defaultConfiguration": "production"
     },
     "post-build": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "nx:run-commands",
+      "outputs": [],
       "options": {
-        "command": "node move-files.ts",
+        "command": "node move-files.js",
+        "cwd": ".",
         "source": "dist/list-project-angular/browser",
         "destination": "C:/code/nginx/html/list-project-angular"
       }
@@ -88,7 +92,10 @@
     "test": {
       "executor": "@angular-devkit/build-angular:karma",
       "options": {
-        "polyfills": ["zone.js", "zone.js/testing"],
+        "polyfills": [
+          "zone.js",
+          "zone.js/testing"
+        ],
         "tsConfig": "tsconfig.spec.json",
         "inlineStyleLanguage": "scss",
         "assets": [
@@ -97,7 +104,9 @@
             "input": "public"
           }
         ],
-        "styles": ["src/styles.scss"],
+        "styles": [
+          "src/styles.scss"
+        ],
         "scripts": []
       }
     }
