@@ -29,6 +29,8 @@ import { ThemeLabelTableComponent } from '../../components/theme-label-table/the
 import { ThemeDatasetTableComponent } from '../../components/theme-dataset-table/theme-dataset-table.component';
 import { ThemeTagTableComponent } from '../../components/theme-tag-table/theme-tag-table.component';
 import { ThemeOtherSettingComponent } from '../../components/theme-other-setting/theme-other-setting.component';
+import { Store } from '@ngrx/store';
+import { updateList } from '../../../../shared/state/layout.actions';
 @Component({
   standalone: true,
   imports: [
@@ -84,7 +86,8 @@ export class ThemeEditComponent implements OnInit {
     private route: ActivatedRoute,
     private themeService: ThemeService,
     private snackbarService: SnackbarService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private store: Store
   ) {}
 
   ngOnInit() {
@@ -144,7 +147,22 @@ export class ThemeEditComponent implements OnInit {
         this.snackbarService.openByI18N(
           type === 'commit' ? 'msg.commitSuccess' : 'msg.saveSuccess'
         );
+        this.getList();
       });
+  }
+  getList() {
+    this.themeService.getAllTheme().subscribe(res => {
+      this.store.dispatch(
+        updateList({
+          [ThemeHeaderType.imageList]: res.filter(
+            x => x.type === ThemeHeaderType.imageList
+          ),
+          [ThemeHeaderType.table]: res.filter(
+            x => x.type === ThemeHeaderType.table
+          ),
+        })
+      );
+    });
   }
   //驗證資料正確
   validationModel(): boolean {
@@ -297,21 +315,9 @@ export class ThemeEditComponent implements OnInit {
             return false;
           }
           break;
-        case 'openUrlByKey':
-          if (isBlank(custom.openUrlByKey)) {
-            this.snackbarService.isBlankMessage('themeCustom.openUrlByKey');
-            return false;
-          }
-          break;
         case 'copyValue':
           if (isBlank(custom.copyValue)) {
             this.snackbarService.isBlankMessage('themeCustom.copyValue');
-            return false;
-          }
-          break;
-        case 'copyValueByKey':
-          if (isBlank(custom.copyValueByKey)) {
-            this.snackbarService.isBlankMessage('themeCustom.copyValueByKey');
             return false;
           }
           break;

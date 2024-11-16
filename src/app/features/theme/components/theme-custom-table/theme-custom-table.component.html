@@ -142,23 +142,21 @@
                 [placeholder]="'themeCustom.copyValuePH' | translate"
                 [(ngModel)]="element.copyValue" />
             }
-            @case ('copyValueByKey') {
-              <input
-                class="form-control mt-1"
-                [placeholder]="'themeCustom.copyValueByKeyPH' | translate"
-                [(ngModel)]="element.copyValueByKey" />
-            }
             @case ('openUrl') {
               <input
                 class="form-control mt-1"
                 [placeholder]="'themeCustom.openUrlPH' | translate"
                 [(ngModel)]="element.openUrl" />
-            }
-            @case ('openUrlByKey') {
-              <input
-                class="form-control mt-1"
-                [placeholder]="'themeCustom.openUrlByKeyPH' | translate"
-                [(ngModel)]="element.openUrlByKey" />
+              <select
+                [(ngModel)]="element.openWindowsTarget"
+                class="form-control"
+                style="min-width: 200px">
+                @for (type of eOpenWindowTargetType | keyvalue; track $index) {
+                  <option [value]="type.key">
+                    {{ 'themeCustom.' + type.key | translate }}
+                  </option>
+                }
+              </select>
             }
             @case ('apiConfig') {
               <div class="mt-1 d-flex flex-wrap gap-3 align-items-center">

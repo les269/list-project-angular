@@ -47,7 +47,12 @@
           @if (getCustomValue(data, custom) !== '') {
             <button
               class="custom-button custom-icon"
-              (click)="openNewPage(getCustomValue(data, custom))">
+              (click)="
+                openNewPage(
+                  getCustomValue(data, custom),
+                  custom.openWindowsTarget
+                )
+              ">
               <mat-icon>open_in_new</mat-icon>
             </button>
           }
@@ -62,25 +67,9 @@
           </button>
         </div>
       }
-      @case ('copyValueByKey') {
-        <div class="custom-button-group">
-          <button class="custom-button" [ngCopy]="data[custom.copyValueByKey]">
-            <label class="px-2">{{ custom.label }}</label>
-          </button>
-        </div>
-      }
       @case ('openUrl') {
         <div class="custom-button-group">
           <button class="custom-button" (click)="onOpenUrl(data, custom)">
-            <label class="px-2">{{ custom.label }}</label>
-          </button>
-        </div>
-      }
-      @case ('openUrlByKey') {
-        <div class="custom-button-group">
-          <button
-            class="custom-button"
-            (click)="openNewPage(data[custom.openUrlByKey])">
             <label class="px-2">{{ custom.label }}</label>
           </button>
         </div>

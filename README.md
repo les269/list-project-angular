@@ -68,5 +68,6 @@
 | 資料集可以用txt,csv讀檔以,分隔                             | done    |      |
 | 取代舊版正式使用 轉移舊版資料至新版                        | doing   |      |
 | 研究https 不會被瀏覽器認定不安全                           | pending |      |
+| 刷新中 如何呈現給前端                                      | pending |      |
 
 聯繫我(replay) : 6x8sckva7@mozmail.com

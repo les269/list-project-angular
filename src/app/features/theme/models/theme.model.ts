@@ -89,10 +89,8 @@ export interface ThemeCustom {
   apiName: string;
   //用於windows.open
   openUrl: string;
-  openUrlByKey: string;
   //複製對應data的資料
   copyValue: string;
-  copyValueByKey: string;
   //按鈕使用的icon false為填滿 true填滿
   buttonIconFill: string;
   buttonIconFillColor: string;
@@ -103,20 +101,26 @@ export interface ThemeCustom {
   moveTo: string;
   filePathForMoveTo: string;
   deleteFile: string;
+  openWindowsTarget: OpenWindowTargetType;
 }
 
 export enum ThemeCustomType {
   openUrl = 'openUrl',
-  openUrlByKey = 'openUrlByKey',
   writeNote = 'writeNote',
   copyValue = 'copyValue',
-  copyValueByKey = 'copyValueByKey',
   buttonIconBoolean = 'buttonIconBoolean',
   buttonIconFill = 'buttonIconFill',
   buttonInputUrl = 'buttonInputUrl',
   apiConfig = 'apiConfig',
   deleteFile = 'deleteFile',
   moveTo = 'moveTo',
+}
+
+export enum OpenWindowTargetType {
+  _self = '_self',
+  _blank = '_blank',
+  _parent = '_parent',
+  _top = '_top',
 }
 
 export interface ThemeTopCustom {

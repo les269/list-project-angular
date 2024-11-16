@@ -1,6 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
-import { ThemeCustom, ThemeCustomType } from '../../models';
+import {
+  OpenWindowTargetType,
+  ThemeCustom,
+  ThemeCustomType,
+} from '../../models';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
@@ -38,6 +42,7 @@ export class ThemeCustomTableComponent implements OnInit {
   @Output() themeCustomListChange = new EventEmitter<ThemeCustom[]>();
   displayedColumns = ['order', 'type', 'byKey', 'label', 'other'];
   eThemeCustomType = ThemeCustomType;
+  eOpenWindowTargetType = OpenWindowTargetType;
   apiConfigList: ApiConfig[] = [];
   constructor(
     private apiConfigService: ApiConfigService,
@@ -60,9 +65,7 @@ export class ThemeCustomTableComponent implements OnInit {
       label: '',
       type: ThemeCustomType.buttonIconBoolean,
       openUrl: '',
-      openUrlByKey: '',
       copyValue: '',
-      copyValueByKey: '',
       buttonIconFill: '',
       buttonIconFillColor: '#000',
       buttonIconTrue: '',
@@ -72,6 +75,7 @@ export class ThemeCustomTableComponent implements OnInit {
       moveTo: '',
       filePathForMoveTo: '',
       deleteFile: '',
+      openWindowsTarget: OpenWindowTargetType._self,
     };
     this.themeCustomList = [...this.themeCustomList, element].map((x, i) => {
       x.seq = i + 1;

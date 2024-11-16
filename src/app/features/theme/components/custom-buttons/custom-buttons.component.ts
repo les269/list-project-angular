@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import {
+  OpenWindowTargetType,
   ThemeCustom,
   ThemeCustomValue,
   ThemeCustomValueResponse,
@@ -144,12 +145,15 @@ export class CustomButtonsComponent {
     });
   }
 
-  openNewPage(text: string) {
-    window.open(text, '_blank');
+  openNewPage(text: string, target: OpenWindowTargetType) {
+    window.open(text, target);
   }
 
   onOpenUrl(data: any, custom: ThemeCustom) {
-    this.openNewPage(replaceValue(custom.openUrl, data));
+    this.openNewPage(
+      replaceValue(custom.openUrl, data),
+      custom.openWindowsTarget
+    );
   }
 
   openNoteDialog(data: any, custom: ThemeCustom, type: 'read' | 'write') {

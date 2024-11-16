@@ -177,7 +177,11 @@
     "deleteFilePH": "刪除檔案設定 ex: C:\\file\\${fileName} ${fileName}=>id是指data的fileName",
     "filePathForMoveToPH": "要移動的檔案路徑 ex: C:\\file\\${fileName} ${fileName}=>id是指data的fileName",
     "moveTo": "移動檔案",
-    "moveToPH": "移動到的資料夾 ex: C:\\file\\${name} ${name}=>id是指data的name"
+    "moveToPH": "移動到的資料夾 ex: C:\\file\\${name} ${name}=>id是指data的name",
+    "_self": "當前畫面開啟(_self)",
+    "_blank": "新開視窗(_blank)",
+    "_parent": "目前瀏覽環境的父級瀏覽上下文(_parent)",
+    "_top": "最頂級的瀏覽上下文(_top)"
   },
   "themeTopCustom": {
     "duplicateData": "顯示重複資料",
