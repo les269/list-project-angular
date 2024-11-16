@@ -27,7 +27,7 @@ import { GroupDatasetService } from '../../dataset/service/group-dataset.service
 import { SelectTableService } from '../../../core/services/select-table.service';
 import { TranslateService } from '@ngx-translate/core';
 import { SnackbarService } from '../../../core/services/snackbar.service';
-import { api } from '../../../../environments/environments';
+import { api } from '../../../../environments/environment';
 import { FileService } from '../../../core/services/file.service';
 
 @Component({
@@ -401,5 +401,5 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
     // This method is intentionally left blank for child classes to override.
   }
 
-  searchChange(text?: string) {}
+  searchChange(text?: string) { }
 }
