@@ -69,5 +69,7 @@
 | 取代舊版正式使用 轉移舊版資料至新版                        | doing   |      |
 | 研究https 不會被瀏覽器認定不安全                           | pending |      |
 | 刷新中 如何呈現給前端                                      | pending |      |
+| 網址爬蟲第一筆為獲取資料後要可以跳轉到別頁爬蟲             | pending |      |
+| 要固定備份sqlite 避免誤刪了config                          | pending |      |
 
 聯繫我(replay) : 6x8sckva7@mozmail.com
