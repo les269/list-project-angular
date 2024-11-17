@@ -91,13 +91,11 @@
           <input
             class="form-control"
             [(ngModel)]="scrapyInput[scrapy.name].url"
-            (keydown.enter)="
-              scrapyByUrl(scrapy.name, scrapyInput[scrapy.name].url)
-            " />
+            (keydown.enter)="scrapyByUrl(scrapy)" />
           <button
             class="btn btn-outline-secondary"
             type="button"
-            (click)="scrapyByUrl(scrapy.name, scrapyInput[scrapy.name].url)">
+            (click)="scrapyByUrl(scrapy)">
             {{ 'g.search' | translate }}
           </button>
         </div>

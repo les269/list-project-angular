@@ -72,6 +72,6 @@
 | 網址爬蟲第一筆為獲取資料後要可以跳轉到別頁爬蟲             | pending |      |
 | 要固定備份sqlite 避免誤刪了config                          | pending |      |
 | table增加拖曳功能                                          | pending |      |
-| select table限制單一頁顯示數量                             | pending |      |
+| select table限制顯示數量                                   | pending |      |
 
 聯繫我(replay) : 6x8sckva7@mozmail.com

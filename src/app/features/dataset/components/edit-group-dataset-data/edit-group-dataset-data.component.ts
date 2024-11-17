@@ -10,8 +10,12 @@ import {
 } from '@angular/material/dialog';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { TranslateModule } from '@ngx-translate/core';
-import { GroupDatasetConfig, GroupDatasetData } from '../../model';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import {
+  GroupDatasetConfig,
+  GroupDatasetData,
+  GroupDatasetScrapy,
+} from '../../model';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { GroupDatasetService } from '../../service/group-dataset.service';
 import { GroupDatasetDataService } from '../../service/group-dataset-data.service';
@@ -67,7 +71,8 @@ export class EditGroupDatasetDataComponent implements OnInit {
     private groupDatasetService: GroupDatasetService,
     private scrapyService: ScrapyService,
     private selectTableService: SelectTableService,
-    private messageBoxService: MessageBoxService
+    private messageBoxService: MessageBoxService,
+    private translateService: TranslateService
   ) {}
   ngOnInit(): void {
     this.groupDatasetService.getGroupDataset(this.groupName).subscribe(res => {
@@ -243,10 +248,23 @@ export class EditGroupDatasetDataComponent implements OnInit {
       });
   }
 
-  scrapyByUrl(scrapyName: string, url: string) {
-    this.scrapyService.scrapyByUrl({ scrapyName, url }).subscribe(res => {
-      this.json = res;
-    });
+  scrapyByUrl(scrapy: GroupDatasetScrapy) {
+    if (isBlank(this.scrapyInput[scrapy.name].url)) {
+      this.snackbarService.isBlankMessage(
+        this.translateService.instant('dataset.scrapyUrlLabel', {
+          label: scrapy.label,
+        })
+      );
+      return;
+    }
+    this.scrapyService
+      .scrapyByUrl({
+        scrapyName: scrapy.name,
+        url: this.scrapyInput[scrapy.name].url,
+      })
+      .subscribe(res => {
+        this.json = res;
+      });
   }
 
   scrapyByJson(scrapyName: string, json: string[]) {
