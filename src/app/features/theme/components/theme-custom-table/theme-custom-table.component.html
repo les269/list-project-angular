@@ -197,6 +197,12 @@
                   [(ngModel)]="element.moveTo" />
               </div>
             }
+            @case ('openFolder') {
+              <input
+                class="form-control mt-1"
+                [placeholder]="'themeCustom.openFolderPH' | translate"
+                [(ngModel)]="element.openFolder" />
+            }
           }
         </div>
       </td>

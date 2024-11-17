@@ -102,6 +102,7 @@ export interface ThemeCustom {
   filePathForMoveTo: string;
   deleteFile: string;
   openWindowsTarget: OpenWindowTargetType;
+  openFolder: string;
 }
 
 export enum ThemeCustomType {
@@ -114,6 +115,7 @@ export enum ThemeCustomType {
   apiConfig = 'apiConfig',
   deleteFile = 'deleteFile',
   moveTo = 'moveTo',
+  openFolder = 'openFolder',
 }
 
 export enum OpenWindowTargetType {

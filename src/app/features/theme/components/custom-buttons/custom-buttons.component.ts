@@ -208,4 +208,16 @@ export class CustomButtonsComponent {
         });
     }
   }
+
+  openFolder(data: any, custom: ThemeCustom) {
+    if (isNotBlank(custom.openFolder)) {
+      this.fileService
+        .openFolder({ path: replaceValue(custom.openFolder, data) })
+        .subscribe(x => {
+          this.snackbarService.openByI18N(
+            x ? 'msg.openFolderSuccess' : 'msg.openFolderFail'
+          );
+        });
+    }
+  }
 }

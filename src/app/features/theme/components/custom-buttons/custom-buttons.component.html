@@ -117,6 +117,16 @@
           </button>
         </div>
       }
+      @case ('openFolder') {
+        <div class="custom-button-group">
+          <button
+            class="custom-button"
+            (click)="openFolder(data, custom)"
+            [disabled]="!fileExist[data[defaultKey]]">
+            <label class="px-2">{{ custom.label }}</label>
+          </button>
+        </div>
+      }
     }
   }
 </div>

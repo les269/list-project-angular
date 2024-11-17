@@ -19,4 +19,7 @@ export class FileService {
       req
     );
   }
+  openFolder(req: FileRequest): Observable<boolean> {
+    return this.http.post<boolean>('/file/open-file', req);
+  }
 }

@@ -76,6 +76,7 @@ export class ThemeCustomTableComponent implements OnInit {
       filePathForMoveTo: '',
       deleteFile: '',
       openWindowsTarget: OpenWindowTargetType._self,
+      openFolder: '',
     };
     this.themeCustomList = [...this.themeCustomList, element].map((x, i) => {
       x.seq = i + 1;

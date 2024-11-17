@@ -50,7 +50,6 @@ export interface EditGroupDatasetDataType {
     MatFormFieldModule,
   ],
   templateUrl: './edit-group-dataset-data.component.html',
-  styleUrl: './edit-group-dataset-data.component.scss',
 })
 export class EditGroupDatasetDataComponent implements OnInit {
   readonly dialogRef = inject(MatDialogRef<EditGroupDatasetDataComponent>);
@@ -146,7 +145,7 @@ export class EditGroupDatasetDataComponent implements OnInit {
 
   getScrapyList() {
     var nameList = this.groupDatasetConfig.groupDatasetScrapyList
-      .filter(x => x.visibleJson)
+      .filter(x => x.visibleJson || x.visibleUrl)
       .map(x => x.name);
     if (nameList && nameList.length > 0) {
       this.scrapyService.getByNameList(nameList).subscribe(res => {
