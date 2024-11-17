@@ -36,6 +36,12 @@ export class GroupDatasetDataService {
     return this.http.post<void>(`${this.prefix}/update`, req);
   }
 
+  updateGroupDatasetDataList(
+    req: Partial<GroupDatasetData[]>
+  ): Observable<void> {
+    return this.http.post<void>(`${this.prefix}/update-list`, req);
+  }
+
   deleteGroupDatasetData(
     groupName: string,
     primeValue: string

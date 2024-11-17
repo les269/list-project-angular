@@ -4,7 +4,12 @@ import { ReplaceValueMapService } from '../../service/replace-value-map.service'
 import { ReplaceValueList, ReplaceValueMap } from '../../model';
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import { filter, switchMap } from 'rxjs';
-import { isBlank, isNotBlank, isNotNull } from '../../../../shared/util/helper';
+import {
+  downloadJsonFile,
+  isBlank,
+  isNotBlank,
+  isNotNull,
+} from '../../../../shared/util/helper';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -39,7 +44,6 @@ import { ScrollTopComponent } from '../../../../core/components/scroll-top/scrol
   ],
   providers: [{ provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl }],
   templateUrl: './replace-value-map.component.html',
-  styleUrl: './replace-value-map.component.scss',
 })
 export class ReplaceValueMapComponent implements AfterViewInit {
   searchName: string = '';
@@ -208,6 +212,25 @@ export class ReplaceValueMapComponent implements AfterViewInit {
 
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
+    }
+  }
+
+  export() {
+    if (isNotBlank(this.searchName) && this.dataSource.data.length > 0) {
+      downloadJsonFile(
+        JSON.stringify(
+          this.dataSource.data.reduce(
+            (a, b) => {
+              a[b.match] = b.replaceValue;
+              return a;
+            },
+            {} as { [key: string]: string }
+          ),
+          null,
+          2
+        ),
+        this.searchName
+      );
     }
   }
 }

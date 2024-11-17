@@ -98,19 +98,23 @@ export class ImageListViewComponent
     this.changeQueryParams(); //初始化query params
     this.getFileExist();
     // 監聽query params的變化
-    this.routeEventsSub = this.router.events
-      .pipe(debounceTime(100))
-      .subscribe(event => {
-        this.changeUrl();
-        this.changeDataset();
-        this.onSearch();
-        this.changePage();
-        this.onSort();
-        this.changeTag();
-        this.updateViewData();
-        this.getCustomValueMap();
-        this.getFileExist();
-      });
+    if (!this.routeEventsSub) {
+      this.routeEventsSub = this.router.events
+        .pipe(debounceTime(100))
+        .subscribe(event => {
+          console.log('router change');
+
+          this.changeUrl();
+          this.changeDataset();
+          this.onSearch();
+          this.changePage();
+          this.onSort();
+          this.changeTag();
+          this.updateViewData();
+          this.getCustomValueMap();
+          this.getFileExist();
+        });
+    }
   }
 
   //使用query param的資料來設定當前資料的來源,排序,頁數

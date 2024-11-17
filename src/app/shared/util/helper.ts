@@ -1,3 +1,12 @@
+import {
+  catchError,
+  fromEvent,
+  map,
+  Observable,
+  switchMap,
+  take,
+  throwError,
+} from 'rxjs';
 import { ThemeHeader, ThemeHeaderType } from '../../features/theme/models';
 
 //是否為空值
@@ -118,3 +127,24 @@ export const isValidWidth = (value: string) => {
 
 export const isNumber = (value: any) =>
   !isNaN(value) && !isNaN(parseFloat(value));
+
+export const downloadJsonFile = (jsonData: string, fileName: string) => {
+  const blob = new Blob([jsonData], { type: 'application/json' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  window.URL.revokeObjectURL(url);
+};
+
+export const readJsonFile = (reader: FileReader): Observable<Object> => {
+  return fromEvent(reader, 'load').pipe(
+    map(() => JSON.parse(reader.result as string)),
+    take(1),
+    catchError(error => {
+      console.error(error.message);
+      return throwError(() => error);
+    })
+  );
+};

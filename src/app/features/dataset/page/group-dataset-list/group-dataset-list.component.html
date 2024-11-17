@@ -54,6 +54,16 @@
             }
             <button
               mat-icon-button
+              [matTooltip]="'title.importExport' | translate"
+              (click)="onImportExport(element)">
+              <mat-icon
+                ><span class="material-symbols-outlined">
+                  file_export
+                </span></mat-icon
+              >
+            </button>
+            <button
+              mat-icon-button
               [matTooltip]="'dataset.editGroupData' | translate"
               (click)="onEditDatasetData(element)">
               <mat-icon>design_services</mat-icon>

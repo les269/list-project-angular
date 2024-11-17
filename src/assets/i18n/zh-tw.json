@@ -33,7 +33,10 @@
     "deleteFileSuccess": "刪除檔案成功",
     "deleteFail": "刪除檔案失敗",
     "moveToFileSuccess": "移動檔案成功",
-    "moveToFileFail": "移動檔案失敗"
+    "moveToFileFail": "移動檔案失敗",
+    "importSuccess": "匯入成功",
+    "importNum": "要匯入的筆數: {{number}}",
+    "importError": "匯入資料格式錯誤"
   },
   "g": {
     "edit": "編輯",
@@ -69,7 +72,12 @@
     "lastPage": "最後一頁",
     "noData": "無資料",
     "rangeLabel": "第 {{start}} - {{end}} 項，共 {{length}} 項",
-    "popupSelect": "視窗選擇"
+    "popupSelect": "視窗選擇",
+    "import": "匯入",
+    "export": "匯出",
+    "download": "下載",
+    "importJson": "匯入json檔案",
+    "importComplete": "匯入完整檔案"
   },
   "title": {
     "home": "清單列表",
@@ -93,7 +101,8 @@
     "groupDatasetEdit": "資料集群組設定",
     "groupDatasetDataEdit": "編輯群組資料",
     "replaceValueMap": "替換文字清單",
-    "topCustom": "頂部自定義功能"
+    "topCustom": "頂部自定義功能",
+    "importExport": "匯入匯出"
   },
   "home": { "createTheme": "創建主題" },
   "themeHeader": {
@@ -312,11 +321,12 @@
     "scrapy": "爬蟲",
     "replaceValueMap": "選擇替換表",
     "text": "文字文本",
-    "importCsvTxt": "匯入csv,txt檔案"
+    "importCsvTxt": "匯入csv,txt檔案",
+    "downloadOnlyJson": "下載僅Json",
+    "downloadComplete": "下載完整資料"
   },
   "replaceValueMap": {
     "searchName": "搜尋名稱",
-    "importJson": "匯入json檔案",
     "match": "被替換值",
     "replaceValue": "替換值",
     "add": "新增"

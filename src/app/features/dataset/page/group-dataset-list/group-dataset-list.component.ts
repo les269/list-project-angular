@@ -16,6 +16,7 @@ import { isNotBlank } from '../../../../shared/util/helper';
 import { CopyDatasetComponent } from '../../components/copy-dataset/copy-dataset.component';
 import { CopyGroupDatasetComponent } from '../../components/copy-group-dataset/copy-group-dataset.component';
 import { EditGroupDatasetDataComponent } from '../../components/edit-group-dataset-data/edit-group-dataset-data.component';
+import { GroupDatasetImportExportComponent } from '../../components/group-dataset-import-export/group-dataset-import-export.component';
 
 @Component({
   selector: 'app-group-dataset-list',
@@ -44,14 +45,17 @@ export class GroupDatasetListComponent {
   ngOnInit() {
     this.getList();
   }
+
   getList() {
     this.groupDatasetService.getAllGroupDataset().subscribe(res => {
       this.list = res;
     });
   }
+
   onAdd() {
     this.router.navigate(['group-dataset-edit']);
   }
+
   onDelete(index: number) {
     this.matDialog
       .open(MessageBoxComponent, {
@@ -71,9 +75,11 @@ export class GroupDatasetListComponent {
         }
       });
   }
+
   onEdit(index: number) {
     this.router.navigate(['group-dataset-edit', this.list[index].groupName]);
   }
+
   onCopy(index: number) {
     this.matDialog
       .open(CopyGroupDatasetComponent, {
@@ -87,6 +93,7 @@ export class GroupDatasetListComponent {
         }
       });
   }
+
   onEditDatasetData(e: GroupDataset) {
     this.matDialog.open(EditGroupDatasetDataComponent, {
       data: {
@@ -97,6 +104,18 @@ export class GroupDatasetListComponent {
       autoFocus: false,
     });
   }
+
+  onImportExport(e: GroupDataset) {
+    this.matDialog.open(GroupDatasetImportExportComponent, {
+      data: {
+        groupName: e.groupName,
+      },
+      width: '480px',
+      height: '500px',
+      autoFocus: false,
+    });
+  }
+
   onRefresh(element: GroupDataset) {
     this.groupDatasetService
       .refreshGroupDataset(element.groupName)
