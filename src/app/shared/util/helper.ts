@@ -148,3 +148,6 @@ export const readJsonFile = (reader: FileReader): Observable<Object> => {
     })
   );
 };
+
+export const sortSeq = (a: any, b: any): number =>
+  parseInt(a.seq) > parseInt(b.seq) ? 1 : -1;

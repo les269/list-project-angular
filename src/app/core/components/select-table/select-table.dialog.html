@@ -9,7 +9,7 @@
     }
     <mat-paginator
       class="mat-paginator"
-      [pageSizeOptions]="[100, 300, 500]"
+      [pageSizeOptions]="[100]"
       [showFirstLastButtons]="true"></mat-paginator>
   </div>
 
@@ -17,14 +17,14 @@
     <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort>
       @if (selectType==='multiple') {
       <ng-container matColumnDef="select">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell *matHeaderCellDef [ngStyle]="{width:'50px'}">
           <mat-checkbox
             (change)="$event ? toggleAllRows() : null"
             [checked]="selection.hasValue() && isAllSelected()"
             [indeterminate]="selection.hasValue() && !isAllSelected()">
           </mat-checkbox>
         </th>
-        <td mat-cell *matCellDef="let row">
+        <td mat-cell *matCellDef="let row" [ngStyle]="{width:'50px'}">
           <mat-checkbox
             (click)="$event.stopPropagation()"
             (change)="$event ? selection.toggle(row) : null"

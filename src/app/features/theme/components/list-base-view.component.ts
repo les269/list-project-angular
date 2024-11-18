@@ -1,7 +1,12 @@
 import { Component, Injector, OnDestroy, OnInit } from '@angular/core';
 import { debounceTime, filter, Subscription, switchMap, tap } from 'rxjs';
 import { updateTitle } from '../../../shared/state/layout.actions';
-import { isBlank, isNotBlank, replaceValue } from '../../../shared/util/helper';
+import {
+  isBlank,
+  isNotBlank,
+  replaceValue,
+  sortSeq,
+} from '../../../shared/util/helper';
 import {
   ThemeHeader,
   ThemeImage,
@@ -120,7 +125,7 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
           this.themeOtherSetting = res.themeOtherSetting;
           this.pageSize = this.themeOtherSetting.listPageSize;
           this.themeLabelList = res.themeLabelList
-            .sort((a, b) => (a.seq > b.seq ? 1 : -1))
+            .sort(sortSeq)
             .filter(x => x.isVisible);
           this.displayedColumns = [
             ...this.themeLabelList.map(x => x.byKey),
@@ -131,22 +136,16 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
               x.seq = parseInt(x.seq + '');
               return x;
             })
-            .sort((a, b) => (a.seq > b.seq ? 1 : -1));
+            .sort(sortSeq);
 
           this.themeTagListForSelect = [
             { seq: -1, tag: '' },
             ...this.themeTagList,
           ];
-          this.themeDatasetList = res.themeDatasetList.sort((a, b) =>
-            a.seq > b.seq ? 1 : -1
-          );
-          this.themeCustomList = res.themeCustomList.sort((a, b) =>
-            a.seq > b.seq ? 1 : -1
-          );
+          this.themeDatasetList = res.themeDatasetList.sort(sortSeq);
+          this.themeCustomList = res.themeCustomList.sort(sortSeq);
           this.themeTopCustomList =
-            res.themeOtherSetting.themeTopCustomList.sort((a, b) =>
-              a.seq > b.seq ? 1 : -1
-            );
+            res.themeOtherSetting.themeTopCustomList.sort(sortSeq);
           this.defaultKey =
             this.themeLabelList.find(x => x.isDefaultKey)?.byKey ?? '';
           //設定標題
@@ -401,5 +400,5 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
     // This method is intentionally left blank for child classes to override.
   }
 
-  searchChange(text?: string) { }
+  searchChange(text?: string) {}
 }

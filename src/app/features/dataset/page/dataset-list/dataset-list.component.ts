@@ -27,6 +27,7 @@ import { EditGroupDatasetDataComponent } from '../../components/edit-group-datas
     MatTooltipModule,
   ],
   templateUrl: './dataset-list.component.html',
+  styleUrl: './dataset-list.component.scss',
 })
 export class DatasetListComponent {
   displayedColumns = [

@@ -30,6 +30,7 @@ import { GroupDatasetImportExportComponent } from '../../components/group-datase
     MatTooltipModule,
   ],
   templateUrl: './group-dataset-list.component.html',
+  styleUrl: './group-dataset-list.component.scss',
 })
 export class GroupDatasetListComponent {
   displayedColumns = ['groupName', 'createdTime', 'updatedTime', 'other'];
