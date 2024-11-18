@@ -1,5 +1,8 @@
-import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { SelectionModel } from '@angular/cdk/collections';
+import {
+  CdkVirtualScrollViewport,
+  ScrollingModule,
+} from '@angular/cdk/scrolling';
 import { CommonModule } from '@angular/common';
 import {
   AfterViewInit,
@@ -13,18 +16,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import {
   MatDialogActions,
-  MatDialogClose,
   MatDialogTitle,
   MatDialogContent,
   MatDialogRef,
   MAT_DIALOG_DATA,
 } from '@angular/material/dialog';
-import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
-import {
-  MatTable,
-  MatTableDataSource,
-  MatTableModule,
-} from '@angular/material/table';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { TranslateModule } from '@ngx-translate/core';
 
 export interface BaseSelectTableData<O> {
@@ -33,7 +31,7 @@ export interface BaseSelectTableData<O> {
   dataSource: O[];
   selectType: 'single' | 'multiple';
   title?: string;
-  selected?: O | O[];
+  selected?: O[];
   columnFormats?: { [key: string]: (value: any) => string };
   columnSorts?: { [key: string]: boolean };
   enableFilter?: boolean;
@@ -42,6 +40,7 @@ export interface BaseSelectTableData<O> {
 @Component({
   standalone: true,
   imports: [
+    CommonModule,
     MatTableModule,
     ReactiveFormsModule,
     FormsModule,
@@ -50,9 +49,9 @@ export interface BaseSelectTableData<O> {
     MatDialogContent,
     MatDialogTitle,
     TranslateModule,
-    CommonModule,
     MatCheckboxModule,
     MatSortModule,
+    ScrollingModule,
   ],
   selector: 'app-select-dialog',
   templateUrl: 'select-table.dialog.html',
@@ -76,14 +75,24 @@ export class SelectTableDialog<O, T extends BaseSelectTableData<O>>
   showTitle = this.data.showTitle === undefined ? true : this.data.showTitle;
   selection = new SelectionModel<O>(true, []);
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(CdkVirtualScrollViewport) viewport!: CdkVirtualScrollViewport;
+  pageSize = 50;
+  currentIndex = 0;
 
   ngOnInit(): void {
     if (this.selectType === 'multiple') {
       this.multipleDisplayedColumns = ['select', ...this.displayedColumns];
       if (this.selected && Array.isArray(this.selected)) {
         this.selection.select(...this.selected);
+        this.dataSource.data = [
+          ...this.selected,
+          ...this.dataSource.data.filter(
+            item => !this.selected!.includes(item)
+          ),
+        ];
       }
     }
+    // this.loadMoreData();
   }
 
   ngAfterViewInit(): void {

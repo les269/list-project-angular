@@ -4,56 +4,65 @@
 
 <mat-dialog-content class="scrollbar-primary">
   @if (enableFilter) {
-  <input class="form-control my-2" (keyup)="applyFilter($event)" />
+  <div class="search-bar">
+    <input class="form-control my-2" (keyup)="applyFilter($event)" />
+  </div>
   }
-
-  <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort>
-    @if (selectType==='multiple') {
-    <ng-container matColumnDef="select">
-      <th mat-header-cell *matHeaderCellDef>
-        <mat-checkbox
-          (change)="$event ? toggleAllRows() : null"
-          [checked]="selection.hasValue() && isAllSelected()"
-          [indeterminate]="selection.hasValue() && !isAllSelected()">
-        </mat-checkbox>
-      </th>
-      <td mat-cell *matCellDef="let row">
-        <mat-checkbox
-          (click)="$event.stopPropagation()"
-          (change)="$event ? selection.toggle(row) : null"
-          [checked]="selection.isSelected(row)">
-        </mat-checkbox>
-      </td>
-    </ng-container>
-    } @for (column of displayedColumns; track $index;let index = $index) {
-    <ng-container matColumnDef="{{column}}">
-      <th
-        mat-header-cell
-        *matHeaderCellDef
-        mat-sort-header="{{column}}"
-        [disabled]="!(columnSorts && columnSorts![column])">
-        {{ labels[index] | translate }}
-      </th>
-      <td mat-cell *matCellDef="let element" class="user-select-none">
-        {{ columnFormats?.[column] ? columnFormats![column](element[column]) :
-        element[column] }}
-      </td>
-    </ng-container>
-    } @if(selectType==='single'){
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr
-      class="select-row"
-      mat-row
-      *matRowDef="let row; columns: displayedColumns;"
-      (click)="onClickOne(row)"></tr>
-    } @else {
-    <tr mat-header-row *matHeaderRowDef="multipleDisplayedColumns"></tr>
-    <tr
-      mat-row
-      *matRowDef="let row; columns: multipleDisplayedColumns;"
-      (click)="selection.toggle(row)"></tr>
-    }
-  </table>
+  <div class="table-container scrollbar-primary">
+    <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort>
+      @if (selectType==='multiple') {
+      <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef>
+          <mat-checkbox
+            (change)="$event ? toggleAllRows() : null"
+            [checked]="selection.hasValue() && isAllSelected()"
+            [indeterminate]="selection.hasValue() && !isAllSelected()">
+          </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let row">
+          <mat-checkbox
+            (click)="$event.stopPropagation()"
+            (change)="$event ? selection.toggle(row) : null"
+            [checked]="selection.isSelected(row)">
+          </mat-checkbox>
+        </td>
+      </ng-container>
+      } @for (column of displayedColumns; track $index;let index = $index) {
+      <ng-container matColumnDef="{{column}}">
+        <th
+          mat-header-cell
+          *matHeaderCellDef
+          mat-sort-header="{{column}}"
+          [disabled]="!(columnSorts && columnSorts![column])">
+          {{ labels[index] | translate }}
+        </th>
+        <td
+          mat-cell
+          *matCellDef="let element"
+          class="user-select-none"
+          [ngStyle]="{maxWidth:'20vw'}">
+          {{ columnFormats?.[column] ? columnFormats![column](element[column]) :
+          element[column] }}
+        </td>
+      </ng-container>
+      } @if(selectType==='single'){
+      <tr mat-header-row *matHeaderRowDef="displayedColumns;sticky:true"></tr>
+      <tr
+        class="select-row"
+        mat-row
+        *matRowDef="let row; columns: displayedColumns;"
+        (click)="onClickOne(row)"></tr>
+      } @else {
+      <tr
+        mat-header-row
+        *matHeaderRowDef="multipleDisplayedColumns;sticky:true"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: multipleDisplayedColumns;"
+        (click)="selection.toggle(row)"></tr>
+      }
+    </table>
+  </div>
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button (click)="onNoClick()">{{ 'g.no' | translate }}</button>

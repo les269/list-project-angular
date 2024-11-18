@@ -9,3 +9,11 @@ tr.select-row:active {
   cursor: pointer;
   user-select: none;
 }
+.search-bar {
+  position: sticky;
+  top: 0px;
+}
+.table-container {
+  overflow: auto;
+  height: 55vh;
+}
