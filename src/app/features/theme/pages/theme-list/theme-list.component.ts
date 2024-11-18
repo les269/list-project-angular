@@ -41,22 +41,11 @@ export class ThemeListComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.getList();
+    this.updateAllTheme();
   }
 
-  getList() {
-    this.themeService.getAllTheme().subscribe(res => {
-      this.store.dispatch(
-        updateList({
-          [ThemeHeaderType.imageList]: res.filter(
-            x => x.type === ThemeHeaderType.imageList
-          ),
-          [ThemeHeaderType.table]: res.filter(
-            x => x.type === ThemeHeaderType.table
-          ),
-        })
-      );
-    });
+  updateAllTheme() {
+    this.themeService.updateAllTheme();
   }
 
   routeCreate() {
@@ -76,7 +65,7 @@ export class ThemeListComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (isNotBlank(result)) {
         this.snackbarService.openByI18N('msg.copySuccess');
-        this.getList();
+        this.updateAllTheme();
       }
     });
   }
@@ -90,7 +79,7 @@ export class ThemeListComponent implements OnInit {
         if (isNotBlank(result)) {
           this.themeService.deleteTheme(item).subscribe(() => {
             this.snackbarService.openByI18N('msg.deleteSuccess');
-            this.getList();
+            this.updateAllTheme();
           });
         }
       });

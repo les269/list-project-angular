@@ -7,17 +7,38 @@ import {
   ThemeCustomValueRequest,
   ThemeCustomValueResponse,
   ThemeHeader,
+  ThemeHeaderType,
   ThemeTagValue,
   ThemeTopCustomValue,
   ThemeTopCustomValueResponse,
 } from '../models';
+import { Store } from '@ngrx/store';
+import { updateList } from '../../../shared/state/layout.actions';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-  constructor(private readonly http: HttpClient) {}
+  constructor(
+    private readonly http: HttpClient,
+    private store: Store
+  ) {}
 
   getAllTheme(): Observable<ThemeHeader[]> {
     return this.http.get<ThemeHeader[]>('/theme/all');
+  }
+
+  updateAllTheme(): void {
+    this.http.get<ThemeHeader[]>('/theme/all').subscribe(res => {
+      this.store.dispatch(
+        updateList({
+          [ThemeHeaderType.imageList]: res
+            .filter(x => x.type === ThemeHeaderType.imageList)
+            .sort((a, b) => (a.seq > b.seq ? 1 : -1)),
+          [ThemeHeaderType.table]: res
+            .filter(x => x.type === ThemeHeaderType.table)
+            .sort((a, b) => (a.seq > b.seq ? 1 : -1)),
+        })
+      );
+    });
   }
 
   getByHeaderId(req: Partial<string>): Observable<ThemeHeader> {

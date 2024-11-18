@@ -147,22 +147,8 @@ export class ThemeEditComponent implements OnInit {
         this.snackbarService.openByI18N(
           type === 'commit' ? 'msg.commitSuccess' : 'msg.saveSuccess'
         );
-        this.getList();
+        this.themeService.updateAllTheme();
       });
-  }
-  getList() {
-    this.themeService.getAllTheme().subscribe(res => {
-      this.store.dispatch(
-        updateList({
-          [ThemeHeaderType.imageList]: res.filter(
-            x => x.type === ThemeHeaderType.imageList
-          ),
-          [ThemeHeaderType.table]: res.filter(
-            x => x.type === ThemeHeaderType.table
-          ),
-        })
-      );
-    });
   }
   //驗證資料正確
   validationModel(): boolean {

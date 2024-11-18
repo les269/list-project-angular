@@ -41,18 +41,7 @@ export class SidenavComponent implements OnInit {
     this.list$ = this.store.pipe(selectLayoutByKey('list'));
   }
   ngOnInit() {
-    this.themeService.getAllTheme().subscribe(res => {
-      this.store.dispatch(
-        updateList({
-          [ThemeHeaderType.imageList]: res
-            .filter(x => x.type === ThemeHeaderType.imageList)
-            .sort((a, b) => (a.seq > b.seq ? 1 : -1)),
-          [ThemeHeaderType.table]: res
-            .filter(x => x.type === ThemeHeaderType.table)
-            .sort((a, b) => (a.seq > b.seq ? 1 : -1)),
-        })
-      );
-    });
+    this.themeService.updateAllTheme();
   }
 
   close() {
