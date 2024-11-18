@@ -3,11 +3,16 @@
 }
 
 <mat-dialog-content class="scrollbar-primary">
-  @if (enableFilter) {
   <div class="search-bar">
+    @if (enableFilter) {
     <input class="form-control my-2" (keyup)="applyFilter($event)" />
+    }
+    <mat-paginator
+      class="mat-paginator"
+      [pageSizeOptions]="[100, 300, 500]"
+      [showFirstLastButtons]="true"></mat-paginator>
   </div>
-  }
+
   <div class="table-container scrollbar-primary">
     <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort>
       @if (selectType==='multiple') {

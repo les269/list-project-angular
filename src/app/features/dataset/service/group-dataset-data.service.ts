@@ -31,6 +31,13 @@ export class GroupDatasetDataService {
       `${this.prefix}/all?groupName=${groupName}`
     );
   }
+  getAllGroupDatasetDataOnlyPrimeValue(
+    groupName: string
+  ): Observable<GroupDatasetData[]> {
+    return this.http.get<GroupDatasetData[]>(
+      `${this.prefix}/all-only-prime-value?groupName=${groupName}`
+    );
+  }
 
   updateGroupDatasetData(req: Partial<GroupDatasetData>): Observable<void> {
     return this.http.post<void>(`${this.prefix}/update`, req);

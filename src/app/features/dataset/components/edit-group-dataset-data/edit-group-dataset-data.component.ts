@@ -167,7 +167,7 @@ export class EditGroupDatasetDataComponent implements OnInit {
 
   selectPrimeValue() {
     this.groupDatasetDataService
-      .getAllGroupDatasetData(this.groupName)
+      .getAllGroupDatasetDataOnlyPrimeValue(this.groupName)
       .pipe(
         switchMap(res =>
           this.selectTableService.selectSingleGroupDatasetData(res)
