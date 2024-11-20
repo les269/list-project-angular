@@ -19,7 +19,7 @@ export class GenericTableComponent<T extends { seq: number }> {
   @Input({ required: true }) list!: T[];
   @Output() listChange = new EventEmitter<T[]>();
   item: T | undefined;
-  dragDisabled = false;
+  dragDisabled = true;
   selectTableService: SelectTableService;
 
   constructor(protected injector: Injector) {
