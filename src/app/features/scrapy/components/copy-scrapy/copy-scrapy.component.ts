@@ -33,7 +33,6 @@ import { EMPTY, switchMap } from 'rxjs';
     CommonModule,
   ],
   templateUrl: './copy-scrapy.component.html',
-  styleUrl: './copy-scrapy.component.scss',
 })
 export class CopyScrapyComponent {
   readonly dialogRef = inject(MatDialogRef<CopyScrapyComponent>);

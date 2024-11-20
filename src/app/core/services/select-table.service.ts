@@ -16,6 +16,7 @@ import { ThemeTag } from '../../features/theme/models';
 import { ReplaceValueMap } from '../../features/replace-value-map/model';
 import { TranslateService } from '@ngx-translate/core';
 import { isNotBlank } from '../../shared/util/helper';
+import { filter } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class SelectTableService {
@@ -44,7 +45,8 @@ export class SelectTableService {
       >(SelectTableDialog, {
         data,
       })
-      .afterClosed();
+      .afterClosed()
+      .pipe(filter(res => res !== undefined));
   }
 
   selectSingleScrapy(dataSource: ScrapyConfig[]) {
@@ -69,7 +71,8 @@ export class SelectTableService {
       >(SelectTableDialog, {
         data,
       })
-      .afterClosed();
+      .afterClosed()
+      .pipe(filter(res => res !== undefined));
   }
 
   selectSingleDataset(dataSource: Dataset[]) {
@@ -234,7 +237,8 @@ export class SelectTableService {
       >(SelectTableDialog, {
         data,
       })
-      .afterClosed();
+      .afterClosed()
+      .pipe(filter(x => x !== undefined));
   }
 
   selectMultipleValue(valueList: string[], selectedValue: string[] | string) {
@@ -271,6 +275,7 @@ export class SelectTableService {
       >(SelectTableDialog, {
         data,
       })
-      .afterClosed();
+      .afterClosed()
+      .pipe(filter(res => res !== undefined));
   }
 }

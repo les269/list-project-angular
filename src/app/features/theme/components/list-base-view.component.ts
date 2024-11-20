@@ -361,7 +361,6 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
   selectMultipleValue() {
     this.selectTableService
       .selectMultipleValue(this.autoCompleteList, this.searchValue)
-      .pipe(filter(res => res !== undefined))
       .subscribe(res => {
         this.searchValue = res.map(x => x.value);
         this.searchChange();

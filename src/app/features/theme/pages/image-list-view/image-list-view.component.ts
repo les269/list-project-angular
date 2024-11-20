@@ -95,8 +95,8 @@ export class ImageListViewComponent
     this.changeTag();
     this.updateViewData();
     this.getCustomValueMap();
-    this.getFileExist();
     this.changeQueryParams(); //初始化query params
+    this.getFileExist();
     // 監聽query params的變化
     if (!this.routeEventsSub) {
       this.routeEventsSub = this.router.events
@@ -225,7 +225,7 @@ export class ImageListViewComponent
       this.pages.push(i + 1);
     }
     // 如果選擇頁數超過當前的頁數長度則設頁數為1
-    if (this.pages.length < this.currentPage && this.currentPage > 1) {
+    if (this.pages.length < this.currentPage && this.currentPage !== 1) {
       this.currentPage = 1;
       this.changeQueryParams();
     }

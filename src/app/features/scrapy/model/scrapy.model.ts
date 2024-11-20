@@ -24,6 +24,7 @@ export enum ScrapyPageType {
 }
 
 export interface Cookie {
+  seq: number;
   name: string;
   value: string;
 }

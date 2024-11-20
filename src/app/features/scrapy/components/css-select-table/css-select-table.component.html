@@ -1,11 +1,23 @@
 <div class="card">
-  <table mat-table [dataSource]="cssSelectList" multiTemplateDataRows>
+  <table
+    mat-table
+    [dataSource]="list"
+    multiTemplateDataRows
+    cdkDropList
+    (cdkDropListDropped)="drop($event)"
+    cdkDropListData="cssSelectList">
     <ng-container matColumnDef="seq">
       <th mat-header-cell *matHeaderCellDef>
         {{ 'g.order' | translate }}
       </th>
       <td mat-cell *matCellDef="let element">
-        {{ element.seq }}
+        <div
+          class="d-flex align-items-center user-select-none"
+          (mouseout)="dragDisabled = true"
+          (mouseover)="dragDisabled = false">
+          <mat-icon class="drag-cursor">reorder</mat-icon>
+          <span>{{ element.seq }}</span>
+        </div>
       </td>
     </ng-container>
     <ng-container matColumnDef="key">
@@ -28,23 +40,9 @@
       <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let element; let i = dataIndex">
         <div class="row flex-nowrap">
-          <button mat-icon-button (click)="onDeleteCssSelect(i)">
+          <button mat-icon-button (click)="onDelete(i)">
             <mat-icon>delete</mat-icon>
           </button>
-          <div class="flex column align-content-center" style="width: 48px">
-            @if (i !== 0) {
-              <mat-icon class="dropupdown-icon up" (click)="onUpDown(i, 'up')"
-                >arrow_drop_up</mat-icon
-              >
-            }
-            @if (i !== cssSelectList.length - 1) {
-              <mat-icon
-                class="dropupdown-icon down"
-                (click)="onUpDown(i, 'down')"
-                >arrow_drop_down</mat-icon
-              >
-            }
-          </div>
         </div>
       </td>
     </ng-container>
@@ -95,7 +93,7 @@
               'scrapy.replaceValueMap' | translate
             }}</label>
             @if (element.replaceValueMapName) {
-              <mat-chip cdkDrag
+              <mat-chip
                 >{{ element.replaceValueMapName }}
                 <button
                   matChipRemove
@@ -123,7 +121,7 @@
         *matFooterCellDef
         [attr.colspan]="displayedColumns.length">
         <div class="row justify-content-center">
-          <button mat-button class="rounded" (click)="onAddCssSelect()">
+          <button mat-button class="rounded" (click)="onAdd()">
             <mat-icon>add</mat-icon>
           </button>
         </div>
@@ -133,7 +131,11 @@
     <tr
       mat-row
       class="expand-row"
-      *matRowDef="let row; columns: displayedColumns"></tr>
+      *matRowDef="let row; columns: displayedColumns"
+      cdkDrag
+      [cdkDragData]="row"
+      [cdkDragDisabled]="dragDisabled"
+      (cdkDragReleased)="dragDisabled = true"></tr>
     <tr mat-row *matRowDef="let row; columns: ['expandedDetail']"></tr>
     <tr mat-footer-row *matFooterRowDef="['add']"></tr>
   </table>

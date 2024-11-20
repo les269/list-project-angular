@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Injector,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import {
@@ -16,6 +23,14 @@ import { SelectTableService } from '../../../../core/services/select-table.servi
 import { DatasetService } from '../../../dataset/service/dataset.service';
 import { Dataset } from '../../../dataset/model';
 import { ThemeDataset } from '../../models';
+import { switchMap } from 'rxjs';
+import {
+  CdkDropList,
+  CdkDrag,
+  CdkDragDrop,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop';
+import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 
 @Component({
   standalone: true,
@@ -30,83 +45,49 @@ import { ThemeDataset } from '../../models';
     MatListModule,
     TranslateModule,
     MatChipsModule,
+    CdkDropList,
+    CdkDrag,
   ],
   selector: 'app-theme-dataset-table',
   templateUrl: 'theme-dataset-table.component.html',
 })
-export class ThemeDatasetTableComponent implements OnInit {
-  @Input({ required: true }) themeDatasetList!: ThemeDataset[];
-  @Output() themeDatasetListChange = new EventEmitter<ThemeDataset[]>();
+export class ThemeDatasetTableComponent extends GenericTableComponent<ThemeDataset> {
   displayedColumns: string[] = ['order', 'dataset', 'label', 'other'];
-  datasetList: Dataset[] = [];
-
-  constructor(
-    private selectTableService: SelectTableService,
-    private datasetService: DatasetService
-  ) {}
-
-  ngOnInit(): void {
-    this.datasetService
-      .getAllDataset()
-      .subscribe(res => (this.datasetList = res));
+  override item: ThemeDataset = {
+    seq: 0,
+    datasetList: [],
+    label: '',
+    isDefault: false,
+  };
+  datasetService: DatasetService;
+  constructor(injector: Injector) {
+    super(injector);
+    this.datasetService = this.injector.get(DatasetService);
   }
 
-  //新增資料來源
-  onAdd() {
-    if (isNull(this.themeDatasetList)) {
-      this.themeDatasetList = [];
-    }
-    let element: ThemeDataset = {
-      seq: this.themeDatasetList.length + 1,
-      label: '',
-      isDefault: false,
-      datasetList: [],
-    };
-    this.themeDatasetList = [...this.themeDatasetList, element].map((x, i) => {
-      x.seq = i + 1;
-      return x;
-    });
-    this.themeDatasetListChange.emit(this.themeDatasetList);
-  }
-
-  //刪除資料來源
-  onDelete(index: number) {
-    this.themeDatasetList = this.themeDatasetList.filter((x, i) => i !== index);
-    this.themeDatasetListChange.emit(this.themeDatasetList);
-  }
-
-  //資料來源的上下移動
-  onUpDown(index: number, type: 'up' | 'down') {
-    let data: ThemeDataset[] = JSON.parse(
-      JSON.stringify(this.themeDatasetList)
-    );
-    let source = data[index];
-    let target = data.splice(index + (type === 'up' ? -1 : 1), 1, source);
-    data.splice(index, 1, target[0]);
-    this.themeDatasetList = data.map((x, i) => {
-      x.seq = i + 1;
-      return x;
-    });
-    this.themeDatasetListChange.emit(this.themeDatasetList);
-  }
   //改變清單預設使用的資料來源
   changeDefaultKey(event: MatCheckboxChange, index: number) {
     if (event.checked) {
-      this.themeDatasetList.map((x, i) => {
+      this.list.map((x, i) => {
         if (i !== index) {
           x.isDefault = false;
         }
         return x;
       });
     }
-    this.themeDatasetListChange.emit(this.themeDatasetList);
+    this.listChange.emit(this.list);
   }
   selectDataset(element: ThemeDataset) {
-    const selected = this.datasetList.filter(x =>
-      element.datasetList.includes(x.name)
-    );
-    this.selectTableService
-      .selectMultipleDataset(this.datasetList, selected)
+    this.datasetService
+      .getAllDataset()
+      .pipe(
+        switchMap(res => {
+          const selected = res.filter(x =>
+            element.datasetList.includes(x.name)
+          );
+          return this.selectTableService.selectMultipleDataset(res, selected);
+        })
+      )
       .subscribe(x => {
         if (x) {
           element.datasetList = x.map(x => x.name);

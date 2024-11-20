@@ -12,6 +12,13 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { TranslateModule } from '@ngx-translate/core';
+import {
+  CdkDropList,
+  CdkDrag,
+  CdkDragDrop,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop';
+import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 
 @Component({
   selector: 'app-dataset-field-table',
@@ -25,43 +32,19 @@ import { TranslateModule } from '@ngx-translate/core';
     CommonModule,
     MatIconModule,
     MatCheckboxModule,
+    CdkDropList,
+    CdkDrag,
   ],
   templateUrl: './dataset-field-table.component.html',
-  styleUrl: './dataset-field-table.component.scss',
 })
-export class DatasetFieldTableComponent {
+export class DatasetFieldTableComponent extends GenericTableComponent<DatasetField> {
   eDatasetFieldType = DatasetFieldType;
   displayedColumns = ['seq', 'key', 'label', 'type', 'other'];
-  @Input({ required: true }) fieldList!: DatasetField[];
-  @Output() fieldListChange = new EventEmitter<DatasetField[]>();
-  onAdd() {
-    this.fieldList = [
-      ...this.fieldList,
-      {
-        seq: this.fieldList.length + 1,
-        type: DatasetFieldType.fixedString,
-        key: '',
-        label: '',
-        fixedString: '',
-      },
-    ];
-    this.fieldListChange.emit(this.fieldList);
-  }
-
-  onDelete(index: number) {
-    this.fieldList = this.fieldList.filter((x, i) => i !== index);
-    this.fieldListChange.emit(this.fieldList);
-  }
-  //資料來源的上下移動
-  onUpDown(index: number, type: 'up' | 'down') {
-    let data: DatasetField[] = JSON.parse(JSON.stringify(this.fieldList));
-    let source = data[index];
-    let target = data.splice(index + (type === 'up' ? -1 : 1), 1, source);
-    data.splice(index, 1, target[0]);
-    this.fieldList = data.map((x, i) => {
-      x.seq = i + 1;
-      return x;
-    });
-    this.fieldListChange.emit(this.fieldList);
-  }
+  override item: DatasetField = {
+    seq: 0,
+    type: DatasetFieldType.path,
+    key: '',
+    label: '',
+    fixedString: '',
+  };
 }

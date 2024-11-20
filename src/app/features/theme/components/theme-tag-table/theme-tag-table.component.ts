@@ -9,6 +9,13 @@ import { MatTableModule } from '@angular/material/table';
 import { TranslateModule } from '@ngx-translate/core';
 import { ThemeTag } from '../../models';
 import { isNull } from '../../../../shared/util/helper';
+import {
+  CdkDropList,
+  CdkDrag,
+  CdkDragDrop,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop';
+import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 
 @Component({
   selector: 'app-theme-tag-table',
@@ -23,49 +30,15 @@ import { isNull } from '../../../../shared/util/helper';
     CommonModule,
     MatListModule,
     TranslateModule,
+    CdkDropList,
+    CdkDrag,
   ],
   templateUrl: './theme-tag-table.component.html',
-  styleUrl: './theme-tag-table.component.scss',
 })
-export class ThemeTagTableComponent {
-  @Input({ required: true }) themeTagList!: ThemeTag[];
-  @Output() themeTagListChange = new EventEmitter<ThemeTag[]>();
+export class ThemeTagTableComponent extends GenericTableComponent<ThemeTag> {
   displayedColumns: string[] = ['seq', 'tag', 'other'];
-
-  onAdd() {
-    if (isNull(this.themeTagList)) {
-      this.themeTagList = [];
-    }
-    let element: ThemeTag = {
-      seq: this.themeTagList.length + 1,
-      tag: '',
-    };
-    this.themeTagList = [...this.themeTagList, element].map((x, i) => {
-      x.seq = i + 1;
-      return x;
-    });
-    this.themeTagListChange.emit(this.themeTagList);
-  }
-  //資料欄位的上下移動
-  onUpDown(index: number, type: 'up' | 'down') {
-    let data: ThemeTag[] = JSON.parse(JSON.stringify(this.themeTagList));
-    let source = data[index];
-    let target = data.splice(index + (type === 'up' ? -1 : 1), 1, source);
-    data.splice(index, 1, target[0]);
-    this.themeTagList = data.map((x, i) => {
-      x.seq = i + 1;
-      return x;
-    });
-    this.themeTagListChange.emit(this.themeTagList);
-  }
-  //刪除資料欄位
-  onDelete(index: number) {
-    this.themeTagList = this.themeTagList
-      .filter((x, i) => i !== index)
-      .map((x, i) => {
-        x.seq = i + 1;
-        return x;
-      });
-    this.themeTagListChange.emit(this.themeTagList);
-  }
+  override item: ThemeTag = {
+    seq: 0,
+    tag: '',
+  };
 }

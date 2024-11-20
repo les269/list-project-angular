@@ -12,6 +12,13 @@ import { MatListModule } from '@angular/material/list';
 import { MatTableModule } from '@angular/material/table';
 import { TranslateModule } from '@ngx-translate/core';
 import { isNull } from '../../../../shared/util/helper';
+import {
+  CdkDropList,
+  CdkDrag,
+  CdkDragDrop,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop';
+import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 
 @Component({
   standalone: true,
@@ -25,86 +32,53 @@ import { isNull } from '../../../../shared/util/helper';
     CommonModule,
     MatListModule,
     TranslateModule,
+    CdkDropList,
+    CdkDrag,
   ],
   selector: 'app-theme-label-table',
   templateUrl: 'theme-label-table.component.html',
-  styleUrl: 'theme-label-table.component.scss',
 })
-export class ThemeLabelTableComponent {
+export class ThemeLabelTableComponent extends GenericTableComponent<ThemeLabel> {
   @Input({ required: true }) type!: ThemeHeaderType;
-  @Input({ required: true }) themeLabelList!: ThemeLabel[];
-  @Output() themeLabelListChange = new EventEmitter<ThemeLabel[]>();
   displayedColumns: string[] = ['seq', 'byKey', 'label', 'type', 'other'];
   eThemeLabelType = ThemeLabelType;
+  override item: ThemeLabel = {
+    seq: 0,
+    byKey: '',
+    label: '',
+    type: ThemeLabelType.string,
+    splitBy: '',
+    useSpace: '、',
+    isSearchButton: false,
+    isCopy: false,
+    isVisible: false,
+    isSort: false,
+    isSearchValue: false,
+    isDefaultKey: false,
+    dateFormat: '',
+    maxWidth: '',
+    minWidth: '',
+    width: '',
+    autoComplete: false,
+  };
 
-  //新增資料欄位
-  onAdd() {
-    if (isNull(this.themeLabelList)) {
-      this.themeLabelList = [];
-    }
-    let element: ThemeLabel = {
-      seq: this.themeLabelList.length + 1,
-      byKey: '',
-      label: '',
-      type: ThemeLabelType.string,
-      splitBy: '',
-      useSpace: '、',
-      isSearchButton: false,
-      isCopy: false,
-      isVisible: false,
-      isSort: false,
-      isSearchValue: false,
-      isDefaultKey: false,
-      dateFormat: '',
-      maxWidth: '',
-      minWidth: '',
-      width: '',
-      autoComplete: false,
-    };
-    this.themeLabelList = [...this.themeLabelList, element].map((x, i) => {
-      x.seq = i + 1;
-      return x;
-    });
-    this.themeLabelListChange.emit(this.themeLabelList);
-  }
-  //資料欄位的上下移動
-  onUpDown(index: number, type: 'up' | 'down') {
-    let data: ThemeLabel[] = JSON.parse(JSON.stringify(this.themeLabelList));
-    let source = data[index];
-    let target = data.splice(index + (type === 'up' ? -1 : 1), 1, source);
-    data.splice(index, 1, target[0]);
-    this.themeLabelList = data.map((x, i) => {
-      x.seq = i + 1;
-      return x;
-    });
-    this.themeLabelListChange.emit(this.themeLabelList);
-  }
-  //刪除資料欄位
-  onDelete(index: number) {
-    this.themeLabelList = this.themeLabelList
-      .filter((x, i) => i !== index)
-      .map((x, i) => {
-        x.seq = i + 1;
-        return x;
-      });
-    this.themeLabelListChange.emit(this.themeLabelList);
-  }
   changeType(event: ThemeLabelType, index: number) {
     if (event === 'seq') {
-      this.themeLabelList[index].isSearchValue = false;
+      this.list[index].isSearchValue = false;
     }
-    this.themeLabelListChange.emit(this.themeLabelList);
+    this.listChange.emit(this.list);
   }
+
   //改變資料欄位的預設欄位,只能有一筆或無
   changeDefaultKey(event: MatCheckboxChange, index: number) {
     if (event.checked) {
-      this.themeLabelList.map((x, i) => {
+      this.list.map((x, i) => {
         if (i !== index) {
           x.isDefaultKey = false;
         }
         return x;
       });
     }
-    this.themeLabelListChange.emit(this.themeLabelList);
+    this.listChange.emit(this.list);
   }
 }

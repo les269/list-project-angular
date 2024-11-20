@@ -1,11 +1,23 @@
 <div class="card mb-3">
-  <table mat-table [dataSource]="themeTopCustomList" multiTemplateDataRows>
+  <table
+    mat-table
+    [dataSource]="list"
+    multiTemplateDataRows
+    cdkDropList
+    (cdkDropListDropped)="drop($event)"
+    cdkDropListData="themeTopCustomList">
     <ng-container matColumnDef="order">
       <th mat-header-cell *matHeaderCellDef>
         {{ 'g.order' | translate }}
       </th>
       <td mat-cell *matCellDef="let element">
-        {{ element.seq }}
+        <div
+          class="d-flex align-items-center user-select-none"
+          (mouseout)="dragDisabled = true"
+          (mouseover)="dragDisabled = false">
+          <mat-icon class="drag-cursor">reorder</mat-icon>
+          <span>{{ element.seq }}</span>
+        </div>
       </td>
     </ng-container>
     <ng-container matColumnDef="type">
@@ -52,24 +64,6 @@
       <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
       <td mat-cell *matCellDef="let element; let i = dataIndex">
         <div class="row flex-nowrap">
-          <div
-            class="flex column align-content-center"
-            style="width: 48px"
-            role="group"
-            aria-label="Vertical button group">
-            @if (i !== 0) {
-              <mat-icon class="dropupdown-icon up" (click)="onUpDown(i, 'up')"
-                >arrow_drop_up</mat-icon
-              >
-            }
-            @if (i !== themeTopCustomList.length - 1) {
-              <mat-icon
-                class="dropupdown-icon down"
-                (click)="onUpDown(i, 'down')"
-                >arrow_drop_down</mat-icon
-              >
-            }
-          </div>
           <button mat-icon-button (click)="onDelete(i)">
             <mat-icon>delete</mat-icon>
           </button>
@@ -105,7 +99,7 @@
             @case ('apiConfig') {
               <div class="mt-1 d-flex flex-wrap gap-3 align-items-center">
                 @if (element.apiConfig) {
-                  <mat-chip cdkDrag
+                  <mat-chip
                     >{{ element.apiConfig.apiName }}
                     <button matChipRemove (click)="removeApi(element)">
                       <mat-icon>cancel</mat-icon>
@@ -132,7 +126,11 @@
     <tr
       mat-row
       *matRowDef="let row; columns: displayedColumns"
-      class="expand-row"></tr>
+      class="expand-row"
+      cdkDrag
+      [cdkDragData]="row"
+      [cdkDragDisabled]="dragDisabled"
+      (cdkDragReleased)="dragDisabled = true"></tr>
     <tr
       mat-row
       class="h-auto"

@@ -102,7 +102,11 @@
           <button
             class="custom-button"
             (click)="deleteFile(data, custom)"
-            [disabled]="!fileExist[data[defaultKey]]">
+            [disabled]="
+              themeHeaderType === 'imageList' && fileExist
+                ? !fileExist[data[defaultKey]]
+                : false
+            ">
             <label class="px-2">{{ custom.label }}</label>
           </button>
         </div>
@@ -112,7 +116,11 @@
           <button
             class="custom-button"
             (click)="moveTo(data, custom)"
-            [disabled]="!fileExist[data[defaultKey]]">
+            [disabled]="
+              themeHeaderType === 'imageList' && fileExist
+                ? !fileExist[data[defaultKey]]
+                : false
+            ">
             <label class="px-2">{{ custom.label }}</label>
           </button>
         </div>
@@ -122,7 +130,11 @@
           <button
             class="custom-button"
             (click)="openFolder(data, custom)"
-            [disabled]="!fileExist[data[defaultKey]]">
+            [disabled]="
+              themeHeaderType === 'imageList' && fileExist
+                ? !fileExist[data[defaultKey]]
+                : false
+            ">
             <label class="px-2">{{ custom.label }}</label>
           </button>
         </div>

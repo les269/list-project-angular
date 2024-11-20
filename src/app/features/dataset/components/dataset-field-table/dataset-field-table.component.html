@@ -1,11 +1,23 @@
 <div class="card">
-  <table mat-table [dataSource]="fieldList" multiTemplateDataRows>
+  <table
+    mat-table
+    [dataSource]="list"
+    multiTemplateDataRows
+    cdkDropList
+    (cdkDropListDropped)="drop($event)"
+    cdkDropListData="fieldList">
     <ng-container matColumnDef="seq">
       <th mat-header-cell *matHeaderCellDef>
         {{ 'dataset.fieldSeq' | translate }}
       </th>
       <td mat-cell *matCellDef="let element">
-        {{ element.seq }}
+        <div
+          class="d-flex align-items-center user-select-none"
+          (mouseout)="dragDisabled = true"
+          (mouseover)="dragDisabled = false">
+          <mat-icon class="drag-cursor">reorder</mat-icon>
+          <span>{{ element.seq }}</span>
+        </div>
       </td>
     </ng-container>
     <ng-container matColumnDef="key">
@@ -42,20 +54,6 @@
       <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
       <td mat-cell *matCellDef="let element; let i = dataIndex">
         <div class="row flex-nowrap">
-          <div class="flex column align-content-center" style="width: 48px">
-            @if (i !== 0) {
-              <mat-icon class="dropupdown-icon up" (click)="onUpDown(i, 'up')"
-                >arrow_drop_up</mat-icon
-              >
-            }
-            @if (i !== fieldList.length - 1) {
-              <mat-icon
-                class="dropupdown-icon down"
-                (click)="onUpDown(i, 'down')"
-                >arrow_drop_down</mat-icon
-              >
-            }
-          </div>
           <button mat-icon-button (click)="onDelete(i)">
             <mat-icon>delete</mat-icon>
           </button>
@@ -99,7 +97,11 @@
     <tr
       mat-row
       *matRowDef="let row; columns: displayedColumns"
-      class="expand-row"></tr>
+      class="expand-row"
+      cdkDrag
+      [cdkDragData]="row"
+      [cdkDragDisabled]="dragDisabled"
+      (cdkDragReleased)="dragDisabled = true"></tr>
     <tr
       mat-row
       *matRowDef="let row; columns: ['expanded']"

@@ -1,4 +1,10 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Injector,
+  Input,
+  Output,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,6 +19,13 @@ import { SelectTableService } from '../../../../core/services/select-table.servi
 import { ReplaceValueMapService } from '../../../replace-value-map/service/replace-value-map.service';
 import { filter, switchMap } from 'rxjs';
 import { isNotNull } from '../../../../shared/util/helper';
+import {
+  CdkDropList,
+  CdkDrag,
+  CdkDragDrop,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop';
+import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 
 @Component({
   selector: 'app-css-select-table',
@@ -28,44 +41,30 @@ import { isNotNull } from '../../../../shared/util/helper';
     MatTooltipModule,
     MatCheckboxModule,
     MatChipsModule,
+    CdkDropList,
+    CdkDrag,
   ],
   templateUrl: './css-select-table.component.html',
-  styleUrl: './css-select-table.component.scss',
 })
-export class CssSelectTableComponent {
+export class CssSelectTableComponent extends GenericTableComponent<CssSelect> {
   displayedColumns = ['seq', 'key', 'value', 'other'];
-  @Input({ required: true }) cssSelectList!: CssSelect[];
-  @Output() cssSelectListChange = new EventEmitter<CssSelect[]>();
+  override item: CssSelect = {
+    seq: 0,
+    key: '',
+    value: '',
+    replaceString: '',
+    attr: '',
+    convertToArray: false,
+    onlyOwn: false,
+    replaceRegular: '',
+    replaceRegularTo: '',
+    replaceValueMapName: '',
+  };
+  replaceValueMapService: ReplaceValueMapService;
 
-  constructor(
-    private selectTableService: SelectTableService,
-    private replaceValueMapService: ReplaceValueMapService
-  ) {}
-
-  //新增CssSelect
-  onAddCssSelect() {
-    this.cssSelectList = [
-      ...this.cssSelectList,
-      {
-        key: '',
-        value: '',
-        replaceString: '',
-        attr: '',
-        convertToArray: false,
-        onlyOwn: false,
-        replaceRegular: '',
-        replaceRegularTo: '',
-        replaceValueMapName: '',
-        seq: this.cssSelectList.length + 1,
-      },
-    ];
-    this.cssSelectListChange.emit(this.cssSelectList);
-  }
-  //刪除CssSelect資料
-  onDeleteCssSelect(i: number) {
-    this.cssSelectList.splice(i, 1);
-    this.cssSelectList = [...this.cssSelectList];
-    this.cssSelectListChange.emit(this.cssSelectList);
+  constructor(injector: Injector) {
+    super(injector);
+    this.replaceValueMapService = this.injector.get(ReplaceValueMapService);
   }
 
   selectReplaceValueMap(element: CssSelect) {
@@ -74,25 +73,10 @@ export class CssSelectTableComponent {
       .pipe(
         switchMap(res =>
           this.selectTableService.selectSingleReplaceValueMap(res)
-        ),
-        filter(x => isNotNull(x))
+        )
       )
       .subscribe(res => {
-        if (res) {
-          element.replaceValueMapName = res.name;
-          this.cssSelectListChange.emit(this.cssSelectList);
-        }
+        element.replaceValueMapName = res.name;
       });
-  }
-  onUpDown(index: number, type: 'up' | 'down') {
-    let data: CssSelect[] = JSON.parse(JSON.stringify(this.cssSelectList));
-    let source = data[index];
-    let target = data.splice(index + (type === 'up' ? -1 : 1), 1, source);
-    data.splice(index, 1, target[0]);
-    this.cssSelectList = data.map((x, i) => {
-      x.seq = i + 1;
-      return x;
-    });
-    this.cssSelectListChange.emit(this.cssSelectList);
   }
 }

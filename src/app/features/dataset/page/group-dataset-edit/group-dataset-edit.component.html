@@ -28,7 +28,7 @@
       {{ 'dataset.fieldTable' | translate }}
     </div>
     <app-group-dataset-field-table
-      [(fieldList)]="
+      [(list)]="
         model.config.groupDatasetFieldList
       "></app-group-dataset-field-table>
 
@@ -45,13 +45,13 @@
     @switch (model.config.type) {
       @case ('scrapy') {
         <app-group-dataset-scrapy-table
-          [(scrapyList)]="
+          [(list)]="
             model.config.groupDatasetScrapyList
           "></app-group-dataset-scrapy-table>
       }
       @case ('api') {
         <app-group-dataset-api-table
-          [(apiList)]="
+          [(list)]="
             model.config.groupDatasetApiList
           "></app-group-dataset-api-table>
       }

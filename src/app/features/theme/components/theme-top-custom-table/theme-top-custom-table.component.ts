@@ -1,4 +1,10 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Injector,
+  Input,
+  Output,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -6,17 +12,18 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { TranslateModule } from '@ngx-translate/core';
-import { ApiConfig } from '../../../api-config/model';
-import {
-  ThemeTopCustom,
-  ThemeCustomType,
-  ThemeTopCustomType,
-} from '../../models';
-import { MatDialog } from '@angular/material/dialog';
+import { ThemeTopCustom, ThemeTopCustomType } from '../../models';
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import { ApiConfigService } from '../../../api-config/service/api-config.service';
-import { isBlank, isNull } from '../../../../shared/util/helper';
-import { ChipInputComponent } from '../../../../core/components/chip-input/chip-input.component';
+import { isNull } from '../../../../shared/util/helper';
+import { switchMap } from 'rxjs';
+import {
+  CdkDrag,
+  CdkDragDrop,
+  CdkDropList,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop';
+import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 
 @Component({
   selector: 'app-theme-top-custom-table',
@@ -30,91 +37,35 @@ import { ChipInputComponent } from '../../../../core/components/chip-input/chip-
     MatTableModule,
     MatButtonModule,
     MatChipsModule,
-    ChipInputComponent,
+    CdkDropList,
+    CdkDrag,
   ],
   templateUrl: './theme-top-custom-table.component.html',
-  styleUrl: './theme-top-custom-table.component.scss',
 })
-export class ThemeTopCustomTableComponent {
-  @Input({ required: true }) themeTopCustomList!: ThemeTopCustom[];
-  @Output() themeTopCustomListChange = new EventEmitter<ThemeTopCustom[]>();
+export class ThemeTopCustomTableComponent extends GenericTableComponent<ThemeTopCustom> {
   displayedColumns = ['order', 'type', 'byKey', 'label', 'other'];
   eThemeTopCustomType = ThemeTopCustomType;
-  apiConfigList: ApiConfig[] = [];
-
-  constructor(
-    private apiConfigService: ApiConfigService,
-    private matDialog: MatDialog,
-    private selectTableService: SelectTableService
-  ) {}
-
-  ngOnInit() {
-    this.apiConfigService.getAll().subscribe(res => {
-      this.apiConfigList = res;
-    });
-  }
-
-  onAdd() {
-    if (isNull(this.themeTopCustomList)) {
-      this.themeTopCustomList = [];
-    }
-    let element: ThemeTopCustom = {
-      seq: this.themeTopCustomList.length + 1,
-      type: ThemeTopCustomType.openUrl,
-      byKey: '',
-      label: '',
-      openUrl: '',
-      apiName: '',
-      apiConfig: undefined,
-    };
-    this.themeTopCustomList = [...this.themeTopCustomList, element].map(
-      (x, i) => {
-        x.seq = i + 1;
-        return x;
-      }
-    );
-    this.themeTopCustomListChange.emit(this.themeTopCustomList);
-  }
-
-  onDelete(index: number) {
-    this.themeTopCustomList = this.themeTopCustomList
-      .filter((x, i) => i !== index)
-      .map((x, i) => {
-        x.seq = i + 1;
-        return x;
-      });
-    this.themeTopCustomListChange.emit(this.themeTopCustomList);
-  }
-
-  onUpDown(index: number, type: 'up' | 'down') {
-    let data: ThemeTopCustom[] = JSON.parse(
-      JSON.stringify(this.themeTopCustomList)
-    );
-    let source = data[index];
-    let target = data.splice(index + (type === 'up' ? -1 : 1), 1, source);
-    data.splice(index, 1, target[0]);
-    this.themeTopCustomList = data.map((x, i) => {
-      x.seq = i + 1;
-      return x;
-    });
-    this.themeTopCustomListChange.emit(this.themeTopCustomList);
+  override item: ThemeTopCustom = {
+    type: ThemeTopCustomType.openUrl,
+    label: '',
+    byKey: '',
+    seq: 0,
+    openUrl: '',
+    apiName: '',
+  };
+  apiConfigService: ApiConfigService;
+  constructor(injector: Injector) {
+    super(injector);
+    this.apiConfigService = this.injector.get(ApiConfigService);
   }
 
   selectApi(element: ThemeTopCustom) {
-    this.selectTableService
-      .selectSingleApi(this.apiConfigList)
+    this.apiConfigService
+      .getAll()
+      .pipe(switchMap(res => this.selectTableService.selectSingleApi(res)))
       .subscribe(res => {
-        if (res) {
-          element.apiConfig = res;
-        }
+        element.apiConfig = res;
       });
-  }
-
-  toJsonParse(s: string): string[] {
-    if (isBlank(s)) {
-      return [];
-    }
-    return JSON.parse(s);
   }
 
   removeApi(element: ThemeTopCustom) {

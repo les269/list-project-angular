@@ -33,7 +33,6 @@ import { GroupDatasetApiTableComponent } from '../../components/group-dataset-ap
     CommonModule,
     MatIconModule,
     MatCheckboxModule,
-    DatasetFieldTableComponent,
     GroupDatasetScrapyTableComponent,
     GroupDatasetFieldTableComponent,
     GroupDatasetApiTableComponent,
@@ -59,7 +58,6 @@ export class GroupDatasetEditComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private groupDatasetService: GroupDatasetService,
-    private translateService: TranslateService,
     private snackbarService: SnackbarService
   ) {}
   ngOnInit(): void {

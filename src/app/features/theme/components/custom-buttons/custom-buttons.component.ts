@@ -6,6 +6,7 @@ import {
   ThemeCustom,
   ThemeCustomValue,
   ThemeCustomValueResponse,
+  ThemeHeaderType,
 } from '../../models';
 import {
   isBlank,
@@ -31,6 +32,8 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
   styleUrl: './custom-buttons.component.scss',
 })
 export class CustomButtonsComponent {
+  @Input({ required: true }) themeHeaderType: ThemeHeaderType =
+    ThemeHeaderType.imageList;
   @Input({ required: true }) themeCustomList: ThemeCustom[] = [];
   @Input({ required: true }) data: any;
   @Input({ required: true }) headerId: string = '';

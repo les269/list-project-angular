@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Injector,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,7 +18,14 @@ import { MatChipsModule } from '@angular/material/chips';
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import { ApiConfigService } from '../../../api-config/service/api-config.service';
 import { ApiConfig } from '../../../api-config/model';
-import { filter } from 'rxjs';
+import { filter, switchMap } from 'rxjs';
+import {
+  CdkDropList,
+  CdkDrag,
+  CdkDragDrop,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop';
+import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 
 @Component({
   selector: 'app-group-dataset-api-table',
@@ -26,58 +40,30 @@ import { filter } from 'rxjs';
     MatIconModule,
     MatCheckboxModule,
     MatChipsModule,
+    CdkDropList,
+    CdkDrag,
   ],
   templateUrl: './group-dataset-api-table.component.html',
 })
-export class GroupDatasetApiTableComponent implements OnInit {
+export class GroupDatasetApiTableComponent extends GenericTableComponent<GroupDatasetApi> {
   displayedColumns = ['seq', 'apiName', 'label', 'other'];
-  @Input({ required: true }) apiList!: GroupDatasetApi[];
-  @Output() apiListChange = new EventEmitter<GroupDatasetApi[]>();
-  apiConfigList: ApiConfig[] = [];
-
-  constructor(
-    private selectTableService: SelectTableService,
-    private apiConfigService: ApiConfigService
-  ) {}
-  ngOnInit(): void {
-    this.apiConfigService.getAll().subscribe(res => (this.apiConfigList = res));
+  override item: GroupDatasetApi = {
+    seq: 0,
+    apiName: '',
+    label: '',
+  };
+  apiConfigService: ApiConfigService;
+  constructor(injector: Injector) {
+    super(injector);
+    this.apiConfigService = this.injector.get(ApiConfigService);
   }
 
   selectApi(e: GroupDatasetApi) {
-    this.selectTableService
-      .selectSingleApi(this.apiConfigList)
-      .pipe(filter(res => res !== undefined))
+    this.apiConfigService
+      .getAll()
+      .pipe(switchMap(x => this.selectTableService.selectSingleApi(x)))
       .subscribe(x => {
         e.apiName = x.apiName;
       });
-  }
-
-  onAdd() {
-    this.apiList = [
-      ...this.apiList,
-      {
-        seq: this.apiList.length + 1,
-        apiName: '',
-        label: '',
-      },
-    ];
-    this.apiListChange.emit(this.apiList);
-  }
-
-  onDelete(index: number) {
-    this.apiList = this.apiList.filter((x, i) => i !== index);
-    this.apiListChange.emit(this.apiList);
-  }
-  //資料來源的上下移動
-  onUpDown(index: number, type: 'up' | 'down') {
-    let data: GroupDatasetApi[] = JSON.parse(JSON.stringify(this.apiList));
-    let source = data[index];
-    let target = data.splice(index + (type === 'up' ? -1 : 1), 1, source);
-    data.splice(index, 1, target[0]);
-    this.apiList = data.map((x, i) => {
-      x.seq = i + 1;
-      return x;
-    });
-    this.apiListChange.emit(this.apiList);
   }
 }

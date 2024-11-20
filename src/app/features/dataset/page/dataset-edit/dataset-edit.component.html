@@ -50,7 +50,7 @@
       }}</label>
       <div class="mt-1 d-flex flex-wrap gap-3 align-items-center">
         @if (model.config.groupName) {
-          <mat-chip cdkDrag
+          <mat-chip
             >{{ model.config.groupName }}
             <button matChipRemove (click)="model.config.groupName = ''">
               <mat-icon>cancel</mat-icon>
@@ -121,7 +121,7 @@
       {{ 'dataset.fixedFieldTable' | translate }}
     </div>
     <app-dataset-field-table
-      [(fieldList)]="model.config.fieldList"></app-dataset-field-table>
+      [(list)]="model.config.fieldList"></app-dataset-field-table>
     @if (status === 'edit') {
       <div class="my-4">
         <button

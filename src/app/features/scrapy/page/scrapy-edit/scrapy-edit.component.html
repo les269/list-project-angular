@@ -63,7 +63,7 @@
               [placeholder]="'scrapy.urlPH' | translate" />
           </div>
           <label class="h6">{{ 'scrapy.cookie' | translate }}</label>
-          <app-cookie-table [(cookieList)]="data.cookie"></app-cookie-table>
+          <app-cookie-table [(list)]="data.cookie"></app-cookie-table>
           <div class="my-2">
             <label class="form-label" for="type">{{
               'scrapy.scrapyPageType' | translate
@@ -87,7 +87,7 @@
             ><div [innerHTML]="'scrapy.cssSelectRemind' | translate"></div
           ></label>
           <app-css-select-table
-            [(cssSelectList)]="data.cssSelectList"></app-css-select-table>
+            [(list)]="data.cssSelectList"></app-css-select-table>
           <div class="form-group mb-2">
             <label>{{ 'scrapy.testHtml' | translate }}</label>
             <code-editor

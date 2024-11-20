@@ -117,15 +117,14 @@
         }
       }
       <app-theme-label-table
-        [(themeLabelList)]="model.themeLabelList"
+        [(list)]="model.themeLabelList"
         [type]="model.type"></app-theme-label-table>
       <app-theme-dataset-table
-        [(themeDatasetList)]="model.themeDatasetList"></app-theme-dataset-table>
+        [(list)]="model.themeDatasetList"></app-theme-dataset-table>
       <label class="h3">{{ 'themeCustom.title' | translate }}</label>
       <app-theme-custom-table
-        [(themeCustomList)]="model.themeCustomList"></app-theme-custom-table>
-      <app-theme-tag-table
-        [(themeTagList)]="model.themeTagList"></app-theme-tag-table>
+        [(list)]="model.themeCustomList"></app-theme-custom-table>
+      <app-theme-tag-table [(list)]="model.themeTagList"></app-theme-tag-table>
       <app-theme-other-setting
         [type]="model.type"
         [(themeOtherSetting)]="
