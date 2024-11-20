@@ -10,13 +10,11 @@ import {
 } from '@angular/material/dialog';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTabsModule } from '@angular/material/tabs';
 import { GroupDatasetDataService } from '../../service/group-dataset-data.service';
-import { filter, map, of, switchMap } from 'rxjs';
+import { EMPTY, filter, map, of, switchMap } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import {
   downloadJsonFile,
-  isBlank,
   isNotBlank,
   readJsonFile,
 } from '../../../../shared/util/helper';
@@ -36,16 +34,15 @@ import { GroupDatasetData } from '../../model';
     ReactiveFormsModule,
     FormsModule,
     MatIconModule,
-    MatTabsModule,
     MatButtonModule,
   ],
   templateUrl: './group-dataset-import-export.component.html',
 })
 export class GroupDatasetImportExportComponent {
   readonly dialogRef = inject(MatDialogRef<GroupDatasetImportExportComponent>);
-  readonly data = inject<{ groupName: string }>(MAT_DIALOG_DATA);
+  readonly data = inject<{ groupName: string; byKey: string }>(MAT_DIALOG_DATA);
   groupName = this.data.groupName;
-  key: string = '';
+  byKey: string = this.data.byKey;
   @ViewChild('importJsonInput') importJsonInput!: ElementRef<HTMLInputElement>;
 
   constructor(
@@ -70,20 +67,7 @@ export class GroupDatasetImportExportComponent {
       });
   }
 
-  importJson() {
-    if (isBlank(this.key)) {
-      this.snackbarService.isBlankMessage('g.key');
-      return;
-    }
-    this.importJsonInput.nativeElement.click();
-  }
-
   import(event: Event, onlyJson?: boolean) {
-    if (onlyJson && isBlank(this.key)) {
-      this.snackbarService.isBlankMessage('g.key');
-      return;
-    }
-
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       const reader = new FileReader();
@@ -93,12 +77,15 @@ export class GroupDatasetImportExportComponent {
             this.handleJsonData(
               data as any[],
               onlyJson ?? false,
-              this.key,
+              this.byKey,
               this.groupName
             )
           ),
           switchMap(req => {
-            if (req.length === 0) return of(null); // 中斷流程，如果資料不正確
+            if (req.length === 0) {
+              this.snackbarService.openByI18N('msg.importError');
+              return EMPTY;
+            } // 中斷流程，如果資料不正確
             return this.messageBoxService
               .openI18N('msg.importNum', { number: req.length })
               .pipe(

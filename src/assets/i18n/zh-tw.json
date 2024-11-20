@@ -78,8 +78,7 @@
     "import": "匯入",
     "export": "匯出",
     "download": "下載",
-    "importJson": "匯入json檔案",
-    "importComplete": "匯入完整檔案"
+    "importJson": "匯入json檔案"
   },
   "title": {
     "home": "清單列表",
@@ -326,8 +325,10 @@
     "replaceValueMap": "選擇替換表",
     "text": "文字文本",
     "importCsvTxt": "匯入csv,txt檔案",
-    "downloadOnlyJson": "下載僅Json",
-    "downloadComplete": "下載完整資料"
+    "exportOnlyJson": "匯出僅JSON資料",
+    "exportComplete": "匯出完整資料",
+    "importJson": "匯入僅JSON資料",
+    "importComplete": "匯入完整檔案"
   },
   "replaceValueMap": {
     "searchName": "搜尋名稱",

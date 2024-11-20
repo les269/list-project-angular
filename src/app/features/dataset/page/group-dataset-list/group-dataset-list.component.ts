@@ -110,9 +110,9 @@ export class GroupDatasetListComponent {
     this.matDialog.open(GroupDatasetImportExportComponent, {
       data: {
         groupName: e.groupName,
+        byKey: e.config.byKey,
       },
       width: '480px',
-      height: '500px',
       autoFocus: false,
     });
   }

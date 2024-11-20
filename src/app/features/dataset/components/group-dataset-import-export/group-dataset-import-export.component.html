@@ -7,43 +7,30 @@
   </button>
 </div>
 <mat-dialog-content>
-  <mat-tab-group>
-    <mat-tab [label]="'g.import' | translate">
-      <div class="my-3">
-        <input
-          type="text"
-          class="form-control"
-          [placeholder]="'g.key' | translate"
-          [(ngModel)]="key" />
-      </div>
-      <input
-        type="file"
-        accept=".json"
-        (change)="import($event, true)"
-        hidden
-        #importJsonInput />
-      <button class="w-100" mat-button (click)="importJson()">
-        {{ 'g.importJson' | translate }}
-      </button>
-      <input
-        type="file"
-        accept=".json"
-        (change)="import($event)"
-        hidden
-        #importCompleteInput />
-      <button class="w-100" mat-button (click)="importCompleteInput.click()">
-        {{ 'g.importComplete' | translate }}
-      </button>
-    </mat-tab>
-    <mat-tab [label]="'g.export' | translate">
-      <div class="my-3">
-        <button mat-button class="w-100" (click)="export(true)">
-          {{ 'dataset.downloadOnlyJson' | translate }}
-        </button>
-        <button mat-button class="w-100" (click)="export()">
-          {{ 'dataset.downloadComplete' | translate }}
-        </button>
-      </div>
-    </mat-tab>
-  </mat-tab-group>
+  <div class="my-3">
+    <input
+      type="file"
+      accept=".json"
+      (change)="import($event, true)"
+      hidden
+      #importJson />
+    <button class="w-100" mat-button (click)="importJson.click()">
+      {{ 'dataset.importJson' | translate }}
+    </button>
+    <input
+      type="file"
+      accept=".json"
+      (change)="import($event)"
+      hidden
+      #importComplete />
+    <button class="w-100" mat-button (click)="importComplete.click()">
+      {{ 'dataset.importComplete' | translate }}
+    </button>
+    <button mat-button class="w-100" (click)="export(true)">
+      {{ 'dataset.exportOnlyJson' | translate }}
+    </button>
+    <button mat-button class="w-100" (click)="export()">
+      {{ 'dataset.exportComplete' | translate }}
+    </button>
+  </div>
 </mat-dialog-content>
