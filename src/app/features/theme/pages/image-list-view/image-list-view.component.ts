@@ -349,8 +349,8 @@ export class ImageListViewComponent
         .map(x => x.trim())
         .filter(x => isNotBlank(x));
     }
-    if (text && !this.searchValue.includes(text)) {
-      this.searchValue = [...this.searchValue, text];
+    if (isNotBlank(text) && !this.searchValue.includes(text!)) {
+      this.searchValue = [text!];
     }
     this.changeQueryParams();
   }

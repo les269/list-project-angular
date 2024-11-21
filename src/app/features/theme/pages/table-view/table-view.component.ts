@@ -196,7 +196,7 @@ export class TableViewComponent
         .filter(x => isNotBlank(x));
     }
     if (isNotBlank(text) && !this.searchValue.includes(text!)) {
-      this.searchValue = [...this.searchValue, text!];
+      this.searchValue = [text!];
     }
     this.onSearch();
   }

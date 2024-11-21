@@ -149,6 +149,10 @@ export class CustomButtonsComponent {
   }
 
   openNewPage(text: string, target: OpenWindowTargetType) {
+    if (isBlank(text)) {
+      this.snackbarService.openByI18N('msg.urlEmpty');
+      return;
+    }
     window.open(text, target);
   }
 

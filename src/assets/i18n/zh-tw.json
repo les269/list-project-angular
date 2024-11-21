@@ -38,7 +38,8 @@
     "importNum": "要匯入的筆數: {{number}}",
     "importError": "匯入資料格式錯誤",
     "openFolderSuccess": "開啟資料夾成功",
-    "openFolderFail": "開啟資料夾失敗"
+    "openFolderFail": "開啟資料夾失敗",
+    "urlEmpty": "網址為空無法開啟請再確認"
   },
   "g": {
     "edit": "編輯",
