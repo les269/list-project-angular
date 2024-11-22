@@ -1,7 +1,15 @@
 <div class="col-md-10 offset-md-1 col-xs-12 pt-2">
-  <button type="button" class="btn btn-primary" (click)="routeCreate()">
-    {{ 'home.createTheme' | translate }}
-  </button>
+  <div class="gap-1">
+    <button type="button" class="btn btn-primary" (click)="routeCreate()">
+      {{ 'home.createTheme' | translate }}
+    </button>
+    <button
+      type="button"
+      class="btn btn-primary mx-1"
+      (click)="onOpenVisible()">
+      {{ 'home.visibleConfig' | translate }}
+    </button>
+  </div>
   @for (type of eThemeHeaderType | keyvalue; track $index) {
     <ng-container *ngIf="list$ | async as list">
       @if (list[type.value].length > 0) {

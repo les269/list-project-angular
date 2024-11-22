@@ -13,6 +13,7 @@ import { CopyThemeComponent } from '../../components/copy-theme.dialog';
 import { isNotBlank } from '../../../../shared/util/helper';
 import { selectLayoutByKey } from '../../../../shared/state/layout.selectors';
 import { Observable } from 'rxjs';
+import { ThemeVisibleComponent } from '../../components/theme-visible/theme-visible.component';
 
 @Component({
   standalone: true,
@@ -87,5 +88,9 @@ export class ThemeListComponent implements OnInit {
 
   navigateList(item: ThemeHeader) {
     this.router.navigate([item.type, item.name, item.version]);
+  }
+
+  onOpenVisible() {
+    this.matDialog.open(ThemeVisibleComponent);
   }
 }

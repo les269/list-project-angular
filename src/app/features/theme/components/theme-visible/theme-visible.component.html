@@ -1,0 +1,35 @@
+<div class="d-flex justify-content-between align-items-center">
+  <h2 mat-dialog-title>
+    {{ 'home.visibleConfig' | translate }}
+  </h2>
+  <button class="d-flex mx-2" mat-icon-button (click)="onNoClick()">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+<mat-dialog-content class="scrollbar-primary">
+  <mat-list>
+    @for (
+      type of eThemeHeaderType | keyvalue;
+      track $index;
+      let isLast = $last
+    ) {
+      @if (list[type.value].length > 0) {
+        <div mat-subheader>{{ 'themeHeader.' + type.key | translate }}</div>
+        @for (item of list[type.value]; track $index) {
+          <mat-list-item>
+            <div matListItemTitle>{{ item.title | translate }}</div>
+            <button mat-button matListItemIcon (click)="changeVisible(item)">
+              {{
+                (item.themeOtherSetting.themeVisible ? 'g.visible' : 'g.hide')
+                  | translate
+              }}
+            </button>
+          </mat-list-item>
+        }
+      }
+      @if (!isLast) {
+        <mat-divider></mat-divider>
+      }
+    }
+  </mat-list>
+</mat-dialog-content>

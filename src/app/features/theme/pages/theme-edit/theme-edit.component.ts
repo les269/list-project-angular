@@ -76,6 +76,7 @@ export class ThemeEditComponent implements OnInit {
       themeTopCustomList: [],
       showDuplicate: false,
       checkFileExist: '',
+      themeVisible: true,
     },
   };
   eThemeHeaderType = ThemeHeaderType;

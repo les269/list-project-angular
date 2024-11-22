@@ -31,10 +31,18 @@ export class ThemeService {
       this.store.dispatch(
         updateList({
           [ThemeHeaderType.imageList]: res
-            .filter(x => x.type === ThemeHeaderType.imageList)
+            .filter(
+              x =>
+                x.type === ThemeHeaderType.imageList &&
+                x.themeOtherSetting.themeVisible
+            )
             .sort((a, b) => (a.seq > b.seq ? 1 : -1)),
           [ThemeHeaderType.table]: res
-            .filter(x => x.type === ThemeHeaderType.table)
+            .filter(
+              x =>
+                x.type === ThemeHeaderType.table &&
+                x.themeOtherSetting.themeVisible
+            )
             .sort((a, b) => (a.seq > b.seq ? 1 : -1)),
         })
       );

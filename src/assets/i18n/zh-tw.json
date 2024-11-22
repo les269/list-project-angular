@@ -79,7 +79,9 @@
     "import": "匯入",
     "export": "匯出",
     "download": "下載",
-    "importJson": "匯入json檔案"
+    "importJson": "匯入json檔案",
+    "visible": "顯示",
+    "hide": "隱藏"
   },
   "title": {
     "home": "清單列表",
@@ -106,7 +108,7 @@
     "topCustom": "頂部自定義功能",
     "importExport": "匯入匯出"
   },
-  "home": { "createTheme": "創建主題" },
+  "home": { "createTheme": "創建主題", "visibleConfig": "清單顯示控制" },
   "themeHeader": {
     "name": "主題名稱",
     "version": "版本",

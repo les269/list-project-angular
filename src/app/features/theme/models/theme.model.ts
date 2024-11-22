@@ -20,6 +20,7 @@ export interface ThemeOtherSetting {
   showDuplicate: boolean;
   themeTopCustomList: ThemeTopCustom[];
   checkFileExist: string;
+  themeVisible: boolean;
 }
 export interface ThemeHeaderCopy {
   name: string;
