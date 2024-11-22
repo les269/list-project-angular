@@ -278,9 +278,7 @@ export class ImageListViewComponent
     this.currentPage = parseInt(this.currentPage + '', 10);
     if (this.currentPage - 1 !== 0) {
       this.currentPage -= 1;
-      this.toTop();
-      this.updateViewData();
-      this.getCustomValueMap();
+      setTimeout(() => this.toTop());
       this.changeQueryParams();
     }
   }
@@ -289,9 +287,8 @@ export class ImageListViewComponent
     this.currentPage = parseInt(this.currentPage + '', 10);
     if (this.currentPage + 1 <= this.pages.length) {
       this.currentPage += 1;
-      this.toTop();
+      setTimeout(() => this.toTop());
       this.updateViewData();
-      this.getCustomValueMap();
       this.changeQueryParams();
     }
   }
