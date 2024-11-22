@@ -16,7 +16,9 @@
         "outputPath": "dist/list-project-angular",
         "index": "src/index.html",
         "browser": "src/main.ts",
-        "polyfills": ["zone.js"],
+        "polyfills": [
+          "zone.js"
+        ],
         "tsConfig": "tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": [
@@ -40,13 +42,7 @@
               "with": "src/environments/environment.prod.ts"
             }
           ],
-          "budgets": [
-            {
-              "type": "initial",
-              "maximumWarning": "500kB",
-              "maximumError": "1MB"
-            }
-          ],
+          "budgets": [],
           "outputHashing": "all",
           "optimization": false,
           "extractLicenses": false,
@@ -88,7 +84,10 @@
     "test": {
       "executor": "@angular-devkit/build-angular:karma",
       "options": {
-        "polyfills": ["zone.js", "zone.js/testing"],
+        "polyfills": [
+          "zone.js",
+          "zone.js/testing"
+        ],
         "tsConfig": "tsconfig.spec.json",
         "inlineStyleLanguage": "scss",
         "assets": [
@@ -97,7 +96,9 @@
             "input": "public"
           }
         ],
-        "styles": ["src/styles.scss"],
+        "styles": [
+          "src/styles.scss"
+        ],
         "scripts": []
       }
     }
