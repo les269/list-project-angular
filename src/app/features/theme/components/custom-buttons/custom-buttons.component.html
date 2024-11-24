@@ -7,9 +7,11 @@
             class="custom-button"
             (click)="changeCustomValue(data, custom)">
             <label class="px-2">{{ custom.label }}</label>
-            <mat-icon class="material-icons-outlined">{{
-              getCustomValueForUI(data, custom)
-            }}</mat-icon>
+            <mat-icon class="material-icons-outlined">
+              <span class="material-symbols-outlined">
+                {{ getCustomValueForUI(data, custom) }}
+              </span>
+            </mat-icon>
           </button>
         </div>
       }

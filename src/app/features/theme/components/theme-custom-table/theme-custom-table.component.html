@@ -95,7 +95,21 @@
                 >
               </div>
 
-              <div class="d-flex input-group">
+              <div class="d-flex align-items-center">
+                <div class="mx-1 d-flex">
+                  <mat-icon class="material-icons-outlined"
+                    ><span class="material-symbols-outlined">
+                      {{ element.buttonIconTrue }}
+                    </span></mat-icon
+                  >
+                </div>
+                <div class="mx-1 d-flex">
+                  <mat-icon class="material-icons-outlined"
+                    ><span class="material-symbols-outlined">
+                      {{ element.buttonIconFalse }}
+                    </span></mat-icon
+                  >
+                </div>
                 <input
                   class="form-control"
                   [placeholder]="'themeCustom.clickBeforeIcon' | translate"
@@ -118,7 +132,20 @@
                   >{{ 'themeCustom.googleIconUrl' | translate }}</a
                 >
               </div>
-              <div class="d-flex">
+              <div class="d-flex align-items-center">
+                <div class="mx-1 d-flex">
+                  <mat-icon class="material-icons-outlined"
+                    ><span class="material-symbols-outlined">
+                      {{ element.buttonIconFill }}
+                    </span></mat-icon
+                  >
+                </div>
+                <div class="mx-1 d-flex">
+                  <mat-icon
+                    [ngStyle]="{ color: element.buttonIconFillColor }"
+                    >{{ element.buttonIconFill }}</mat-icon
+                  >
+                </div>
                 <input
                   class="form-control mt-1"
                   [placeholder]="'themeCustom.fillIcon' | translate"
