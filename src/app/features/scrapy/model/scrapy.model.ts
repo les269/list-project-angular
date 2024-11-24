@@ -16,6 +16,8 @@ export interface ScrapyData {
   cssSelectList: CssSelect[];
   script: string;
   html: string;
+  replaceRegular: string;
+  replaceRegularTo: string;
 }
 
 export enum ScrapyPageType {

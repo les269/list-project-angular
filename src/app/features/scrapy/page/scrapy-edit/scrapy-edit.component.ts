@@ -114,6 +114,8 @@ export class ScrapyEditComponent implements OnInit {
       script: this.defaultJS,
       name: '',
       html: '',
+      replaceRegular: '',
+      replaceRegularTo: '',
     });
   }
 
