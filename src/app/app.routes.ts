@@ -50,6 +50,30 @@ export const routes: Routes = [
     data: { title: 'title.scrapyEdit' },
   },
   {
+    path: 'scrapy-pagination-list',
+    loadComponent: () =>
+      import(
+        './features/scrapy/page/scrapy-pagination-list/scrapy-pagination-list.component'
+      ).then(mod => mod.ScrapyPaginationListComponent),
+    data: { title: 'title.scrapyPaginationList', sidenav: true },
+  },
+  {
+    path: 'scrapy-pagination-edit',
+    loadComponent: () =>
+      import(
+        './features/scrapy/page/scrapy-pagination-edit/scrapy-pagination-edit.component'
+      ).then(mod => mod.ScrapyPaginationEditComponent),
+    data: { title: 'title.scrapyPaginationEdit' },
+  },
+  {
+    path: 'scrapy-pagination-edit/:name',
+    loadComponent: () =>
+      import(
+        './features/scrapy/page/scrapy-pagination-edit/scrapy-pagination-edit.component'
+      ).then(mod => mod.ScrapyPaginationEditComponent),
+    data: { title: 'title.scrapyPaginationEdit' },
+  },
+  {
     path: 'dataset-list',
     loadComponent: () =>
       import(

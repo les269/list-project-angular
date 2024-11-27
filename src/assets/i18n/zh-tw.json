@@ -84,7 +84,7 @@
     "hide": "隱藏"
   },
   "title": {
-    "home": "清單列表",
+    "home": "主題清單列表",
     "editTheme": "編輯主題",
     "copyTheme": "複製主題",
     "copyScrapy": "複製爬蟲",
@@ -106,7 +106,9 @@
     "groupDatasetDataEdit": "編輯群組資料",
     "replaceValueMap": "替換文字清單",
     "topCustom": "頂部自定義功能",
-    "importExport": "匯入匯出"
+    "importExport": "匯入匯出",
+    "scrapyPaginationList": "爬蟲處理分頁清單",
+    "scrapyPaginationEdit": "爬蟲處理分頁編輯"
   },
   "home": { "createTheme": "創建主題", "visibleConfig": "清單顯示控制" },
   "themeHeader": {

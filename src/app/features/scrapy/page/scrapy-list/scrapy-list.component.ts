@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { MatButton, MatButtonModule } from '@angular/material/button';
+import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { ScrapyConfig, ScrapyData } from '../../model/scrapy.model';
+import { ScrapyConfig } from '../../model/scrapy.model';
 import { ScrapyService } from '../../services/scrapy.service';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
@@ -24,7 +24,6 @@ import { CopyScrapyComponent } from '../../components/copy-scrapy/copy-scrapy.co
   ],
   selector: 'app-scrapy-list',
   templateUrl: 'scrapy-list.component.html',
-  styleUrl: 'scrapy-list.component.scss',
 })
 export class ScrapyListComponent implements OnInit {
   displayedColumns = ['name', 'createdTime', 'updatedTime', 'other'];

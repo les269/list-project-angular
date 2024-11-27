@@ -5,7 +5,7 @@ import { ThemeHeaderType } from '../../features/theme/models';
 
 export const initialState: Readonly<LayoutState> = {
   openSidenav: false,
-  title: 'test',
+  title: '',
   list: {
     [ThemeHeaderType.imageList]: [],
     [ThemeHeaderType.table]: [],
