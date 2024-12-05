@@ -25,6 +25,8 @@ export interface DatasetField {
   key: string;
   label: string;
   fixedString: string;
+  replaceRegular: string;
+  replaceRegularTo: string;
 }
 
 export enum DatasetFieldType {
