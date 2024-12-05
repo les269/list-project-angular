@@ -60,3 +60,22 @@ export interface ScrapyReq {
   json?: string[];
   url?: string;
 }
+
+export interface ScrapyPagination {
+  name: string;
+  config: ScrapyPaginationConfig;
+}
+export interface ScrapyPaginationConfig {
+  startUrl: string;
+  redirectUrlList: string[];
+  redirectParamsList: string[][];
+  cookie: Cookie[];
+  cssSelectList: CssSelect[];
+  springExpressionLangList: SpringExpressionLang[];
+}
+
+export interface SpringExpressionLang {
+  seq: number;
+  key: string;
+  expression: string;
+}

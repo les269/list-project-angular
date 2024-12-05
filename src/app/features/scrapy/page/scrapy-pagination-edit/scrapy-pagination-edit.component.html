@@ -1,1 +1,72 @@
-<p>scrapy-pagination-edit works!</p>
+<div class="container d-flex">
+  <div class="col-md-10 offset-md-1 col-xs-12 mt-2">
+    <button mat-icon-button (click)="onBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="form-group mb-2">
+      <label>{{ 'scrapy.name' | translate }}</label>
+      <input
+        class="form-control"
+        [(ngModel)]="model.name"
+        [disabled]="status === 'edit'" />
+    </div>
+    <div class="form-group mb-2">
+      <label>{{ 'scrapy.startUrl' | translate }}</label>
+      <input class="form-control" [(ngModel)]="model.config.startUrl" />
+    </div>
+    <label class="h5">{{ 'scrapy.cookie' | translate }}</label>
+    <app-cookie-table [(list)]="model.config.cookie"></app-cookie-table>
+    <label class="h5 mt-2">{{
+      'scrapy.springExpressionLang' | translate
+    }}</label>
+    <label class="form-text"
+      ><div [innerHTML]="'scrapy.springExpressionLangRemind' | translate"></div
+    ></label>
+    <app-spring-expression-lang-table
+      [(list)]="
+        model.config.springExpressionLangList
+      "></app-spring-expression-lang-table>
+    <label class="h5 mt-2">{{ 'scrapy.cssSelect' | translate }}</label>
+    <label class="form-text"
+      ><div [innerHTML]="'scrapy.cssSelectRemind' | translate"></div
+    ></label>
+    <app-css-select-table
+      [(list)]="model.config.cssSelectList"></app-css-select-table>
+    <div class="form-group mb-2">
+      <label>{{ 'scrapy.testHtml' | translate }}</label>
+      <code-editor
+        [style.height]="'400px'"
+        [(ngModel)]="testHtml"
+        [language]="'html'"
+        [indentWithTab]="true"
+        [languages]="languages" />
+      <button type="button" class="btn btn-primary" (click)="onTestParseHtml()">
+        {{ 'scrapy.test' | translate }}
+      </button>
+    </div>
+    <code-editor
+      [(ngModel)]="testResult"
+      [language]="'json'"
+      [indentWithTab]="true"
+      [languages]="languages" />
+    @if (status === 'edit') {
+      <div class="my-4">
+        <button
+          type="submit"
+          class="btn btn-success w-100"
+          (click)="update(false, 'save')">
+          {{ 'g.save' | translate }}
+        </button>
+      </div>
+    }
+
+    <div class="my-4">
+      <button
+        type="submit"
+        class="btn btn-success w-100"
+        (click)="update(true, 'commit')">
+        {{ 'g.submit' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

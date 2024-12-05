@@ -90,10 +90,10 @@ export class ImageListViewComponent
     this.changeDataset();
     this.initBaseConfig();
     this.onSearch();
-    this.changePage();
     this.onSort();
     this.changeTag();
     this.updateViewData();
+    this.changePage();
     this.getCustomValueMap();
     this.changeQueryParams(); //初始化query params
     this.getFileExist();
@@ -107,10 +107,10 @@ export class ImageListViewComponent
           this.changeUrl();
           this.changeDataset();
           this.onSearch();
-          this.changePage();
           this.onSort();
           this.changeTag();
           this.updateViewData();
+          this.changePage();
           this.getCustomValueMap();
           this.getFileExist();
         });
@@ -379,7 +379,7 @@ export class ImageListViewComponent
         url =
           this.webApi +
           '/proxy-image?url=' +
-          this.replaceImageUrl(themeImage.imageUrl, data);
+          this.replaceImageUrl(themeImage.imageUrl, data, true);
         break;
     }
     return url;

@@ -272,7 +272,11 @@
     "replaceRegular": "輸入要替換的正則",
     "replaceRegularTo": "要替換成的正則",
     "replaceValueMap": "選擇替換表",
-    "paramReplace": "參數使用前替換"
+    "paramReplace": "參數使用前替換",
+    "startUrl": "起始網址",
+    "springExpressionLang": "表達式參數",
+    "expression": "表達式",
+    "springExpressionLangRemind": "提前設定會需要使用的參數使用方法為Spring Expression Language, 固定參數是'#index'從數字0開始, 而參數可以從上一個鍵取來使用方法為'#鍵', 閱讀官方使用<a href='https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html' target='_blank'>文件</a> 或 <a href='https://itmyhome.com/spring/expressions.html' target='_blank'>中文文件</a>。"
   },
   "dataset": {
     "createDataset": "創建資料集",
