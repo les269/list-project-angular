@@ -41,6 +41,7 @@ export interface CssSelect {
   replaceRegular: string;
   replaceRegularTo: string;
   replaceValueMapName: string;
+  splitText: string;
 }
 
 export interface HtmlRequest {
@@ -67,11 +68,20 @@ export interface ScrapyPagination {
 }
 export interface ScrapyPaginationConfig {
   startUrl: string;
+  lastUpdateDate: Date;
+  updateInterval: number;
+  updateIntervalType: UpdateIntervalType;
   redirectUrlList: string[];
   redirectParamsList: string[][];
   cookie: Cookie[];
   cssSelectList: CssSelect[];
   springExpressionLangList: SpringExpressionLang[];
+}
+
+export enum UpdateIntervalType {
+  year = 'year',
+  month = 'month',
+  day = 'day',
 }
 
 export interface SpringExpressionLang {

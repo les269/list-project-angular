@@ -14,12 +14,45 @@
       <label>{{ 'scrapy.startUrl' | translate }}</label>
       <input class="form-control" [(ngModel)]="model.config.startUrl" />
     </div>
+    <mat-form-field appearance="outline">
+      <mat-label style="color: black">{{
+        'scrapy.lastUpdateDate' | translate
+      }}</mat-label>
+      <input
+        style="color: black"
+        matInput
+        [matDatepicker]="picker"
+        [(ngModel)]="model.config.lastUpdateDate"
+        disabled />
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker disabled="false"></mat-datepicker>
+    </mat-form-field>
+    <div class="input-group mb-2">
+      <label class="input-group-text">{{
+        'scrapy.updateInterval' | translate
+      }}</label>
+      <input
+        class="form-control"
+        type="number"
+        [(ngModel)]="model.config.updateInterval" />
+      <select
+        class="form-control form-select"
+        [(ngModel)]="model.config.updateIntervalType">
+        <option
+          *ngFor="let type of eUpdateIntervalType | keyvalue"
+          [ngValue]="type.key">
+          {{ 'g.' + type.key | translate }}
+        </option>
+      </select>
+    </div>
     <label class="h5">{{ 'scrapy.cookie' | translate }}</label>
     <app-cookie-table [(list)]="model.config.cookie"></app-cookie-table>
     <label class="h5 mt-2">{{
       'scrapy.springExpressionLang' | translate
     }}</label>
-    <label class="form-text"
+    <label class="form-text w-100"
       ><div [innerHTML]="'scrapy.springExpressionLangRemind' | translate"></div
     ></label>
     <app-spring-expression-lang-table
@@ -27,8 +60,8 @@
         model.config.springExpressionLangList
       "></app-spring-expression-lang-table>
     <label class="h5 mt-2">{{ 'scrapy.cssSelect' | translate }}</label>
-    <label class="form-text"
-      ><div [innerHTML]="'scrapy.cssSelectRemind' | translate"></div
+    <label class="form-text w-100"
+      ><div [innerHTML]="'scrapy.cssSelectRemind2' | translate"></div
     ></label>
     <app-css-select-table
       [(list)]="model.config.cssSelectList"></app-css-select-table>

@@ -7,11 +7,12 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { ScrapyConfig } from '../../model';
+import { ScrapyConfig, ScrapyPagination } from '../../model';
 import { ScrapyService } from '../../services/scrapy.service';
 import { MessageBoxComponent } from '../../../../core/components/message-box/message-box.component';
 import { isNotBlank } from '../../../../shared/util/helper';
 import { CopyScrapyComponent } from '../../components/copy-scrapy/copy-scrapy.component';
+import { ScrapyPaginationService } from '../../services/scrapy-pagination.service';
 
 @Component({
   selector: 'app-scrapy-pagination-list',
@@ -27,13 +28,13 @@ import { CopyScrapyComponent } from '../../components/copy-scrapy/copy-scrapy.co
 })
 export class ScrapyPaginationListComponent {
   displayedColumns = ['name', 'createdTime', 'updatedTime', 'other'];
-  list: ScrapyConfig[] = [];
+  list: ScrapyPagination[] = [];
 
   constructor(
     private translateService: TranslateService,
     private matDialog: MatDialog,
     private router: Router,
-    private scapyService: ScrapyService,
+    private scrapyPaginationService: ScrapyPaginationService,
     private snackbarService: SnackbarService
   ) {}
 
@@ -42,9 +43,9 @@ export class ScrapyPaginationListComponent {
   }
 
   getList() {
-    // this.scapyService.getAllConfig().subscribe(res => {
-    //   this.list = res;
-    // });
+    this.scrapyPaginationService.getAll().subscribe(res => {
+      this.list = res;
+    });
   }
 
   onAdd() {
@@ -52,23 +53,23 @@ export class ScrapyPaginationListComponent {
   }
 
   onDelete(index: number) {
-    // this.matDialog
-    //   .open(MessageBoxComponent, {
-    //     data: {
-    //       message: this.translateService.instant('msg.sureDeleteScrapy'),
-    //     },
-    //   })
-    //   .afterClosed()
-    //   .subscribe(result => {
-    //     if (isNotBlank(result)) {
-    //       this.scapyService
-    //         .deleteConfig(this.list[index].name)
-    //         .subscribe(() => {
-    //           this.snackbarService.openByI18N('msg.deleteSuccess');
-    //           this.getList();
-    //         });
-    //     }
-    //   });
+    this.matDialog
+      .open(MessageBoxComponent, {
+        data: {
+          message: this.translateService.instant('msg.sureDeleteScrapy'),
+        },
+      })
+      .afterClosed()
+      .subscribe(result => {
+        if (isNotBlank(result)) {
+          this.scrapyPaginationService
+            .delete(this.list[index].name)
+            .subscribe(() => {
+              this.snackbarService.openByI18N('msg.deleteSuccess');
+              this.getList();
+            });
+        }
+      });
   }
 
   onEdit(index: number) {

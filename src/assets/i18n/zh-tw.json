@@ -39,7 +39,8 @@
     "importError": "匯入資料格式錯誤",
     "openFolderSuccess": "開啟資料夾成功",
     "openFolderFail": "開啟資料夾失敗",
-    "urlEmpty": "網址為空無法開啟請再確認"
+    "urlEmpty": "網址為空無法開啟請再確認",
+    "updateIntervalError": "更新間隔為整數且最少為0"
   },
   "g": {
     "edit": "編輯",
@@ -81,7 +82,10 @@
     "download": "下載",
     "importJson": "匯入json檔案",
     "visible": "顯示",
-    "hide": "隱藏"
+    "hide": "隱藏",
+    "year": "年",
+    "month": "月",
+    "day": "日"
   },
   "title": {
     "home": "主題清單列表",
@@ -276,7 +280,12 @@
     "startUrl": "起始網址",
     "springExpressionLang": "表達式參數",
     "expression": "表達式",
-    "springExpressionLangRemind": "提前設定會需要使用的參數使用方法為Spring Expression Language, 固定參數是'#index'從數字0開始, 而參數可以從上一個鍵取來使用方法為'#鍵', 閱讀官方使用<a href='https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html' target='_blank'>文件</a> 或 <a href='https://itmyhome.com/spring/expressions.html' target='_blank'>中文文件</a>。"
+    "cssSelectRemind2": "當獲取到資料為單筆時會是保存成字串,而多筆時會保存成陣列,使用方法為Jsoup的select, 閱讀官方使用<a href='https://jsoup.org/apidocs/org/jsoup/select/Selector.html' target='_blank'>文件</a>。<br> 特殊鍵'__next_page'用來設定下一頁，'__item_url'設定要爬取資料的網址需要強制為陣列，'__item_param_0'要爬取資料的參數由0開始遞增且確保每個參數一定是字串。",
+    "springExpressionLangRemind": "提前設定會需要使用的參數使用方法為Spring Expression Language, 固定參數是'#index'從數字0開始, 而參數可以從上一個鍵取來使用方法為'#鍵', 閱讀官方使用<a href='https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/expressions.html' target='_blank'>文件</a> 或 <a href='https://itmyhome.com/spring/expressions.html' target='_blank'>中文文件</a>。",
+    "lastUpdateDate": "最後更新日期",
+    "updateInterval": "更新間隔",
+    "currentUpdateDate": "當前更新日期",
+    "useSplitText": "分割字串僅限單一字串"
   },
   "dataset": {
     "createDataset": "創建資料集",
