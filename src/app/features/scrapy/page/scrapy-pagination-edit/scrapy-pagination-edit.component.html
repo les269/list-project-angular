@@ -1,6 +1,9 @@
 <div class="container d-flex">
   <div class="col-md-10 offset-md-1 col-xs-12 mt-2">
-    <button mat-icon-button (click)="onBack()">
+    <button
+      mat-icon-button
+      class="d-flex align-content-center"
+      (click)="onBack()">
       <mat-icon>arrow_back</mat-icon>
     </button>
     <div class="form-group mb-2">
@@ -49,7 +52,7 @@
     </div>
     <label class="h5">{{ 'scrapy.cookie' | translate }}</label>
     <app-cookie-table [(list)]="model.config.cookie"></app-cookie-table>
-    <label class="h5 mt-2">{{
+    <!-- <label class="h5 mt-2">{{
       'scrapy.springExpressionLang' | translate
     }}</label>
     <label class="form-text w-100"
@@ -58,7 +61,7 @@
     <app-spring-expression-lang-table
       [(list)]="
         model.config.springExpressionLangList
-      "></app-spring-expression-lang-table>
+      "></app-spring-expression-lang-table> -->
     <label class="h5 mt-2">{{ 'scrapy.cssSelect' | translate }}</label>
     <label class="form-text w-100"
       ><div [innerHTML]="'scrapy.cssSelectRemind2' | translate"></div

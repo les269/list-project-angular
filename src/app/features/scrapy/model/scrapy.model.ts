@@ -65,14 +65,17 @@ export interface ScrapyReq {
 export interface ScrapyPagination {
   name: string;
   config: ScrapyPaginationConfig;
+  createdTime?: Date;
+  updatedTime?: Date;
 }
 export interface ScrapyPaginationConfig {
   startUrl: string;
   lastUpdateDate: Date;
+  currentUpdateDate?: Date;
   updateInterval: number;
   updateIntervalType: UpdateIntervalType;
-  redirectUrlList: string[];
-  redirectParamsList: string[][];
+  keyRedirectUrlMap: { [key: string]: string };
+  // redirectParamsList: string[][];
   cookie: Cookie[];
   cssSelectList: CssSelect[];
   springExpressionLangList: SpringExpressionLang[];
@@ -88,4 +91,9 @@ export interface SpringExpressionLang {
   seq: number;
   key: string;
   expression: string;
+}
+
+export interface ScrapyPaginationTest {
+  html: string;
+  config: ScrapyPaginationConfig;
 }

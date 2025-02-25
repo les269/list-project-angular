@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ScrapyPagination } from '../model';
+import { ScrapyPagination, ScrapyPaginationTest } from '../model';
 import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
@@ -26,5 +26,15 @@ export class ScrapyPaginationService {
 
   delete(name: string): Observable<void> {
     return this.http.delete<void>(`${this.prefix}/delete?name=${name}`);
+  }
+
+  testHtml(req: ScrapyPaginationTest): Observable<any> {
+    return this.http.post(`${this.prefix}/test/html`, req);
+  }
+
+  updateRedirectData(name: string): Observable<ScrapyPagination> {
+    return this.http.get<ScrapyPagination>(
+      `${this.prefix}/update-redirect-data?name=${name}`
+    );
   }
 }

@@ -57,8 +57,7 @@ export class ScrapyPaginationEditComponent implements OnInit {
       startUrl: '',
       cookie: [],
       cssSelectList: [],
-      redirectUrlList: [],
-      redirectParamsList: [],
+      keyRedirectUrlMap: {},
       springExpressionLangList: [],
       updateIntervalType: UpdateIntervalType.year,
       updateInterval: 0,
@@ -151,5 +150,11 @@ export class ScrapyPaginationEditComponent implements OnInit {
     return true;
   }
 
-  onTestParseHtml() {}
+  onTestParseHtml() {
+    this.scrapyPaginationService
+      .testHtml({ html: this.testHtml, config: this.model.config })
+      .subscribe(result => {
+        this.testResult = JSON.stringify(result, undefined, 2);
+      });
+  }
 }

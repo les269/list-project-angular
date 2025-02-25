@@ -14,6 +14,7 @@ import {
   isNotBlank,
   isNumber,
   replaceValue,
+  sortSeq,
 } from '../../../../shared/util/helper';
 import {
   SortType,
@@ -202,7 +203,7 @@ export class ImageListViewComponent
     }
     //設定排序資料
     this.sortArray = this.themeLabelList
-      .sort((a, b) => (a.seq > b.seq ? 1 : -1))
+      .sort(sortSeq)
       .filter(x => x.isSort)
       .map(x => ({ key: x.byKey, label: x.label }));
     if (this.sortArray.length > 0) {

@@ -13,6 +13,8 @@ import { MessageBoxComponent } from '../../../../core/components/message-box/mes
 import { isNotBlank } from '../../../../shared/util/helper';
 import { CopyScrapyComponent } from '../../components/copy-scrapy/copy-scrapy.component';
 import { ScrapyPaginationService } from '../../services/scrapy-pagination.service';
+import { CopyScrapyPaginationComponent } from '../../components/copy-scrapy-pagination/copy-scrapy-pagination.component';
+import { RedirectDataComponent } from '../../components/redirect-data/redirect-data.component';
 
 @Component({
   selector: 'app-scrapy-pagination-list',
@@ -76,17 +78,28 @@ export class ScrapyPaginationListComponent {
     this.router.navigate(['scrapy-pagination-edit', this.list[index].name]);
   }
 
+  onRedirectData(index: number) {
+    this.matDialog
+      .open(RedirectDataComponent, {
+        data: { source: this.list[index] },
+      })
+      .afterClosed()
+      .subscribe(result => {
+        this.getList();
+      });
+  }
+
   onCopy(index: number) {
-    // this.matDialog
-    //   .open(CopyScrapyComponent, {
-    //     data: { source: this.list[index] },
-    //   })
-    //   .afterClosed()
-    //   .subscribe(result => {
-    //     if (isNotBlank(result)) {
-    //       this.snackbarService.openByI18N('msg.copySuccess');
-    //       this.getList();
-    //     }
-    //   });
+    this.matDialog
+      .open(CopyScrapyPaginationComponent, {
+        data: { source: this.list[index] },
+      })
+      .afterClosed()
+      .subscribe(result => {
+        if (isNotBlank(result)) {
+          this.snackbarService.openByI18N('msg.copySuccess');
+          this.getList();
+        }
+      });
   }
 }

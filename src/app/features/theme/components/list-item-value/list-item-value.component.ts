@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ArrayTextComponent } from '../array-text/array-text.component';
 import { FileSizePipe } from '../../../../shared/util/util.pipe';
@@ -20,12 +20,17 @@ import { isBlank, isNotBlank } from '../../../../shared/util/helper';
   templateUrl: './list-item-value.component.html',
   styleUrl: './list-item-value.component.scss',
 })
-export class ListItemValueComponent {
+export class ListItemValueComponent implements OnInit {
   @Input({ required: true }) themeLabel!: ThemeLabel;
   @Input({ required: true }) data!: any;
   @Input({ required: true }) isHover: boolean = false;
   @Input({ required: true }) seqKey: string = '';
   @Output() searchChange = new EventEmitter<string>();
+  value: any;
+
+  ngOnInit(): void {
+    this.value = this.data[this.themeLabel.byKey];
+  }
 
   getStringSplit(label: ThemeLabel, view: any): string[] {
     if (isBlank(view[label.byKey])) {
