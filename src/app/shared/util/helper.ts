@@ -89,7 +89,11 @@ export function getRandomInt(min: number, max: number) {
  * @param obj
  * @returns
  */
-export const replaceValue = (value: string, obj: any): string =>
+export const replaceValue = (
+  value: string,
+  obj: any,
+  encodedParam?: boolean
+): string =>
   value.replace(/\$\{(.*?)\}/g, (match, key) => {
     try {
       // 分割路徑，並使用正則表達式來分辨陣列索引
@@ -101,7 +105,10 @@ export const replaceValue = (value: string, obj: any): string =>
         // 如果是數字字串，將其轉換成數字來訪問陣列
         return acc && acc[isNaN(Number(curr)) ? curr : Number(curr)];
       }, obj);
-      return result !== undefined ? result : match; // 如果找到值就替換，否則保留原樣
+      if (result === undefined) {
+        return match;
+      }
+      return encodedParam ? encodeURIComponent(result) : result; // 如果找到值就替換，否則保留原樣
     } catch (e) {
       return match; // 如果路徑解析失敗，返回原值
     }

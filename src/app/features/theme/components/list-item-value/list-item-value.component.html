@@ -8,17 +8,17 @@
         <a
           class="text-link"
           href="javascript:void(0);"
-          (click)="searchValue(data[themeLabel.byKey])">
-          {{ data[themeLabel.byKey] }}</a
+          (click)="searchValue(value)">
+          {{ value }}</a
         >
       } @else {
-        <ng-container>{{ data[themeLabel.byKey] }}</ng-container>
+        <ng-container>{{ value }}</ng-container>
       }
       @if (themeLabel.isCopy && themeLabel.isSearchButton && isHover) {
         <mat-icon
           class="copy-icon"
           fontIcon="content_copy"
-          [ngCopy]="data[themeLabel.byKey]"></mat-icon>
+          [ngCopy]="value"></mat-icon>
       }
     </div>
   }
@@ -32,7 +32,7 @@
   @case ('stringArray') {
     <app-array-text
       [themeLabel]="themeLabel"
-      [array]="data[themeLabel.byKey]"
+      [array]="value"
       [isHover]="isHover"
       (searchChange)="searchValue($event)"></app-array-text>
   }
@@ -40,12 +40,12 @@
     <div>{{ data[seqKey] }}</div>
   }
   @case ('fileSize') {
-    <div>{{ data[themeLabel.byKey] | fileSize }}</div>
+    <div>{{ value | fileSize }}</div>
   }
   @case ('date') {
     <div>
       {{
-        data[themeLabel.byKey]
+        value
           | date
             : (themeLabel.dateFormat !== ''
                 ? themeLabel.dateFormat
@@ -54,6 +54,6 @@
     </div>
   }
   @default {
-    <div>{{ data[themeLabel.byKey] }}</div>
+    <div>{{ value }}</div>
   }
 }

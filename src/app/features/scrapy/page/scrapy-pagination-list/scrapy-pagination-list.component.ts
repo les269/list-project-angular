@@ -1,19 +1,23 @@
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { ScrapyConfig } from '../../model/scrapy.model';
-import { ScrapyService } from '../../services/scrapy.service';
-import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { SnackbarService } from '../../../../core/services/snackbar.service';
+import { ScrapyConfig, ScrapyPagination } from '../../model';
+import { ScrapyService } from '../../services/scrapy.service';
 import { MessageBoxComponent } from '../../../../core/components/message-box/message-box.component';
 import { isNotBlank } from '../../../../shared/util/helper';
-import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { CopyScrapyComponent } from '../../components/copy-scrapy/copy-scrapy.component';
+import { ScrapyPaginationService } from '../../services/scrapy-pagination.service';
+import { CopyScrapyPaginationComponent } from '../../components/copy-scrapy-pagination/copy-scrapy-pagination.component';
+import { RedirectDataComponent } from '../../components/redirect-data/redirect-data.component';
 
 @Component({
+  selector: 'app-scrapy-pagination-list',
   standalone: true,
   imports: [
     TranslateModule,
@@ -22,17 +26,17 @@ import { CopyScrapyComponent } from '../../components/copy-scrapy/copy-scrapy.co
     MatButtonModule,
     MatIconModule,
   ],
-  selector: 'app-scrapy-list',
-  templateUrl: 'scrapy-list.component.html',
+  templateUrl: './scrapy-pagination-list.component.html',
 })
-export class ScrapyListComponent implements OnInit {
+export class ScrapyPaginationListComponent {
   displayedColumns = ['name', 'createdTime', 'updatedTime', 'other'];
-  list: ScrapyConfig[] = [];
+  list: ScrapyPagination[] = [];
+
   constructor(
     private translateService: TranslateService,
     private matDialog: MatDialog,
     private router: Router,
-    private scapyService: ScrapyService,
+    private scrapyPaginationService: ScrapyPaginationService,
     private snackbarService: SnackbarService
   ) {}
 
@@ -41,13 +45,13 @@ export class ScrapyListComponent implements OnInit {
   }
 
   getList() {
-    this.scapyService.getAllConfig().subscribe(res => {
+    this.scrapyPaginationService.getAll().subscribe(res => {
       this.list = res;
     });
   }
 
   onAdd() {
-    this.router.navigate(['scrapy-edit']);
+    this.router.navigate(['scrapy-pagination-edit']);
   }
 
   onDelete(index: number) {
@@ -60,8 +64,8 @@ export class ScrapyListComponent implements OnInit {
       .afterClosed()
       .subscribe(result => {
         if (isNotBlank(result)) {
-          this.scapyService
-            .deleteConfig(this.list[index].name)
+          this.scrapyPaginationService
+            .delete(this.list[index].name)
             .subscribe(() => {
               this.snackbarService.openByI18N('msg.deleteSuccess');
               this.getList();
@@ -71,12 +75,23 @@ export class ScrapyListComponent implements OnInit {
   }
 
   onEdit(index: number) {
-    this.router.navigate(['scrapy-edit', this.list[index].name]);
+    this.router.navigate(['scrapy-pagination-edit', this.list[index].name]);
+  }
+
+  onRedirectData(index: number) {
+    this.matDialog
+      .open(RedirectDataComponent, {
+        data: { source: this.list[index] },
+      })
+      .afterClosed()
+      .subscribe(result => {
+        this.getList();
+      });
   }
 
   onCopy(index: number) {
     this.matDialog
-      .open(CopyScrapyComponent, {
+      .open(CopyScrapyPaginationComponent, {
         data: { source: this.list[index] },
       })
       .afterClosed()

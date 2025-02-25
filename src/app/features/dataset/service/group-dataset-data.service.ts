@@ -13,7 +13,7 @@ export class GroupDatasetDataService {
     primeValue: string
   ): Observable<GroupDatasetData> {
     return this.http.get<GroupDatasetData>(
-      `${this.prefix}/get?groupName=${groupName}&primeValue=${primeValue}`
+      `${this.prefix}/get?groupName=${groupName}&primeValue=${encodeURIComponent(primeValue)}`
     );
   }
 
@@ -22,7 +22,7 @@ export class GroupDatasetDataService {
     primeValue: string
   ): Observable<boolean> {
     return this.http.get<boolean>(
-      `${this.prefix}/exist?groupName=${groupName}&primeValue=${primeValue}`
+      `${this.prefix}/exist?groupName=${groupName}&primeValue=${encodeURIComponent(primeValue)}`
     );
   }
 
@@ -35,7 +35,7 @@ export class GroupDatasetDataService {
     groupName: string
   ): Observable<GroupDatasetData[]> {
     return this.http.get<GroupDatasetData[]>(
-      `${this.prefix}/all-only-prime-value?groupName=${groupName}`
+      `${this.prefix}/all-only-prime-value?groupName=${encodeURIComponent(groupName)}`
     );
   }
 
@@ -54,7 +54,7 @@ export class GroupDatasetDataService {
     primeValue: string
   ): Observable<void> {
     return this.http.delete<void>(
-      `${this.prefix}/delete?groupName=${groupName}&primeValue=${primeValue}`
+      `${this.prefix}/delete?groupName=${encodeURIComponent(groupName)}&primeValue=${encodeURIComponent(primeValue)}`
     );
   }
 
@@ -63,7 +63,7 @@ export class GroupDatasetDataService {
     primeValue: string
   ): Observable<string> {
     return this.http.delete(
-      `${this.prefix}/delete-image?groupName=${groupName}&primeValue=${primeValue}`,
+      `${this.prefix}/delete-image?groupName=${groupName}&primeValue=${encodeURIComponent(primeValue)}`,
       { responseType: 'text' }
     );
   }

@@ -5,7 +5,7 @@ import {
   BaseSelectTableData,
   SelectTableDialog,
 } from '../components/select-table/select-table.dialog';
-import { ScrapyConfig } from '../../features/scrapy/model';
+import { ScrapyConfig, ScrapyPagination } from '../../features/scrapy/model';
 import { DatePipe } from '@angular/common';
 import {
   Dataset,
@@ -277,5 +277,33 @@ export class SelectTableService {
       })
       .afterClosed()
       .pipe(filter(res => res !== undefined));
+  }
+
+  selectSingleScrapyPagination(dataSource: ScrapyPagination[]) {
+    const datePipe = new DatePipe('en-US');
+    const data: BaseSelectTableData<ScrapyPagination> = {
+      displayedColumns: ['name', 'createdTime', 'updatedTime'],
+      labels: ['g.name', 'g.createdTime', 'g.updatedTime'],
+      dataSource,
+      selectType: 'single',
+      columnFormats: {
+        createdTime: (value: any) =>
+          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
+        updatedTime: (value: any) =>
+          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
+      },
+    };
+    return this.matDialog
+      .open<
+        SelectTableDialog<
+          ScrapyPagination,
+          BaseSelectTableData<ScrapyPagination>
+        >,
+        BaseSelectTableData<ScrapyPagination>,
+        ScrapyPagination
+      >(SelectTableDialog, {
+        data,
+      })
+      .afterClosed();
   }
 }

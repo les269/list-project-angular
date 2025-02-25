@@ -17,6 +17,7 @@ export interface DatasetConfig {
   autoImageDownload: boolean;
   imageByKey: string;
   scrapyText: string;
+  scrapyPagination: string;
 }
 
 export interface DatasetField {
@@ -25,6 +26,8 @@ export interface DatasetField {
   key: string;
   label: string;
   fixedString: string;
+  replaceRegular: string;
+  replaceRegularTo: string;
 }
 
 export enum DatasetFieldType {
@@ -46,4 +49,5 @@ export enum DatasetConfigType {
   folder = 'folder',
   all = 'all',
   text = 'text',
+  pagination = 'pagination',
 }

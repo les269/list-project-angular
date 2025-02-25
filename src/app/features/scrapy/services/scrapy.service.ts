@@ -1,13 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import {
-  HtmlRequest,
-  ScrapyConfig,
-  ScrapyData,
-  ScrapyReq,
-  ScrapyTestReq,
-} from '../model';
+import { ScrapyConfig, ScrapyReq, ScrapyTestReq } from '../model';
 
 @Injectable({ providedIn: 'root' })
 export class ScrapyService {

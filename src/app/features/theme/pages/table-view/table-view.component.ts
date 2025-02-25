@@ -247,23 +247,23 @@ export class TableViewComponent
    * 從資料庫取得當前頁面的自定義資料
    */
   getCustomValueMap() {
-    if (isNotBlank(this.defaultKey)) {
-      const req = {
-        headerId: this.headerId,
-        valueList: this.list.data.map((x: any) => x[this.defaultKey]),
-      };
-      this.themeService.findCustomValue(req).subscribe(res => {
-        this.customValueMap = res;
-        this.customValueMap = this.list.data
-          .map((x: any) => x[this.defaultKey])
-          .reduce((a: ThemeCustomValueResponse, b: string) => {
-            if (!a.hasOwnProperty(b)) {
-              a[b] = {};
-            }
-            return a;
-          }, this.customValueMap);
-      });
-    }
+    // if (isNotBlank(this.defaultKey)) {
+    //   const req = {
+    //     headerId: this.headerId,
+    //     valueList: this.list.data.map((x: any) => x[this.defaultKey]),
+    //   };
+    //   this.themeService.findCustomValue(req).subscribe(res => {
+    //     this.customValueMap = res;
+    //     this.customValueMap = this.list.data
+    //       .map((x: any) => x[this.defaultKey])
+    //       .reduce((a: ThemeCustomValueResponse, b: string) => {
+    //         if (!a.hasOwnProperty(b)) {
+    //           a[b] = {};
+    //         }
+    //         return a;
+    //       }, this.customValueMap);
+    //   });
+    // }
   }
 
   showDuplicate() {

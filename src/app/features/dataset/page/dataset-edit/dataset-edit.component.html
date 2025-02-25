@@ -1,6 +1,9 @@
 <div class="container d-flex">
   <div class="col-md-10 offset-md-1 col-xs-12 mt-2">
-    <button mat-icon-button (click)="onBack()">
+    <button
+      class="d-flex align-content-center"
+      mat-icon-button
+      (click)="onBack()">
       <mat-icon>arrow_back</mat-icon>
     </button>
     <div class="form-group mb-2">
@@ -12,7 +15,10 @@
     </div>
     <div class="form-group mb-2">
       <label class="form-label">{{ 'dataset.filterType' | translate }}</label>
-      <select class="form-control form-select" [(ngModel)]="model.config.type">
+      <select
+        class="form-control form-select"
+        [(ngModel)]="model.config.type"
+        (change)="changeType()">
         <option
           *ngFor="let type of eDatasetConfigType | keyvalue"
           [ngValue]="type.key">
@@ -44,6 +50,7 @@
         {{ 'dataset.importCsvTxt' | translate }}
       </button>
     }
+
     <div class="form-group mb-2">
       <label class="form-label require">{{
         'dataset.groupName' | translate
@@ -69,6 +76,34 @@
       </div>
       <label class="form-text">{{ 'dataset.groupNameDesc' | translate }}</label>
     </div>
+    @if (model.config.type === 'pagination') {
+      <div class="form-group mb-2">
+        <label class="form-label require">{{
+          'dataset.pagination' | translate
+        }}</label>
+        <div class="mt-1 d-flex flex-wrap gap-3 align-items-center">
+          @if (model.config.scrapyPagination) {
+            <mat-chip
+              >{{ model.config.scrapyPagination }}
+              <button
+                matChipRemove
+                (click)="model.config.scrapyPagination = ''">
+                <mat-icon>cancel</mat-icon>
+              </button>
+            </mat-chip>
+          }
+          <button
+            class="btn btn-outline-primary d-flex"
+            (click)="selectScrapyPagination()">
+            <mat-icon class="material-icons-outlined"
+              ><span class="material-symbols-outlined">
+                select_window_2
+              </span></mat-icon
+            >
+          </button>
+        </div>
+      </div>
+    }
     @if (model.config.type === 'file') {
       <div class="form-group mb-2 require">
         <label>{{ 'dataset.filePath' | translate }}</label>
@@ -85,7 +120,7 @@
         <input class="form-control" [(ngModel)]="model.config.folderPath" />
       </div>
     }
-    @if (model.config.type !== 'all') {
+    @if (model.config.type === 'file' || model.config.type === 'folder') {
       <div class="form-group mb-2">
         <mat-checkbox [(ngModel)]="model.config.filing">
           {{ 'dataset.filing' | translate }}
@@ -93,13 +128,14 @@
         <br />
         <label class="form-text">{{ 'dataset.filingDesc' | translate }}</label>
       </div>
-    }
-
-    @if (model.config.filing) {
-      <div class="form-group mb-2">
-        <label>{{ 'dataset.filingRegular' | translate }}</label>
-        <input class="form-control" [(ngModel)]="model.config.filingRegular" />
-      </div>
+      @if (model.config.filing) {
+        <div class="form-group mb-2">
+          <label>{{ 'dataset.filingRegular' | translate }}</label>
+          <input
+            class="form-control"
+            [(ngModel)]="model.config.filingRegular" />
+        </div>
+      }
     }
 
     <div class="form-group mb-2">

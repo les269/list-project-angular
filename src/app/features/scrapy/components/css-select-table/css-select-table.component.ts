@@ -59,6 +59,7 @@ export class CssSelectTableComponent extends GenericTableComponent<CssSelect> {
     replaceRegular: '',
     replaceRegularTo: '',
     replaceValueMapName: '',
+    splitText: '',
   };
   replaceValueMapService: ReplaceValueMapService;
 

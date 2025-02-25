@@ -1,15 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
-import { ReactiveFormsModule, FormsModule, FormControl } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import {
-  MatDialogActions,
-  MatDialogClose,
-  MatDialogTitle,
-  MatDialogContent,
-  MatDialogRef,
-  MAT_DIALOG_DATA,
-} from '@angular/material/dialog';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ScrapyConfig, ScrapyData, ScrapyPageType } from '../../model';
 import { ScrapyService } from '../../services/scrapy.service';
@@ -18,23 +10,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { languages } from '@codemirror/language-data';
 import { CodeEditor } from '@acrodata/code-editor';
 import { Router, ActivatedRoute } from '@angular/router';
-import {
-  tap,
-  filter,
-  switchMap,
-  EMPTY,
-  debounceTime,
-  from,
-  concatMap,
-  delay,
-  toArray,
-} from 'rxjs';
-import {
-  isBlank,
-  isNotBlank,
-  isNotJson,
-  replaceValue,
-} from '../../../../shared/util/helper';
+import { filter, switchMap, EMPTY, debounceTime } from 'rxjs';
+import { isBlank, isNotBlank, isNotJson } from '../../../../shared/util/helper';
 import { MatTabsModule } from '@angular/material/tabs';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -61,7 +38,6 @@ import { CssSelectTableComponent } from '../../components/css-select-table/css-s
   ],
   selector: 'app-scrapy-edit',
   templateUrl: 'scrapy-edit.component.html',
-  styleUrl: 'scrapy-edit.component.scss',
 })
 export class ScrapyEditComponent implements OnInit {
   status: 'new' | 'edit' = 'new';

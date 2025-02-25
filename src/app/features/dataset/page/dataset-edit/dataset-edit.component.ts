@@ -18,6 +18,8 @@ import { MatChipsModule } from '@angular/material/chips';
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import { GroupDatasetService } from '../../service/group-dataset.service';
 import { languages } from '@codemirror/language-data';
+import { ScrapyPaginationService } from '../../../scrapy/services/scrapy-pagination.service';
+import { ScrapyPagination } from '../../../scrapy/model';
 
 @Component({
   selector: 'app-dataset-edit',
@@ -53,10 +55,12 @@ export class DatasetEditComponent implements OnInit {
       autoImageDownload: false,
       imageByKey: '',
       scrapyText: '',
+      scrapyPagination: '',
     },
   };
   eDatasetConfigType = DatasetConfigType;
   groupDatasetList: GroupDataset[] = [];
+  scrapyPaginationList: ScrapyPagination[] = [];
   languages = languages;
 
   constructor(
@@ -66,13 +70,19 @@ export class DatasetEditComponent implements OnInit {
     private translateService: TranslateService,
     private snackbarService: SnackbarService,
     private selectTableService: SelectTableService,
-    private groupDatasetService: GroupDatasetService
+    private groupDatasetService: GroupDatasetService,
+    private scrapyPaginationService: ScrapyPaginationService
   ) {}
 
   ngOnInit() {
     this.groupDatasetService.getAllGroupDataset().subscribe(res => {
       if (res) {
         this.groupDatasetList = res;
+      }
+    });
+    this.scrapyPaginationService.getAll().subscribe(res => {
+      if (res) {
+        this.scrapyPaginationList = res;
       }
     });
     this.route.paramMap
@@ -119,6 +129,13 @@ export class DatasetEditComponent implements OnInit {
       isBlank(this.model.config.folderPath)
     ) {
       this.snackbarService.isBlankMessage('dataset.folderPath');
+      return false;
+    }
+    if (
+      this.model.config.type === 'pagination' &&
+      isBlank(this.model.config.scrapyPagination)
+    ) {
+      this.snackbarService.isBlankMessage('dataset.pagination');
       return false;
     }
     if (this.model.config.filing && isBlank(this.model.config.filingRegular)) {
@@ -206,5 +223,25 @@ export class DatasetEditComponent implements OnInit {
       console.error('Error reading file');
     };
     reader.readAsText(file);
+  }
+
+  changeType() {
+    if (
+      this.model.config.type !== DatasetConfigType.file &&
+      this.model.config.type !== DatasetConfigType.folder
+    ) {
+      this.model.config.filing = false;
+      this.model.config.filingRegular = '';
+    }
+  }
+
+  selectScrapyPagination() {
+    this.selectTableService
+      .selectSingleScrapyPagination(this.scrapyPaginationList)
+      .subscribe(res => {
+        if (res) {
+          this.model.config.scrapyPagination = res.name;
+        }
+      });
   }
 }

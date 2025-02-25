@@ -14,6 +14,7 @@ import {
   isNotBlank,
   isNumber,
   replaceValue,
+  sortSeq,
 } from '../../../../shared/util/helper';
 import {
   SortType,
@@ -90,10 +91,10 @@ export class ImageListViewComponent
     this.changeDataset();
     this.initBaseConfig();
     this.onSearch();
-    this.changePage();
     this.onSort();
     this.changeTag();
     this.updateViewData();
+    this.changePage();
     this.getCustomValueMap();
     this.changeQueryParams(); //初始化query params
     this.getFileExist();
@@ -107,10 +108,10 @@ export class ImageListViewComponent
           this.changeUrl();
           this.changeDataset();
           this.onSearch();
-          this.changePage();
           this.onSort();
           this.changeTag();
           this.updateViewData();
+          this.changePage();
           this.getCustomValueMap();
           this.getFileExist();
         });
@@ -202,7 +203,7 @@ export class ImageListViewComponent
     }
     //設定排序資料
     this.sortArray = this.themeLabelList
-      .sort((a, b) => (a.seq > b.seq ? 1 : -1))
+      .sort(sortSeq)
       .filter(x => x.isSort)
       .map(x => ({ key: x.byKey, label: x.label }));
     if (this.sortArray.length > 0) {
@@ -379,7 +380,7 @@ export class ImageListViewComponent
         url =
           this.webApi +
           '/proxy-image?url=' +
-          this.replaceImageUrl(themeImage.imageUrl, data);
+          this.replaceImageUrl(themeImage.imageUrl, data, true);
         break;
     }
     return url;

@@ -46,5 +46,7 @@ export class DatasetFieldTableComponent extends GenericTableComponent<DatasetFie
     key: '',
     label: '',
     fixedString: '',
+    replaceRegular: '',
+    replaceRegularTo: '',
   };
 }
