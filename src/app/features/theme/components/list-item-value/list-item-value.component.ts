@@ -20,17 +20,12 @@ import { isBlank, isNotBlank } from '../../../../shared/util/helper';
   templateUrl: './list-item-value.component.html',
   styleUrl: './list-item-value.component.scss',
 })
-export class ListItemValueComponent implements OnInit {
+export class ListItemValueComponent {
   @Input({ required: true }) themeLabel!: ThemeLabel;
   @Input({ required: true }) data!: any;
   @Input({ required: true }) isHover: boolean = false;
   @Input({ required: true }) seqKey: string = '';
   @Output() searchChange = new EventEmitter<string>();
-  value: any;
-
-  ngOnInit(): void {
-    this.value = this.data[this.themeLabel.byKey];
-  }
 
   getStringSplit(label: ThemeLabel, view: any): string[] {
     if (isBlank(view[label.byKey])) {
