@@ -35,7 +35,11 @@ import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
 })
 export class ThemeNoteComponent implements OnInit, OnDestroy {
   readonly dialogRef = inject(MatDialogRef<ThemeNoteComponent>);
-  readonly data = inject<{ value: string; disabled: boolean }>(MAT_DIALOG_DATA);
+  readonly data = inject<{
+    value: string;
+    disabled: boolean;
+    save: (text: string) => void;
+  }>(MAT_DIALOG_DATA);
   value = this.data.value;
   disabled = this.data.disabled;
   editor: Editor = new Editor({ history: true });
@@ -56,7 +60,10 @@ export class ThemeNoteComponent implements OnInit, OnDestroy {
     this.value = html;
   }
   onOK() {
-    this.dialogRef.close(this.value);
+    this.dialogRef.close(this.value === '<p></p>' ? '' : this.value);
+  }
+  onSave() {
+    this.data.save(this.value === '<p></p>' ? '' : this.value);
   }
   onNoClick(): void {
     this.dialogRef.close();

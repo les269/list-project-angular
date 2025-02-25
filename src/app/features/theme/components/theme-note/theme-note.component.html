@@ -32,7 +32,10 @@
     <button mat-button (click)="onNoClick()">
       {{ 'g.no' | translate }}
     </button>
-    <button mat-button cdkFocusInitial [mat-dialog-close]="value">
+    <button mat-button (click)="onSave()">
+      {{ 'g.save' | translate }}
+    </button>
+    <button mat-button cdkFocusInitial (click)="onOK()">
       {{ 'g.ok' | translate }}
     </button>
   </mat-dialog-actions>

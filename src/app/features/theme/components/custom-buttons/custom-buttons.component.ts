@@ -169,6 +169,11 @@ export class CustomButtonsComponent {
         data: {
           value: this.getCustomValue(data, custom) ?? '',
           disabled: type === 'read',
+          save: (result: string) => {
+            if (isNotNull(result)) {
+              this.changeCustomValue(data, custom, result);
+            }
+          },
         },
         panelClass: 'dialog-responsive',
         height: '80vh',
