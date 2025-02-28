@@ -16,6 +16,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ApiConfigService } from '../../../api-config/service/api-config.service';
 import { ThemeService } from '../../services/theme.service';
 import { ThemeNoteComponent } from '../theme-note/theme-note.component';
+import { SnackbarService } from '../../../../core/services/snackbar.service';
 
 @Component({
   selector: 'app-top-custom-buttons',
@@ -33,7 +34,8 @@ export class TopCustomButtonsComponent implements OnInit {
   constructor(
     private themeService: ThemeService,
     private matDialog: MatDialog,
-    private apiConfigService: ApiConfigService
+    private apiConfigService: ApiConfigService,
+    private snackbarService: SnackbarService
   ) {}
   ngOnInit(): void {
     if (isNotBlank(this.headerId)) {
@@ -60,6 +62,13 @@ export class TopCustomButtonsComponent implements OnInit {
         data: {
           value: this.getCustomValue(custom) ?? '',
           disabled: type === 'read',
+          save: (result: string) => {
+            if (isNotNull(result)) {
+              this.changeCustomValue(custom, result, {
+                isDialogSave: true,
+              });
+            }
+          },
         },
         panelClass: 'dialog-responsive',
         height: '80vh',
@@ -87,7 +96,11 @@ export class TopCustomButtonsComponent implements OnInit {
     }
     return '';
   }
-  changeCustomValue(custom: ThemeTopCustom, value: string) {
+  changeCustomValue(
+    custom: ThemeTopCustom,
+    value: string,
+    options?: { isDialogSave?: boolean }
+  ) {
     let req: ThemeTopCustomValue = {
       headerId: this.headerId,
       byKey: custom.byKey,
@@ -96,6 +109,9 @@ export class TopCustomButtonsComponent implements OnInit {
 
     this.themeService.updateTopCustomValue(req).subscribe(() => {
       this.topCustomValueMap[req.byKey] = value;
+      if (options?.isDialogSave) {
+        this.snackbarService.openByI18N('msg.saveSuccess');
+      }
     });
   }
 }

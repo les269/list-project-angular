@@ -109,7 +109,12 @@ export class CustomButtonsComponent {
    * @param data
    * @param value
    */
-  changeCustomValue(data: any, custom: ThemeCustom, value?: any) {
+  changeCustomValue(
+    data: any,
+    custom: ThemeCustom,
+    value?: any,
+    options?: { isDialogSave?: boolean }
+  ) {
     let req: ThemeCustomValue = {
       headerId: this.headerId,
       byKey: custom.byKey,
@@ -132,6 +137,9 @@ export class CustomButtonsComponent {
 
     this.themeService.updateCustomValue(req).subscribe(() => {
       this.customValueMap[req.correspondDataValue][req.byKey] = req.customValue;
+      if (options?.isDialogSave) {
+        this.snackbarService.openByI18N('msg.saveSuccess');
+      }
     });
   }
 
@@ -171,7 +179,9 @@ export class CustomButtonsComponent {
           disabled: type === 'read',
           save: (result: string) => {
             if (isNotNull(result)) {
-              this.changeCustomValue(data, custom, result);
+              this.changeCustomValue(data, custom, result, {
+                isDialogSave: true,
+              });
             }
           },
         },
