@@ -385,4 +385,17 @@ export class ImageListViewComponent
     }
     return url;
   }
+
+  checkValueVisible(value: any) {
+    if (value instanceof Array) {
+      return value.length > 0;
+    }
+    if (typeof value === 'number') {
+      return true;
+    }
+    if (typeof value === 'string') {
+      return isNotBlank(value);
+    }
+    return true;
+  }
 }
