@@ -387,6 +387,9 @@ export class ImageListViewComponent
   }
 
   checkValueVisible(value: any) {
+    if (value === null || value === undefined) {
+      return false;
+    }
     if (value instanceof Array) {
       return value.length > 0;
     }
