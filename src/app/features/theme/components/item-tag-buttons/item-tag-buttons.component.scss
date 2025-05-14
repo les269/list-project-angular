@@ -1,33 +1,60 @@
-.custom-button {
+.custom-button-group {
   display: flex;
-  justify-content: center;
-  height: 28px;
-  min-width: 8em;
-  background-color: #f0f7f9;
-  color: #000;
-  border: 1px solid #6b90da;
-  padding: 0px 12px;
-  font-size: 1rem;
-  border-radius: 0.125rem;
-  align-items: center;
-  > label {
-    cursor: pointer;
+  flex-direction: row;
+  > .custom-button:first-child {
+    border-top-left-radius: 0.125rem;
+    border-bottom-left-radius: 0.125rem;
   }
-
-  &:hover:not([disabled]) {
-    background-color: #c3e6ff;
+  > .custom-button:last-child {
+    border-top-right-radius: 0.125rem;
+    border-bottom-right-radius: 0.125rem;
   }
-
-  &:active:not([disabled]) {
-    background-color: #c3e6ff;
-    box-shadow:
-      0px 5px 5px -3px rgba(0, 0, 0, 0.2),
-      0px 8px 10px 1px rgba(0, 0, 0, 0.14),
-      0px 3px 14px 2px rgba(0, 0, 0, 0.12);
+  > .custom-button:first-child:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: 0px;
   }
+  > .custom-button:last-child:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: 0px;
+  }
+  > .custom-icon {
+    min-width: 0px !important;
+    width: 30px !important;
+    padding: 0px !important;
+  }
+  > .custom-button {
+    display: flex;
+    justify-content: center;
+    height: 24px;
+    min-width: 8em;
+    background-color: #f0f7f9;
+    color: #000;
+    border: 1px solid #6b90da;
+    padding: 0px 12px;
+    font-size: 0.875rem;
 
-  &[disabled] {
-    background-color: #d5d5d5;
-    border-color: #949494;
+    align-items: center;
+    > label {
+      cursor: pointer;
+    }
+
+    &:hover:not([disabled]) {
+      background-color: #c3e6ff;
+    }
+
+    &:active:not([disabled]) {
+      background-color: #c3e6ff;
+      box-shadow:
+        0px 5px 5px -3px rgba(0, 0, 0, 0.2),
+        0px 8px 10px 1px rgba(0, 0, 0, 0.14),
+        0px 3px 14px 2px rgba(0, 0, 0, 0.12);
+    }
+
+    &[disabled] {
+      background-color: #d5d5d5;
+      border-color: #949494;
+    }
   }
 }
