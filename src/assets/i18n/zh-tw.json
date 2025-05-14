@@ -113,7 +113,8 @@
     "importExport": "匯入匯出",
     "scrapyPaginationList": "爬蟲處理分頁清單",
     "scrapyPaginationEdit": "爬蟲處理分頁編輯",
-    "redirectData": "跳轉網址資訊"
+    "redirectData": "跳轉網址資訊",
+    "setting": "設定"
   },
   "home": { "createTheme": "創建主題", "visibleConfig": "清單顯示控制" },
   "themeHeader": {

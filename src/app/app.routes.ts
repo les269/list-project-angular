@@ -143,5 +143,13 @@ export const routes: Routes = [
       ).then(mod => mod.ReplaceValueMapComponent),
     data: { title: 'title.replaceValueMap', sidenav: true },
   },
+  {
+    path: 'setting',
+    loadComponent: () =>
+      import('./features/setting/page/setting/setting.component').then(
+        mod => mod.SettingComponent
+      ),
+    data: { title: 'title.setting', sidenav: true },
+  },
   { path: '**', redirectTo: '' },
 ];
