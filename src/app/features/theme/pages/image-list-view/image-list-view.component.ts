@@ -22,6 +22,7 @@ import {
   ThemeHeaderType,
   ThemeImage,
   ThemeImageType,
+  ThemeTag,
 } from '../../models';
 import { NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
@@ -37,6 +38,10 @@ import { ListBaseViewComponent } from '../../components/list-base-view.component
 import { TopCustomButtonsComponent } from '../../components/top-custom-buttons/top-custom-buttons.component';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FixedImageComponent } from '../../../../core/components/fixed-image/fixed-image.component';
+import {
+  ItemTagButtonsComponent,
+  ThemeTagUpdate,
+} from '../../components/item-tag-buttons/item-tag-buttons.component';
 
 @Component({
   standalone: true,
@@ -56,6 +61,7 @@ import { FixedImageComponent } from '../../../../core/components/fixed-image/fix
     MatAutocompleteModule,
     NgTemplateOutlet,
     FixedImageComponent,
+    ItemTagButtonsComponent,
   ],
   selector: 'app-image-list-view',
   templateUrl: 'image-list-view.component.html',
@@ -400,5 +406,22 @@ export class ImageListViewComponent
       return isNotBlank(value);
     }
     return true;
+  }
+
+  tagValueUpdate(event: ThemeTagUpdate) {
+    const themeTagValue = this.themeTagValueList.find(x => x.tag === event.tag);
+    if (themeTagValue) {
+      const index = themeTagValue.valueList.indexOf(event.value);
+      if (index > -1) {
+        themeTagValue.valueList.splice(index, 1);
+        themeTagValue.valueList = [...themeTagValue.valueList];
+      } else {
+        themeTagValue.valueList = [...themeTagValue.valueList, event.value];
+      }
+      this.themeTagValueList = [...this.themeTagValueList];
+      this.themeService.updateSingleTagValue(themeTagValue).subscribe(() => {
+        this.changeQueryParams();
+      });
+    }
   }
 }

@@ -231,6 +231,19 @@
                 </div>
               }
             }
+            @if (themeTagList.length > 0) {
+              <div class="detail-row">
+                <div class="row-label">{{ 'g.tag' | translate }}</div>
+                <app-item-tag-buttons
+                  [value]="data[defaultKey]"
+                  [data]="data"
+                  [themeTagList]="themeTagList"
+                  [themeTagValueList]="themeTagValueList"
+                  (tagValueUpdate)="
+                    tagValueUpdate($event)
+                  "></app-item-tag-buttons>
+              </div>
+            }
           </div>
 
           @if (defaultKey && themeCustomList.length > 0) {

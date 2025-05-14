@@ -1,0 +1,12 @@
+<div class="d-flex">
+  @for (themeTag of themeTagList; track $index) {
+    <button class="custom-button" (click)="onSetTag(themeTag.tag)">
+      <label class="px-2">{{ themeTag.tag }}</label>
+      @if (showTag(themeTag.tag)) {
+        <mat-icon class="material-icons-outlined">
+          <span class="material-symbols-outlined"> check </span>
+        </mat-icon>
+      }
+    </button>
+  }
+</div>

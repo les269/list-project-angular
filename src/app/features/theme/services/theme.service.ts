@@ -94,6 +94,11 @@ export class ThemeService {
     return this.http.post<void>(`/theme/tag/update`, req);
   }
 
+  //更新單一tag value
+  updateSingleTagValue(req: ThemeTagValue): Observable<void> {
+    return this.http.post<void>(`/theme/tag/update/single`, req);
+  }
+
   findTopCustomValue(req: string): Observable<ThemeTopCustomValueResponse> {
     return this.http.get<ThemeTopCustomValueResponse>(
       `/theme/top-custom/value?headerId=${req}`
