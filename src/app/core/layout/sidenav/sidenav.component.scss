@@ -9,6 +9,7 @@
   transition: all 0.2s;
   transform: translate3d(-200px, 0px, 0px);
   z-index: 1002;
+  overflow: auto;
 }
 .sidenav-display {
   transform: translate3d(0px, 0px, 0px);

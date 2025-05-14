@@ -115,3 +115,12 @@ ngx-editor.disabled > div.NgxEditor {
 .cdk-drop-list-dragging .mat-row:not(.cdk-drag-placeholder) {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
+
+body.lock-scrollbar {
+  overflow-y: scroll !important;
+  position: fixed !important;
+  width: 100%; /* 避免因 scroll 條寬度而變窄 */
+  top: 0;
+  left: 0;
+  right: 0;
+}
