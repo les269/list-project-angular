@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { GroupDataset } from '../../model';
@@ -17,6 +17,7 @@ import { CopyDatasetComponent } from '../../components/copy-dataset/copy-dataset
 import { CopyGroupDatasetComponent } from '../../components/copy-group-dataset/copy-group-dataset.component';
 import { EditGroupDatasetDataComponent } from '../../components/edit-group-dataset-data/edit-group-dataset-data.component';
 import { GroupDatasetImportExportComponent } from '../../components/group-dataset-import-export/group-dataset-import-export.component';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 
 @Component({
   selector: 'app-group-dataset-list',
@@ -28,13 +29,16 @@ import { GroupDatasetImportExportComponent } from '../../components/group-datase
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
+    MatSortModule,
   ],
   templateUrl: './group-dataset-list.component.html',
   styleUrl: './group-dataset-list.component.scss',
 })
-export class GroupDatasetListComponent {
+export class GroupDatasetListComponent implements OnInit, AfterViewInit {
   displayedColumns = ['groupName', 'createdTime', 'updatedTime', 'other'];
-  list: GroupDataset[] = [];
+  dataSource = new MatTableDataSource<GroupDataset>([]);
+
+  @ViewChild(MatSort) sort!: MatSort;
   constructor(
     private translateService: TranslateService,
     private matDialog: MatDialog,
@@ -47,9 +51,13 @@ export class GroupDatasetListComponent {
     this.getList();
   }
 
+  ngAfterViewInit() {
+    this.dataSource.sort = this.sort;
+  }
+
   getList() {
     this.groupDatasetService.getAllGroupDataset().subscribe(res => {
-      this.list = res;
+      this.dataSource.data = res;
     });
   }
 
@@ -57,7 +65,7 @@ export class GroupDatasetListComponent {
     this.router.navigate(['group-dataset-edit']);
   }
 
-  onDelete(index: number) {
+  onDelete(e: GroupDataset) {
     this.matDialog
       .open(MessageBoxComponent, {
         data: {
@@ -68,7 +76,7 @@ export class GroupDatasetListComponent {
       .subscribe(result => {
         if (isNotBlank(result)) {
           this.groupDatasetService
-            .deleteGroupDataset(this.list[index].groupName)
+            .deleteGroupDataset(e.groupName)
             .subscribe(() => {
               this.snackbarService.openByI18N('msg.deleteSuccess');
               this.getList();
@@ -77,14 +85,14 @@ export class GroupDatasetListComponent {
       });
   }
 
-  onEdit(index: number) {
-    this.router.navigate(['group-dataset-edit', this.list[index].groupName]);
+  onEdit(e: GroupDataset) {
+    this.router.navigate(['group-dataset-edit', e.groupName]);
   }
 
-  onCopy(index: number) {
+  onCopy(e: GroupDataset) {
     this.matDialog
       .open(CopyGroupDatasetComponent, {
-        data: { source: this.list[index] },
+        data: { source: e },
       })
       .afterClosed()
       .subscribe(result => {

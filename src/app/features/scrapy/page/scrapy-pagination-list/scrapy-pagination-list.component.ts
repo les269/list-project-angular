@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -15,6 +15,7 @@ import { CopyScrapyComponent } from '../../components/copy-scrapy/copy-scrapy.co
 import { ScrapyPaginationService } from '../../services/scrapy-pagination.service';
 import { CopyScrapyPaginationComponent } from '../../components/copy-scrapy-pagination/copy-scrapy-pagination.component';
 import { RedirectDataComponent } from '../../components/redirect-data/redirect-data.component';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 
 @Component({
   selector: 'app-scrapy-pagination-list',
@@ -25,12 +26,15 @@ import { RedirectDataComponent } from '../../components/redirect-data/redirect-d
     MatTableModule,
     MatButtonModule,
     MatIconModule,
+    MatSortModule,
   ],
   templateUrl: './scrapy-pagination-list.component.html',
 })
-export class ScrapyPaginationListComponent {
+export class ScrapyPaginationListComponent implements AfterViewInit {
   displayedColumns = ['name', 'createdTime', 'updatedTime', 'other'];
-  list: ScrapyPagination[] = [];
+  dataSource = new MatTableDataSource<ScrapyPagination>([]);
+
+  @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
     private translateService: TranslateService,
@@ -44,9 +48,13 @@ export class ScrapyPaginationListComponent {
     this.getList();
   }
 
+  ngAfterViewInit() {
+    this.dataSource.sort = this.sort;
+  }
+
   getList() {
     this.scrapyPaginationService.getAll().subscribe(res => {
-      this.list = res;
+      this.dataSource.data = res;
     });
   }
 
@@ -54,7 +62,7 @@ export class ScrapyPaginationListComponent {
     this.router.navigate(['scrapy-pagination-edit']);
   }
 
-  onDelete(index: number) {
+  onDelete(e: ScrapyPagination) {
     this.matDialog
       .open(MessageBoxComponent, {
         data: {
@@ -64,24 +72,22 @@ export class ScrapyPaginationListComponent {
       .afterClosed()
       .subscribe(result => {
         if (isNotBlank(result)) {
-          this.scrapyPaginationService
-            .delete(this.list[index].name)
-            .subscribe(() => {
-              this.snackbarService.openByI18N('msg.deleteSuccess');
-              this.getList();
-            });
+          this.scrapyPaginationService.delete(e.name).subscribe(() => {
+            this.snackbarService.openByI18N('msg.deleteSuccess');
+            this.getList();
+          });
         }
       });
   }
 
-  onEdit(index: number) {
-    this.router.navigate(['scrapy-pagination-edit', this.list[index].name]);
+  onEdit(e: ScrapyPagination) {
+    this.router.navigate(['scrapy-pagination-edit', e.name]);
   }
 
-  onRedirectData(index: number) {
+  onRedirectData(e: ScrapyPagination) {
     this.matDialog
       .open(RedirectDataComponent, {
-        data: { source: this.list[index] },
+        data: { source: e },
       })
       .afterClosed()
       .subscribe(result => {
@@ -89,10 +95,10 @@ export class ScrapyPaginationListComponent {
       });
   }
 
-  onCopy(index: number) {
+  onCopy(e: ScrapyPagination) {
     this.matDialog
       .open(CopyScrapyPaginationComponent, {
-        data: { source: this.list[index] },
+        data: { source: e },
       })
       .afterClosed()
       .subscribe(result => {

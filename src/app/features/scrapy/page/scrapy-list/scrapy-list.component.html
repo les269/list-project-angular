@@ -3,9 +3,9 @@
     {{ 'scrapy.createScrapy' | translate }}
   </button>
   <div class="card">
-    <table mat-table [dataSource]="list" multiTemplateDataRows>
+    <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort>
       <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'scrapy.name' | translate }}
         </th>
         <td mat-cell *matCellDef="let element">
@@ -13,7 +13,7 @@
         </td>
       </ng-container>
       <ng-container matColumnDef="createdTime">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'g.createdTime' | translate }}
         </th>
         <td mat-cell *matCellDef="let element">
@@ -21,7 +21,7 @@
         </td>
       </ng-container>
       <ng-container matColumnDef="updatedTime">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'g.updatedTime' | translate }}
         </th>
         <td mat-cell *matCellDef="let element">
@@ -32,13 +32,13 @@
         <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
         <td mat-cell *matCellDef="let element; let i = dataIndex">
           <div class="row flex-nowrap">
-            <button mat-icon-button (click)="onEdit(i)">
+            <button mat-icon-button (click)="onEdit(element)">
               <mat-icon>edit</mat-icon>
             </button>
-            <button mat-icon-button (click)="onCopy(i)">
+            <button mat-icon-button (click)="onCopy(element)">
               <mat-icon>file_copy</mat-icon>
             </button>
-            <button mat-icon-button (click)="onDelete(i)">
+            <button mat-icon-button (click)="onDelete(element)">
               <mat-icon>delete</mat-icon>
             </button>
           </div>

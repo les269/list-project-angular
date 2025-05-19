@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -14,6 +14,7 @@ import { DatasetService } from '../../service/dataset.service';
 import { CopyDatasetComponent } from '../../components/copy-dataset/copy-dataset.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { EditGroupDatasetDataComponent } from '../../components/edit-group-dataset-data/edit-group-dataset-data.component';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 
 @Component({
   selector: 'app-dataset-list',
@@ -25,11 +26,12 @@ import { EditGroupDatasetDataComponent } from '../../components/edit-group-datas
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
+    MatSortModule,
   ],
   templateUrl: './dataset-list.component.html',
   styleUrl: './dataset-list.component.scss',
 })
-export class DatasetListComponent {
+export class DatasetListComponent implements OnInit, AfterViewInit {
   displayedColumns = [
     'name',
     'filterType',
@@ -38,8 +40,9 @@ export class DatasetListComponent {
     'updatedTime',
     'other',
   ];
-  list: Dataset[] = [];
+  dataSource = new MatTableDataSource<Dataset>([]);
   isRefreshing: boolean = false;
+  @ViewChild(MatSort) sort!: MatSort;
   constructor(
     private translateService: TranslateService,
     private matDialog: MatDialog,
@@ -51,15 +54,21 @@ export class DatasetListComponent {
   ngOnInit() {
     this.getList();
   }
+
+  ngAfterViewInit() {
+    this.dataSource.sort = this.sort;
+  }
+
   getList() {
     this.datasetService.getAllDataset().subscribe(res => {
-      this.list = res;
+      this.dataSource.data = res;
     });
   }
+
   onAdd() {
     this.router.navigate(['dataset-edit']);
   }
-  onDelete(index: number) {
+  onDelete(e: Dataset) {
     this.matDialog
       .open(MessageBoxComponent, {
         data: {
@@ -69,22 +78,20 @@ export class DatasetListComponent {
       .afterClosed()
       .subscribe(result => {
         if (isNotBlank(result)) {
-          this.datasetService
-            .deleteDataset(this.list[index].name)
-            .subscribe(() => {
-              this.snackbarService.openByI18N('msg.deleteSuccess');
-              this.getList();
-            });
+          this.datasetService.deleteDataset(e.name).subscribe(() => {
+            this.snackbarService.openByI18N('msg.deleteSuccess');
+            this.getList();
+          });
         }
       });
   }
-  onEdit(index: number) {
-    this.router.navigate(['dataset-edit', this.list[index].name]);
+  onEdit(e: Dataset) {
+    this.router.navigate(['dataset-edit', e.name]);
   }
-  onCopy(index: number) {
+  onCopy(e: Dataset) {
     this.matDialog
       .open(CopyDatasetComponent, {
-        data: { source: this.list[index] },
+        data: { source: e },
       })
       .afterClosed()
       .subscribe(result => {
@@ -94,12 +101,12 @@ export class DatasetListComponent {
         }
       });
   }
-  onRefresh(index: number) {
+  onRefresh(e: Dataset) {
     if (this.isRefreshing) {
       return;
     }
     this.isRefreshing = true;
-    this.datasetService.refreshData(this.list[index].name).subscribe(
+    this.datasetService.refreshData(e.name).subscribe(
       x => {
         this.snackbarService.openByI18N('msg.refreshSuccess');
       },

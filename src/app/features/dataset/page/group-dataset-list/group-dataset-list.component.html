@@ -3,9 +3,9 @@
     {{ 'dataset.createDatasetGroup' | translate }}
   </button>
   <div class="card table-container scrollbar-primary">
-    <table mat-table [dataSource]="list" multiTemplateDataRows>
+    <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort>
       <ng-container matColumnDef="groupName">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'dataset.groupName' | translate }}
         </th>
         <td mat-cell *matCellDef="let element">
@@ -13,7 +13,7 @@
         </td>
       </ng-container>
       <ng-container matColumnDef="createdTime">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'g.createdTime' | translate }}
         </th>
         <td mat-cell *matCellDef="let element">
@@ -21,7 +21,7 @@
         </td>
       </ng-container>
       <ng-container matColumnDef="updatedTime">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'g.updatedTime' | translate }}
         </th>
         <td mat-cell *matCellDef="let element">
@@ -35,13 +35,13 @@
             <button
               mat-icon-button
               [matTooltip]="'g.edit' | translate"
-              (click)="onEdit(i)">
+              (click)="onEdit(element)">
               <mat-icon>edit</mat-icon>
             </button>
             <button
               mat-icon-button
               [matTooltip]="'g.copy' | translate"
-              (click)="onCopy(i)">
+              (click)="onCopy(element)">
               <mat-icon>file_copy</mat-icon>
             </button>
             @if (element.config.type === 'api') {
