@@ -124,3 +124,7 @@ body.lock-scrollbar {
   left: 0;
   right: 0;
 }
+
+body.lock-scrollbar-firefox {
+  overflow: hidden;
+}
