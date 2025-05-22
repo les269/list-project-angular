@@ -30,6 +30,7 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class AppComponent implements OnInit {
   openSidenav$: Observable<Readonly<boolean>>;
+  private scrollY = 0;
 
   constructor(
     private store: Store,
@@ -63,11 +64,15 @@ export class AppComponent implements OnInit {
       });
     this.openSidenav$.subscribe(open => {
       if (open) {
+        this.scrollY = window.scrollY;
         document.body.style.overflow = 'hidden';
         document.body.classList.add('lock-scrollbar');
+        document.body.style.top = `-${this.scrollY}px`;
       } else {
         document.body.style.overflow = '';
         document.body.classList.remove('lock-scrollbar');
+        document.body.style.top = '';
+        window.scrollBy({ top: this.scrollY, behavior: 'instant' });
       }
     });
   }
