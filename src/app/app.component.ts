@@ -62,20 +62,25 @@ export class AppComponent implements OnInit {
           this.store.dispatch(updateTitle({ title }));
         }
       });
+    const isFirefox = navigator.userAgent.includes('Firefox');
+    const lockScrollbar = isFirefox
+      ? 'lock-scrollbar-firefox'
+      : 'lock-scrollbar';
     this.openSidenav$.subscribe(open => {
-      const lockScrollbar = navigator.userAgent.includes('Firefox')
-        ? 'lock-scrollbar-firefox'
-        : 'lock-scrollbar';
       if (open) {
         this.scrollY = window.scrollY;
         document.body.style.overflow = 'hidden';
         document.body.classList.add(lockScrollbar);
-        document.body.style.top = `-${this.scrollY}px`;
+        if (!isFirefox) {
+          document.body.style.top = `-${this.scrollY}px`;
+        }
       } else {
         document.body.style.overflow = '';
         document.body.classList.remove(lockScrollbar);
-        document.body.style.top = '';
-        window.scrollBy({ top: this.scrollY, behavior: 'instant' });
+        if (!isFirefox) {
+          document.body.style.top = '';
+          window.scrollBy({ top: this.scrollY, behavior: 'instant' });
+        }
       }
     });
   }
