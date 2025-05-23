@@ -49,11 +49,13 @@ export const parseHeaderId = (
 export function dynamicSort(key: string, ascending: boolean) {
   let sortOrder = ascending ? 1 : -1;
   return (a1: any, a2: any) => {
-    if (key === null || key === '') {
+    if (isBlank(key)) {
       return 1;
     }
     let f: string | number = a1[key];
     let b: string | number = a2[key];
+    f = f ?? '';
+    b = b ?? '';
 
     if (typeof f === 'string' && typeof b === 'string') {
       f = f.toLowerCase();
