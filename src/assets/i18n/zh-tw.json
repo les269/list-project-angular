@@ -86,7 +86,8 @@
     "year": "年",
     "month": "月",
     "day": "日",
-    "tag": "標籤"
+    "tag": "標籤",
+    "keywordSearch": "關鍵字搜尋"
   },
   "title": {
     "home": "主題清單列表",
@@ -169,7 +170,8 @@
     "dataset": "設定資料集",
     "datasetEmpty": "設定資料集不能為空",
     "selectDataset": "選擇變更資料集",
-    "editData": "編輯資料"
+    "editData": "編輯資料",
+    "refreshData": "刷新資料"
   },
   "themeCustom": {
     "title": "資料自定義功能",
