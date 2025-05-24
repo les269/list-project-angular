@@ -263,13 +263,13 @@ export class EditGroupDatasetDataComponent implements OnInit {
         url: this.scrapyInput[scrapy.name].url,
       })
       .subscribe(res => {
-        this.json = res;
+        this.json = { ...this.json, ...res };
       });
   }
 
   scrapyByJson(scrapyName: string, json: string[]) {
     this.scrapyService.scrapyByJson({ scrapyName, json }).subscribe(res => {
-      this.json = res;
+      this.json = { ...this.json, ...res };
     });
   }
 
