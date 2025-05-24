@@ -75,6 +75,14 @@
                 scrapyByJson(scrapy.name, scrapyInput[scrapy.name].json)
               " />
           }
+          @if (scrapySize[scrapy.name] === 1) {
+            <button
+              class="btn btn-outline-secondary"
+              type="button"
+              (click)="scrapyByJson(scrapy.name, [primeValue])">
+              {{ 'g.keywordSearch' | translate }}
+            </button>
+          }
           <button
             class="btn btn-outline-secondary"
             type="button"
