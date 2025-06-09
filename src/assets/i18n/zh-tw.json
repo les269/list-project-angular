@@ -207,7 +207,8 @@
     "_self": "當前畫面開啟(_self)",
     "_blank": "新開視窗(_blank)",
     "_parent": "目前瀏覽環境的父級瀏覽上下文(_parent)",
-    "_top": "最頂級的瀏覽上下文(_top)"
+    "_top": "最頂級的瀏覽上下文(_top)",
+    "visibleDatasetNameListPH": "是否顯示按鈕為空則全部顯示,對應資料集的名稱列表 ex: dataset1,dataset2"
   },
   "themeTopCustom": {
     "duplicateData": "顯示重複資料",

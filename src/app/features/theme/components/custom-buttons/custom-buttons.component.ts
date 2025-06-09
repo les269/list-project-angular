@@ -40,6 +40,7 @@ export class CustomButtonsComponent {
   @Input({ required: true }) defaultKey: string = '';
   @Input({ required: true }) customValueMap: ThemeCustomValueResponse = {};
   @Input({ required: true }) fileExist: { [key in string]: boolean } = {};
+  @Input() currentDatasetName: string = '';
   replaceValue = replaceValue;
 
   constructor(
@@ -241,5 +242,16 @@ export class CustomButtonsComponent {
           );
         });
     }
+  }
+  visibleByDatasetName(custom: ThemeCustom): boolean {
+    if (
+      this.themeHeaderType === ThemeHeaderType.imageList &&
+      Array.isArray(custom.visibleDatasetNameList) &&
+      custom.visibleDatasetNameList.length > 0 &&
+      !custom.visibleDatasetNameList.includes(this.currentDatasetName)
+    ) {
+      return false;
+    }
+    return true;
   }
 }

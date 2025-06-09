@@ -30,7 +30,6 @@ import { ThemeDatasetTableComponent } from '../../components/theme-dataset-table
 import { ThemeTagTableComponent } from '../../components/theme-tag-table/theme-tag-table.component';
 import { ThemeOtherSettingComponent } from '../../components/theme-other-setting/theme-other-setting.component';
 import { Store } from '@ngrx/store';
-import { updateList } from '../../../../shared/state/layout.actions';
 @Component({
   standalone: true,
   imports: [
@@ -295,6 +294,15 @@ export class ThemeEditComponent implements OnInit {
         this.snackbarService.isBlankMessage('themeCustom.byKey');
         return false;
       }
+      if (isBlank(custom.visibleDatasetNameList)) {
+        custom.visibleDatasetNameList = [];
+      }
+      if (!Array.isArray(custom.visibleDatasetNameList)) {
+        custom.visibleDatasetNameList = (custom.visibleDatasetNameList + '')
+          .split(',')
+          .map(x => x.trim())
+          .filter(x => isNotBlank(x));
+      }
       switch (custom.type) {
         case 'openUrl':
           if (isBlank(custom.openUrl)) {
@@ -331,6 +339,7 @@ export class ThemeEditComponent implements OnInit {
           break;
       }
     }
+
     return true;
   }
 

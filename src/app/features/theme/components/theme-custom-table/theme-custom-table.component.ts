@@ -59,6 +59,7 @@ export class ThemeCustomTableComponent extends GenericTableComponent<ThemeCustom
     deleteFile: '',
     openWindowsTarget: OpenWindowTargetType._self,
     openFolder: '',
+    visibleDatasetNameList: [],
   };
   eThemeCustomType = ThemeCustomType;
   eOpenWindowTargetType = OpenWindowTargetType;

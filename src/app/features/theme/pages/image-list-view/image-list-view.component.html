@@ -255,7 +255,10 @@
                 [defaultKey]="defaultKey"
                 [customValueMap]="customValueMap"
                 [fileExist]="fileExist"
-                [themeHeaderType]="themeHeaderType"></app-custom-buttons>
+                [themeHeaderType]="themeHeaderType"
+                [currentDatasetName]="
+                  datasetDataMap[datasetSeq - 1].themeDataset.label
+                "></app-custom-buttons>
             </div>
           }
         </div>

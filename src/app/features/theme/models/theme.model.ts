@@ -104,6 +104,7 @@ export interface ThemeCustom {
   deleteFile: string;
   openWindowsTarget: OpenWindowTargetType;
   openFolder: string;
+  visibleDatasetNameList: string[];
 }
 
 export enum ThemeCustomType {
