@@ -180,19 +180,31 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
         }),
         switchMap(x =>
           this.datasetService.findDatasetDataByNameList(uniqueDatasetList)
-        )
+        ),
+        tap(res => {
+          this.datasetDataMap = this.themeDatasetList.map(themeDataset => {
+            var datasetDataList = res.filter(datasetData =>
+              themeDataset.datasetList.includes(datasetData.datasetName)
+            );
+            return { themeDataset, datasetDataList };
+          });
+          //設定過濾資料欄位
+          this.searchLabel = this.themeLabelList.filter(
+            x => x.isSearchValue && x.type !== 'seq'
+          );
+        }),
+        switchMap(res => {
+          const nameList = res
+            .flatMap(x => x.data)
+            .map(x => x[this.defaultKey]);
+          this.themeTagValueList = this.themeTagValueList.map(x => {
+            x.valueList = x.valueList.filter(y => nameList.includes(y));
+            return x;
+          });
+          return this.themeService.updateTagValueList(this.themeTagValueList);
+        })
       )
       .subscribe(res => {
-        this.datasetDataMap = this.themeDatasetList.map(themeDataset => {
-          var datasetDataList = res.filter(datasetData =>
-            themeDataset.datasetList.includes(datasetData.datasetName)
-          );
-          return { themeDataset, datasetDataList };
-        });
-        //設定過濾資料欄位
-        this.searchLabel = this.themeLabelList.filter(
-          x => x.isSearchValue && x.type !== 'seq'
-        );
         this.initData();
       });
   }
@@ -300,8 +312,8 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
   getTagValueLength(tag: string) {
     const tagValue = this.themeTagValueList.find(x => x.tag === tag);
     if (tagValue && this.useData) {
-      const list = this.useData.map((x: any) => x[this.defaultKey]);
-      return tagValue.valueList.filter(x => list.includes(x)).length;
+      const nameList = this.useData.map((x: any) => x[this.defaultKey]);
+      return tagValue.valueList.filter(x => nameList.includes(x)).length;
     }
     return 0;
   }

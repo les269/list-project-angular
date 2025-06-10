@@ -318,8 +318,18 @@ export class ImageListViewComponent
    * 隨機搜尋
    */
   randomSearch() {
-    const randomNo = getRandomInt(1, this.useData.length) - 1;
-    this.searchValue = [this.useData[randomNo][this.defaultKey]];
+    if (this.useTag.seq !== -1) {
+      const nameList = this.useData.map((x: any) => x[this.defaultKey]);
+      const valueList = this.themeTagValueList
+        .find(tag => tag.tag === this.useTag.tag)!
+        .valueList.filter(x => nameList.includes(x));
+      const randomNo = getRandomInt(1, valueList.length) - 1;
+      this.searchValue = [valueList[randomNo]];
+    } else {
+      const randomNo = getRandomInt(1, this.useData.length) - 1;
+      this.searchValue = [this.useData[randomNo][this.defaultKey]];
+    }
+
     this.changeQueryParams();
   }
 
