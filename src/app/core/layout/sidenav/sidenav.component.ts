@@ -52,4 +52,20 @@ export class SidenavComponent implements OnInit {
       .createUrlTree([item.type, item.name, item.version])
       .toString();
   }
+  getQueryParams(item: ThemeHeader) {
+    let obj = {};
+    if (item.type === ThemeHeaderType.imageList) {
+      const sortArray = item.themeLabelList.filter(x => x.isSort);
+      const defaultDataset = item.themeDatasetList.find(x => x.isDefault);
+      obj = {
+        page: 1,
+        searchValue: '',
+        dataset: defaultDataset ? defaultDataset.seq : 1, //
+        tag: -1,
+        sort: sortArray.length > 0 ? sortArray[0].byKey : '', //
+        asc: true,
+      };
+    }
+    return obj;
+  }
 }
