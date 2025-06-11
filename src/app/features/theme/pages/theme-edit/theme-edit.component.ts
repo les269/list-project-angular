@@ -294,7 +294,10 @@ export class ThemeEditComponent implements OnInit {
         this.snackbarService.isBlankMessage('themeCustom.byKey');
         return false;
       }
-      if (isBlank(custom.visibleDatasetNameList)) {
+      if (
+        !Array.isArray(custom.visibleDatasetNameList) &&
+        isBlank(custom.visibleDatasetNameList)
+      ) {
         custom.visibleDatasetNameList = [];
       }
       if (!Array.isArray(custom.visibleDatasetNameList)) {
