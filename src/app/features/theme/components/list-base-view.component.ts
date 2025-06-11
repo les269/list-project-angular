@@ -237,7 +237,12 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
       .find(x => x.themeDataset.label === this.useDataset.label)!
       .datasetDataList.map(x => {
         x.data = x.data.map(data => {
-          data[this.randomStr] = crypto.getRandomValues(new Uint32Array(1))[0];
+          if (!data[this.randomStr]) {
+            data[this.randomStr] = crypto.getRandomValues(
+              new Uint32Array(1)
+            )[0];
+          }
+
           data[this.datasetNameStr] = x.datasetName;
           return data;
         });
