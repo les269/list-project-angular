@@ -8,6 +8,7 @@ import {
   throwError,
 } from 'rxjs';
 import { ThemeHeader, ThemeHeaderType } from '../../features/theme/models';
+import { Params } from '@angular/router';
 
 //是否為空值
 export const isBlank = (s: any): boolean =>
@@ -160,3 +161,19 @@ export const readJsonFile = (reader: FileReader): Observable<Object> => {
 
 export const sortSeq = (a: any, b: any): number =>
   parseInt(a.seq) > parseInt(b.seq) ? 1 : -1;
+
+export const getQueryParamsByHeader = (header: ThemeHeader): Params | null => {
+  if (header.type === ThemeHeaderType.imageList) {
+    const sortArray = header.themeLabelList.filter(x => x.isSort);
+    const defaultDataset = header.themeDatasetList.find(x => x.isDefault);
+    return {
+      page: 1,
+      searchValue: '',
+      dataset: defaultDataset ? defaultDataset.seq : 1, //
+      tag: -1,
+      sort: sortArray.length > 0 ? sortArray[0].byKey : '', //
+      asc: true,
+    };
+  }
+  return null;
+};

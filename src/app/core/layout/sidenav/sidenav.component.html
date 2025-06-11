@@ -15,7 +15,7 @@
           <a
             class="menu-item"
             [routerLink]="navigateList(item)"
-            [queryParams]="getQueryParams(item)"
+            [queryParams]="getQueryParamsByHeader(item)"
             (click)="close()"
             >{{ item.title | translate }}</a
           >
