@@ -1,7 +1,7 @@
 <div
   class="img-content"
   (click)="refreshImage($event)"
-  [ngStyle]="{ cursor: showRefresh ? 'wait' : 'default' }">
+  [ngStyle]="{ cursor: ctrlPressed ? 'wait' : 'default' }">
   <img
     alt=""
     [ngSrc]="displaySrc"

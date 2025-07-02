@@ -178,6 +178,7 @@
           class="img-content"
           [url]="getImageUrl(data, themeImage)"
           [priority]="i === 0"
+          [ctrlPressed]="ctrlPressed"
           (hiddenFixedImage)="fixedImage.hidden()"
           (visibleFixedImage)="fixedImage.visible()"
           (changeFixedImagePath)="fixedImagePath = $event"

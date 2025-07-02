@@ -20,6 +20,7 @@ import { CommonModule, NgOptimizedImage } from '@angular/common';
 export class ImgContentComponent implements OnInit, OnChanges {
   @Input({ required: true }) url = '';
   @Input({ required: true }) priority = false;
+  @Input({ required: true }) ctrlPressed = false;
   @Output() hiddenFixedImage = new EventEmitter<void>();
   @Output() visibleFixedImage = new EventEmitter<void>();
   @Output() changeFixedImagePath = new EventEmitter<string>();
@@ -29,12 +30,11 @@ export class ImgContentComponent implements OnInit, OnChanges {
   }>();
   displaySrc: string = '';
   fallbackSrc: string = 'assets/img/img-not-found.jpg';
-  showRefresh = false;
-  ctrlPressed = false;
 
   ngOnInit() {
     this.displaySrc = this.url;
   }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['url']) {
       this.displaySrc = this.url;
@@ -65,20 +65,6 @@ export class ImgContentComponent implements OnInit, OnChanges {
     if (event.ctrlKey) {
       event.stopPropagation(); // 防止事件冒泡
       this.displaySrc = this.url + '&t=' + Date.now();
-    }
-  }
-
-  @HostListener('window:keydown', ['$event'])
-  onKeyDown(event: KeyboardEvent) {
-    if (event.key === 'Control') {
-      this.showRefresh = true;
-    }
-  }
-
-  @HostListener('window:keyup', ['$event'])
-  onKeyUp(event: KeyboardEvent) {
-    if (event.key === 'Control') {
-      this.showRefresh = false; // 當放開 Ctrl 時隱藏
     }
   }
 }

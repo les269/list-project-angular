@@ -1,4 +1,10 @@
-import { Component, Injector, OnDestroy, ViewChild } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  Injector,
+  OnDestroy,
+  ViewChild,
+} from '@angular/core';
 import {
   debounceTime,
   fromEvent,
@@ -88,6 +94,7 @@ export class ImageListViewComponent
   replaceImageUrl = replaceValue;
 
   @ViewChild('fixedImage') fixedImage!: FixedImageComponent;
+  ctrlPressed = false;
 
   constructor(injector: Injector) {
     super(injector);
@@ -433,6 +440,20 @@ export class ImageListViewComponent
       this.themeService.updateSingleTagValue(themeTagValue).subscribe(() => {
         this.changeQueryParams();
       });
+    }
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Control') {
+      this.ctrlPressed = true;
+    }
+  }
+
+  @HostListener('window:keyup', ['$event'])
+  onKeyUp(event: KeyboardEvent) {
+    if (event.key === 'Control') {
+      this.ctrlPressed = false;
     }
   }
 }
