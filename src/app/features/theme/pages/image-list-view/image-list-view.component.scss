@@ -103,24 +103,6 @@ div.card {
     align-items: center;
     padding: 0px;
 
-    > div.img-content {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 0px;
-      > img {
-        position: relative !important;
-        padding: 0.25rem;
-        background-color: #fff;
-        border: 1px solid #dee2e6;
-        border-radius: 0.25rem;
-        max-width: 100%;
-        width: auto !important;
-        max-height: 33vh;
-        height: 100%;
-        object-fit: scale-down;
-      }
-    }
     > div.detail-content {
       display: flex;
       flex-direction: column;

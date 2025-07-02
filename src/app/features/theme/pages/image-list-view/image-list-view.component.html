@@ -174,19 +174,16 @@
       (mouseenter)="hoveredIndex = i"
       (mouseleave)="hoveredIndex = null">
       <div class="card-body">
-        <div class="img-content">
-          <img
-            alt=""
-            [ngSrc]="getImageUrl(data, themeImage)"
-            fill
-            [priority]="i === 0"
-            (mouseout)="fixedImage.hidden()"
-            (mouseover)="delayViewImg($event, getImageUrl(data, themeImage))"
-            (click)="
-              fixedImage.visible();
-              fixedImagePath = getImageUrl(data, themeImage)
-            " />
-        </div>
+        <app-img-content
+          class="img-content"
+          [url]="getImageUrl(data, themeImage)"
+          [priority]="i === 0"
+          (hiddenFixedImage)="fixedImage.hidden()"
+          (visibleFixedImage)="fixedImage.visible()"
+          (changeFixedImagePath)="fixedImagePath = $event"
+          (delayViewImg)="
+            delayViewImg($event.event, $event.url)
+          "></app-img-content>
         <div class="detail-content">
           <div class="edit-button">
             @if (hoveredIndex === i && themeTagList.length > 0 && defaultKey) {

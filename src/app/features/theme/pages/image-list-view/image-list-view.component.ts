@@ -42,12 +42,12 @@ import {
   ItemTagButtonsComponent,
   ThemeTagUpdate,
 } from '../../components/item-tag-buttons/item-tag-buttons.component';
+import { ImgContentComponent } from '../../components/img-content/img-content.component';
 
 @Component({
   standalone: true,
   imports: [
     MatIconModule,
-    ReplaceValuePipe,
     NgOptimizedImage,
     TranslateModule,
     FormsModule,
@@ -62,6 +62,7 @@ import {
     NgTemplateOutlet,
     FixedImageComponent,
     ItemTagButtonsComponent,
+    ImgContentComponent,
   ],
   selector: 'app-image-list-view',
   templateUrl: 'image-list-view.component.html',
