@@ -1,0 +1,134 @@
+<div class="d-flex justify-content-between align-items-center">
+  <h2 mat-dialog-title>
+    {{ 'home.shareTagList' | translate }}
+  </h2>
+  <button class="d-flex mx-2" mat-icon-button (click)="onNoClick()">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+<mat-dialog-content class="scrollbar-primary">
+  <div class="share-tag-list">
+    <div class="toolbar d-flex justify-content-between align-items-center mb-2">
+      <div class="filter-box" style="flex: 1; max-width: 420px">
+        <input
+          class="form-control"
+          [placeholder]="'g.filter' | translate"
+          (input)="applyFilter($event)" />
+      </div>
+      <div class="ms-2">
+        <button type="button" class="btn add" (click)="openAddDialog()">
+          {{ 'g.add' | translate }}
+        </button>
+      </div>
+    </div>
+
+    <div class="dialog">
+      <div class="table-container">
+        <table
+          mat-table
+          [dataSource]="dataSource"
+          multiTemplateDataRows
+          matSort>
+          <!-- ID Column -->
+          <ng-container matColumnDef="shareTagId">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+              class="sticky-header"
+              [ngStyle]="{ width: '200px' }">
+              {{ 'shareTag.tagId' | translate }}
+            </th>
+            <td mat-cell *matCellDef="let tag">{{ tag.shareTagId }}</td>
+          </ng-container>
+
+          <!-- Name Column -->
+          <ng-container matColumnDef="shareTagName">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+              class="sticky-header"
+              [ngStyle]="{ width: '250px' }">
+              {{ 'shareTag.tagName' | translate }}
+            </th>
+            <td mat-cell *matCellDef="let tag">{{ tag.shareTagName }}</td>
+          </ng-container>
+
+          <!-- Updated Time -->
+          <ng-container matColumnDef="updatedTime">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+              class="sticky-header"
+              [ngStyle]="{ width: '250px' }">
+              {{ 'g.updatedTime' | translate }}
+            </th>
+            <td mat-cell *matCellDef="let tag">
+              {{ tag.updatedTime | date: 'yyyy-MM-dd HH:mm' }}
+            </td>
+          </ng-container>
+
+          <!-- Actions -->
+          <ng-container matColumnDef="action">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              class="sticky-header"
+              [ngStyle]="{ width: '150px' }"></th>
+            <td mat-cell *matCellDef="let tag">
+              <div class="d-flex">
+                <button mat-icon-button (click)="onEditTag(tag)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button (click)="deleteTag(tag.shareTagId)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+      </div>
+      <div
+        *ngIf="!dataSource.data || dataSource.data.length === 0"
+        class="empty mt-2">
+        {{ 'shareTag.noTags' | translate }}
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+<!-- Add dialog template (opened by MatDialog) -->
+<ng-template #addTagDialog>
+  <h2 mat-dialog-title>{{ 'shareTag.addTag' | translate }}</h2>
+  <mat-dialog-content>
+    <div class="mb-3">
+      <label for="shareTagId" class="form-label">{{
+        'shareTag.tagId' | translate
+      }}</label>
+      <input
+        type="text"
+        class="form-control"
+        [(ngModel)]="newTagId"
+        [disabled]="isEdit" />
+    </div>
+
+    <div class="mb-3">
+      <label for="shareTagName" class="form-label">{{
+        'shareTag.tagName' | translate
+      }}</label>
+      <input type="text" class="form-control" [(ngModel)]="newTagName" />
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button type="button" class="btn btn-secondary" (click)="closeAddDialog()">
+      {{ 'g.no' | translate }}
+    </button>
+    <button type="button" class="btn btn-primary" (click)="confirmAddTag()">
+      {{ 'g.ok' | translate }}
+    </button>
+  </mat-dialog-actions>
+</ng-template>

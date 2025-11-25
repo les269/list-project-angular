@@ -176,12 +176,11 @@ export class TableViewComponent
     this.getCustomValueMap();
   }
 
+  // 改變當前選擇的標籤 url上的
   override changeTag() {
     this.searchChange();
     if (this.useTag.seq !== -1) {
-      const valueList = this.themeTagValueList.find(
-        tag => tag.tag === this.useTag.tag
-      )!.valueList;
+      const valueList = this.shareTagValueMap[this.useTag.shareTagId];
       this.list.data = this.list.data.filter((x: any) =>
         valueList.includes(x[this.defaultKey])
       );

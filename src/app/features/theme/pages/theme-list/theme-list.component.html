@@ -9,6 +9,12 @@
       (click)="onOpenVisible()">
       {{ 'home.visibleConfig' | translate }}
     </button>
+    <button
+      type="button"
+      class="btn btn-primary mx-1"
+      (click)="onShareTagConfig()">
+      {{ 'home.shareTagList' | translate }}
+    </button>
   </div>
   @for (type of eThemeHeaderType | keyvalue; track $index) {
     <ng-container *ngIf="list$ | async as list">

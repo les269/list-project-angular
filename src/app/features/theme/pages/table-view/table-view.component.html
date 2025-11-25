@@ -24,8 +24,12 @@
           (change)="changeTag()">
           @for (tag of themeTagListForSelect; track $index) {
             <option [ngValue]="tag">
-              {{ tag.tag }}
-              {{ tag.seq === -1 ? '' : '(' + getTagValueLength(tag.tag) + ')' }}
+              {{ tag.shareTagId }}
+              {{
+                tag.seq === -1
+                  ? ''
+                  : '(' + getTagValueLength(tag.shareTagId) + ')'
+              }}
             </option>
           }
         </select>

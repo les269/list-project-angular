@@ -12,6 +12,7 @@ import {
   GroupDataset,
   GroupDatasetData,
 } from '../../features/dataset/model';
+import { ShareTag } from '../../features/theme/models';
 import { ThemeTag } from '../../features/theme/models';
 import { ReplaceValueMap } from '../../features/replace-value-map/model';
 import { TranslateService } from '@ngx-translate/core';
@@ -185,9 +186,9 @@ export class SelectTableService {
       .afterClosed();
   }
 
-  selectMutipleTag(dataSource: ThemeTag[], selected: ThemeTag[]) {
-    const data: BaseSelectTableData<ThemeTag> = {
-      displayedColumns: ['tag'],
+  selectMutipleTag(dataSource: ShareTag[], selected: ShareTag[]) {
+    const data: BaseSelectTableData<ShareTag> = {
+      displayedColumns: ['shareTagId', 'shareTagName'],
       labels: ['themeTag.tag'],
       dataSource,
       selectType: 'multiple',
@@ -196,13 +197,38 @@ export class SelectTableService {
     };
     return this.matDialog
       .open<
-        SelectTableDialog<ThemeTag, BaseSelectTableData<ThemeTag>>,
-        BaseSelectTableData<ThemeTag>,
-        ThemeTag[]
+        SelectTableDialog<ShareTag, BaseSelectTableData<ShareTag>>,
+        BaseSelectTableData<ShareTag>,
+        ShareTag[]
       >(SelectTableDialog, {
         data,
       })
       .afterClosed();
+  }
+
+  selectSingleShareTag(dataSource: ShareTag[]) {
+    const datePipe = new DatePipe('en-US');
+    const data: BaseSelectTableData<ShareTag> = {
+      displayedColumns: ['shareTagId', 'shareTagName', 'updatedTime'],
+      labels: ['shareTag.tagId', 'shareTag.tagName', 'g.updatedTime'],
+      dataSource,
+      selectType: 'single',
+      columnFormats: {
+        updatedTime: (value: any) =>
+          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
+      },
+      showTitle: false,
+    };
+    return this.matDialog
+      .open<
+        SelectTableDialog<ShareTag, BaseSelectTableData<ShareTag>>,
+        BaseSelectTableData<ShareTag>,
+        ShareTag
+      >(SelectTableDialog, {
+        data,
+      })
+      .afterClosed()
+      .pipe(filter(res => res !== undefined));
   }
 
   selectSingleReplaceValueMap(dataSource: ReplaceValueMap[]) {

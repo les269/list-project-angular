@@ -174,24 +174,7 @@ export interface SortType {
 
 export interface ThemeTag {
   seq: number;
-  tag: string;
-}
-
-export interface ThemeTagValue {
-  headerId: string;
-  tag: string;
-  valueList: string[];
-}
-
-export enum UpdateTagValue {
-  add = 'add',
-  remove = 'remove',
-}
-export interface ThemeTagValueReq {
-  type: UpdateTagValue;
-  headerId: string;
-  tag: string;
-  value: string;
+  shareTagId: string;
 }
 
 export const DEFAULT_ROW_COLOR: string[] = [

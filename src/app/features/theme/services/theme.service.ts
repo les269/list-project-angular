@@ -8,7 +8,6 @@ import {
   ThemeCustomValueResponse,
   ThemeHeader,
   ThemeHeaderType,
-  ThemeTagValue,
   ThemeTopCustomValue,
   ThemeTopCustomValueResponse,
 } from '../models';
@@ -81,22 +80,6 @@ export class ThemeService {
   //更新custom value
   updateCustomValue(req: ThemeCustomValue): Observable<void> {
     return this.http.post<void>('/theme/custom/update', req);
-  }
-
-  //取得tag list
-  getTagValueList(headerId: string): Observable<ThemeTagValue[]> {
-    return this.http.get<ThemeTagValue[]>(
-      `/theme/tag/value?headerId=${headerId}`
-    );
-  }
-  //更新tag value
-  updateTagValueList(req: ThemeTagValue[]): Observable<void> {
-    return this.http.post<void>(`/theme/tag/update`, req);
-  }
-
-  //更新單一tag value
-  updateSingleTagValue(req: ThemeTagValue): Observable<void> {
-    return this.http.post<void>(`/theme/tag/update/single`, req);
   }
 
   findTopCustomValue(req: string): Observable<ThemeTopCustomValueResponse> {

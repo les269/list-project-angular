@@ -27,7 +27,25 @@
         {{ 'themeTag.tag' | translate }}
       </th>
       <td mat-cell *matCellDef="let element; let i = dataIndex">
-        <input class="form-control" [(ngModel)]="element.tag" />
+        <div class="mt-1 d-flex flex-wrap gap-3 align-items-center">
+          @if (element.shareTagId) {
+            <mat-chip
+              >{{ getShareTagName(element.shareTagId) }}
+              <button matChipRemove (click)="element.shareTagId = ''">
+                <mat-icon>cancel</mat-icon>
+              </button>
+            </mat-chip>
+          }
+          <button
+            class="btn btn-outline-primary d-flex"
+            (click)="selectShareTag(element)">
+            <mat-icon class="material-icons-outlined"
+              ><span class="material-symbols-outlined">
+                select_window_2
+              </span></mat-icon
+            >
+          </button>
+        </div>
       </td>
     </ng-container>
     <ng-container matColumnDef="other">

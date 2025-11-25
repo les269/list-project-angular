@@ -23,6 +23,7 @@ import {
   sortSeq,
 } from '../../../../shared/util/helper';
 import {
+  ShareTagValue,
   SortType,
   ThemeCustomValueResponse,
   ThemeHeaderType,
@@ -44,10 +45,7 @@ import { ListBaseViewComponent } from '../../components/list-base-view.component
 import { TopCustomButtonsComponent } from '../../components/top-custom-buttons/top-custom-buttons.component';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FixedImageComponent } from '../../../../core/components/fixed-image/fixed-image.component';
-import {
-  ItemTagButtonsComponent,
-  ThemeTagUpdate,
-} from '../../components/item-tag-buttons/item-tag-buttons.component';
+import { ItemTagButtonsComponent } from '../../components/item-tag-buttons/item-tag-buttons.component';
 import { ImgContentComponent } from '../../components/img-content/img-content.component';
 
 @Component({
@@ -190,17 +188,11 @@ export class ImageListViewComponent
 
   override changeTag() {
     if (this.useTag.seq !== -1) {
-      const valueList = this.themeTagValueList.find(
-        tag => tag.tag === this.useTag.tag
-      )!.valueList;
+      const valueList = this.shareTagValueMap[this.useTag.shareTagId];
       this.filterData = this.filterData.filter((x: any) =>
         valueList.includes(x[this.defaultKey])
       );
     }
-  }
-
-  onSetTag(data: any) {
-    this.openSelectTag(data).subscribe(() => this.changeQueryParams());
   }
 
   initBaseConfig() {
@@ -328,9 +320,9 @@ export class ImageListViewComponent
   randomSearch() {
     if (this.useTag.seq !== -1) {
       const nameList = this.useData.map((x: any) => x[this.defaultKey]);
-      const valueList = this.themeTagValueList
-        .find(tag => tag.tag === this.useTag.tag)!
-        .valueList.filter(x => nameList.includes(x));
+      const valueList = this.shareTagValueMap[this.useTag.shareTagId].filter(
+        x => nameList.includes(x)
+      );
       const randomNo = getRandomInt(1, valueList.length) - 1;
       this.searchValue = [valueList[randomNo]];
     } else {
@@ -426,18 +418,22 @@ export class ImageListViewComponent
     return true;
   }
 
-  tagValueUpdate(event: ThemeTagUpdate) {
-    const themeTagValue = this.themeTagValueList.find(x => x.tag === event.tag);
-    if (themeTagValue) {
-      const index = themeTagValue.valueList.indexOf(event.value);
-      if (index > -1) {
-        themeTagValue.valueList.splice(index, 1);
-        themeTagValue.valueList = [...themeTagValue.valueList];
-      } else {
-        themeTagValue.valueList = [...themeTagValue.valueList, event.value];
-      }
-      this.themeTagValueList = [...this.themeTagValueList];
-      this.themeService.updateSingleTagValue(themeTagValue).subscribe(() => {
+  tagValueUpdate(event: ShareTagValue) {
+    const index = this.shareTagValueMap[event.shareTagId].indexOf(event.value);
+    if (index > -1) {
+      this.shareTagValueMap[event.shareTagId].splice(index, 1);
+      this.shareTagValueMap[event.shareTagId] = [
+        ...this.shareTagValueMap[event.shareTagId],
+      ];
+      this.shareTagService.deleteTagValue(event).subscribe(() => {
+        this.changeQueryParams();
+      });
+    } else {
+      this.shareTagValueMap[event.shareTagId] = [
+        ...this.shareTagValueMap[event.shareTagId],
+        event.value,
+      ];
+      this.shareTagService.addTagValue(event).subscribe(() => {
         this.changeQueryParams();
       });
     }

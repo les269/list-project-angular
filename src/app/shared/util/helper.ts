@@ -177,3 +177,20 @@ export const getQueryParamsByHeader = (header: ThemeHeader): Params | null => {
   }
   return null;
 };
+
+export function groupBy<T, K extends string | number>(
+  array: T[],
+  keyFn: (item: T) => K
+): Record<K, T[]> {
+  return array.reduce(
+    (map, item) => {
+      const key = keyFn(item);
+      if (!map[key]) {
+        map[key] = [] as T[];
+      }
+      map[key].push(item);
+      return map;
+    },
+    {} as Record<K, T[]>
+  );
+}

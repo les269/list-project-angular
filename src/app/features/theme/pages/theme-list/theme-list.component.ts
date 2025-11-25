@@ -17,6 +17,7 @@ import {
 import { selectLayoutByKey } from '../../../../shared/state/layout.selectors';
 import { Observable } from 'rxjs';
 import { ThemeVisibleComponent } from '../../components/theme-visible/theme-visible.component';
+import { ShareTagListComponent } from '../../components/share-tag-list/share-tag-list.component';
 
 @Component({
   standalone: true,
@@ -97,5 +98,12 @@ export class ThemeListComponent implements OnInit {
 
   onOpenVisible() {
     this.matDialog.open(ThemeVisibleComponent);
+  }
+
+  onShareTagConfig() {
+    this.matDialog.open(ShareTagListComponent, {
+      width: '800px',
+      maxWidth: '800px',
+    });
   }
 }

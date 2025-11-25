@@ -24,8 +24,12 @@
           (change)="changeQueryParams()">
           @for (tag of themeTagListForSelect; track $index) {
             <option [ngValue]="tag">
-              {{ tag.tag }}
-              {{ tag.seq === -1 ? '' : '(' + getTagValueLength(tag.tag) + ')' }}
+              {{ shareTagNameMap[tag.shareTagId] || tag.shareTagId }}
+              {{
+                tag.seq === -1
+                  ? ''
+                  : '(' + getTagValueLength(tag.shareTagId) + ')'
+              }}
             </option>
           }
         </select>
@@ -187,19 +191,6 @@
           "></app-img-content>
         <div class="detail-content">
           <div class="edit-button">
-            @if (hoveredIndex === i && themeTagList.length > 0 && defaultKey) {
-              <button
-                class="d-flex"
-                mat-icon-button
-                [matTooltip]="'themeTag.setTag' | translate"
-                (click)="onSetTag(data)">
-                <mat-icon class="material-icons-outlined"
-                  ><span class="material-symbols-outlined">
-                    bookmark
-                  </span></mat-icon
-                >
-              </button>
-            }
             @if (hoveredIndex === i) {
               <button
                 class="d-flex"
@@ -236,10 +227,9 @@
                   [value]="data[defaultKey]"
                   [data]="data"
                   [themeTagList]="themeTagList"
-                  [themeTagValueList]="themeTagValueList"
-                  (tagValueUpdate)="
-                    tagValueUpdate($event)
-                  "></app-item-tag-buttons>
+                  [shareTagValueMap]="shareTagValueMap"
+                  (tagValueUpdate)="tagValueUpdate($event)"
+                  [shareTagNameMap]="shareTagNameMap"></app-item-tag-buttons>
               </div>
             }
           </div>

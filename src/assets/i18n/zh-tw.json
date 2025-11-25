@@ -4,6 +4,7 @@
     "deleteSuccess": "刪除成功",
     "copySuccess": "複製成功",
     "commitSuccess": "提交成功",
+    "addSuccess": "新增成功",
     "saveSuccess": "保存成功",
     "updateSuccess": "更新成功",
     "themeExist": "主題已經存在",
@@ -40,7 +41,8 @@
     "openFolderSuccess": "開啟資料夾成功",
     "openFolderFail": "開啟資料夾失敗",
     "urlEmpty": "網址為空無法開啟請再確認",
-    "updateIntervalError": "更新間隔為整數且最少為0"
+    "updateIntervalError": "更新間隔為整數且最少為0",
+    "sureDeleteTag": "是否要刪除該標籤?"
   },
   "g": {
     "edit": "編輯",
@@ -48,8 +50,10 @@
     "delete": "刪除",
     "submit": "提交",
     "clear": "清除",
+    "add": "新增",
     "ok": "確定",
     "no": "取消",
+    "filter": "過濾",
     "save": "保存",
     "totalNum": "總數量",
     "page": "頁",
@@ -118,7 +122,11 @@
     "redirectData": "跳轉網址資訊",
     "setting": "設定"
   },
-  "home": { "createTheme": "創建主題", "visibleConfig": "清單顯示控制" },
+  "home": {
+    "createTheme": "創建主題",
+    "visibleConfig": "清單顯示控制",
+    "shareTagList": "共享標籤清單"
+  },
   "themeHeader": {
     "name": "主題名稱",
     "version": "版本",
@@ -365,5 +373,13 @@
     "match": "被替換值",
     "replaceValue": "替換值",
     "add": "新增"
+  },
+  "shareTag": {
+    "tagId": "標籤ID",
+    "tagName": "標籤名稱",
+    "addTag": "新增標籤",
+    "editTag": "編輯標籤",
+    "tagDuplicate": "標籤ID不能重複",
+    "noTags": "暫無標籤請新增標籤"
   }
 }

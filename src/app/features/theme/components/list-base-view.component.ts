@@ -1,7 +1,8 @@
 import { Component, Injector, OnDestroy, OnInit } from '@angular/core';
-import { debounceTime, filter, Subscription, switchMap, tap } from 'rxjs';
+import { debounceTime, filter, pipe, Subscription, switchMap, tap } from 'rxjs';
 import { updateTitle } from '../../../shared/state/layout.actions';
 import {
+  groupBy,
   isBlank,
   isNotBlank,
   replaceValue,
@@ -15,11 +16,12 @@ import {
   ThemeDataset,
   ThemeTag,
   ThemeCustom,
-  ThemeTagValue,
   ThemeHeaderType,
   SortType,
   ThemeTopCustomValueResponse,
   ThemeTopCustom,
+  ShareTag,
+  ShareTagValue,
 } from '../models';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ThemeService } from '../services/theme.service';
@@ -34,6 +36,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { SnackbarService } from '../../../core/services/snackbar.service';
 import { api } from '../../../../environments/environment';
 import { FileService } from '../../../core/services/file.service';
+import { ShareTagService } from '../services/share-tag.service';
 
 @Component({
   standalone: true,
@@ -53,7 +56,6 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
   themeTagListForSelect!: ThemeTag[];
   themeCustomList!: ThemeCustom[];
   themeTopCustomList!: ThemeTopCustom[];
-  themeTagValueList: ThemeTagValue[] = [];
   displayedColumns: string[] = [];
   datasetDataMap: {
     themeDataset: ThemeDataset;
@@ -69,6 +71,9 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
   topCustomValueMap: ThemeTopCustomValueResponse = {};
   autoCompleteList: string[] = [];
   fileExist: { [key in string]: boolean } = {};
+  shareTags: ShareTag[] = [];
+  shareTagNameMap: { [key in string]: string } = {};
+  shareTagValueMap: { [key in string]: string[] } = {};
 
   seqKey = '';
   defaultKey: string = '';
@@ -94,6 +99,7 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
   translateService: TranslateService;
   snackbarService: SnackbarService;
   fileService: FileService;
+  shareTagService: ShareTagService;
   constructor(protected injector: Injector) {
     this.themeService = this.injector.get(ThemeService);
     this.router = this.injector.get(Router);
@@ -106,6 +112,7 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
     this.translateService = this.injector.get(TranslateService);
     this.snackbarService = this.injector.get(SnackbarService);
     this.fileService = this.injector.get(FileService);
+    this.shareTagService = this.injector.get(ShareTagService);
   }
 
   ngOnInit() {
@@ -139,7 +146,7 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
             .sort(sortSeq);
 
           this.themeTagListForSelect = [
-            { seq: -1, tag: '' },
+            { seq: -1, shareTagId: '' },
             ...this.themeTagList,
           ];
           this.themeDatasetList = res.themeDatasetList.sort(sortSeq);
@@ -154,6 +161,7 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
           //呼叫取得清單資料
           this.getDataSoure();
           this.getTopCustomValueMap();
+          this.getShareTagList();
         });
       });
   }
@@ -172,11 +180,18 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
     const uniqueDatasetList = Array.from(
       new Set(this.themeDatasetList.flatMap(x => x.datasetList))
     );
-    this.themeService
-      .getTagValueList(this.headerId)
+    const tagIds = this.themeTagList.map(t => t.shareTagId);
+    this.shareTagService
+      .getShareTagValues(tagIds)
       .pipe(
-        tap(res => {
-          this.themeTagValueList = res;
+        tap(x => {
+          const grouped = groupBy(x, v => v.shareTagId);
+          this.shareTagValueMap = Object.fromEntries(
+            Object.entries(grouped).map(([k, arr]) => [
+              k,
+              arr.map(a => a.value),
+            ])
+          );
         }),
         switchMap(x =>
           this.datasetService.findDatasetDataByNameList(uniqueDatasetList)
@@ -192,19 +207,9 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
           this.searchLabel = this.themeLabelList.filter(
             x => x.isSearchValue && x.type !== 'seq'
           );
-        }),
-        switchMap(res => {
-          const nameList = res
-            .flatMap(x => x.data)
-            .map(x => x[this.defaultKey]);
-          this.themeTagValueList = this.themeTagValueList.map(x => {
-            x.valueList = x.valueList.filter(y => nameList.includes(y));
-            return x;
-          });
-          return this.themeService.updateTagValueList(this.themeTagValueList);
         })
       )
-      .subscribe(res => {
+      .subscribe(values => {
         this.initData();
       });
   }
@@ -229,7 +234,7 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
       this.useDataset = this.themeDatasetList[0];
     }
     if (this.tagSeq === -1) {
-      this.useTag = { seq: -1, tag: '' };
+      this.useTag = { seq: -1, shareTagId: '' };
     } else {
       this.useTag = this.themeTagListForSelect[this.tagSeq];
     }
@@ -274,25 +279,13 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
 
   openSelectTag(data: any) {
     const value = data[this.defaultKey];
-    const tagList = this.themeTagValueList
-      .filter(x => x.valueList.includes(value))
-      .map(x => x.tag);
-    const selected = this.themeTagList.filter(x => tagList.includes(x.tag));
-    return this.selectTableService
-      .selectMutipleTag(this.themeTagList, selected)
-      .pipe(
-        filter(res => res !== undefined),
-        switchMap(res => {
-          this.themeTagValueList = this.themeTagValueList.map(x => {
-            x.valueList = x.valueList.filter(x => x !== value);
-            if (res.find(y => x.tag === y.tag)) {
-              x.valueList.push(value);
-            }
-            return x;
-          });
-          return this.themeService.updateTagValueList(this.themeTagValueList);
-        })
+    const selected = Object.entries(this.shareTagValueMap)
+      .filter(([shareTagId, valueList]) => valueList.includes(value))
+      .map(
+        ([shareTagId, valueList]) =>
+          this.shareTags.find(x => x.shareTagId === shareTagId)!
       );
+    return this.selectTableService.selectMutipleTag(this.shareTags, selected);
   }
 
   onRefresh() {
@@ -314,11 +307,11 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
     return a && b ? a.seq === b.seq : a === b;
   }
 
-  getTagValueLength(tag: string) {
-    const tagValue = this.themeTagValueList.find(x => x.tag === tag);
-    if (tagValue && this.useData) {
+  getTagValueLength(shareTagId: string) {
+    const valueList = this.shareTagValueMap[shareTagId];
+    if (valueList && this.useData) {
       const nameList = this.useData.map((x: any) => x[this.defaultKey]);
-      return tagValue.valueList.filter(x => nameList.includes(x)).length;
+      return valueList.filter(x => nameList.includes(x)).length;
     }
     return 0;
   }
@@ -417,4 +410,16 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
   }
 
   searchChange(text?: string) {}
+
+  getShareTagList() {
+    this.shareTagService.getAllTag().subscribe(tags => {
+      this.shareTags = tags.filter(t =>
+        this.themeTagList.some(tt => tt.shareTagId === t.shareTagId)
+      );
+      this.shareTagNameMap = {};
+      for (const element of tags) {
+        this.shareTagNameMap[element.shareTagId] = element.shareTagName;
+      }
+    });
+  }
 }

@@ -266,12 +266,12 @@ export class ThemeEditComponent implements OnInit {
 
   validationTag() {
     for (let tag of this.model.themeTagList) {
-      if (isBlank(tag.tag)) {
+      if (isBlank(tag.shareTagId)) {
         this.snackbarService.isBlankMessage('themeTag.tag');
         return false;
       }
     }
-    if (isDuplicate(this.model.themeTagList.map(x => x.tag))) {
+    if (isDuplicate(this.model.themeTagList.map(x => x.shareTagId))) {
       this.snackbarService.openByI18N('themeTag.tagDuplicate');
       return false;
     }
