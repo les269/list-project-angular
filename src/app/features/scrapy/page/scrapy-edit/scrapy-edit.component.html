@@ -12,178 +12,179 @@
         class="form-control"
         [(ngModel)]="model.name"
         [disabled]="status === 'edit'" />
-    </div>
-    <div class="form-group mb-2">
-      <label>{{ 'scrapy.paramSize' | translate }}</label>
-      <input class="form-control" type="number" [(ngModel)]="model.paramSize" />
-      <label class="form-text">{{ 'scrapy.paramSizeDesc' | translate }}</label>
-    </div>
-    <button type="button" class="btn btn-primary" (click)="onAddData()">
-      {{ 'scrapy.createScrapy' | translate }}
-    </button>
-    <mat-tab-group
-      [selectedIndex]="selected"
-      (selectedIndexChange)="selected = $event">
-      @for (data of model.data; track $index; let index = $index) {
-        <mat-tab>
-          <ng-template mat-tab-label>
-            @if (model.data.length !== 1 && index !== 0) {
-              <button
-                mat-icon-button
+      </div>
+      <div class="form-group mb-2">
+        <label>{{ 'scrapy.paramSize' | translate }}</label>
+        <input class="form-control" type="number" [(ngModel)]="model.paramSize" />
+        <label class="form-text">{{ 'scrapy.paramSizeDesc' | translate }}</label>
+      </div>
+      <button type="button" class="btn btn-primary" (click)="onAddData()">
+        {{ 'scrapy.createScrapy' | translate }}
+      </button>
+      <mat-tab-group
+        [selectedIndex]="selected"
+        (selectedIndexChange)="selected = $event">
+        @for (data of model.data; track $index; let index = $index) {
+          <mat-tab>
+            <ng-template mat-tab-label>
+              @if (model.data.length !== 1 && index !== 0) {
+                <button
+                  mat-icon-button
                 (click)="
                   $event.stopPropagation(); moveTab(model.data, index, 'left')
                 ">
-                <mat-icon>arrow_left</mat-icon>
-              </button>
-            }
-            {{ data.name ? data.name : '(' + ('g.unnamed' | translate) + ')' }}
-            @if (model.data.length !== 1 && index !== model.data.length - 1) {
-              <button
-                mat-icon-button
+                  <mat-icon>arrow_left</mat-icon>
+                </button>
+              }
+              {{ data.name ? data.name : '(' + ('g.unnamed' | translate) + ')' }}
+              @if (model.data.length !== 1 && index !== model.data.length - 1) {
+                <button
+                  mat-icon-button
                 (click)="
                   $event.stopPropagation(); moveTab(model.data, index, 'right')
                 ">
-                <mat-icon>arrow_right</mat-icon>
-              </button>
-            }
-          </ng-template>
-          <button
-            type="button"
-            class="btn btn-primary mt-2"
-            (click)="onDeleteData(index)">
-            {{ 'scrapy.deleteScrapy' | translate }}
-          </button>
-
-          <div class="input-group my-2">
-            <label class="input-group-text">{{
-              'scrapy.tabName' | translate
-            }}</label>
-            <input class="form-control" [(ngModel)]="data.name" />
-          </div>
-          <div class="input-group my-2">
-            <label class="input-group-text">{{
-              'scrapy.paramReplace' | translate
-            }}</label>
-            <input
-              class="form-control"
-              [matTooltip]="'scrapy.replaceRegular' | translate"
-              [placeholder]="'scrapy.replaceRegular' | translate"
-              [(ngModel)]="data.replaceRegular" />
-            <input
-              class="form-control"
-              [matTooltip]="'scrapy.replaceRegularTo' | translate"
-              [placeholder]="'scrapy.replaceRegularTo' | translate"
-              [(ngModel)]="data.replaceRegularTo" />
-          </div>
-          <div class="input-group my-2">
-            <label class="input-group-text">{{
-              'scrapy.url' | translate
-            }}</label>
-            <input
-              class="form-control"
-              [(ngModel)]="data.url"
-              [placeholder]="'scrapy.urlPH' | translate" />
-          </div>
-          <label class="h6">{{ 'scrapy.cookie' | translate }}</label>
-          <app-cookie-table [(list)]="data.cookie"></app-cookie-table>
-          <div class="my-2">
-            <label class="form-label" for="type">{{
-              'scrapy.scrapyPageType' | translate
-            }}</label>
-            <select
-              class="form-control form-select"
-              [(ngModel)]="data.scrapyPageType">
-              <option
-                *ngFor="let type of eScrapyPageType | keyvalue"
-                [ngValue]="type.key">
-                {{ 'scrapy.' + type.key | translate }}
-              </option>
-            </select>
-            @if (data.scrapyPageType === 'redirect') {
-              <label class="form-text">{{
-                'scrapy.redirectRemind' | translate
-              }}</label>
-            }
-          </div>
-          <label class="form-text"
-            ><div [innerHTML]="'scrapy.cssSelectRemind' | translate"></div
-          ></label>
-          <app-css-select-table
-            [(list)]="data.cssSelectList"></app-css-select-table>
-          <div class="form-group mb-2">
-            <label>{{ 'scrapy.testHtml' | translate }}</label>
-            <code-editor
-              [style.height]="'400px'"
-              [(ngModel)]="data.html"
-              [language]="'html'"
-              [indentWithTab]="true"
-              [languages]="languages" />
+                  <mat-icon>arrow_right</mat-icon>
+                </button>
+              }
+            </ng-template>
             <button
               type="button"
-              class="btn btn-primary"
-              (click)="onTestParseHtml(model.data[index])">
-              {{ 'scrapy.test' | translate }}
+              class="btn btn-primary mt-2"
+              (click)="onDeleteData(index)">
+              {{ 'scrapy.deleteScrapy' | translate }}
             </button>
-          </div>
-          <label>{{ 'scrapy.testResult' | translate }}</label>
-          <code-editor
-            [(ngModel)]="testResult"
-            [language]="'json'"
-            [indentWithTab]="true"
-            [languages]="languages" />
-        </mat-tab>
-      }
-      <mat-tab [label]="'scrapy.testArea' | translate">
-        <div class="form-group mb-2">
-          <div>{{ 'scrapy.testJson' | translate }}</div>
-          <label class="form-text">{{
-            'scrapy.useJsonRemind' | translate
-          }}</label>
-          <code-editor
-            [(ngModel)]="model.testJson"
-            [language]="'json'"
-            [indentWithTab]="true"
-            [languages]="languages" />
-          <button type="button" class="btn btn-primary" (click)="onTestJson()">
-            {{ 'scrapy.test' | translate }}
-          </button>
-        </div>
-        <div class="form-group mb-2">
-          <div>{{ 'scrapy.testUrl' | translate }}</div>
-          <label class="form-text">{{
-            'scrapy.useUrlRemind' | translate
-          }}</label>
-          <input class="form-control" [(ngModel)]="model.testUrl" />
-          <button type="button" class="btn btn-primary" (click)="onTestUrl()">
-            {{ 'scrapy.test' | translate }}
-          </button>
-        </div>
-        <label>{{ 'scrapy.testResult' | translate }}</label>
-        <code-editor
-          [(ngModel)]="testResult"
-          [language]="'json'"
-          [indentWithTab]="true"
-          [languages]="languages" />
-      </mat-tab>
-    </mat-tab-group>
-    @if (status === 'edit') {
-      <div class="my-4">
-        <button
-          type="submit"
-          class="btn btn-success w-100"
-          (click)="update(false, 'save')">
-          {{ 'g.save' | translate }}
-        </button>
-      </div>
-    }
 
-    <div class="my-4">
-      <button
-        type="submit"
-        class="btn btn-success w-100"
-        (click)="update(true, 'commit')">
-        {{ 'g.submit' | translate }}
-      </button>
-    </div>
-  </div>
-</div>
+            <div class="input-group my-2">
+              <label class="input-group-text">{{
+                'scrapy.tabName' | translate
+              }}</label>
+              <input class="form-control" [(ngModel)]="data.name" />
+            </div>
+            <div class="input-group my-2">
+              <label class="input-group-text">{{
+                'scrapy.paramReplace' | translate
+              }}</label>
+              <input
+                class="form-control"
+                [matTooltip]="'scrapy.replaceRegular' | translate"
+                [placeholder]="'scrapy.replaceRegular' | translate"
+                [(ngModel)]="data.replaceRegular" />
+                <input
+                  class="form-control"
+                  [matTooltip]="'scrapy.replaceRegularTo' | translate"
+                  [placeholder]="'scrapy.replaceRegularTo' | translate"
+                  [(ngModel)]="data.replaceRegularTo" />
+                </div>
+                <div class="input-group my-2">
+                  <label class="input-group-text">{{
+                    'scrapy.url' | translate
+                  }}</label>
+                  <input
+                    class="form-control"
+                    [(ngModel)]="data.url"
+                    [placeholder]="'scrapy.urlPH' | translate" />
+                  </div>
+                  <label class="h6">{{ 'scrapy.cookie' | translate }}</label>
+                  <app-cookie-table [(list)]="data.cookie"></app-cookie-table>
+                  <div class="my-2">
+                    <label class="form-label" for="type">{{
+                      'scrapy.scrapyPageType' | translate
+                    }}</label>
+                    <select
+                      class="form-control form-select"
+                      [(ngModel)]="data.scrapyPageType">
+                      @for (type of eScrapyPageType | keyvalue; track type) {
+                        <option
+                          [ngValue]="type.key">
+                          {{ 'scrapy.' + type.key | translate }}
+                        </option>
+                      }
+                    </select>
+                    @if (data.scrapyPageType === 'redirect') {
+                      <label class="form-text">{{
+                        'scrapy.redirectRemind' | translate
+                      }}</label>
+                    }
+                  </div>
+                  <label class="form-text"
+                    ><div [innerHTML]="'scrapy.cssSelectRemind' | translate"></div
+                  ></label>
+                  <app-css-select-table
+                  [(list)]="data.cssSelectList"></app-css-select-table>
+                  <div class="form-group mb-2">
+                    <label>{{ 'scrapy.testHtml' | translate }}</label>
+                    <code-editor
+                      [style.height]="'400px'"
+                      [(ngModel)]="data.html"
+                      [language]="'html'"
+                      [indentWithTab]="true"
+                      [languages]="languages" />
+                      <button
+                        type="button"
+                        class="btn btn-primary"
+                        (click)="onTestParseHtml(model.data[index])">
+                        {{ 'scrapy.test' | translate }}
+                      </button>
+                    </div>
+                    <label>{{ 'scrapy.testResult' | translate }}</label>
+                    <code-editor
+                      [(ngModel)]="testResult"
+                      [language]="'json'"
+                      [indentWithTab]="true"
+                      [languages]="languages" />
+                    </mat-tab>
+                  }
+                  <mat-tab [label]="'scrapy.testArea' | translate">
+                    <div class="form-group mb-2">
+                      <div>{{ 'scrapy.testJson' | translate }}</div>
+                      <label class="form-text">{{
+                        'scrapy.useJsonRemind' | translate
+                      }}</label>
+                      <code-editor
+                        [(ngModel)]="model.testJson"
+                        [language]="'json'"
+                        [indentWithTab]="true"
+                        [languages]="languages" />
+                        <button type="button" class="btn btn-primary" (click)="onTestJson()">
+                          {{ 'scrapy.test' | translate }}
+                        </button>
+                      </div>
+                      <div class="form-group mb-2">
+                        <div>{{ 'scrapy.testUrl' | translate }}</div>
+                        <label class="form-text">{{
+                          'scrapy.useUrlRemind' | translate
+                        }}</label>
+                        <input class="form-control" [(ngModel)]="model.testUrl" />
+                        <button type="button" class="btn btn-primary" (click)="onTestUrl()">
+                          {{ 'scrapy.test' | translate }}
+                        </button>
+                      </div>
+                      <label>{{ 'scrapy.testResult' | translate }}</label>
+                      <code-editor
+                        [(ngModel)]="testResult"
+                        [language]="'json'"
+                        [indentWithTab]="true"
+                        [languages]="languages" />
+                      </mat-tab>
+                    </mat-tab-group>
+                    @if (status === 'edit') {
+                      <div class="my-4">
+                        <button
+                          type="submit"
+                          class="btn btn-success w-100"
+                          (click)="update(false, 'save')">
+                          {{ 'g.save' | translate }}
+                        </button>
+                      </div>
+                    }
+
+                    <div class="my-4">
+                      <button
+                        type="submit"
+                        class="btn btn-success w-100"
+                        (click)="update(true, 'commit')">
+                        {{ 'g.submit' | translate }}
+                      </button>
+                    </div>
+                  </div>
+                </div>

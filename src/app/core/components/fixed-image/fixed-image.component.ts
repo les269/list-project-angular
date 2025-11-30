@@ -1,10 +1,10 @@
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-fixed-image',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './fixed-image.component.html',
   styleUrl: './fixed-image.component.scss',
 })

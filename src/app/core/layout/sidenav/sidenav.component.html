@@ -1,26 +1,27 @@
 <div class="sidenav" [ngClass]="{ 'sidenav-display': (openSidenav$ | async) }">
-  <a
-    *ngFor="let route of routes"
-    class="menu-item"
-    [routerLink]="route.path"
-    (click)="close()"
-    >{{ route.title | translate }}</a
-  >
-  <div class="divider"></div>
-  <ng-container *ngIf="list$ | async as list">
-    @for (type of eThemeHeaderType | keyvalue; track $index) {
-      @if (list[type.value].length > 0) {
-        <div class="subheader">{{ 'themeHeader.' + type.key | translate }}</div>
-        @for (item of list[type.value]; track $index) {
-          <a
-            class="menu-item"
-            [routerLink]="navigateList(item)"
-            [queryParams]="getQueryParamsByHeader(item)"
-            (click)="close()"
-            >{{ item.title | translate }}</a
-          >
+  @for (route of routes; track route) {
+    <a
+      class="menu-item"
+      [routerLink]="route.path"
+      (click)="close()"
+      >{{ route.title | translate }}</a
+      >
+    }
+    <div class="divider"></div>
+    @if (list$ | async; as list) {
+      @for (type of eThemeHeaderType | keyvalue; track $index) {
+        @if (list[type.value].length > 0) {
+          <div class="subheader">{{ 'themeHeader.' + type.key | translate }}</div>
+          @for (item of list[type.value]; track $index) {
+            <a
+              class="menu-item"
+              [routerLink]="navigateList(item)"
+              [queryParams]="getQueryParamsByHeader(item)"
+              (click)="close()"
+              >{{ item.title | translate }}</a
+              >
+            }
+          }
         }
       }
-    }
-  </ng-container>
-</div>
+    </div>

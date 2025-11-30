@@ -14,68 +14,69 @@
         class="form-control"
         [(ngModel)]="model.groupName"
         [disabled]="status === 'edit'" />
-    </div>
-    <div class="form-group mb-2">
-      <label class="form-label require">{{
-        'dataset.byKey' | translate
-      }}</label>
-      <input class="form-control" [(ngModel)]="model.config.byKey" />
-    </div>
-    <div class="form-group mb-2">
-      <label class="form-label">{{
-        'dataset.imageSaveFolder' | translate
-      }}</label>
-      <input class="form-control" [(ngModel)]="model.config.imageSaveFolder" />
-    </div>
-    <div class="h4 fw-bold">
-      {{ 'dataset.fieldTable' | translate }}
-    </div>
-    <app-group-dataset-field-table
+      </div>
+      <div class="form-group mb-2">
+        <label class="form-label require">{{
+          'dataset.byKey' | translate
+        }}</label>
+        <input class="form-control" [(ngModel)]="model.config.byKey" />
+      </div>
+      <div class="form-group mb-2">
+        <label class="form-label">{{
+          'dataset.imageSaveFolder' | translate
+        }}</label>
+        <input class="form-control" [(ngModel)]="model.config.imageSaveFolder" />
+      </div>
+      <div class="h4 fw-bold">
+        {{ 'dataset.fieldTable' | translate }}
+      </div>
+      <app-group-dataset-field-table
       [(list)]="
         model.config.groupDatasetFieldList
       "></app-group-dataset-field-table>
 
-    <div class="form-group mb-2">
-      <label class="form-label">{{ 'dataset.getDataType' | translate }}</label>
-      <select class="form-control form-select" [(ngModel)]="model.config.type">
-        <option
-          *ngFor="let type of eGroupDatasetConfigType | keyvalue"
-          [ngValue]="type.key">
-          {{ 'dataset.' + type.key | translate }}
-        </option>
-      </select>
-    </div>
-    @switch (model.config.type) {
-      @case ('scrapy') {
-        <app-group-dataset-scrapy-table
+      <div class="form-group mb-2">
+        <label class="form-label">{{ 'dataset.getDataType' | translate }}</label>
+        <select class="form-control form-select" [(ngModel)]="model.config.type">
+          @for (type of eGroupDatasetConfigType | keyvalue; track type) {
+            <option
+              [ngValue]="type.key">
+              {{ 'dataset.' + type.key | translate }}
+            </option>
+          }
+        </select>
+      </div>
+      @switch (model.config.type) {
+        @case ('scrapy') {
+          <app-group-dataset-scrapy-table
           [(list)]="
             model.config.groupDatasetScrapyList
           "></app-group-dataset-scrapy-table>
-      }
-      @case ('api') {
-        <app-group-dataset-api-table
+        }
+        @case ('api') {
+          <app-group-dataset-api-table
           [(list)]="
             model.config.groupDatasetApiList
           "></app-group-dataset-api-table>
+        }
       }
-    }
-    @if (status === 'edit') {
+      @if (status === 'edit') {
+        <div class="my-4">
+          <button
+            type="submit"
+            class="btn btn-success w-100"
+            (click)="update(false, 'save')">
+            {{ 'g.save' | translate }}
+          </button>
+        </div>
+      }
       <div class="my-4">
         <button
           type="submit"
           class="btn btn-success w-100"
-          (click)="update(false, 'save')">
-          {{ 'g.save' | translate }}
+          (click)="update(true, 'commit')">
+          {{ 'g.submit' | translate }}
         </button>
       </div>
-    }
-    <div class="my-4">
-      <button
-        type="submit"
-        class="btn btn-success w-100"
-        (click)="update(true, 'commit')">
-        {{ 'g.submit' | translate }}
-      </button>
     </div>
   </div>
-</div>

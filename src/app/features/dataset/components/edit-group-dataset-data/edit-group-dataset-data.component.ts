@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -48,11 +48,10 @@ export interface EditGroupDatasetDataType {
     MatDialogTitle,
     MatDialogContent,
     TranslateModule,
-    CommonModule,
     MatIconModule,
     MatChipsModule,
-    MatFormFieldModule,
-  ],
+    MatFormFieldModule
+],
   templateUrl: './edit-group-dataset-data.component.html',
 })
 export class EditGroupDatasetDataComponent implements OnInit {

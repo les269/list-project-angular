@@ -42,11 +42,12 @@
       </th>
       <td mat-cell *matCellDef="let element">
         <select class="form-control form-select" [(ngModel)]="element.type">
-          <option
-            *ngFor="let type of eDatasetFieldType | keyvalue"
-            [ngValue]="type.key">
-            {{ 'dataset.' + type.key | translate }}
-          </option>
+          @for (type of eDatasetFieldType | keyvalue; track type) {
+            <option
+              [ngValue]="type.key">
+              {{ 'dataset.' + type.key | translate }}
+            </option>
+          }
         </select>
       </td>
     </ng-container>
@@ -87,38 +88,38 @@
                 class="form-control"
                 [placeholder]="'dataset.fixedStringPH' | translate"
                 [(ngModel)]="element.fixedString" />
-            </div>
-          }
-          <div class="d-flex input-group my-1 align-items-center">
-            <label class="input-group-text">{{
-              'dataset.replaceReg' | translate
-            }}</label>
-            <input
-              class="form-control"
-              [placeholder]="'dataset.replaceRegular' | translate"
-              [(ngModel)]="element.replaceRegular" />
-            <input
-              class="form-control"
-              [placeholder]="'dataset.replaceRegularTo' | translate"
-              [(ngModel)]="element.replaceRegularTo" />
-          </div>
-        </div>
-      </td>
-    </ng-container>
+              </div>
+            }
+            <div class="d-flex input-group my-1 align-items-center">
+              <label class="input-group-text">{{
+                'dataset.replaceReg' | translate
+              }}</label>
+              <input
+                class="form-control"
+                [placeholder]="'dataset.replaceRegular' | translate"
+                [(ngModel)]="element.replaceRegular" />
+                <input
+                  class="form-control"
+                  [placeholder]="'dataset.replaceRegularTo' | translate"
+                  [(ngModel)]="element.replaceRegularTo" />
+                </div>
+              </div>
+            </td>
+          </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr
-      mat-row
-      *matRowDef="let row; columns: displayedColumns"
-      class="expand-row"
-      cdkDrag
-      [cdkDragData]="row"
-      [cdkDragDisabled]="dragDisabled"
-      (cdkDragReleased)="dragDisabled = true"></tr>
-    <tr
-      mat-row
-      *matRowDef="let row; columns: ['expanded']"
-      style="height: 0px"></tr>
-    <tr mat-footer-row *matFooterRowDef="['add']"></tr>
-  </table>
-</div>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: displayedColumns"
+            class="expand-row"
+            cdkDrag
+            [cdkDragData]="row"
+            [cdkDragDisabled]="dragDisabled"
+          (cdkDragReleased)="dragDisabled = true"></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: ['expanded']"
+          style="height: 0px"></tr>
+          <tr mat-footer-row *matFooterRowDef="['add']"></tr>
+        </table>
+      </div>

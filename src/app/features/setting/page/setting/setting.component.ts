@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { SettingService } from '../../services/setting.service';
 import { TranslateService } from '@ngx-translate/core';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -8,7 +8,7 @@ import { Setting } from '../../model';
 @Component({
   selector: 'app-setting',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './setting.component.html',
   styleUrl: './setting.component.scss',
 })

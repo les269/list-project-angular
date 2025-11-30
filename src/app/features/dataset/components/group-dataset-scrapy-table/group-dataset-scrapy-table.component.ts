@@ -5,7 +5,7 @@ import {
   Input,
   Output,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatTableModule } from '@angular/material/table';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -37,13 +37,12 @@ import { GenericTableComponent } from '../../../../core/components/generic-table
     FormsModule,
     MatButtonModule,
     TranslateModule,
-    CommonModule,
     MatIconModule,
     MatCheckboxModule,
     MatChipsModule,
     CdkDropList,
-    CdkDrag,
-  ],
+    CdkDrag
+],
   templateUrl: './group-dataset-scrapy-table.component.html',
 })
 export class GroupDatasetScrapyTableComponent extends GenericTableComponent<GroupDatasetScrapy> {

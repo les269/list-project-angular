@@ -17,7 +17,7 @@
     </button>
   </div>
   @for (type of eThemeHeaderType | keyvalue; track $index) {
-    <ng-container *ngIf="list$ | async as list">
+    @if (list$ | async; as list) {
       @if (list[type.value].length > 0) {
         <h4 class="d-flex mt-4">{{ 'themeHeader.' + type.key | translate }}</h4>
         <div class="d-flex flex-wrap">
@@ -92,6 +92,6 @@
           }
         </div>
       }
-    </ng-container>
+    }
   }
 </div>

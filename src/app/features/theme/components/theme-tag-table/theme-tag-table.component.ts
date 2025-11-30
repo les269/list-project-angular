@@ -5,7 +5,7 @@ import {
   Output,
   Injector,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -36,13 +36,12 @@ import { MatChipsModule } from '@angular/material/chips';
     MatIconModule,
     MatButtonModule,
     MatCheckboxModule,
-    CommonModule,
     MatListModule,
     TranslateModule,
     CdkDropList,
     CdkDrag,
-    MatChipsModule,
-  ],
+    MatChipsModule
+],
   templateUrl: './theme-tag-table.component.html',
 })
 export class ThemeTagTableComponent extends GenericTableComponent<ThemeTag> {

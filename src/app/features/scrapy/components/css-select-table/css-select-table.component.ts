@@ -5,7 +5,7 @@ import {
   Input,
   Output,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -34,7 +34,6 @@ import { GenericTableComponent } from '../../../../core/components/generic-table
     MatTableModule,
     ReactiveFormsModule,
     FormsModule,
-    CommonModule,
     TranslateModule,
     MatIconModule,
     MatButtonModule,
@@ -42,8 +41,8 @@ import { GenericTableComponent } from '../../../../core/components/generic-table
     MatCheckboxModule,
     MatChipsModule,
     CdkDropList,
-    CdkDrag,
-  ],
+    CdkDrag
+],
   templateUrl: './css-select-table.component.html',
 })
 export class CssSelectTableComponent extends GenericTableComponent<CssSelect> {

@@ -1,5 +1,5 @@
 import { Component, Injector } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 import { SpringExpressionLang } from '../../model';
 import { CdkDropList, CdkDrag } from '@angular/cdk/drag-drop';
@@ -13,7 +13,6 @@ import { MatButtonModule } from '@angular/material/button';
   selector: 'app-spring-expression-lang-table',
   standalone: true,
   imports: [
-    CommonModule,
     CdkDropList,
     CdkDrag,
     MatTableModule,
@@ -21,8 +20,8 @@ import { MatButtonModule } from '@angular/material/button';
     TranslateModule,
     ReactiveFormsModule,
     FormsModule,
-    MatButtonModule,
-  ],
+    MatButtonModule
+],
   templateUrl: './spring-expression-lang-table.component.html',
 })
 export class SpringExpressionLangTableComponent extends GenericTableComponent<SpringExpressionLang> {

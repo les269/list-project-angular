@@ -9,7 +9,7 @@ import {
   Output,
   SimpleChanges,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import {
   DEFAULT_ROW_COLOR,
   ThemeHeaderType,
@@ -37,14 +37,13 @@ import { ThemeTopCustomTableComponent } from '../theme-top-custom-table/theme-to
     MatIconModule,
     MatButtonModule,
     MatCheckboxModule,
-    CommonModule,
     MatListModule,
     TranslateModule,
     MatFormFieldModule,
     MatChipsModule,
     ChipInputComponent,
-    ThemeTopCustomTableComponent,
-  ],
+    ThemeTopCustomTableComponent
+],
   templateUrl: './theme-other-setting.component.html',
   styleUrl: './theme-other-setting.component.scss',
 })

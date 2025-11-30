@@ -1,5 +1,5 @@
 import { Component, ElementRef, inject, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { TranslateModule } from '@ngx-translate/core';
 import {
   MatDialogClose,
@@ -26,7 +26,6 @@ import { GroupDatasetData } from '../../model';
   selector: 'app-group-dataset-import-export',
   standalone: true,
   imports: [
-    CommonModule,
     TranslateModule,
     MatDialogClose,
     MatDialogTitle,
@@ -34,8 +33,8 @@ import { GroupDatasetData } from '../../model';
     ReactiveFormsModule,
     FormsModule,
     MatIconModule,
-    MatButtonModule,
-  ],
+    MatButtonModule
+],
   templateUrl: './group-dataset-import-export.component.html',
 })
 export class GroupDatasetImportExportComponent {

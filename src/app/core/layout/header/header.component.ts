@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { Store } from '@ngrx/store';
@@ -16,10 +16,9 @@ import { selectLayoutByKey } from '../../../shared/state/layout.selectors';
     RouterLinkActive,
     RouterLink,
     AsyncPipe,
-    NgIf,
     MatIconModule,
-    MatButtonModule,
-  ],
+    MatButtonModule
+],
   standalone: true,
 })
 export class HeaderComponent {

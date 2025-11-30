@@ -5,22 +5,23 @@
   <mat-chip-grid #chipGrid>
     @if (type === 'color') {
       <div class="d-flex align-items-center flex-wrap">
-        <mat-chip-row
-          *ngFor="let value of chipList; let i = index"
-          (removed)="removeChip(i)"
-          [editable]="true"
-          (edited)="editChip(i, $event.value)">
-          <div
+        @for (value of chipList; track value; let i = $index) {
+          <mat-chip-row
+            (removed)="removeChip(i)"
+            [editable]="true"
+            (edited)="editChip(i, $event.value)">
+            <div
             [ngStyle]="{
               'background-color': getLuminance(value) < 0.5 ? '' : '#525252',
               color: value,
             }">
-            {{ value }}
-          </div>
-          <button matChipRemove>
-            <mat-icon>cancel</mat-icon>
-          </button>
-        </mat-chip-row>
+              {{ value }}
+            </div>
+            <button matChipRemove>
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </mat-chip-row>
+        }
         <input
           class="form-control form-control-color"
           style="max-width: 30px"
@@ -30,16 +31,17 @@
           (matChipInputTokenEnd)="addChip($event)" />
       </div>
     } @else {
-      <mat-chip-row
-        *ngFor="let value of chipList; let i = index"
-        (removed)="removeChip(i)"
-        [editable]="true"
-        (edited)="editChip(i, $event.value)">
-        {{ value }}
-        <button matChipRemove>
-          <mat-icon>cancel</mat-icon>
-        </button>
-      </mat-chip-row>
+      @for (value of chipList; track value; let i = $index) {
+        <mat-chip-row
+          (removed)="removeChip(i)"
+          [editable]="true"
+          (edited)="editChip(i, $event.value)">
+          {{ value }}
+          <button matChipRemove>
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip-row>
+      }
       <input
         [type]="type"
         [matChipInputFor]="chipGrid"

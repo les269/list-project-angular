@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { GroupDataset } from '../../model';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -28,9 +28,8 @@ import { GroupDatasetService } from '../../service/group-dataset.service';
     MatDialogClose,
     MatDialogTitle,
     MatDialogContent,
-    TranslateModule,
-    CommonModule,
-  ],
+    TranslateModule
+],
   templateUrl: './copy-group-dataset.component.html',
 })
 export class CopyGroupDatasetComponent {

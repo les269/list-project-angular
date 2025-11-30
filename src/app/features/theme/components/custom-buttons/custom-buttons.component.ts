@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatIconModule } from '@angular/material/icon';
 import {
   OpenWindowTargetType,
@@ -27,7 +27,7 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
 @Component({
   selector: 'app-custom-buttons',
   standalone: true,
-  imports: [CommonModule, MatIconModule, CopyDirective],
+  imports: [MatIconModule, CopyDirective],
   templateUrl: './custom-buttons.component.html',
   styleUrl: './custom-buttons.component.scss',
 })

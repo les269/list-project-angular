@@ -6,7 +6,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -36,13 +36,12 @@ import { GenericTableComponent } from '../../../../core/components/generic-table
     FormsModule,
     MatButtonModule,
     TranslateModule,
-    CommonModule,
     MatIconModule,
     MatCheckboxModule,
     MatChipsModule,
     CdkDropList,
-    CdkDrag,
-  ],
+    CdkDrag
+],
   templateUrl: './group-dataset-api-table.component.html',
 })
 export class GroupDatasetApiTableComponent extends GenericTableComponent<GroupDatasetApi> {

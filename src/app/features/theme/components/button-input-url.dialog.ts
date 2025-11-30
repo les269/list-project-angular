@@ -10,7 +10,7 @@ import {
 } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   standalone: true,
@@ -22,9 +22,8 @@ import { CommonModule } from '@angular/common';
     MatDialogClose,
     MatDialogTitle,
     MatDialogContent,
-    TranslateModule,
-    CommonModule,
-  ],
+    TranslateModule
+],
   selector: 'app-button-input-url',
   template: `
     <h2 mat-dialog-title>{{ 'title.inputUrl' | translate }}</h2>

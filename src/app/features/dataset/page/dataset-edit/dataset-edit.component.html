@@ -12,169 +12,170 @@
         class="form-control"
         [(ngModel)]="model.name"
         [disabled]="status === 'edit'" />
-    </div>
-    <div class="form-group mb-2">
-      <label class="form-label">{{ 'dataset.filterType' | translate }}</label>
-      <select
-        class="form-control form-select"
-        [(ngModel)]="model.config.type"
-        (change)="changeType()">
-        <option
-          *ngFor="let type of eDatasetConfigType | keyvalue"
-          [ngValue]="type.key">
-          {{ 'dataset.' + type.key | translate }}
-        </option>
-      </select>
-      <label class="form-text" [style]="{ 'white-space': 'pre-wrap' }">{{
-        'dataset.filterTypeDesc' | translate
-      }}</label>
-    </div>
-    @if (model.config.type === 'text') {
-      <div class="form-group mb-2">
-        <code-editor
-          [style.height]="'400px'"
-          [(ngModel)]="model.config.scrapyText"
-          [language]="'textile'"
-          [indentWithTab]="true"
-          [languages]="languages" />
       </div>
-      <input
-        type="file"
-        accept=".csv,.txt"
-        (change)="importCsvTxt($event)"
-        hidden
-        #fileInput />
-      <button
-        class="btn btn-outline-secondary d-flex"
-        (click)="fileInput.click()">
-        {{ 'dataset.importCsvTxt' | translate }}
-      </button>
-    }
-
-    <div class="form-group mb-2">
-      <label class="form-label require">{{
-        'dataset.groupName' | translate
-      }}</label>
-      <div class="mt-1 d-flex flex-wrap gap-3 align-items-center">
-        @if (model.config.groupName) {
-          <mat-chip
-            >{{ model.config.groupName }}
-            <button matChipRemove (click)="model.config.groupName = ''">
-              <mat-icon>cancel</mat-icon>
-            </button>
-          </mat-chip>
-        }
-        <button
-          class="btn btn-outline-primary d-flex"
-          (click)="selectGroupDataset()">
-          <mat-icon class="material-icons-outlined"
-            ><span class="material-symbols-outlined">
-              select_window_2
-            </span></mat-icon
-          >
-        </button>
-      </div>
-      <label class="form-text">{{ 'dataset.groupNameDesc' | translate }}</label>
-    </div>
-    @if (model.config.type === 'pagination') {
       <div class="form-group mb-2">
-        <label class="form-label require">{{
-          'dataset.pagination' | translate
-        }}</label>
-        <div class="mt-1 d-flex flex-wrap gap-3 align-items-center">
-          @if (model.config.scrapyPagination) {
-            <mat-chip
-              >{{ model.config.scrapyPagination }}
-              <button
-                matChipRemove
-                (click)="model.config.scrapyPagination = ''">
-                <mat-icon>cancel</mat-icon>
-              </button>
-            </mat-chip>
+        <label class="form-label">{{ 'dataset.filterType' | translate }}</label>
+        <select
+          class="form-control form-select"
+          [(ngModel)]="model.config.type"
+          (change)="changeType()">
+          @for (type of eDatasetConfigType | keyvalue; track type) {
+            <option
+              [ngValue]="type.key">
+              {{ 'dataset.' + type.key | translate }}
+            </option>
           }
-          <button
-            class="btn btn-outline-primary d-flex"
-            (click)="selectScrapyPagination()">
-            <mat-icon class="material-icons-outlined"
-              ><span class="material-symbols-outlined">
-                select_window_2
-              </span></mat-icon
-            >
-          </button>
-        </div>
+        </select>
+        <label class="form-text" [style]="{ 'white-space': 'pre-wrap' }">{{
+          'dataset.filterTypeDesc' | translate
+        }}</label>
       </div>
-    }
-    @if (model.config.type === 'file') {
-      <div class="form-group mb-2 require">
-        <label>{{ 'dataset.filePath' | translate }}</label>
-        <input class="form-control" [(ngModel)]="model.config.filePath" />
-      </div>
-      <div class="form-group mb-2">
-        <label>{{ 'dataset.fileExtension' | translate }}</label>
-        <input class="form-control" [(ngModel)]="model.config.fileExtension" />
-      </div>
-    }
-    @if (model.config.type === 'folder') {
-      <div class="form-group mb-2 require">
-        <label>{{ 'dataset.folderPath' | translate }}</label>
-        <input class="form-control" [(ngModel)]="model.config.folderPath" />
-      </div>
-    }
-    @if (model.config.type === 'file' || model.config.type === 'folder') {
-      <div class="form-group mb-2">
-        <mat-checkbox [(ngModel)]="model.config.filing">
-          {{ 'dataset.filing' | translate }}
-        </mat-checkbox>
-        <br />
-        <label class="form-text">{{ 'dataset.filingDesc' | translate }}</label>
-      </div>
-      @if (model.config.filing) {
+      @if (model.config.type === 'text') {
         <div class="form-group mb-2">
-          <label>{{ 'dataset.filingRegular' | translate }}</label>
+          <code-editor
+            [style.height]="'400px'"
+            [(ngModel)]="model.config.scrapyText"
+            [language]="'textile'"
+            [indentWithTab]="true"
+            [languages]="languages" />
+          </div>
           <input
-            class="form-control"
-            [(ngModel)]="model.config.filingRegular" />
-        </div>
-      }
-    }
+            type="file"
+            accept=".csv,.txt"
+            (change)="importCsvTxt($event)"
+            hidden
+            #fileInput />
+            <button
+              class="btn btn-outline-secondary d-flex"
+              (click)="fileInput.click()">
+              {{ 'dataset.importCsvTxt' | translate }}
+            </button>
+          }
 
-    <div class="form-group mb-2">
-      <mat-checkbox [(ngModel)]="model.config.autoImageDownload">
-        {{ 'dataset.autoImageDownload' | translate }}
-      </mat-checkbox>
-      <br />
-      <label class="form-text">{{
-        'dataset.autoImageDownloadDesc' | translate
-      }}</label>
-    </div>
-    @if (model.config.autoImageDownload) {
-      <div class="form-group mb-2">
-        <label>{{ 'dataset.imageByKey' | translate }}</label>
-        <input class="form-control" [(ngModel)]="model.config.imageByKey" />
-      </div>
-    }
-    <div class="h4 fw-bold">
-      {{ 'dataset.fixedFieldTable' | translate }}
-    </div>
-    <app-dataset-field-table
-      [(list)]="model.config.fieldList"></app-dataset-field-table>
-    @if (status === 'edit') {
-      <div class="my-4">
-        <button
-          type="submit"
-          class="btn btn-success w-100"
-          (click)="update(false, 'save')">
-          {{ 'g.save' | translate }}
-        </button>
-      </div>
-    }
-    <div class="my-4">
-      <button
-        type="submit"
-        class="btn btn-success w-100"
-        (click)="update(true, 'commit')">
-        {{ 'g.submit' | translate }}
-      </button>
-    </div>
-  </div>
-</div>
+          <div class="form-group mb-2">
+            <label class="form-label require">{{
+              'dataset.groupName' | translate
+            }}</label>
+            <div class="mt-1 d-flex flex-wrap gap-3 align-items-center">
+              @if (model.config.groupName) {
+                <mat-chip
+                  >{{ model.config.groupName }}
+                  <button matChipRemove (click)="model.config.groupName = ''">
+                    <mat-icon>cancel</mat-icon>
+                  </button>
+                </mat-chip>
+              }
+              <button
+                class="btn btn-outline-primary d-flex"
+                (click)="selectGroupDataset()">
+                <mat-icon class="material-icons-outlined"
+                  ><span class="material-symbols-outlined">
+                  select_window_2
+                </span></mat-icon
+                >
+              </button>
+            </div>
+            <label class="form-text">{{ 'dataset.groupNameDesc' | translate }}</label>
+          </div>
+          @if (model.config.type === 'pagination') {
+            <div class="form-group mb-2">
+              <label class="form-label require">{{
+                'dataset.pagination' | translate
+              }}</label>
+              <div class="mt-1 d-flex flex-wrap gap-3 align-items-center">
+                @if (model.config.scrapyPagination) {
+                  <mat-chip
+                    >{{ model.config.scrapyPagination }}
+                    <button
+                      matChipRemove
+                      (click)="model.config.scrapyPagination = ''">
+                      <mat-icon>cancel</mat-icon>
+                    </button>
+                  </mat-chip>
+                }
+                <button
+                  class="btn btn-outline-primary d-flex"
+                  (click)="selectScrapyPagination()">
+                  <mat-icon class="material-icons-outlined"
+                    ><span class="material-symbols-outlined">
+                    select_window_2
+                  </span></mat-icon
+                  >
+                </button>
+              </div>
+            </div>
+          }
+          @if (model.config.type === 'file') {
+            <div class="form-group mb-2 require">
+              <label>{{ 'dataset.filePath' | translate }}</label>
+              <input class="form-control" [(ngModel)]="model.config.filePath" />
+            </div>
+            <div class="form-group mb-2">
+              <label>{{ 'dataset.fileExtension' | translate }}</label>
+              <input class="form-control" [(ngModel)]="model.config.fileExtension" />
+            </div>
+          }
+          @if (model.config.type === 'folder') {
+            <div class="form-group mb-2 require">
+              <label>{{ 'dataset.folderPath' | translate }}</label>
+              <input class="form-control" [(ngModel)]="model.config.folderPath" />
+            </div>
+          }
+          @if (model.config.type === 'file' || model.config.type === 'folder') {
+            <div class="form-group mb-2">
+              <mat-checkbox [(ngModel)]="model.config.filing">
+                {{ 'dataset.filing' | translate }}
+              </mat-checkbox>
+              <br />
+              <label class="form-text">{{ 'dataset.filingDesc' | translate }}</label>
+            </div>
+            @if (model.config.filing) {
+              <div class="form-group mb-2">
+                <label>{{ 'dataset.filingRegular' | translate }}</label>
+                <input
+                  class="form-control"
+                  [(ngModel)]="model.config.filingRegular" />
+                </div>
+              }
+            }
+
+            <div class="form-group mb-2">
+              <mat-checkbox [(ngModel)]="model.config.autoImageDownload">
+                {{ 'dataset.autoImageDownload' | translate }}
+              </mat-checkbox>
+              <br />
+              <label class="form-text">{{
+                'dataset.autoImageDownloadDesc' | translate
+              }}</label>
+            </div>
+            @if (model.config.autoImageDownload) {
+              <div class="form-group mb-2">
+                <label>{{ 'dataset.imageByKey' | translate }}</label>
+                <input class="form-control" [(ngModel)]="model.config.imageByKey" />
+              </div>
+            }
+            <div class="h4 fw-bold">
+              {{ 'dataset.fixedFieldTable' | translate }}
+            </div>
+            <app-dataset-field-table
+            [(list)]="model.config.fieldList"></app-dataset-field-table>
+            @if (status === 'edit') {
+              <div class="my-4">
+                <button
+                  type="submit"
+                  class="btn btn-success w-100"
+                  (click)="update(false, 'save')">
+                  {{ 'g.save' | translate }}
+                </button>
+              </div>
+            }
+            <div class="my-4">
+              <button
+                type="submit"
+                class="btn btn-success w-100"
+                (click)="update(true, 'commit')">
+                {{ 'g.submit' | translate }}
+              </button>
+            </div>
+          </div>
+        </div>

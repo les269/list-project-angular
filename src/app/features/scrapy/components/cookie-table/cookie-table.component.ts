@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { TranslateModule } from '@ngx-translate/core';
 import { MatTableModule } from '@angular/material/table';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
@@ -21,13 +21,12 @@ import { GenericTableComponent } from '../../../../core/components/generic-table
     MatTableModule,
     ReactiveFormsModule,
     FormsModule,
-    CommonModule,
     TranslateModule,
     MatIconModule,
     MatButtonModule,
     CdkDropList,
-    CdkDrag,
-  ],
+    CdkDrag
+],
   templateUrl: './cookie-table.component.html',
 })
 export class CookieTableComponent extends GenericTableComponent<Cookie> {

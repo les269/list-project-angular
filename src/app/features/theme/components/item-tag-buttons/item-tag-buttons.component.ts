@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ShareTagValue, ThemeTag } from '../../models';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-item-tag-buttons',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [MatIconModule],
   templateUrl: './item-tag-buttons.component.html',
   styleUrl: './item-tag-buttons.component.scss',
 })

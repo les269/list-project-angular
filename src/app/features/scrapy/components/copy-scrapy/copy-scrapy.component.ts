@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import {
@@ -29,9 +29,8 @@ import { EMPTY, switchMap } from 'rxjs';
     MatDialogClose,
     MatDialogTitle,
     MatDialogContent,
-    TranslateModule,
-    CommonModule,
-  ],
+    TranslateModule
+],
   templateUrl: './copy-scrapy.component.html',
 })
 export class CopyScrapyComponent {

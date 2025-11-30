@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Dataset } from '../../model';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -28,9 +28,8 @@ import { DatasetService } from '../../service/dataset.service';
     MatDialogClose,
     MatDialogTitle,
     MatDialogContent,
-    TranslateModule,
-    CommonModule,
-  ],
+    TranslateModule
+],
   templateUrl: './copy-dataset.component.html',
 })
 export class CopyDatasetComponent {

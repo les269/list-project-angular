@@ -424,12 +424,33 @@
             "type": "UPDATE"
           }
         ],
-        "ref": "d4fc5b6c50eafb9c2147fe52cf0b11b023924d16",
+        "ref": "43f1df8c54db1b2ca3a90821798289b2cb442bbc",
+        "nextSteps": []
+      },
+      "inject-flags": {
+        "type": "successful",
+        "name": "inject-flags",
+        "changedFiles": [],
+        "ref": "43f1df8c54db1b2ca3a90821798289b2cb442bbc",
+        "nextSteps": []
+      },
+      "test-bed-get": {
+        "type": "successful",
+        "name": "test-bed-get",
+        "changedFiles": [],
+        "ref": "43f1df8c54db1b2ca3a90821798289b2cb442bbc",
+        "nextSteps": []
+      },
+      "control-flow-migration": {
+        "type": "successful",
+        "name": "control-flow-migration",
+        "changedFiles": [],
+        "ref": "8cbff299534fbc52a8381af206593915fec20380",
         "nextSteps": []
       }
     },
     "runningMigrations": [
-      "update-angular-cli-version-20-3-0"
+      "control-flow-migration"
     ],
     "confirmedPackageUpdates": true
   }

@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import {
@@ -34,9 +34,8 @@ import { ScrapyPaginationService } from '../../services/scrapy-pagination.servic
     MatDialogClose,
     MatDialogTitle,
     MatDialogContent,
-    TranslateModule,
-    CommonModule,
-  ],
+    TranslateModule
+],
   templateUrl: './copy-scrapy-pagination.component.html',
 })
 export class CopyScrapyPaginationComponent {

@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReplaceValueMapService } from '../../service/replace-value-map.service';
 import { ReplaceValueList, ReplaceValueMap } from '../../model';
 import { SelectTableService } from '../../../../core/services/select-table.service';
@@ -33,15 +33,14 @@ import { ScrollTopComponent } from '../../../../core/components/scroll-top/scrol
   imports: [
     FormsModule,
     ReactiveFormsModule,
-    CommonModule,
     MatTableModule,
     TranslateModule,
     MatIconModule,
     MatPaginatorModule,
     MatSortModule,
     MatButtonModule,
-    ScrollTopComponent,
-  ],
+    ScrollTopComponent
+],
   providers: [{ provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl }],
   templateUrl: './replace-value-map.component.html',
 })
