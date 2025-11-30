@@ -374,12 +374,24 @@
             "type": "UPDATE"
           }
         ],
-        "ref": "310b0ab84edb9deaa9e8675b36ad4230f7b6bd80",
+        "ref": "22a95c1c0c4fdcbb18523838eaaa841388ef87b4",
+        "nextSteps": []
+      },
+      "update-angular-cli-version-20-1-0": {
+        "type": "successful",
+        "name": "update-angular-cli-version-20-1-0",
+        "changedFiles": [
+          {
+            "path": "package.json",
+            "type": "UPDATE"
+          }
+        ],
+        "ref": "bc10ca2fd6c8378f4d13b05027def7a3010073a0",
         "nextSteps": []
       }
     },
     "runningMigrations": [
-      "update-module-resolution"
+      "update-angular-cli-version-20-1-0"
     ],
     "confirmedPackageUpdates": true
   }
