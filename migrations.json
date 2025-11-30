@@ -386,12 +386,31 @@
             "type": "UPDATE"
           }
         ],
-        "ref": "bc10ca2fd6c8378f4d13b05027def7a3010073a0",
+        "ref": "89f965ef619c2e92d04670092c38b0e3f7ee99b0",
+        "nextSteps": []
+      },
+      "set-tsconfig-option": {
+        "type": "successful",
+        "name": "set-tsconfig-option",
+        "changedFiles": [],
+        "ref": "89f965ef619c2e92d04670092c38b0e3f7ee99b0",
+        "nextSteps": []
+      },
+      "update-angular-cli-version-20-2-0": {
+        "type": "successful",
+        "name": "update-angular-cli-version-20-2-0",
+        "changedFiles": [
+          {
+            "path": "package.json",
+            "type": "UPDATE"
+          }
+        ],
+        "ref": "a43a539beddbfd846a1d47aa8c67803f1b3684dd",
         "nextSteps": []
       }
     },
     "runningMigrations": [
-      "update-angular-cli-version-20-1-0"
+      "update-angular-cli-version-20-2-0"
     ],
     "confirmedPackageUpdates": true
   }
