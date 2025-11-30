@@ -41,7 +41,6 @@ import { ScrapyPaginationService } from '../../services/scrapy-pagination.servic
     CookieTableComponent,
     CssSelectTableComponent,
     MatButtonModule,
-    SpringExpressionLangTableComponent,
     CodeEditorModule,
     MatFormFieldModule,
     MatInputModule,

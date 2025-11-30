@@ -24,7 +24,6 @@ import { MatListModule } from '@angular/material/list';
     FormsModule,
     MatButtonModule,
     MatDialogActions,
-    MatDialogClose,
     MatDialogTitle,
     MatDialogContent,
     TranslateModule,

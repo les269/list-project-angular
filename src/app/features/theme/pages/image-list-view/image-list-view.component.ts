@@ -52,7 +52,6 @@ import { ImgContentComponent } from '../../components/img-content/img-content.co
   standalone: true,
   imports: [
     MatIconModule,
-    NgOptimizedImage,
     TranslateModule,
     FormsModule,
     ReactiveFormsModule,

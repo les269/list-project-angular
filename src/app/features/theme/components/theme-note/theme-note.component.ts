@@ -22,7 +22,6 @@ import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
     FormsModule,
     MatButtonModule,
     MatDialogActions,
-    MatDialogClose,
     MatDialogTitle,
     MatDialogContent,
     TranslateModule,

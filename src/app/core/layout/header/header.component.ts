@@ -12,13 +12,7 @@ import { selectLayoutByKey } from '../../../shared/state/layout.selectors';
   selector: 'app-layout-header',
   templateUrl: './header.component.html',
   styleUrls: ['header.component.scss'],
-  imports: [
-    RouterLinkActive,
-    RouterLink,
-    AsyncPipe,
-    MatIconModule,
-    MatButtonModule
-],
+  imports: [AsyncPipe, MatIconModule, MatButtonModule],
   standalone: true,
 })
 export class HeaderComponent {

@@ -21,7 +21,6 @@ export interface MessageBoxData {
     MatButtonModule,
     MatDialogActions,
     MatDialogClose,
-    MatDialogTitle,
     MatDialogContent,
     TranslateModule,
   ],
