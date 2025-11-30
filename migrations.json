@@ -405,12 +405,31 @@
             "type": "UPDATE"
           }
         ],
-        "ref": "a43a539beddbfd846a1d47aa8c67803f1b3684dd",
+        "ref": "82432ba078554119ed08634f6b21ce5bfa23a2a5",
+        "nextSteps": []
+      },
+      "remove-default-karma-configuration-files": {
+        "type": "successful",
+        "name": "remove-default-karma-configuration-files",
+        "changedFiles": [],
+        "ref": "82432ba078554119ed08634f6b21ce5bfa23a2a5",
+        "nextSteps": []
+      },
+      "update-angular-cli-version-20-3-0": {
+        "type": "successful",
+        "name": "update-angular-cli-version-20-3-0",
+        "changedFiles": [
+          {
+            "path": "package.json",
+            "type": "UPDATE"
+          }
+        ],
+        "ref": "d4fc5b6c50eafb9c2147fe52cf0b11b023924d16",
         "nextSteps": []
       }
     },
     "runningMigrations": [
-      "update-angular-cli-version-20-2-0"
+      "update-angular-cli-version-20-3-0"
     ],
     "confirmedPackageUpdates": true
   }
