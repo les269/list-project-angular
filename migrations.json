@@ -313,12 +313,31 @@
             "type": "UPDATE"
           }
         ],
-        "ref": "16f1e3e32346081c0acb63493be91816442016ce",
+        "ref": "af7252112c3481f034369175901ef52ad884768c",
+        "nextSteps": []
+      },
+      "change-data-persistence-operators-imports-to-ngrx-router-store-data-persistence": {
+        "type": "successful",
+        "name": "change-data-persistence-operators-imports-to-ngrx-router-store-data-persistence",
+        "changedFiles": [],
+        "ref": "af7252112c3481f034369175901ef52ad884768c",
+        "nextSteps": []
+      },
+      "update-angular-cli-version-20-0-0": {
+        "type": "successful",
+        "name": "update-angular-cli-version-20-0-0",
+        "changedFiles": [
+          {
+            "path": "package.json",
+            "type": "UPDATE"
+          }
+        ],
+        "ref": "282abbdfc1323a52fecef4d0e103f56e9994a1ca",
         "nextSteps": []
       }
     },
     "runningMigrations": [
-      "set-continuous-option"
+      "update-angular-cli-version-20-0-0"
     ],
     "confirmedPackageUpdates": true
   }
