@@ -358,12 +358,28 @@
             "type": "UPDATE"
           }
         ],
-        "ref": "092d440555c27a6dba0ada7e14aeff0e778f3564",
+        "ref": "4126f80669e654f7220b63e56d7256d457c21b40",
+        "nextSteps": []
+      },
+      "update-module-resolution": {
+        "type": "successful",
+        "name": "update-module-resolution",
+        "changedFiles": [
+          {
+            "path": "tsconfig.app.json",
+            "type": "UPDATE"
+          },
+          {
+            "path": "tsconfig.spec.json",
+            "type": "UPDATE"
+          }
+        ],
+        "ref": "310b0ab84edb9deaa9e8675b36ad4230f7b6bd80",
         "nextSteps": []
       }
     },
     "runningMigrations": [
-      "set-generator-defaults-for-previous-style-guide"
+      "update-module-resolution"
     ],
     "confirmedPackageUpdates": true
   }
