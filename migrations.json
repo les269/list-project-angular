@@ -242,9 +242,51 @@
         "type": "failed",
         "name": "move-use-daemon-process",
         "error": "Cannot find module './run-migration-process.js'\nRequire stack:\n- c:\\Users\\les269\\.vscode\\extensions\\nrwl.angular-console-18.81.0\\main.js\n- c:\\Users\\les269\\AppData\\Local\\Programs\\Microsoft VS Code\\resources\\app\\out\\vs\\workbench\\api\\node\\extensionHostProcess.js"
+      },
+      "remove-legacy-cache": {
+        "type": "successful",
+        "name": "remove-legacy-cache",
+        "changedFiles": [],
+        "ref": "703bb2b214587519562151a4fe4cd6ed8481a5af",
+        "nextSteps": []
+      },
+      "remove-custom-tasks-runner": {
+        "type": "successful",
+        "name": "remove-custom-tasks-runner",
+        "changedFiles": [],
+        "ref": "703bb2b214587519562151a4fe4cd6ed8481a5af",
+        "nextSteps": []
+      },
+      "release-version-config-changes": {
+        "type": "successful",
+        "name": "release-version-config-changes",
+        "changedFiles": [],
+        "ref": "703bb2b214587519562151a4fe4cd6ed8481a5af",
+        "nextSteps": []
+      },
+      "release-changelog-config-changes": {
+        "type": "successful",
+        "name": "release-changelog-config-changes",
+        "changedFiles": [],
+        "ref": "703bb2b214587519562151a4fe4cd6ed8481a5af",
+        "nextSteps": []
+      },
+      "21-1-0-add-ignore-entries-for-nx-rule-files": {
+        "type": "successful",
+        "name": "21-1-0-add-ignore-entries-for-nx-rule-files",
+        "changedFiles": [
+          {
+            "path": ".gitignore",
+            "type": "UPDATE"
+          }
+        ],
+        "ref": "93622cb1cd86b3b21647a0a43c5d8e00c4433849",
+        "nextSteps": []
       }
     },
-    "runningMigrations": [],
+    "runningMigrations": [
+      "21-1-0-add-ignore-entries-for-nx-rule-files"
+    ],
     "confirmedPackageUpdates": true
   }
 }
