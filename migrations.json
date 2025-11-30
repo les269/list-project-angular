@@ -280,12 +280,45 @@
             "type": "UPDATE"
           }
         ],
-        "ref": "93622cb1cd86b3b21647a0a43c5d8e00c4433849",
+        "ref": "36b169f2919071d812edbe4de11c7bde9bf69df0",
+        "nextSteps": []
+      },
+      "22-0-0-release-version-config-changes": {
+        "type": "successful",
+        "name": "22-0-0-release-version-config-changes",
+        "changedFiles": [],
+        "ref": "36b169f2919071d812edbe4de11c7bde9bf69df0",
+        "nextSteps": []
+      },
+      "22-0-0-consolidate-release-tag-config": {
+        "type": "successful",
+        "name": "22-0-0-consolidate-release-tag-config",
+        "changedFiles": [],
+        "ref": "36b169f2919071d812edbe4de11c7bde9bf69df0",
+        "nextSteps": []
+      },
+      "22-1-0-update-nx-wrapper": {
+        "type": "successful",
+        "name": "22-1-0-update-nx-wrapper",
+        "changedFiles": [],
+        "ref": "36b169f2919071d812edbe4de11c7bde9bf69df0",
+        "nextSteps": []
+      },
+      "set-continuous-option": {
+        "type": "successful",
+        "name": "set-continuous-option",
+        "changedFiles": [
+          {
+            "path": "project.json",
+            "type": "UPDATE"
+          }
+        ],
+        "ref": "16f1e3e32346081c0acb63493be91816442016ce",
         "nextSteps": []
       }
     },
     "runningMigrations": [
-      "21-1-0-add-ignore-entries-for-nx-rule-files"
+      "set-continuous-option"
     ],
     "confirmedPackageUpdates": true
   }
