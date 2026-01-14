@@ -192,6 +192,11 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
               arr.map(a => a.value),
             ])
           );
+          for (const tagId of tagIds) {
+            if (!this.shareTagValueMap[tagId]) {
+              this.shareTagValueMap[tagId] = [];
+            }
+          }
         }),
         switchMap(x =>
           this.datasetService.findDatasetDataByNameList(uniqueDatasetList)
