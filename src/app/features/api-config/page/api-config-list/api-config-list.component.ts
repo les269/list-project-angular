@@ -10,10 +10,11 @@ import {
   ApiConfigDialog,
   ApiConfigDialogData,
 } from '../../components/api-config.dialog';
-import { MessageBoxComponent } from '../../../../core/components/message-box/message-box.component';
+
 import { isNotBlank } from '../../../../shared/util/helper';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { CommonModule } from '@angular/common';
+import { MessageBoxService } from '../../../../core/services/message-box.service';
 
 @Component({
   standalone: true,
@@ -35,7 +36,8 @@ export class ApiConfigListComponent implements OnInit {
     private translateService: TranslateService,
     private apiConfigService: ApiConfigService,
     private matDialog: MatDialog,
-    private snackbarService: SnackbarService
+    private snackbarService: SnackbarService,
+    private messageBoxService: MessageBoxService
   ) {}
 
   ngOnInit() {
@@ -66,19 +68,14 @@ export class ApiConfigListComponent implements OnInit {
       });
   }
   onDelete(index: number) {
-    this.matDialog
-      .open(MessageBoxComponent, {
-        data: { message: this.translateService.instant('msg.sureDeleteApi') },
-      })
-      .afterClosed()
-      .subscribe(result => {
-        if (isNotBlank(result)) {
-          this.apiConfigService.delete(this.list[index]).subscribe(() => {
-            this.snackbarService.openByI18N('msg.deleteSuccess');
-            this.getList();
-          });
-        }
-      });
+    this.messageBoxService.openI18N('msg.sureDeleteApi').subscribe(result => {
+      if (isNotBlank(result)) {
+        this.apiConfigService.delete(this.list[index]).subscribe(() => {
+          this.snackbarService.openByI18N('msg.deleteSuccess');
+          this.getList();
+        });
+      }
+    });
   }
   onAdd() {
     this.matDialog

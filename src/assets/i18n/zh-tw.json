@@ -5,6 +5,7 @@
     "copySuccess": "複製成功",
     "commitSuccess": "提交成功",
     "addSuccess": "新增成功",
+    "addFailed": "新增失敗",
     "saveSuccess": "保存成功",
     "updateSuccess": "更新成功",
     "themeExist": "主題已經存在",
@@ -42,7 +43,8 @@
     "openFolderFail": "開啟資料夾失敗",
     "urlEmpty": "網址為空無法開啟請再確認",
     "updateIntervalError": "更新間隔為整數且最少為0",
-    "sureDeleteTag": "是否要刪除該標籤?"
+    "sureDeleteTag": "是否要刪除該標籤?",
+    "sureDeleteTagValue": "是否要刪除所選標籤值?"
   },
   "g": {
     "edit": "編輯",
@@ -91,7 +93,8 @@
     "month": "月",
     "day": "日",
     "tag": "標籤",
-    "keywordSearch": "關鍵字搜尋"
+    "keywordSearch": "關鍵字搜尋",
+    "deleteSelected": "刪除所選"
   },
   "title": {
     "home": "主題清單列表",
@@ -380,6 +383,11 @@
     "addTag": "新增標籤",
     "editTag": "編輯標籤",
     "tagDuplicate": "標籤ID不能重複",
-    "noTags": "暫無標籤請新增標籤"
+    "noTags": "暫無標籤請新增標籤",
+    "noTagValue": "暫無標籤值請新增標籤值",
+    "tagValue": "標籤值",
+    "tagValueList": "標籤值清單",
+    "inUse": "目前該標籤使用中如需刪除需要清除使用該標籤的所有清單才可進行刪除 {{values}}",
+    "addTagValue": "新增標籤值"
   }
 }

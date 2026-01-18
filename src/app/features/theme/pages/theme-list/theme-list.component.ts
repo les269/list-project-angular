@@ -5,11 +5,10 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { ThemeService } from '../../services/theme.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { updateList } from '../../../../shared/state/layout.actions';
 import { Store } from '@ngrx/store';
 import { MatDialog } from '@angular/material/dialog';
-import { MessageBoxComponent } from '../../../../core/components/message-box/message-box.component';
 import { CopyThemeComponent } from '../../components/copy-theme.dialog';
+import { MessageBoxService } from '../../../../core/services/message-box.service';
 import {
   getQueryParamsByHeader,
   isNotBlank,
@@ -40,7 +39,8 @@ export class ThemeListComponent implements OnInit {
     private snackbarService: SnackbarService,
     private translateService: TranslateService,
     private store: Store,
-    private matDialog: MatDialog
+    private matDialog: MatDialog,
+    private messageBoxService: MessageBoxService
   ) {
     this.list$ = this.store.pipe(selectLayoutByKey('list'));
   }
@@ -75,19 +75,14 @@ export class ThemeListComponent implements OnInit {
     });
   }
   onDelete(item: ThemeHeader) {
-    this.matDialog
-      .open(MessageBoxComponent, {
-        data: { message: this.translateService.instant('msg.sureDeleteTheme') },
-      })
-      .afterClosed()
-      .subscribe(result => {
-        if (isNotBlank(result)) {
-          this.themeService.deleteTheme(item).subscribe(() => {
-            this.snackbarService.openByI18N('msg.deleteSuccess');
-            this.updateAllTheme();
-          });
-        }
-      });
+    this.messageBoxService.openI18N('msg.sureDeleteTheme').subscribe(result => {
+      if (isNotBlank(result)) {
+        this.themeService.deleteTheme(item).subscribe(() => {
+          this.snackbarService.openByI18N('msg.deleteSuccess');
+          this.updateAllTheme();
+        });
+      }
+    });
   }
 
   navigateList(item: ThemeHeader) {
@@ -104,6 +99,7 @@ export class ThemeListComponent implements OnInit {
     this.matDialog.open(ShareTagListComponent, {
       width: '800px',
       maxWidth: '800px',
+      height: '600px',
     });
   }
 }

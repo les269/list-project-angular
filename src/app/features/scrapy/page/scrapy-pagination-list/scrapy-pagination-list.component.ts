@@ -9,13 +9,13 @@ import { Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { ScrapyConfig, ScrapyPagination } from '../../model';
 import { ScrapyService } from '../../services/scrapy.service';
-import { MessageBoxComponent } from '../../../../core/components/message-box/message-box.component';
 import { isNotBlank } from '../../../../shared/util/helper';
 import { CopyScrapyComponent } from '../../components/copy-scrapy/copy-scrapy.component';
 import { ScrapyPaginationService } from '../../services/scrapy-pagination.service';
 import { CopyScrapyPaginationComponent } from '../../components/copy-scrapy-pagination/copy-scrapy-pagination.component';
 import { RedirectDataComponent } from '../../components/redirect-data/redirect-data.component';
 import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MessageBoxService } from '../../../../core/services/message-box.service';
 
 @Component({
   selector: 'app-scrapy-pagination-list',
@@ -41,7 +41,8 @@ export class ScrapyPaginationListComponent implements AfterViewInit {
     private matDialog: MatDialog,
     private router: Router,
     private scrapyPaginationService: ScrapyPaginationService,
-    private snackbarService: SnackbarService
+    private snackbarService: SnackbarService,
+    private messageBoxService: MessageBoxService
   ) {}
 
   ngOnInit() {
@@ -63,13 +64,8 @@ export class ScrapyPaginationListComponent implements AfterViewInit {
   }
 
   onDelete(e: ScrapyPagination) {
-    this.matDialog
-      .open(MessageBoxComponent, {
-        data: {
-          message: this.translateService.instant('msg.sureDeleteScrapy'),
-        },
-      })
-      .afterClosed()
+    this.messageBoxService
+      .openI18N('msg.sureDeleteScrapy')
       .subscribe(result => {
         if (isNotBlank(result)) {
           this.scrapyPaginationService.delete(e.name).subscribe(() => {

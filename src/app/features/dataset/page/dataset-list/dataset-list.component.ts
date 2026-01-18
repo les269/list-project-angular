@@ -6,7 +6,6 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { MessageBoxComponent } from '../../../../core/components/message-box/message-box.component';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { isNotBlank } from '../../../../shared/util/helper';
 import { Dataset } from '../../model/dataset.model';
@@ -15,6 +14,7 @@ import { CopyDatasetComponent } from '../../components/copy-dataset/copy-dataset
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { EditGroupDatasetDataComponent } from '../../components/edit-group-dataset-data/edit-group-dataset-data.component';
 import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MessageBoxService } from '../../../../core/services/message-box.service';
 
 @Component({
   selector: 'app-dataset-list',
@@ -48,7 +48,8 @@ export class DatasetListComponent implements OnInit, AfterViewInit {
     private matDialog: MatDialog,
     private router: Router,
     private snackbarService: SnackbarService,
-    private datasetService: DatasetService
+    private datasetService: DatasetService,
+    private messageBoxService: MessageBoxService
   ) {}
 
   ngOnInit() {
@@ -69,13 +70,8 @@ export class DatasetListComponent implements OnInit, AfterViewInit {
     this.router.navigate(['dataset-edit']);
   }
   onDelete(e: Dataset) {
-    this.matDialog
-      .open(MessageBoxComponent, {
-        data: {
-          message: this.translateService.instant('msg.sureDeleteDataset'),
-        },
-      })
-      .afterClosed()
+    this.messageBoxService
+      .openI18N('msg.sureDeleteDataset')
       .subscribe(result => {
         if (isNotBlank(result)) {
           this.datasetService.deleteDataset(e.name).subscribe(() => {

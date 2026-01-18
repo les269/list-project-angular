@@ -24,8 +24,8 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { CustomMatPaginatorIntl } from '../../../../core/components/custom-mat-paginatorIntl/custom-mat-paginatorIntl';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
-import { MessageBoxComponent } from '../../../../core/components/message-box/message-box.component';
 import { ScrollTopComponent } from '../../../../core/components/scroll-top/scroll-top.component';
+import { MessageBoxService } from '../../../../core/services/message-box.service';
 
 @Component({
   selector: 'app-replace-value-map',
@@ -39,8 +39,8 @@ import { ScrollTopComponent } from '../../../../core/components/scroll-top/scrol
     MatPaginatorModule,
     MatSortModule,
     MatButtonModule,
-    ScrollTopComponent
-],
+    ScrollTopComponent,
+  ],
   providers: [{ provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl }],
   templateUrl: './replace-value-map.component.html',
 })
@@ -57,7 +57,8 @@ export class ReplaceValueMapComponent implements AfterViewInit {
     private selectTableService: SelectTableService,
     private snackbarService: SnackbarService,
     private matDialog: MatDialog,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private messageBoxService: MessageBoxService
   ) {}
 
   ngAfterViewInit(): void {
@@ -148,15 +149,7 @@ export class ReplaceValueMapComponent implements AfterViewInit {
       .existMap(this.searchName)
       .pipe(
         filter(res => res),
-        switchMap(x =>
-          this.matDialog
-            .open(MessageBoxComponent, {
-              data: {
-                message: this.translateService.instant('msg.sureDeleteMap'),
-              },
-            })
-            .afterClosed()
-        ),
+        switchMap(x => this.messageBoxService.openI18N('msg.sureDeleteMap')),
         filter(res => isNotBlank(res)),
         switchMap(x =>
           this.replaceValueMapService.deleteByName(this.searchName)

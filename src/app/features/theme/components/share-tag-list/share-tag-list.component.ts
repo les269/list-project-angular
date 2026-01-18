@@ -4,6 +4,8 @@ import {
   OnInit,
   ViewChild,
   TemplateRef,
+  ViewChildren,
+  QueryList,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
@@ -25,8 +27,9 @@ import { MatTableModule } from '@angular/material/table';
 import { EMPTY, switchMap } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { isBlank } from '../../../../shared/util/helper';
-import { MessageBoxComponent } from '../../../../core/components/message-box/message-box.component';
+import { isBlank, parseHeaderId } from '../../../../shared/util/helper';
+import { ShareTagValueListComponent } from '../share-tag-value-list/share-tag-value-list.component';
+import { MessageBoxService } from '../../../../core/services/message-box.service';
 
 @Component({
   selector: 'app-share-tag-list',
@@ -50,6 +53,11 @@ import { MessageBoxComponent } from '../../../../core/components/message-box/mes
 })
 export class ShareTagListComponent implements OnInit {
   readonly dialogRef = inject(MatDialogRef<ShareTagListComponent>);
+  private readonly shareTagService = inject(ShareTagService);
+  private readonly snackbarService = inject(SnackbarService);
+  private readonly matDialog = inject(MatDialog);
+  private readonly translateService = inject(TranslateService);
+  private readonly messageBoxService = inject(MessageBoxService);
   dataSource: MatTableDataSource<ShareTag> = new MatTableDataSource<ShareTag>(
     []
   );
@@ -66,12 +74,6 @@ export class ShareTagListComponent implements OnInit {
   @ViewChild('addTagDialog') addTagDialog!: TemplateRef<any>;
   @ViewChild(MatSort) sort!: MatSort;
   private addDialogRef?: MatDialogRef<any>;
-  constructor(
-    private shareTagService: ShareTagService,
-    private snackbarService: SnackbarService,
-    private matDialog: MatDialog,
-    private translateService: TranslateService
-  ) {}
 
   ngOnInit(): void {
     this.shareTagService.getAllTag().subscribe(tags => {
@@ -80,29 +82,29 @@ export class ShareTagListComponent implements OnInit {
   }
 
   deleteTag(shareTagId: string): void {
-    this.matDialog
-      .open(MessageBoxComponent, {
-        data: { message: this.translateService.instant('msg.sureDeleteTag') },
-      })
-      .afterClosed()
+    this.shareTagService
+      .inUse(shareTagId)
       .pipe(
+        switchMap(inUse => {
+          if (inUse.length > 0) {
+            // show message that the tag is currently bound/used
+            this.messageBoxService.openI18N('shareTag.inUse', {
+              values: inUse.join('\n'),
+            });
+            return EMPTY;
+          }
+          return this.messageBoxService.openI18N(
+            'msg.sureDeleteTag',
+            undefined,
+            true
+          );
+        }),
         switchMap(result => {
           if (!result) return EMPTY;
-
-          // check if the tag is in use before deleting
-          return this.shareTagService.inUse(shareTagId).pipe(
-            switchMap(inUse => {
-              if (inUse) {
-                // show message that the tag is currently bound/used
-                this.snackbarService.openByI18N('shareTag.inUse');
-                return EMPTY;
-              }
-              return this.shareTagService.deleteTag(shareTagId);
-            })
-          );
-        })
+          return this.shareTagService.deleteTag(shareTagId);
+        }),
+        switchMap(() => this.shareTagService.getAllTag())
       )
-      .pipe(switchMap(() => this.shareTagService.getAllTag()))
       .subscribe(x => {
         this.dataSource.data = x;
         this.snackbarService.openByI18N('msg.deleteSuccess');
@@ -111,21 +113,6 @@ export class ShareTagListComponent implements OnInit {
 
   onNoClick(): void {
     this.dialogRef.close();
-  }
-
-  openAddDialog() {
-    this.addDialogRef = this.matDialog.open(this.addTagDialog);
-    this.addDialogRef.afterClosed().subscribe(() => {
-      this.newTagId = '';
-      this.newTagName = '';
-      this.isEdit = false;
-    });
-    // attach sort after view initialised
-    setTimeout(() => {
-      if (this.sort) {
-        this.dataSource.sort = this.sort;
-      }
-    });
   }
 
   ngAfterViewInit() {
@@ -150,6 +137,7 @@ export class ShareTagListComponent implements OnInit {
       this.isEdit = false;
     });
   }
+
   confirmAddTag() {
     if (isBlank(this.newTagId)) {
       this.snackbarService.isBlankMessage('shareTag.tagId');
@@ -187,9 +175,32 @@ export class ShareTagListComponent implements OnInit {
       });
   }
 
+  openAddDialog() {
+    this.addDialogRef = this.matDialog.open(this.addTagDialog);
+    this.addDialogRef.afterClosed().subscribe(() => {
+      this.newTagId = '';
+      this.newTagName = '';
+      this.isEdit = false;
+    });
+    // attach sort after view initialised
+    setTimeout(() => {
+      if (this.sort) {
+        this.dataSource.sort = this.sort;
+      }
+    });
+  }
+
   closeAddDialog() {
     if (this.addDialogRef) {
       this.addDialogRef.close();
     }
+  }
+
+  onReorderTag(tag: ShareTag) {
+    this.matDialog.open(ShareTagValueListComponent, {
+      width: '700px',
+      maxWidth: '700px',
+      data: tag,
+    });
   }
 }

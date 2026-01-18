@@ -8,11 +8,11 @@ import { ScrapyConfig } from '../../model/scrapy.model';
 import { ScrapyService } from '../../services/scrapy.service';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { MessageBoxComponent } from '../../../../core/components/message-box/message-box.component';
 import { isNotBlank } from '../../../../shared/util/helper';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { CopyScrapyComponent } from '../../components/copy-scrapy/copy-scrapy.component';
 import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MessageBoxService } from '../../../../core/services/message-box.service';
 
 @Component({
   standalone: true,
@@ -37,7 +37,8 @@ export class ScrapyListComponent implements OnInit, AfterViewInit {
     private matDialog: MatDialog,
     private router: Router,
     private scapyService: ScrapyService,
-    private snackbarService: SnackbarService
+    private snackbarService: SnackbarService,
+    private messageBoxService: MessageBoxService
   ) {}
 
   ngOnInit() {
@@ -59,13 +60,8 @@ export class ScrapyListComponent implements OnInit, AfterViewInit {
   }
 
   onDelete(e: ScrapyConfig) {
-    this.matDialog
-      .open(MessageBoxComponent, {
-        data: {
-          message: this.translateService.instant('msg.sureDeleteScrapy'),
-        },
-      })
-      .afterClosed()
+    this.messageBoxService
+      .openI18N('msg.sureDeleteScrapy')
       .subscribe(result => {
         if (isNotBlank(result)) {
           this.scapyService.deleteConfig(e.name).subscribe(() => {

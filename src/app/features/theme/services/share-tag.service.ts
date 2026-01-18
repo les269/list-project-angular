@@ -19,14 +19,19 @@ export class ShareTagService {
     return this.http.post<void>('/share-tag/add', req);
   }
 
-  inUse(shareTagId: string): Observable<boolean> {
-    return this.http.get<boolean>('/share-tag/in-use', {
+  inUse(shareTagId: string): Observable<string[]> {
+    return this.http.get<string[]>('/share-tag/in-use', {
       params: { shareTagId },
     });
   }
 
   deleteTag(shareTagId: string): Observable<void> {
     return this.http.delete<void>('/share-tag/delete', {
+      params: { shareTagId },
+    });
+  }
+  getShareTagValue(shareTagId: string): Observable<ShareTagValue[]> {
+    return this.http.get<ShareTagValue[]>('/share-tag/value/id', {
       params: { shareTagId },
     });
   }
@@ -48,6 +53,15 @@ export class ShareTagService {
         shareTagId: req.shareTagId,
         value: req.value,
       },
+    });
+  }
+
+  deleteShareTagValueList(req: {
+    shareTagId: string;
+    values: string[];
+  }): Observable<void> {
+    return this.http.delete<void>('/share-tag/value/delete-list', {
+      body: req,
     });
   }
 }
