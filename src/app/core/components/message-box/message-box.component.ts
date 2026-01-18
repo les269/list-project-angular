@@ -30,12 +30,9 @@ export interface MessageBoxData {
   selector: 'app-message-box',
   templateUrl: './message-box.component.html',
 })
-export class MessageBoxComponent implements OnInit {
+export class MessageBoxComponent {
   readonly dialogRef = inject(MatDialogRef<MessageBoxComponent>);
   readonly data = inject<MessageBoxData>(MAT_DIALOG_DATA);
-  constructor() {}
-
-  ngOnInit() {}
 
   ok() {
     this.dialogRef.close('ok');

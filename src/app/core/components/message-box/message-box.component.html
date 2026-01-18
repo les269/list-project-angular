@@ -2,7 +2,7 @@
   {{ data.message }}
 </mat-dialog-content>
 <mat-dialog-actions>
-  @if (data.onlyOk === false) {
+  @if (!data.onlyOk) {
     <button mat-button mat-dialog-close (click)="no()">
       {{ 'g.no' | translate }}
     </button>

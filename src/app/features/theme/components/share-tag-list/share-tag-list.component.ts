@@ -88,16 +88,16 @@ export class ShareTagListComponent implements OnInit {
         switchMap(inUse => {
           if (inUse.length > 0) {
             // show message that the tag is currently bound/used
-            this.messageBoxService.openI18N('shareTag.inUse', {
-              values: inUse.join('\n'),
-            });
+            this.messageBoxService.openI18N(
+              'shareTag.inUse',
+              {
+                values: inUse.join('\n'),
+              },
+              true
+            );
             return EMPTY;
           }
-          return this.messageBoxService.openI18N(
-            'msg.sureDeleteTag',
-            undefined,
-            true
-          );
+          return this.messageBoxService.openI18N('msg.sureDeleteTag');
         }),
         switchMap(result => {
           if (!result) return EMPTY;
