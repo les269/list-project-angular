@@ -208,7 +208,11 @@
 
           <div class="detail-rows scrollbar-primary">
             @for (label of themeLabelList; track $index; let idx = $index) {
-              @if (label.isVisible && checkValueVisible(data[label.byKey])) {
+              @if (
+                label.isVisible &&
+                checkValueVisible(data[label.byKey]) &&
+                checkVisibleByDataset(label)
+              ) {
                 <div class="detail-row">
                   <div class="row-label">{{ label.label }}</div>
                   <app-list-item-value

@@ -15,6 +15,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { EditGroupDatasetDataComponent } from '../../components/edit-group-dataset-data/edit-group-dataset-data.component';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-dataset-list',
@@ -27,6 +29,8 @@ import { MessageBoxService } from '../../../../core/services/message-box.service
     MatIconModule,
     MatTooltipModule,
     MatSortModule,
+    MatFormFieldModule,
+    MatInputModule,
   ],
   templateUrl: './dataset-list.component.html',
   styleUrl: './dataset-list.component.scss',
@@ -42,9 +46,9 @@ export class DatasetListComponent implements OnInit, AfterViewInit {
   ];
   dataSource = new MatTableDataSource<Dataset>([]);
   isRefreshing: boolean = false;
+  filterValue: string = '';
   @ViewChild(MatSort) sort!: MatSort;
   constructor(
-    private translateService: TranslateService,
     private matDialog: MatDialog,
     private router: Router,
     private snackbarService: SnackbarService,
@@ -58,6 +62,24 @@ export class DatasetListComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.dataSource.sort = this.sort;
+    this.dataSource.sortingDataAccessor = (item, property) => {
+      switch (property) {
+        case 'filterType':
+          return item.config.type ?? '';
+        case 'groupName':
+          return item.config.groupName ?? '';
+        default:
+          return (item as any)[property];
+      }
+    };
+    this.dataSource.filterPredicate = (data: Dataset, filter: string) => {
+      const filterLower = filter.toLowerCase();
+      return (
+        data.name.toLowerCase().includes(filterLower) ||
+        (data.config.type?.toLowerCase().includes(filterLower) ?? false) ||
+        (data.config.groupName?.toLowerCase().includes(filterLower) ?? false)
+      );
+    };
   }
 
   getList() {
@@ -123,5 +145,16 @@ export class DatasetListComponent implements OnInit, AfterViewInit {
       minWidth: '60vw',
       autoFocus: false,
     });
+  }
+
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.filterValue = filterValue;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
+
+  clearFilter() {
+    this.filterValue = '';
+    this.dataSource.filter = '';
   }
 }

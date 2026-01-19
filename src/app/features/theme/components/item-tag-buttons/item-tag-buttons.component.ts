@@ -19,7 +19,7 @@ export class ItemTagButtonsComponent {
   @Output() tagValueUpdate = new EventEmitter<ShareTagValue>();
 
   showTagCheck(shareTagId: string): boolean {
-    return this.shareTagValueMap[shareTagId].includes(this.value);
+    return this.shareTagValueMap[shareTagId]?.includes(this.value);
   }
 
   onSetTag(shareTagId: string) {

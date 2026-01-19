@@ -169,7 +169,8 @@
     "minWidth": "最小寬度",
     "maxWidth": "最大寬度",
     "width": "寬度",
-    "autoComplete": "加入快速輸入"
+    "autoComplete": "加入搜尋清單",
+    "visibleDatasetNameListPH": "是否顯示按鈕為空則全部顯示,對應資料集的名稱列表 ex: dataset1,dataset2"
   },
   "themeDataset": {
     "title": "資料集設定",

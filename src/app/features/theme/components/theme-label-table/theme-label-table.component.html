@@ -143,6 +143,10 @@
             <mat-checkbox [(ngModel)]="element.autoComplete">{{
               'themeLabel.autoComplete' | translate
             }}</mat-checkbox>
+            <input
+              class="form-control"
+              [placeholder]="'themeLabel.visibleDatasetNameListPH' | translate"
+              [(ngModel)]="element.visibleDatasetNameList" />
           </div>
         </div>
       </td>

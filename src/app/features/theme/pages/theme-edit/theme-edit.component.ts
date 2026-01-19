@@ -235,13 +235,26 @@ export class ThemeEditComponent implements OnInit {
           return false;
         }
       }
+      if (isDuplicate(this.model.themeLabelList.map(x => x.byKey))) {
+        this.snackbarService.openByI18N('msg.duplicateColumn', {
+          text: this.translateService.instant('themeLabel.byKey'),
+        });
+        return false;
+      }
+      if (
+        !Array.isArray(label.visibleDatasetNameList) &&
+        isBlank(label.visibleDatasetNameList)
+      ) {
+        label.visibleDatasetNameList = [];
+      }
+      if (!Array.isArray(label.visibleDatasetNameList)) {
+        label.visibleDatasetNameList = (label.visibleDatasetNameList + '')
+          .split(',')
+          .map(x => x.trim())
+          .filter(x => isNotBlank(x));
+      }
     }
-    if (isDuplicate(this.model.themeLabelList.map(x => x.byKey))) {
-      this.snackbarService.openByI18N('msg.duplicateColumn', {
-        text: this.translateService.instant('themeLabel.byKey'),
-      });
-      return false;
-    }
+
     return true;
   }
 

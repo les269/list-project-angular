@@ -60,6 +60,7 @@ export class ThemeLabelTableComponent extends GenericTableComponent<ThemeLabel> 
     minWidth: '',
     width: '',
     autoComplete: false,
+    visibleDatasetNameList: [],
   };
 
   changeType(event: ThemeLabelType, index: number) {

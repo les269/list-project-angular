@@ -29,6 +29,7 @@ import {
   ThemeHeaderType,
   ThemeImage,
   ThemeImageType,
+  ThemeLabel,
   ThemeTag,
 } from '../../models';
 import { NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
@@ -401,7 +402,7 @@ export class ImageListViewComponent
     return url;
   }
 
-  checkValueVisible(value: any) {
+  checkValueVisible(value: any): boolean {
     if (value === null || value === undefined) {
       return false;
     }
@@ -413,6 +414,16 @@ export class ImageListViewComponent
     }
     if (typeof value === 'string') {
       return isNotBlank(value);
+    }
+
+    return true;
+  }
+  checkVisibleByDataset(themeLabel: ThemeLabel): boolean {
+    if (!themeLabel.visibleDatasetNameList) {
+      return true;
+    }
+    if (themeLabel.visibleDatasetNameList.length > 0) {
+      return themeLabel.visibleDatasetNameList.includes(this.useDataset.label);
     }
     return true;
   }
