@@ -60,6 +60,7 @@ export class TopCustomButtonsComponent implements OnInit {
     this.matDialog
       .open(ThemeNoteComponent, {
         data: {
+          title: custom.label,
           value: this.getCustomValue(custom) ?? '',
           disabled: type === 'read',
           save: (result: string) => {

@@ -36,6 +36,7 @@ export class ThemeNoteComponent implements OnInit, OnDestroy {
   readonly dialogRef = inject(MatDialogRef<ThemeNoteComponent>);
   readonly data = inject<{
     value: string;
+    title: string;
     disabled: boolean;
     save: (text: string) => void;
   }>(MAT_DIALOG_DATA);

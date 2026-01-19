@@ -176,6 +176,7 @@ export class CustomButtonsComponent {
     this.matDialog
       .open(ThemeNoteComponent, {
         data: {
+          title: custom.label,
           value: this.getCustomValue(data, custom) ?? '',
           disabled: type === 'read',
           save: (result: string) => {

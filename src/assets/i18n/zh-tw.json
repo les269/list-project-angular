@@ -49,6 +49,7 @@
   "g": {
     "edit": "編輯",
     "copy": "複製",
+    "read": "瀏覽",
     "delete": "刪除",
     "submit": "提交",
     "clear": "清除",
@@ -104,8 +105,6 @@
     "copyDataset": "複製資料集",
     "copyGroupDataset": "複製資料集群組",
     "inputUrl": "輸入網址",
-    "writeNote": "編輯Note",
-    "readNote": "瀏覽Note",
     "apiConfigList": "API設定清單",
     "editApi": "編輯API",
     "pleaseSelect": "請選擇",
