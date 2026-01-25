@@ -29,6 +29,11 @@ body {
   background-color: transparent !important;
 }
 
+.scrollbar-primary {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
+}
+
 .scrollbar-primary::-webkit-scrollbar {
   width: 10px;
 }
