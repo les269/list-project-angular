@@ -183,12 +183,10 @@
           [url]="getImageUrl(data, themeImage)"
           [priority]="i === 0"
           [ctrlPressed]="ctrlPressed"
-          (hiddenFixedImage)="fixedImage.hidden()"
-          (visibleFixedImage)="fixedImage.visible()"
-          (changeFixedImagePath)="fixedImagePath = $event"
-          (delayViewImg)="
-            delayViewImg($event.event, $event.url)
-          "></app-img-content>
+          [refreshDate]="refreshDate()"
+          (hiddenFixedImage)="fixedImage.closeModal()"
+          (visibleFixedImage)="fixedImage.show()"
+          (changeFixedImagePath)="fixedImagePath = $event"></app-img-content>
         <div class="detail-content">
           <div class="edit-button">
             @if (hoveredIndex === i) {

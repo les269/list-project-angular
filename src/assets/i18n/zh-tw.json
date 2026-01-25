@@ -95,7 +95,9 @@
     "day": "日",
     "tag": "標籤",
     "keywordSearch": "關鍵字搜尋",
-    "deleteSelected": "刪除所選"
+    "deleteSelected": "刪除所選",
+    "zoomIn": "放大",
+    "openNewWindow": "新視窗"
   },
   "title": {
     "home": "主題清單列表",

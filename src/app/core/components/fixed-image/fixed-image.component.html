@@ -1,8 +1,40 @@
-<div
-  #fixedImage
-  class="fixedImage"
-  (mouseout)="fixedImage.style.visibility = 'hidden'"
-  (mouseover)="fixedImage.style.visibility = 'visible'"
-  (click)="fixedImage.style.visibility = 'hidden'">
-  <img alt="" [src]="fixedImagePath" />
-</div>
+@if (isVisible()) {
+  <div class="fixedImage-overlay" (click)="closeModal($event)">
+    <!-- 按鈕組 -->
+    <div class="fixedImage-buttons" (click)="$event.stopPropagation()">
+      <!-- <button
+        class="btn-icon"
+        (click)="zoomIn()"
+        [title]="'g.zoomIn' | translate">
+        <mat-icon>zoom_in</mat-icon>
+      </button> -->
+      <button
+        class="btn-icon"
+        (click)="openNewWindow()"
+        [title]="'g.openNewWindow' | translate">
+        <mat-icon>open_in_new</mat-icon>
+      </button>
+      <button
+        class="btn-icon"
+        (click)="downloadImage()"
+        [title]="'g.download' | translate">
+        <mat-icon>download</mat-icon>
+      </button>
+      <button
+        class="btn-icon"
+        (click)="closeModal()"
+        [title]="'g.close' | translate">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="fixedImage-container" (click)="$event.stopPropagation()">
+      <!-- 圖片 -->
+      <img
+        #imageEl
+        alt="Preview"
+        [src]="fixedImagePath()"
+        [style.max-width.vw]="zoomLevel() * 70"
+        [style.max-height.vh]="zoomLevel() * 70" />
+    </div>
+  </div>
+}

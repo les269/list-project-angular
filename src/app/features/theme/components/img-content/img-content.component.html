@@ -1,14 +1,12 @@
 <div
   class="img-content"
   (click)="refreshImage($event)"
-  [ngStyle]="{ cursor: ctrlPressed ? 'wait' : 'default' }">
+  [ngStyle]="{ cursor: ctrlPressed() ? 'wait' : 'default' }">
   <img
     alt=""
-    [ngSrc]="displaySrc"
+    [ngSrc]="displaySrc()"
     fill
-    [priority]="priority"
+    [priority]="priority()"
     (error)="onError()"
-    (mouseout)="hiddenFixedImageHandle()"
-    (mouseover)="delayViewImgHandle($event)"
     (click)="clickImg($event)" />
 </div>

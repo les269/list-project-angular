@@ -1,11 +1,10 @@
 import {
   Component,
-  EventEmitter,
-  HostListener,
-  Input,
+  input,
   OnChanges,
   OnInit,
-  Output,
+  output,
+  signal,
   SimpleChanges,
 } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
@@ -18,31 +17,32 @@ import { CommonModule, NgOptimizedImage } from '@angular/common';
   styleUrl: './img-content.component.scss',
 })
 export class ImgContentComponent implements OnInit, OnChanges {
-  @Input({ required: true }) url = '';
-  @Input({ required: true }) priority = false;
-  @Input({ required: true }) ctrlPressed = false;
-  @Output() hiddenFixedImage = new EventEmitter<void>();
-  @Output() visibleFixedImage = new EventEmitter<void>();
-  @Output() changeFixedImagePath = new EventEmitter<string>();
-  @Output() delayViewImg = new EventEmitter<{
-    event: MouseEvent;
-    url: string;
-  }>();
-  displaySrc: string = '';
+  url = input.required<string>();
+  priority = input.required<boolean>();
+  ctrlPressed = input.required<boolean>();
+  refreshDate = input.required<Date>();
+  hiddenFixedImage = output<void>();
+  visibleFixedImage = output<void>();
+  changeFixedImagePath = output<string>();
+  delayViewImg = output<{ event: MouseEvent; url: string }>();
+  displaySrc = signal<string>('');
   fallbackSrc: string = 'assets/img/img-not-found.jpg';
 
   ngOnInit() {
-    this.displaySrc = this.url;
+    this.displaySrc.update(() => this.url());
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['url']) {
-      this.displaySrc = this.url;
+      this.displaySrc.update(() => this.url());
+    }
+    if (changes['refreshDate']) {
+      this.displaySrc.update(() => this.url() + '&t=' + this.refreshDate());
     }
   }
 
   onError(): void {
-    this.displaySrc = this.fallbackSrc;
+    this.displaySrc.set(this.fallbackSrc);
   }
 
   hiddenFixedImageHandle() {
@@ -54,17 +54,17 @@ export class ImgContentComponent implements OnInit, OnChanges {
       return;
     }
     this.visibleFixedImage.emit();
-    this.changeFixedImagePath.emit(this.displaySrc);
+    this.changeFixedImagePath.emit(this.displaySrc());
   }
 
   delayViewImgHandle(event: MouseEvent) {
-    this.delayViewImg.emit({ event, url: this.displaySrc });
+    this.delayViewImg.emit({ event, url: this.displaySrc() });
   }
 
   refreshImage(event: MouseEvent) {
     if (event.ctrlKey) {
       event.stopPropagation(); // 防止事件冒泡
-      this.displaySrc = this.url + '&t=' + Date.now();
+      this.displaySrc.update(() => this.url() + '&t=' + Date.now());
     }
   }
 }

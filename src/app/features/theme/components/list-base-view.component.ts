@@ -1,4 +1,4 @@
-import { Component, Injector, OnDestroy, OnInit } from '@angular/core';
+import { Component, Injector, OnDestroy, OnInit, signal } from '@angular/core';
 import { debounceTime, filter, pipe, Subscription, switchMap, tap } from 'rxjs';
 import { updateTitle } from '../../../shared/state/layout.actions';
 import {
@@ -82,6 +82,7 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
   randomStr = '__random';
   datasetNameStr = '__datasetName';
   colorStr = '__color';
+  refreshDate = signal<Date>(new Date());
 
   webApi = api;
 
@@ -298,6 +299,7 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
       .refreshDataByNameList(this.useDataset.datasetList)
       .subscribe(x => {
         this.getDataSoure();
+        this.refreshDate.set(new Date());
         this.snackbarService.openByI18N('msg.refreshSuccess');
       });
   }

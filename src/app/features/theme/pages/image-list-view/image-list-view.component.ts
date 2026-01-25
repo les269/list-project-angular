@@ -372,18 +372,6 @@ export class ImageListViewComponent
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  delayViewImg(event: MouseEvent, path: string) {
-    const img = event.target as HTMLImageElement;
-    this.fixedImagePath = path;
-    // 當滑鼠移出圖片時取消顯示計時
-    const mouseOut$ = fromEvent(img, 'mouseout');
-    timer(1000)
-      .pipe(takeUntil(mouseOut$))
-      .subscribe(() => {
-        this.fixedImage.visible();
-      });
-  }
-
   getImageUrl(data: any, themeImage: ThemeImage) {
     let url = '';
     switch (themeImage.type) {
