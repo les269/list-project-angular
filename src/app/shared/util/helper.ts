@@ -59,8 +59,14 @@ export function dynamicSort(key: string, ascending: boolean) {
     b = b ?? '';
 
     if (typeof f === 'string' && typeof b === 'string') {
-      f = f.toLowerCase();
-      b = b.toLowerCase();
+      // 如果兩個值都是數字字符串，轉換為數字進行排序
+      if (isNumber(f) && isNumber(b)) {
+        f = parseFloat(f);
+        b = parseFloat(b);
+      } else {
+        f = f.toLowerCase();
+        b = b.toLowerCase();
+      }
     }
     const result = f < b ? -1 : f > b ? 1 : 0;
     return result * sortOrder;

@@ -307,9 +307,7 @@ export class ImageListViewComponent
           a[this.randomStr] > b[this.randomStr] ? 1 : -1
         );
       } else {
-        this.filterData = this.filterData.sort(
-          dynamicSort(this.sortValue.key, this.sortAsc)
-        );
+        this.filterData.sort(dynamicSort(this.sortValue.key, this.sortAsc));
       }
     }
   }
