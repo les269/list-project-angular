@@ -28,8 +28,8 @@ import { GroupDatasetService } from '../../service/group-dataset.service';
     MatDialogClose,
     MatDialogTitle,
     MatDialogContent,
-    TranslateModule
-],
+    TranslateModule,
+  ],
   templateUrl: './copy-group-dataset.component.html',
 })
 export class CopyGroupDatasetComponent {
@@ -51,7 +51,7 @@ export class CopyGroupDatasetComponent {
       .pipe(
         switchMap(res => {
           if (res) {
-            this.snackbarService.openByI18N('msg.scrapyExist');
+            this.snackbarService.openI18N('msg.scrapyExist');
             return EMPTY;
           }
           return this.groupDatasetService.updateGroupDataset(this.source);

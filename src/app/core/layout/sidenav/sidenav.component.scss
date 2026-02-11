@@ -2,10 +2,10 @@
   display: flex;
   position: fixed;
   flex-direction: column;
-  height: calc(100% - 48px);
+  height: calc(100% - var(--header-height));
   background-color: #f3f6f9;
   width: 200px;
-  top: 51px;
+  top: var(--header-height);
   transition: all 0.2s;
   transform: translate3d(-200px, 0px, 0px);
   z-index: 1002;

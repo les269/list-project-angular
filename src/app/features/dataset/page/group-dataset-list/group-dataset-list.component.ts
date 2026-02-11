@@ -11,13 +11,13 @@ import { Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { DatasetService } from '../../service/dataset.service';
 import { GroupDatasetService } from '../../service/group-dataset.service';
-import { MessageBoxComponent } from '../../../../core/components/message-box/message-box.component';
 import { isNotBlank } from '../../../../shared/util/helper';
 import { CopyDatasetComponent } from '../../components/copy-dataset/copy-dataset.component';
 import { CopyGroupDatasetComponent } from '../../components/copy-group-dataset/copy-group-dataset.component';
 import { EditGroupDatasetDataComponent } from '../../components/edit-group-dataset-data/edit-group-dataset-data.component';
 import { GroupDatasetImportExportComponent } from '../../components/group-dataset-import-export/group-dataset-import-export.component';
 import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MessageBoxService } from '../../../../core/services/message-box.service';
 
 @Component({
   selector: 'app-group-dataset-list',
@@ -44,7 +44,8 @@ export class GroupDatasetListComponent implements OnInit, AfterViewInit {
     private matDialog: MatDialog,
     private router: Router,
     private snackbarService: SnackbarService,
-    private groupDatasetService: GroupDatasetService
+    private groupDatasetService: GroupDatasetService,
+    private messageBoxService: MessageBoxService
   ) {}
 
   ngOnInit() {
@@ -66,19 +67,14 @@ export class GroupDatasetListComponent implements OnInit, AfterViewInit {
   }
 
   onDelete(e: GroupDataset) {
-    this.matDialog
-      .open(MessageBoxComponent, {
-        data: {
-          message: this.translateService.instant('msg.sureDeleteDataset'),
-        },
-      })
-      .afterClosed()
+    this.messageBoxService
+      .openI18N('msg.sureDeleteDataset')
       .subscribe(result => {
         if (isNotBlank(result)) {
           this.groupDatasetService
             .deleteGroupDataset(e.groupName)
             .subscribe(() => {
-              this.snackbarService.openByI18N('msg.deleteSuccess');
+              this.snackbarService.openI18N('msg.deleteSuccess');
               this.getList();
             });
         }
@@ -97,7 +93,7 @@ export class GroupDatasetListComponent implements OnInit, AfterViewInit {
       .afterClosed()
       .subscribe(result => {
         if (isNotBlank(result)) {
-          this.snackbarService.openByI18N('msg.copySuccess');
+          this.snackbarService.openI18N('msg.copySuccess');
           this.getList();
         }
       });

@@ -1,18 +1,17 @@
-div.img-content {
+.img-content {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 0px;
+  position: relative;
+  height: 33vh;
   > img {
-    position: relative !important;
+    position: absolute !important;
     padding: 0.25rem;
     background-color: #fff;
-    border: 1px solid #dee2e6;
     border-radius: 0.25rem;
     max-width: 100%;
-    width: auto !important;
-    max-height: 33vh;
-    height: 100%;
-    object-fit: scale-down;
+    max-height: 100%;
+    object-fit: contain;
   }
 }

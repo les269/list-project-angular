@@ -1,0 +1,15 @@
+.sidebar {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  width: var(--setting-sidebar-width);
+  height: calc(100vh - var(--header-height));
+}
+.main {
+  width: 100%;
+  margin-left: var(--setting-sidebar-width);
+  display: flex;
+  justify-content: center;
+}

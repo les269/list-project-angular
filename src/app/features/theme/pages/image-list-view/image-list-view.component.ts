@@ -29,6 +29,7 @@ import {
   ThemeHeaderType,
   ThemeImage,
   ThemeImageType,
+  ThemeLabel,
   ThemeTag,
 } from '../../models';
 import { NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
@@ -52,7 +53,6 @@ import { ImgContentComponent } from '../../components/img-content/img-content.co
   standalone: true,
   imports: [
     MatIconModule,
-    NgOptimizedImage,
     TranslateModule,
     FormsModule,
     ReactiveFormsModule,
@@ -307,9 +307,7 @@ export class ImageListViewComponent
           a[this.randomStr] > b[this.randomStr] ? 1 : -1
         );
       } else {
-        this.filterData = this.filterData.sort(
-          dynamicSort(this.sortValue.key, this.sortAsc)
-        );
+        this.filterData.sort(dynamicSort(this.sortValue.key, this.sortAsc));
       }
     }
   }
@@ -374,18 +372,6 @@ export class ImageListViewComponent
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  delayViewImg(event: MouseEvent, path: string) {
-    const img = event.target as HTMLImageElement;
-    this.fixedImagePath = path;
-    // 當滑鼠移出圖片時取消顯示計時
-    const mouseOut$ = fromEvent(img, 'mouseout');
-    timer(1000)
-      .pipe(takeUntil(mouseOut$))
-      .subscribe(() => {
-        this.fixedImage.visible();
-      });
-  }
-
   getImageUrl(data: any, themeImage: ThemeImage) {
     let url = '';
     switch (themeImage.type) {
@@ -402,7 +388,7 @@ export class ImageListViewComponent
     return url;
   }
 
-  checkValueVisible(value: any) {
+  checkValueVisible(value: any): boolean {
     if (value === null || value === undefined) {
       return false;
     }
@@ -414,6 +400,16 @@ export class ImageListViewComponent
     }
     if (typeof value === 'string') {
       return isNotBlank(value);
+    }
+
+    return true;
+  }
+  checkVisibleByDataset(themeLabel: ThemeLabel): boolean {
+    if (!themeLabel.visibleDatasetNameList) {
+      return true;
+    }
+    if (themeLabel.visibleDatasetNameList.length > 0) {
+      return themeLabel.visibleDatasetNameList.includes(this.useDataset.label);
     }
     return true;
   }

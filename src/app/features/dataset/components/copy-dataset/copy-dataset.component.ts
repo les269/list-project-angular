@@ -28,8 +28,8 @@ import { DatasetService } from '../../service/dataset.service';
     MatDialogClose,
     MatDialogTitle,
     MatDialogContent,
-    TranslateModule
-],
+    TranslateModule,
+  ],
   templateUrl: './copy-dataset.component.html',
 })
 export class CopyDatasetComponent {
@@ -51,7 +51,7 @@ export class CopyDatasetComponent {
       .pipe(
         switchMap(res => {
           if (res) {
-            this.snackbarService.openByI18N('msg.scrapyExist');
+            this.snackbarService.openI18N('msg.scrapyExist');
             return EMPTY;
           }
           return this.datasetService.updateDataset(this.source);

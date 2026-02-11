@@ -34,8 +34,8 @@ import { ScrapyPaginationService } from '../../services/scrapy-pagination.servic
     MatDialogClose,
     MatDialogTitle,
     MatDialogContent,
-    TranslateModule
-],
+    TranslateModule,
+  ],
   templateUrl: './copy-scrapy-pagination.component.html',
 })
 export class CopyScrapyPaginationComponent {
@@ -57,7 +57,7 @@ export class CopyScrapyPaginationComponent {
       .pipe(
         switchMap(res => {
           if (res) {
-            this.snackbarService.openByI18N('msg.scrapyExist');
+            this.snackbarService.openI18N('msg.scrapyExist');
             return EMPTY;
           }
           return this.scrapyPaginationService.update(this.source);

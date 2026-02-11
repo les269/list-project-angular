@@ -1,7 +1,14 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  inject,
+  OnInit,
+  viewChild,
+  ViewChild,
+} from '@angular/core';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -57,7 +64,7 @@ export interface BaseSelectTableData<O> {
   providers: [{ provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl }],
 })
 export class SelectTableDialog<O, T extends BaseSelectTableData<O>>
-  implements OnInit
+  implements OnInit, AfterViewInit
 {
   readonly dialogRef = inject(MatDialogRef<SelectTableDialog<O, T>>);
   readonly data = inject<T>(MAT_DIALOG_DATA);
@@ -73,12 +80,11 @@ export class SelectTableDialog<O, T extends BaseSelectTableData<O>>
   enableFilter = this.data.enableFilter;
   showTitle = this.data.showTitle === undefined ? true : this.data.showTitle;
   selection = new SelectionModel<O>(true, []);
-  @ViewChild(MatSort) sort!: MatSort;
-  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
+  sort = viewChild(MatSort);
+  paginator = viewChild(MatPaginator);
 
   ngOnInit(): void {
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
+    this.dataSource.paginator = this.paginator();
     if (this.selectType === 'multiple') {
       this.multipleDisplayedColumns = ['select', ...this.displayedColumns];
       if (this.selected && Array.isArray(this.selected)) {
@@ -92,6 +98,11 @@ export class SelectTableDialog<O, T extends BaseSelectTableData<O>>
       }
     }
   }
+
+  ngAfterViewInit() {
+    this.dataSource.sort = this.sort();
+  }
+
   onOk() {
     this.dialogRef.close(this.selection.selected);
   }

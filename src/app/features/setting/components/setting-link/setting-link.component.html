@@ -1,0 +1,5 @@
+<div class="link-container">
+  <a [class]="'link' + (active() ? ' active' : '')" [routerLink]="link()">
+    <div class="px-3">{{ text() }}</div>
+  </a>
+</div>

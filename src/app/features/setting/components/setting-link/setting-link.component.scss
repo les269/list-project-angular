@@ -1,0 +1,21 @@
+.link {
+  min-height: 40px;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  text-decoration: none;
+  color: black;
+  font-size: 1rem;
+}
+.link-container {
+  margin: 0 16px;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+  }
+  & .active {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+  }
+}

@@ -22,7 +22,6 @@ import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
     FormsModule,
     MatButtonModule,
     MatDialogActions,
-    MatDialogClose,
     MatDialogTitle,
     MatDialogContent,
     TranslateModule,
@@ -37,6 +36,7 @@ export class ThemeNoteComponent implements OnInit, OnDestroy {
   readonly dialogRef = inject(MatDialogRef<ThemeNoteComponent>);
   readonly data = inject<{
     value: string;
+    title: string;
     disabled: boolean;
     save: (text: string) => void;
   }>(MAT_DIALOG_DATA);

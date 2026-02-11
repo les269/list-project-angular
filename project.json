@@ -11,12 +11,14 @@
   },
   "targets": {
     "build": {
-      "executor": "@angular-devkit/build-angular:application",
+      "executor": "@angular/build:application",
       "options": {
         "outputPath": "dist/list-project-angular",
         "index": "src/index.html",
         "browser": "src/main.ts",
-        "polyfills": ["zone.js"],
+        "polyfills": [
+          "zone.js"
+        ],
         "tsConfig": "tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": [
@@ -65,7 +67,7 @@
       }
     },
     "serve": {
-      "executor": "@angular-devkit/build-angular:dev-server",
+      "executor": "@angular/build:dev-server",
       "configurations": {
         "production": {
           "buildTarget": "list-project-angular:build:production"
@@ -78,12 +80,15 @@
       "continuous": true
     },
     "extract-i18n": {
-      "executor": "@angular-devkit/build-angular:extract-i18n"
+      "executor": "@angular/build:extract-i18n"
     },
     "test": {
-      "executor": "@angular-devkit/build-angular:karma",
+      "executor": "@angular/build:karma",
       "options": {
-        "polyfills": ["zone.js", "zone.js/testing"],
+        "polyfills": [
+          "zone.js",
+          "zone.js/testing"
+        ],
         "tsConfig": "tsconfig.spec.json",
         "inlineStyleLanguage": "scss",
         "assets": [
@@ -92,7 +97,9 @@
             "input": "public"
           }
         ],
-        "styles": ["src/styles.scss"],
+        "styles": [
+          "src/styles.scss"
+        ],
         "scripts": []
       }
     }

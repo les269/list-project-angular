@@ -116,7 +116,7 @@ export class ScrapyEditComponent implements OnInit {
       isNotJson(this.model.testJson) ||
       !Array.isArray(JSON.parse(this.model.testJson))
     ) {
-      this.snackbarService.openByI18N('msg.testJsonError');
+      this.snackbarService.openI18N('msg.testJsonError');
       return;
     }
     this.testResult = '';
@@ -149,7 +149,7 @@ export class ScrapyEditComponent implements OnInit {
     if (
       !(Number.isInteger(this.model.paramSize) && this.model.paramSize >= 1)
     ) {
-      this.snackbarService.openByI18N('msg.paramSizeError');
+      this.snackbarService.openI18N('msg.paramSizeError');
       return false;
     }
     return true;
@@ -164,11 +164,11 @@ export class ScrapyEditComponent implements OnInit {
       .pipe(
         switchMap(exist => {
           if (this.status === 'new' && exist) {
-            this.snackbarService.openByI18N('msg.scrapyExist');
+            this.snackbarService.openI18N('msg.scrapyExist');
             return EMPTY;
           }
           if (this.status === 'edit' && !exist) {
-            this.snackbarService.openByI18N('msg.scrapyNotExist');
+            this.snackbarService.openI18N('msg.scrapyNotExist');
             return EMPTY;
           }
           return this.scrapyService.updateConfig(this.model);
@@ -178,7 +178,7 @@ export class ScrapyEditComponent implements OnInit {
         if (back) {
           this.router.navigate(['scrapy-list']);
         }
-        this.snackbarService.openByI18N(
+        this.snackbarService.openI18N(
           type === 'commit' ? 'msg.commitSuccess' : 'msg.saveSuccess'
         );
       });

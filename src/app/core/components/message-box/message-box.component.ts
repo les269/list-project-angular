@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import {
@@ -13,6 +14,7 @@ import { TranslateModule } from '@ngx-translate/core';
 
 export interface MessageBoxData {
   message: string;
+  onlyOk?: boolean;
 }
 
 @Component({
@@ -21,31 +23,16 @@ export interface MessageBoxData {
     MatButtonModule,
     MatDialogActions,
     MatDialogClose,
-    MatDialogTitle,
     MatDialogContent,
     TranslateModule,
+    CommonModule,
   ],
   selector: 'app-message-box',
-  template: `
-    <mat-dialog-content>
-      {{ data.message | translate }}
-    </mat-dialog-content>
-    <mat-dialog-actions>
-      <button mat-button mat-dialog-close (click)="no()">
-        {{ 'g.no' | translate }}
-      </button>
-      <button mat-button mat-dialog-close cdkFocusInitial (click)="ok()">
-        {{ 'g.ok' | translate }}
-      </button>
-    </mat-dialog-actions>
-  `,
+  templateUrl: './message-box.component.html',
 })
-export class MessageBoxComponent implements OnInit {
+export class MessageBoxComponent {
   readonly dialogRef = inject(MatDialogRef<MessageBoxComponent>);
   readonly data = inject<MessageBoxData>(MAT_DIALOG_DATA);
-  constructor() {}
-
-  ngOnInit() {}
 
   ok() {
     this.dialogRef.close('ok');

@@ -1,4 +1,4 @@
-import { Component, Injector, OnDestroy, OnInit } from '@angular/core';
+import { Component, Injector, OnDestroy, OnInit, signal } from '@angular/core';
 import { debounceTime, filter, pipe, Subscription, switchMap, tap } from 'rxjs';
 import { updateTitle } from '../../../shared/state/layout.actions';
 import {
@@ -82,6 +82,7 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
   randomStr = '__random';
   datasetNameStr = '__datasetName';
   colorStr = '__color';
+  refreshDate = signal<Date>(new Date());
 
   webApi = api;
 
@@ -126,6 +127,10 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
           return;
         }
         this.themeService.getByHeaderId(this.headerId).subscribe(res => {
+          if (!res) {
+            this.router.navigate(['']);
+            return;
+          }
           this.themeHeader = res;
 
           this.themeImage = res.themeImage;
@@ -192,6 +197,11 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
               arr.map(a => a.value),
             ])
           );
+          for (const tagId of tagIds) {
+            if (!this.shareTagValueMap[tagId]) {
+              this.shareTagValueMap[tagId] = [];
+            }
+          }
         }),
         switchMap(x =>
           this.datasetService.findDatasetDataByNameList(uniqueDatasetList)
@@ -293,7 +303,8 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
       .refreshDataByNameList(this.useDataset.datasetList)
       .subscribe(x => {
         this.getDataSoure();
-        this.snackbarService.openByI18N('msg.refreshSuccess');
+        this.refreshDate.set(new Date());
+        this.snackbarService.openI18N('msg.refreshSuccess');
       });
   }
 

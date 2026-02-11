@@ -6,7 +6,7 @@
     <mat-icon>close</mat-icon>
   </button>
 </div>
-<mat-dialog-content class="scrollbar-primary">
+<mat-dialog-content class="scrollbar-primary overflow-y-hidden">
   <div class="share-tag-list">
     <div class="toolbar d-flex justify-content-between align-items-center mb-2">
       <div class="filter-box" style="flex: 1; max-width: 420px">
@@ -76,11 +76,14 @@
               mat-header-cell
               *matHeaderCellDef
               class="sticky-header"
-            [ngStyle]="{ width: '150px' }"></th>
+              [ngStyle]="{ width: '150px' }"></th>
             <td mat-cell *matCellDef="let tag">
               <div class="d-flex">
                 <button mat-icon-button (click)="onEditTag(tag)">
                   <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button (click)="onReorderTag(tag)">
+                  <mat-icon>reorder</mat-icon>
                 </button>
                 <button mat-icon-button (click)="deleteTag(tag.shareTagId)">
                   <mat-icon>delete</mat-icon>
@@ -94,14 +97,14 @@
         </table>
       </div>
       @if (!dataSource.data || dataSource.data.length === 0) {
-        <div
-          class="empty mt-2">
+        <div class="empty mt-2">
           {{ 'shareTag.noTags' | translate }}
         </div>
       }
     </div>
   </div>
 </mat-dialog-content>
+
 <!-- Add dialog template (opened by MatDialog) -->
 <ng-template #addTagDialog>
   <h2 mat-dialog-title>{{ 'shareTag.addTag' | translate }}</h2>

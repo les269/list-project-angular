@@ -171,11 +171,11 @@ export class DatasetEditComponent implements OnInit {
       .pipe(
         switchMap(exist => {
           if (this.status === 'new' && exist) {
-            this.snackbarService.openByI18N('msg.datasetExist');
+            this.snackbarService.openI18N('msg.datasetExist');
             return EMPTY;
           }
           if (this.status === 'edit' && !exist) {
-            this.snackbarService.openByI18N('msg.datasetNotExist');
+            this.snackbarService.openI18N('msg.datasetNotExist');
             return EMPTY;
           }
           return this.datasetService.updateDataset(this.model);
@@ -185,7 +185,7 @@ export class DatasetEditComponent implements OnInit {
         if (back) {
           this.router.navigate(['dataset-list']);
         }
-        this.snackbarService.openByI18N(
+        this.snackbarService.openI18N(
           type === 'commit' ? 'msg.commitSuccess' : 'msg.saveSuccess'
         );
       });

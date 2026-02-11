@@ -1,4 +1,12 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  input,
+  Input,
+  OnInit,
+  output,
+  Output,
+} from '@angular/core';
 
 import { ShareTagValue, ThemeTag } from '../../models';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,20 +19,20 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './item-tag-buttons.component.scss',
 })
 export class ItemTagButtonsComponent {
-  @Input({ required: true }) value: string = '';
-  @Input({ required: true }) themeTagList!: ThemeTag[];
-  @Input({ required: true }) data!: any;
-  @Input({ required: true }) shareTagNameMap!: { [key in string]: string };
-  @Input({ required: true }) shareTagValueMap!: { [key in string]: string[] };
-  @Output() tagValueUpdate = new EventEmitter<ShareTagValue>();
+  value = input.required<string>();
+  themeTagList = input.required<ThemeTag[]>();
+  data = input.required<any>();
+  shareTagNameMap = input.required<{ [key in string]: string }>();
+  shareTagValueMap = input.required<{ [key in string]: string[] }>();
+  tagValueUpdate = output<ShareTagValue>();
 
   showTagCheck(shareTagId: string): boolean {
-    return this.shareTagValueMap[shareTagId].includes(this.value);
+    return this.shareTagValueMap()[shareTagId]?.includes(this.value());
   }
 
   onSetTag(shareTagId: string) {
     this.tagValueUpdate.emit({
-      value: this.value,
+      value: this.value(),
       shareTagId,
     });
   }

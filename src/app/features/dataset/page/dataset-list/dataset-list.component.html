@@ -1,7 +1,15 @@
 <div class="col-md-10 offset-md-1 col-xs-12 mt-3">
-  <button type="button" class="btn btn-primary" (click)="onAdd()">
-    {{ 'dataset.createDataset' | translate }}
-  </button>
+  <div class="mb-3 d-flex">
+    <button type="button" class="btn btn-primary" (click)="onAdd()">
+      {{ 'dataset.createDataset' | translate }}
+    </button>
+    <div class="mx-2" style="flex: 1; max-width: 420px">
+      <input
+        class="form-control"
+        [placeholder]="'g.filter' | translate"
+        (input)="applyFilter($event)" />
+    </div>
+  </div>
   <div class="card table-container scrollbar-primary">
     <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort>
       <ng-container matColumnDef="name">
@@ -13,7 +21,7 @@
         </td>
       </ng-container>
       <ng-container matColumnDef="filterType">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'dataset.filterType' | translate }}
         </th>
         <td mat-cell *matCellDef="let element">
@@ -21,7 +29,7 @@
         </td>
       </ng-container>
       <ng-container matColumnDef="groupName">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'dataset.groupName' | translate }}
         </th>
         <td mat-cell *matCellDef="let element">

@@ -64,6 +64,7 @@ export interface ThemeLabel {
   maxWidth: string;
   minWidth: string;
   autoComplete: boolean;
+  visibleDatasetNameList: string[];
 }
 
 export enum ThemeLabelType {

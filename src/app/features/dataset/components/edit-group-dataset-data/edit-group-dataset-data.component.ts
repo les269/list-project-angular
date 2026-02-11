@@ -50,8 +50,8 @@ export interface EditGroupDatasetDataType {
     TranslateModule,
     MatIconModule,
     MatChipsModule,
-    MatFormFieldModule
-],
+    MatFormFieldModule,
+  ],
   templateUrl: './edit-group-dataset-data.component.html',
 })
 export class EditGroupDatasetDataComponent implements OnInit {
@@ -100,7 +100,7 @@ export class EditGroupDatasetDataComponent implements OnInit {
       .pipe(
         tap(x => {
           if (!x) {
-            this.snackbarService.openByI18N('msg.dataNotExist');
+            this.snackbarService.openI18N('msg.dataNotExist');
           }
         }),
         filter(x => x),
@@ -123,10 +123,10 @@ export class EditGroupDatasetDataComponent implements OnInit {
     }
     this.messageBoxService
       .openI18N('msg.sureDeleteDatasetData', {
-        name: this.primeValue,
+        params: { name: this.primeValue },
       })
       .pipe(
-        filter(x => x),
+        filter(x => isNotBlank(x)),
         switchMap(x =>
           this.groupDatasetDataService.existGroupDatasetData(
             this.groupName,
@@ -214,7 +214,7 @@ export class EditGroupDatasetDataComponent implements OnInit {
       json: this.json,
     };
     this.groupDatasetDataService.updateGroupDatasetData(req).subscribe(() => {
-      this.snackbarService.openByI18N('msg.updateSuccess');
+      this.snackbarService.openI18N('msg.updateSuccess');
     });
   }
 
@@ -224,7 +224,7 @@ export class EditGroupDatasetDataComponent implements OnInit {
       return;
     }
     this.messageBoxService
-      .openI18N('msg.sureDeleteImage', { name: this.primeValue })
+      .openI18N('msg.sureDeleteImage', { params: { name: this.primeValue } })
       .pipe(
         switchMap(x => {
           if (x) {
@@ -238,9 +238,9 @@ export class EditGroupDatasetDataComponent implements OnInit {
       )
       .subscribe(res => {
         if (isBlank(res)) {
-          this.snackbarService.openByI18N('msg.deleteImageFail');
+          this.snackbarService.openI18N('msg.deleteImageFail');
         } else {
-          this.snackbarService.openByI18N('msg.deleteImageSuccess', {
+          this.snackbarService.openI18N('msg.deleteImageSuccess', {
             path: res,
           });
         }
