@@ -37,6 +37,7 @@
       "ref": "bc2530c4decd511814e9155a9dab7f6133c63195",
       "subject": "chore: migrate nx to new version"
     },
-    "targetVersion": "next"
+    "targetVersion": "next",
+    "confirmedPackageUpdates": true
   }
 }
