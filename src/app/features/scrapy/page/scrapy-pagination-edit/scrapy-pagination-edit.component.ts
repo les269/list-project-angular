@@ -107,11 +107,11 @@ export class ScrapyPaginationEditComponent implements OnInit {
       .pipe(
         switchMap(exist => {
           if (this.status === 'new' && exist) {
-            this.snackbarService.openByI18N('msg.scrapyExist');
+            this.snackbarService.openI18N('msg.scrapyExist');
             return EMPTY;
           }
           if (this.status === 'edit' && !exist) {
-            this.snackbarService.openByI18N('msg.scrapyNotExist');
+            this.snackbarService.openI18N('msg.scrapyNotExist');
             return EMPTY;
           }
           return this.scrapyPaginationService.update(this.model);
@@ -121,7 +121,7 @@ export class ScrapyPaginationEditComponent implements OnInit {
         if (back) {
           this.onBack();
         }
-        this.snackbarService.openByI18N(
+        this.snackbarService.openI18N(
           type === 'commit' ? 'msg.commitSuccess' : 'msg.saveSuccess'
         );
       });
@@ -142,7 +142,7 @@ export class ScrapyPaginationEditComponent implements OnInit {
         this.model.config.updateInterval >= 0
       )
     ) {
-      this.snackbarService.openByI18N('msg.paramSizeError');
+      this.snackbarService.openI18N('msg.paramSizeError');
       return false;
     }
 

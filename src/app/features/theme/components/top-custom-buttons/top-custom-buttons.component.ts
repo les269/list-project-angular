@@ -111,7 +111,7 @@ export class TopCustomButtonsComponent implements OnInit {
     this.themeService.updateTopCustomValue(req).subscribe(() => {
       this.topCustomValueMap[req.byKey] = value;
       if (options?.isDialogSave) {
-        this.snackbarService.openByI18N('msg.saveSuccess');
+        this.snackbarService.openI18N('msg.saveSuccess');
       }
     });
   }

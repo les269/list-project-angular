@@ -139,7 +139,7 @@ export class CustomButtonsComponent {
     this.themeService.updateCustomValue(req).subscribe(() => {
       this.customValueMap[req.correspondDataValue][req.byKey] = req.customValue;
       if (options?.isDialogSave) {
-        this.snackbarService.openByI18N('msg.saveSuccess');
+        this.snackbarService.openI18N('msg.saveSuccess');
       }
     });
   }
@@ -159,7 +159,7 @@ export class CustomButtonsComponent {
 
   openNewPage(text: string, target: OpenWindowTargetType) {
     if (isBlank(text)) {
-      this.snackbarService.openByI18N('msg.urlEmpty');
+      this.snackbarService.openI18N('msg.urlEmpty');
       return;
     }
     window.open(text, target);
@@ -210,7 +210,7 @@ export class CustomButtonsComponent {
         .delete({ path: replaceValue(custom.deleteFile, data) })
         .subscribe(x => {
           this.fileExist[this.data[this.defaultKey]] = !x;
-          this.snackbarService.openByI18N(
+          this.snackbarService.openI18N(
             x ? 'msg.deleteFileSuccess' : 'msg.deleteFail'
           );
         });
@@ -226,7 +226,7 @@ export class CustomButtonsComponent {
         })
         .subscribe(x => {
           this.fileExist[this.data[this.defaultKey]] = !x;
-          this.snackbarService.openByI18N(
+          this.snackbarService.openI18N(
             x ? 'msg.moveToFileSuccess' : 'msg.moveToFileFail'
           );
         });
@@ -238,7 +238,7 @@ export class CustomButtonsComponent {
       this.fileService
         .openFolder({ path: replaceValue(custom.openFolder, data) })
         .subscribe(x => {
-          this.snackbarService.openByI18N(
+          this.snackbarService.openI18N(
             x ? 'msg.openFolderSuccess' : 'msg.openFolderFail'
           );
         });

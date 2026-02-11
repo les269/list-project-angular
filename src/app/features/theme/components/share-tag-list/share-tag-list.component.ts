@@ -88,13 +88,10 @@ export class ShareTagListComponent implements OnInit {
         switchMap(inUse => {
           if (inUse.length > 0) {
             // show message that the tag is currently bound/used
-            this.messageBoxService.openI18N(
-              'shareTag.inUse',
-              {
-                values: inUse.join('\n'),
-              },
-              true
-            );
+            this.messageBoxService.openI18N('shareTag.inUse', {
+              params: { values: inUse.join('\n') },
+              onlyOk: true,
+            });
             return EMPTY;
           }
           return this.messageBoxService.openI18N('msg.sureDeleteTag');
@@ -107,7 +104,7 @@ export class ShareTagListComponent implements OnInit {
       )
       .subscribe(x => {
         this.dataSource.data = x;
-        this.snackbarService.openByI18N('msg.deleteSuccess');
+        this.snackbarService.openI18N('msg.deleteSuccess');
       });
   }
 
@@ -151,7 +148,7 @@ export class ShareTagListComponent implements OnInit {
       !this.isEdit &&
       this.dataSource.data.find(x => x.shareTagId === this.newTagId.trim())
     ) {
-      this.snackbarService.openByI18N('shareTag.tagDuplicate');
+      this.snackbarService.openI18N('shareTag.tagDuplicate');
       return;
     }
 
@@ -171,7 +168,7 @@ export class ShareTagListComponent implements OnInit {
         if (this.addDialogRef) {
           this.addDialogRef.close();
         }
-        this.snackbarService.openByI18N('msg.addSuccess');
+        this.snackbarService.openI18N('msg.addSuccess');
       });
   }
 

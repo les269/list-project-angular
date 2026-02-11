@@ -17,7 +17,7 @@ export class CopyDirective {
     private renderer: Renderer2,
     private snackbarService: SnackbarService
   ) {}
-  @HostListener('click', ['$event'])
+  @HostListener('click')
   onClick() {
     if (!this.enableCopy) {
       return;
@@ -38,6 +38,6 @@ export class CopyDirective {
       document.execCommand('copy');
       this.renderer.removeChild(document.body, textarea);
     }
-    this.snackbarService.openByI18N('msg.copyText', { text });
+    this.snackbarService.openI18N('msg.copyText', { text });
   }
 }

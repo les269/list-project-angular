@@ -130,11 +130,11 @@ export class ThemeEditComponent implements OnInit {
       .pipe(
         switchMap(exist => {
           if (this.status === 'new' && exist) {
-            this.snackbarService.openByI18N('msg.themeExist');
+            this.snackbarService.openI18N('msg.themeExist');
             return EMPTY;
           }
           if (this.status === 'edit' && !exist) {
-            this.snackbarService.openByI18N('msg.themeNotExist');
+            this.snackbarService.openI18N('msg.themeNotExist');
             return EMPTY;
           }
           return this.themeService.updateTheme(this.model);
@@ -144,7 +144,7 @@ export class ThemeEditComponent implements OnInit {
         if (back) {
           this.router.navigate(['']);
         }
-        this.snackbarService.openByI18N(
+        this.snackbarService.openI18N(
           type === 'commit' ? 'msg.commitSuccess' : 'msg.saveSuccess'
         );
         this.themeService.updateAllTheme();
@@ -217,26 +217,26 @@ export class ThemeEditComponent implements OnInit {
 
       if (this.model.type === 'table') {
         if (isNotBlank(label.width) && !isValidWidth(label.width)) {
-          this.snackbarService.openByI18N('msg.lengthError', {
+          this.snackbarService.openI18N('msg.lengthError', {
             label: this.translateService.instant('themeLabel.width'),
           });
           return false;
         }
         if (isNotBlank(label.minWidth) && !isValidWidth(label.minWidth)) {
-          this.snackbarService.openByI18N('msg.lengthError', {
+          this.snackbarService.openI18N('msg.lengthError', {
             label: this.translateService.instant('themeLabel.minWidth'),
           });
           return false;
         }
         if (isNotBlank(label.maxWidth) && !isValidWidth(label.maxWidth)) {
-          this.snackbarService.openByI18N('msg.lengthError', {
+          this.snackbarService.openI18N('msg.lengthError', {
             label: this.translateService.instant('themeLabel.maxWidth'),
           });
           return false;
         }
       }
       if (isDuplicate(this.model.themeLabelList.map(x => x.byKey))) {
-        this.snackbarService.openByI18N('msg.duplicateColumn', {
+        this.snackbarService.openI18N('msg.duplicateColumn', {
           text: this.translateService.instant('themeLabel.byKey'),
         });
         return false;
@@ -261,7 +261,7 @@ export class ThemeEditComponent implements OnInit {
   validationDataset() {
     for (let dataset of this.model.themeDatasetList) {
       if (dataset.datasetList.length === 0) {
-        this.snackbarService.openByI18N('themeDataset.datasetEmpty');
+        this.snackbarService.openI18N('themeDataset.datasetEmpty');
         return false;
       }
       if (isBlank(dataset.label)) {
@@ -270,7 +270,7 @@ export class ThemeEditComponent implements OnInit {
       }
     }
     if (isDuplicate(this.model.themeDatasetList.map(x => x.label))) {
-      this.snackbarService.openByI18N('themeDataset.labelDuplicate');
+      this.snackbarService.openI18N('themeDataset.labelDuplicate');
       return false;
     }
 
@@ -285,7 +285,7 @@ export class ThemeEditComponent implements OnInit {
       }
     }
     if (isDuplicate(this.model.themeTagList.map(x => x.shareTagId))) {
-      this.snackbarService.openByI18N('themeTag.tagDuplicate');
+      this.snackbarService.openI18N('themeTag.tagDuplicate');
       return false;
     }
     return true;
@@ -293,7 +293,7 @@ export class ThemeEditComponent implements OnInit {
   validCustom() {
     //byKey不可重複
     if (isDuplicate(this.model.themeCustomList.map(x => x.byKey))) {
-      this.snackbarService.openByI18N('msg.duplicateColumn', {
+      this.snackbarService.openI18N('msg.duplicateColumn', {
         text: this.translateService.instant('themeCustom.byKey'),
       });
       return false;
@@ -364,7 +364,7 @@ export class ThemeEditComponent implements OnInit {
       this.model.type === 'imageList' &&
       this.model.themeOtherSetting.listPageSize <= 0
     ) {
-      this.snackbarService.openByI18N('otherSetting.listPageSizeMoreZero');
+      this.snackbarService.openI18N('otherSetting.listPageSizeMoreZero');
       return false;
     }
     for (let custom of this.model.themeOtherSetting.themeTopCustomList) {

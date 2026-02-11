@@ -123,7 +123,7 @@ export class ShareTagValueListComponent implements OnInit {
       )
       .subscribe(x => {
         this.dataSource.data = x;
-        this.snackbarService.openByI18N('msg.deleteSuccess');
+        this.snackbarService.openI18N('msg.deleteSuccess');
         this.selection.clear();
       });
   }
@@ -146,7 +146,7 @@ export class ShareTagValueListComponent implements OnInit {
       )
       .subscribe(x => {
         this.dataSource.data = x;
-        this.snackbarService.openByI18N('msg.deleteSuccess');
+        this.snackbarService.openI18N('msg.deleteSuccess');
       });
   }
 
@@ -186,11 +186,11 @@ export class ShareTagValueListComponent implements OnInit {
       .subscribe({
         next: data => {
           this.dataSource.data = data;
-          this.snackbarService.openByI18N('msg.addSuccess');
+          this.snackbarService.openI18N('msg.addSuccess');
           this.closeAddValueDialog();
         },
         error: () => {
-          this.snackbarService.openByI18N('msg.addFailed');
+          this.snackbarService.openI18N('msg.addFailed');
         },
       });
   }

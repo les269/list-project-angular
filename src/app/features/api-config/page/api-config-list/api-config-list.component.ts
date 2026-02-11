@@ -71,7 +71,7 @@ export class ApiConfigListComponent implements OnInit {
     this.messageBoxService.openI18N('msg.sureDeleteApi').subscribe(result => {
       if (isNotBlank(result)) {
         this.apiConfigService.delete(this.list[index]).subscribe(() => {
-          this.snackbarService.openByI18N('msg.deleteSuccess');
+          this.snackbarService.openI18N('msg.deleteSuccess');
           this.getList();
         });
       }

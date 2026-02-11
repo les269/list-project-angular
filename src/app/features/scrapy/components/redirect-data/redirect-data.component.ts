@@ -54,7 +54,7 @@ export class RedirectDataComponent implements OnInit {
       .subscribe(res => {
         this.source = res;
         this.updateKeyRedirectUrl();
-        this.snackbarService.openByI18N('msg.updateSuccess');
+        this.snackbarService.openI18N('msg.updateSuccess');
       });
   }
   updateKeyRedirectUrl() {

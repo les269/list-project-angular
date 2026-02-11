@@ -10,6 +10,13 @@ $theme: mat.define-theme(
   )
 );
 
+:root {
+  --header-height: 48px;
+  --setting-sidebar-width: 240px;
+  --spec-text-primary: #0f0f0f;
+  --spec-text-secondary: #606060;
+}
+
 body {
   font-family: Roboto, 'Helvetica Neue', sans-serif;
 

@@ -74,7 +74,7 @@ export class GroupDatasetListComponent implements OnInit, AfterViewInit {
           this.groupDatasetService
             .deleteGroupDataset(e.groupName)
             .subscribe(() => {
-              this.snackbarService.openByI18N('msg.deleteSuccess');
+              this.snackbarService.openI18N('msg.deleteSuccess');
               this.getList();
             });
         }
@@ -93,7 +93,7 @@ export class GroupDatasetListComponent implements OnInit, AfterViewInit {
       .afterClosed()
       .subscribe(result => {
         if (isNotBlank(result)) {
-          this.snackbarService.openByI18N('msg.copySuccess');
+          this.snackbarService.openI18N('msg.copySuccess');
           this.getList();
         }
       });

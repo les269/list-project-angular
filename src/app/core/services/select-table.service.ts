@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable, LOCALE_ID } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ApiConfig } from '../../features/api-config/model';
 import {
@@ -6,25 +6,23 @@ import {
   SelectTableDialog,
 } from '../components/select-table/select-table.dialog';
 import { ScrapyConfig, ScrapyPagination } from '../../features/scrapy/model';
-import { DatePipe } from '@angular/common';
+import { DatePipe, formatDate } from '@angular/common';
 import {
   Dataset,
   GroupDataset,
   GroupDatasetData,
 } from '../../features/dataset/model';
 import { ShareTag } from '../../features/theme/models';
-import { ThemeTag } from '../../features/theme/models';
 import { ReplaceValueMap } from '../../features/replace-value-map/model';
 import { TranslateService } from '@ngx-translate/core';
 import { isNotBlank } from '../../shared/util/helper';
 import { filter } from 'rxjs';
+import { DatabaseConfig } from '../../features/setting/model';
 
 @Injectable({ providedIn: 'root' })
 export class SelectTableService {
-  constructor(
-    private matDialog: MatDialog,
-    private translateService: TranslateService
-  ) {}
+  matDialog = inject(MatDialog);
+  translateService = inject(TranslateService);
 
   selectSingleApi(dataSource: ApiConfig[]) {
     const data: BaseSelectTableData<ApiConfig> = {
@@ -38,132 +36,75 @@ export class SelectTableService {
       dataSource,
       selectType: 'single',
     };
-    return this.matDialog
-      .open<
-        SelectTableDialog<ApiConfig, BaseSelectTableData<ApiConfig>>,
-        BaseSelectTableData<ApiConfig>,
-        ApiConfig
-      >(SelectTableDialog, {
-        data,
-      })
-      .afterClosed()
-      .pipe(filter(res => res !== undefined));
+    return this.openSelectDialog(data);
   }
 
   selectSingleScrapy(dataSource: ScrapyConfig[]) {
-    const datePipe = new DatePipe('en-US');
     const data: BaseSelectTableData<ScrapyConfig> = {
       displayedColumns: ['name', 'createdTime', 'updatedTime'],
       labels: ['scrapy.name', 'g.createdTime', 'g.updatedTime'],
       dataSource,
       selectType: 'single',
       columnFormats: {
-        createdTime: (value: any) =>
-          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
-        updatedTime: (value: any) =>
-          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
+        createdTime: this.dateTransform,
+        updatedTime: this.dateTransform,
       },
     };
-    return this.matDialog
-      .open<
-        SelectTableDialog<ScrapyConfig, BaseSelectTableData<ScrapyConfig>>,
-        BaseSelectTableData<ScrapyConfig>,
-        ScrapyConfig
-      >(SelectTableDialog, {
-        data,
-      })
-      .afterClosed()
-      .pipe(filter(res => res !== undefined));
+    return this.openSelectDialog(data);
   }
 
   selectSingleDataset(dataSource: Dataset[]) {
-    const datePipe = new DatePipe('en-US');
     const data: BaseSelectTableData<Dataset> = {
       displayedColumns: ['name', 'createdTime', 'updatedTime'],
       labels: ['dataset.name', 'g.createdTime', 'g.updatedTime'],
       dataSource,
       selectType: 'single',
       columnFormats: {
-        createdTime: (value: any) =>
-          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
-        updatedTime: (value: any) =>
-          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
+        createdTime: this.dateTransform,
+        updatedTime: this.dateTransform,
       },
     };
-    return this.matDialog
-      .open<
-        SelectTableDialog<Dataset, BaseSelectTableData<Dataset>>,
-        BaseSelectTableData<Dataset>,
-        Dataset
-      >(SelectTableDialog, {
-        data,
-      })
-      .afterClosed();
+    return this.openSelectDialog(data);
   }
 
   selectMultipleDataset(dataSource: Dataset[], selected: Dataset[]) {
-    const datePipe = new DatePipe('en-US');
     const data: BaseSelectTableData<Dataset> = {
       displayedColumns: ['name', 'createdTime', 'updatedTime'],
       labels: ['dataset.name', 'g.createdTime', 'g.updatedTime'],
       dataSource,
       selectType: 'multiple',
       columnFormats: {
-        createdTime: (value: any) =>
-          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
-        updatedTime: (value: any) =>
-          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
+        createdTime: this.dateTransform,
+        updatedTime: this.dateTransform,
       },
       selected,
     };
-    return this.matDialog
-      .open<
-        SelectTableDialog<Dataset, BaseSelectTableData<Dataset>>,
-        BaseSelectTableData<Dataset>,
-        Dataset[]
-      >(SelectTableDialog, {
-        data,
-      })
-      .afterClosed();
+    return this.openMultipleSelectDialog(data);
   }
 
   selectSingleGroupDataset(dataSource: GroupDataset[]) {
-    const datePipe = new DatePipe('en-US');
     const data: BaseSelectTableData<GroupDataset> = {
       displayedColumns: ['groupName', 'createdTime', 'updatedTime'],
       labels: ['dataset.groupName', 'g.createdTime', 'g.updatedTime'],
       dataSource,
       selectType: 'single',
       columnFormats: {
-        createdTime: (value: any) =>
-          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
-        updatedTime: (value: any) =>
-          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
+        createdTime: this.dateTransform,
+        updatedTime: this.dateTransform,
       },
     };
-    return this.matDialog
-      .open<
-        SelectTableDialog<GroupDataset, BaseSelectTableData<GroupDataset>>,
-        BaseSelectTableData<GroupDataset>,
-        GroupDataset
-      >(SelectTableDialog, {
-        data,
-      })
-      .afterClosed();
+    return this.openSelectDialog(data);
   }
 
   selectSingleGroupDatasetData(dataSource: GroupDatasetData[]) {
-    const datePipe = new DatePipe('en-US');
     const data: BaseSelectTableData<GroupDatasetData> = {
       displayedColumns: ['primeValue', 'createdTime', 'updatedTime'],
       labels: ['dataset.primeValue', 'g.createdTime', 'g.updatedTime'],
       dataSource,
       selectType: 'single',
       columnFormats: {
-        createdTime: (value: any) =>
-          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
-        updatedTime: (value: any) =>
-          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
+        createdTime: this.dateTransform,
+        updatedTime: this.dateTransform,
       },
       columnSorts: {
         primeValue: true,
@@ -172,18 +113,7 @@ export class SelectTableService {
       },
       enableFilter: true,
     };
-    return this.matDialog
-      .open<
-        SelectTableDialog<
-          GroupDatasetData,
-          BaseSelectTableData<GroupDatasetData>
-        >,
-        BaseSelectTableData<GroupDatasetData>,
-        GroupDatasetData
-      >(SelectTableDialog, {
-        data,
-      })
-      .afterClosed();
+    return this.openSelectDialog(data);
   }
 
   selectMutipleTag(dataSource: ShareTag[], selected: ShareTag[]) {
@@ -195,54 +125,32 @@ export class SelectTableService {
       selected,
       showTitle: false,
     };
-    return this.matDialog
-      .open<
-        SelectTableDialog<ShareTag, BaseSelectTableData<ShareTag>>,
-        BaseSelectTableData<ShareTag>,
-        ShareTag[]
-      >(SelectTableDialog, {
-        data,
-      })
-      .afterClosed();
+    return this.openMultipleSelectDialog(data);
   }
 
   selectSingleShareTag(dataSource: ShareTag[]) {
-    const datePipe = new DatePipe('en-US');
     const data: BaseSelectTableData<ShareTag> = {
       displayedColumns: ['shareTagId', 'shareTagName', 'updatedTime'],
       labels: ['shareTag.tagId', 'shareTag.tagName', 'g.updatedTime'],
       dataSource,
       selectType: 'single',
       columnFormats: {
-        updatedTime: (value: any) =>
-          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
+        updatedTime: this.dateTransform,
       },
       showTitle: false,
     };
-    return this.matDialog
-      .open<
-        SelectTableDialog<ShareTag, BaseSelectTableData<ShareTag>>,
-        BaseSelectTableData<ShareTag>,
-        ShareTag
-      >(SelectTableDialog, {
-        data,
-      })
-      .afterClosed()
-      .pipe(filter(res => res !== undefined));
+    return this.openSelectDialog(data);
   }
 
   selectSingleReplaceValueMap(dataSource: ReplaceValueMap[]) {
-    const datePipe = new DatePipe('en-US');
     const data: BaseSelectTableData<ReplaceValueMap> = {
       displayedColumns: ['name', 'createdTime', 'updatedTime'],
       labels: ['dataset.name', 'g.createdTime', 'g.updatedTime'],
       dataSource,
       selectType: 'single',
       columnFormats: {
-        createdTime: (value: any) =>
-          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
-        updatedTime: (value: any) =>
-          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
+        createdTime: this.dateTransform,
+        updatedTime: this.dateTransform,
       },
       columnSorts: {
         primeValue: true,
@@ -252,19 +160,7 @@ export class SelectTableService {
       enableFilter: true,
       title: this.translateService.instant('title.selectReplaceValueMap'),
     };
-    return this.matDialog
-      .open<
-        SelectTableDialog<
-          ReplaceValueMap,
-          BaseSelectTableData<ReplaceValueMap>
-        >,
-        BaseSelectTableData<ReplaceValueMap>,
-        ReplaceValueMap
-      >(SelectTableDialog, {
-        data,
-      })
-      .afterClosed()
-      .pipe(filter(x => x !== undefined));
+    return this.openSelectDialog(data);
   }
 
   selectMultipleValue(valueList: string[], selectedValue: string[] | string) {
@@ -290,46 +186,45 @@ export class SelectTableService {
       showTitle: false,
       enableFilter: true,
     };
-    return this.matDialog
-      .open<
-        SelectTableDialog<
-          { value: string },
-          BaseSelectTableData<{ value: string }>
-        >,
-        BaseSelectTableData<{ value: string }>,
-        { value: string }[]
-      >(SelectTableDialog, {
-        data,
-      })
-      .afterClosed()
-      .pipe(filter(res => res !== undefined));
+    return this.openMultipleSelectDialog(data);
   }
 
   selectSingleScrapyPagination(dataSource: ScrapyPagination[]) {
-    const datePipe = new DatePipe('en-US');
     const data: BaseSelectTableData<ScrapyPagination> = {
       displayedColumns: ['name', 'createdTime', 'updatedTime'],
       labels: ['g.name', 'g.createdTime', 'g.updatedTime'],
       dataSource,
       selectType: 'single',
       columnFormats: {
-        createdTime: (value: any) =>
-          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
-        updatedTime: (value: any) =>
-          datePipe.transform(value, 'yyyy-MM-dd HH:mm:ss') || '',
+        createdTime: this.dateTransform,
+        updatedTime: this.dateTransform,
       },
     };
+    return this.openSelectDialog(data);
+  }
+
+  dateTransform(value: any): string {
+    return formatDate(value, 'yyyy-MM-dd HH:mm:ss', 'en-US') || '';
+  }
+
+  private openSelectDialog<T>(config: BaseSelectTableData<T>) {
     return this.matDialog
       .open<
-        SelectTableDialog<
-          ScrapyPagination,
-          BaseSelectTableData<ScrapyPagination>
-        >,
-        BaseSelectTableData<ScrapyPagination>,
-        ScrapyPagination
-      >(SelectTableDialog, {
-        data,
-      })
-      .afterClosed();
+        SelectTableDialog<T, BaseSelectTableData<T>>,
+        BaseSelectTableData<T>,
+        T
+      >(SelectTableDialog, { data: config })
+      .afterClosed()
+      .pipe(filter(x => x !== undefined));
+  }
+  private openMultipleSelectDialog<T>(config: BaseSelectTableData<T>) {
+    return this.matDialog
+      .open<
+        SelectTableDialog<T, BaseSelectTableData<T>>,
+        BaseSelectTableData<T>,
+        T[]
+      >(SelectTableDialog, { data: config })
+      .afterClosed()
+      .pipe(filter(res => res !== undefined));
   }
 }

@@ -44,7 +44,13 @@
     "urlEmpty": "網址為空無法開啟請再確認",
     "updateIntervalError": "更新間隔為整數且最少為0",
     "sureDeleteTag": "是否要刪除該標籤?",
-    "sureDeleteTagValue": "是否要刪除所選標籤值?"
+    "sureDeleteTagValue": "是否要刪除所選標籤值?",
+    "testConnectionSuccess": "測試連線成功",
+    "testConnectionFailed": "測試連線失敗: {{message}}",
+    "pleaseTestIfUpdata": "資料已經變動請再次測試連線後再進行保存",
+    "configIdExist": "設定ID已經存在",
+    "sureDeleteDatabaseConfig": "是否要刪除該資料庫設定?",
+    "changeDatabaseSuccess": "更換資料庫成功"
   },
   "g": {
     "edit": "編輯",
@@ -97,7 +103,9 @@
     "keywordSearch": "關鍵字搜尋",
     "deleteSelected": "刪除所選",
     "zoomIn": "放大",
-    "openNewWindow": "新視窗"
+    "openNewWindow": "新視窗",
+    "description": "描述",
+    "useThis": "使用這個"
   },
   "title": {
     "home": "主題清單列表",
@@ -124,7 +132,9 @@
     "scrapyPaginationList": "爬蟲處理分頁清單",
     "scrapyPaginationEdit": "爬蟲處理分頁編輯",
     "redirectData": "跳轉網址資訊",
-    "setting": "設定"
+    "setting": "設定",
+    "database": "資料庫",
+    "databaseEdit": "資料庫設定"
   },
   "home": {
     "createTheme": "創建主題",
@@ -391,5 +401,24 @@
     "tagValueList": "標籤值清單",
     "inUse": "目前該標籤使用中如需刪除需要清除使用該標籤的所有清單才可進行刪除 {{values}}",
     "addTagValue": "新增標籤值"
+  },
+  "database": {
+    "currentDatabaseId": "當前所使用的資料庫ID",
+    "currentDatabaseName": "當前所使用的資料庫名稱",
+    "databaseConfigList": "資料庫清單",
+    "changeDatabaseConfig": "更換使用的資料庫",
+    "createDatabaseConfig": "創建資料庫設定",
+    "editDatabaseConfig": "編輯資料庫設定",
+    "databaseType": "資料庫類型",
+    "configId": "資料庫ID",
+    "configName": "資料庫名稱",
+    "host": "主機位址",
+    "port": "連接埠",
+    "username": "使用者名稱",
+    "password": "密碼",
+    "databaseName": "資料庫名稱",
+    "testConnection": "測試連線",
+    "connectionSuccess": "連線成功",
+    "connectionFailed": "連線失敗"
   }
 }

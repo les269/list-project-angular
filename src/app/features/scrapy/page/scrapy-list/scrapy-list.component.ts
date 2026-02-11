@@ -65,7 +65,7 @@ export class ScrapyListComponent implements OnInit, AfterViewInit {
       .subscribe(result => {
         if (isNotBlank(result)) {
           this.scapyService.deleteConfig(e.name).subscribe(() => {
-            this.snackbarService.openByI18N('msg.deleteSuccess');
+            this.snackbarService.openI18N('msg.deleteSuccess');
             this.getList();
           });
         }
@@ -84,7 +84,7 @@ export class ScrapyListComponent implements OnInit, AfterViewInit {
       .afterClosed()
       .subscribe(result => {
         if (isNotBlank(result)) {
-          this.snackbarService.openByI18N('msg.copySuccess');
+          this.snackbarService.openI18N('msg.copySuccess');
           this.getList();
         }
       });

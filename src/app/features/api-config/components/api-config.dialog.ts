@@ -76,14 +76,14 @@ export class ApiConfigDialog {
       this.type === 'add' &&
       this.list.find(x => x.apiName === apiName.trim())
     ) {
-      this.snackbarService.openByI18N('msg.apiExist');
+      this.snackbarService.openI18N('msg.apiExist');
       return;
     }
     if (
       (httpMethod === 'post' || httpMethod === 'put') &&
       isNotJson(requestBody)
     ) {
-      this.snackbarService.openByI18N('msg.jsonError');
+      this.snackbarService.openI18N('msg.jsonError');
       return;
     }
     this.apiConfigService

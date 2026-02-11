@@ -29,8 +29,8 @@ import { EMPTY, switchMap } from 'rxjs';
     MatDialogClose,
     MatDialogTitle,
     MatDialogContent,
-    TranslateModule
-],
+    TranslateModule,
+  ],
   templateUrl: './copy-scrapy.component.html',
 })
 export class CopyScrapyComponent {
@@ -52,7 +52,7 @@ export class CopyScrapyComponent {
       .pipe(
         switchMap(res => {
           if (res) {
-            this.snackbarService.openByI18N('msg.scrapyExist');
+            this.snackbarService.openI18N('msg.scrapyExist');
             return EMPTY;
           }
           return this.scrapyService.updateConfig(this.source);

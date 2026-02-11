@@ -136,7 +136,7 @@ export class ReplaceValueMapComponent implements AfterViewInit {
     };
 
     this.replaceValueMapService.update(req).subscribe(() => {
-      this.snackbarService.openByI18N('msg.updateSuccess');
+      this.snackbarService.openI18N('msg.updateSuccess');
     });
   }
 
@@ -158,7 +158,7 @@ export class ReplaceValueMapComponent implements AfterViewInit {
       .subscribe(result => {
         this.searchName = '';
         this.dataSource.data = [];
-        this.snackbarService.openByI18N('msg.deleteSuccess');
+        this.snackbarService.openI18N('msg.deleteSuccess');
       });
   }
 

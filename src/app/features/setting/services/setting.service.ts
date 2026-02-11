@@ -19,4 +19,14 @@ export class SettingService {
   updateAll(req: Setting[]): Observable<void> {
     return this.http.post<void>(`${this.prefix}/update/all`, req);
   }
+
+  getByName(name: string): Observable<Setting> {
+    return this.http.get<Setting>(`${this.prefix}/get-by-name`, {
+      params: { name },
+    });
+  }
+
+  changeDatabase(req: Setting): Observable<void> {
+    return this.http.post<void>(`${this.prefix}/changeDatabase`, req);
+  }
 }

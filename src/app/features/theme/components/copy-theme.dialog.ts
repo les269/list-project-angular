@@ -45,55 +45,54 @@ import { SnackbarService } from '../../../core/services/snackbar.service';
           id="name"
           name="name"
           #name="ngModel" />
-        </div>
-        <div class="mb-3">
-          <label for="version" class="form-label">{{
-            'themeHeader.version' | translate
-          }}</label>
-          <input
-            type="text"
-            class="form-control"
-            [(ngModel)]="target.version"
-            id="version"
-            name="version" />
-          </div>
-          <div class="mb-3">
-            <label class="form-label" for="type">{{
-              'themeHeader.type' | translate
-            }}</label>
-            <select
-              class="form-control form-select"
-              [(ngModel)]="target.type"
-              name="type">
-              @for (type of eThemeHeaderType | keyvalue; track type) {
-                <option
-                  [ngValue]="type.key">
-                  {{ 'themeHeader.' + type.key | translate }}
-                </option>
-              }
-            </select>
-          </div>
-          <div class="mb-3">
-            <label for="title" class="form-label">{{
-              'themeHeader.title' | translate
-            }}</label>
-            <input
-              type="text"
-              class="form-control"
-              [(ngModel)]="target.title"
-              id="title"
-              name="title" />
-            </div>
-          </mat-dialog-content>
-          <mat-dialog-actions>
-            <button mat-button mat-dialog-close>
-              {{ 'g.no' | translate }}
-            </button>
-            <button mat-button cdkFocusInitial (click)="ok()">
-              {{ 'g.ok' | translate }}
-            </button>
-          </mat-dialog-actions>
-    `,
+      </div>
+      <div class="mb-3">
+        <label for="version" class="form-label">{{
+          'themeHeader.version' | translate
+        }}</label>
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="target.version"
+          id="version"
+          name="version" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="type">{{
+          'themeHeader.type' | translate
+        }}</label>
+        <select
+          class="form-control form-select"
+          [(ngModel)]="target.type"
+          name="type">
+          @for (type of eThemeHeaderType | keyvalue; track type) {
+            <option [ngValue]="type.key">
+              {{ 'themeHeader.' + type.key | translate }}
+            </option>
+          }
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="title" class="form-label">{{
+          'themeHeader.title' | translate
+        }}</label>
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="target.title"
+          id="title"
+          name="title" />
+      </div>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-button mat-dialog-close>
+        {{ 'g.no' | translate }}
+      </button>
+      <button mat-button cdkFocusInitial (click)="ok()">
+        {{ 'g.ok' | translate }}
+      </button>
+    </mat-dialog-actions>
+  `,
 })
 export class CopyThemeComponent implements OnInit {
   readonly dialogRef = inject(MatDialogRef<CopyThemeComponent>);
@@ -139,7 +138,7 @@ export class CopyThemeComponent implements OnInit {
       .pipe(
         switchMap(res => {
           if (res) {
-            this.snackbarService.openByI18N('msg.themeExist');
+            this.snackbarService.openI18N('msg.themeExist');
             return EMPTY;
           }
           return this.themeService.copyTheme({

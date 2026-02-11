@@ -127,6 +127,10 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
           return;
         }
         this.themeService.getByHeaderId(this.headerId).subscribe(res => {
+          if (!res) {
+            this.router.navigate(['']);
+            return;
+          }
           this.themeHeader = res;
 
           this.themeImage = res.themeImage;
@@ -300,7 +304,7 @@ export class ListBaseViewComponent implements OnInit, OnDestroy {
       .subscribe(x => {
         this.getDataSoure();
         this.refreshDate.set(new Date());
-        this.snackbarService.openByI18N('msg.refreshSuccess');
+        this.snackbarService.openI18N('msg.refreshSuccess');
       });
   }
 

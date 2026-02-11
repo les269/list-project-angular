@@ -37,7 +37,6 @@ export class ThemeListComponent implements OnInit {
     private router: Router,
     private themeService: ThemeService,
     private snackbarService: SnackbarService,
-    private translateService: TranslateService,
     private store: Store,
     private matDialog: MatDialog,
     private messageBoxService: MessageBoxService
@@ -69,7 +68,7 @@ export class ThemeListComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe(result => {
       if (isNotBlank(result)) {
-        this.snackbarService.openByI18N('msg.copySuccess');
+        this.snackbarService.openI18N('msg.copySuccess');
         this.updateAllTheme();
       }
     });
@@ -78,7 +77,7 @@ export class ThemeListComponent implements OnInit {
     this.messageBoxService.openI18N('msg.sureDeleteTheme').subscribe(result => {
       if (isNotBlank(result)) {
         this.themeService.deleteTheme(item).subscribe(() => {
-          this.snackbarService.openByI18N('msg.deleteSuccess');
+          this.snackbarService.openI18N('msg.deleteSuccess');
           this.updateAllTheme();
         });
       }

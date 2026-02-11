@@ -10,12 +10,18 @@ export class MessageBoxService {
     private translateService: TranslateService
   ) {}
 
-  openI18N(msg: string, obj?: Object, onlyOk?: boolean) {
+  openI18N(
+    msg: string,
+    obj?: {
+      params?: Object;
+      onlyOk?: boolean;
+    }
+  ): import('rxjs').Observable<string> {
     return this.matDialog
       .open(MessageBoxComponent, {
         data: {
-          message: this.translateService.instant(msg, obj),
-          onlyOk: onlyOk,
+          message: this.translateService.instant(msg, obj?.params),
+          onlyOk: obj?.onlyOk,
         },
       })
       .afterClosed();

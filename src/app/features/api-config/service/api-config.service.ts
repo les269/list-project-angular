@@ -29,12 +29,12 @@ export class ApiConfigService {
 
   callSingleApi(apiConfig: ApiConfig, data: any) {
     if (isNull(apiConfig)) {
-      this.snackbarService.openByI18N('msg.apiConfigEmtpy');
+      this.snackbarService.openI18N('msg.apiConfigEmtpy');
       return;
     }
     this.getById(apiConfig.apiName).subscribe(res => {
       if (isNull(res)) {
-        this.snackbarService.openByI18N('msg.apiConfigError');
+        this.snackbarService.openI18N('msg.apiConfigError');
         return;
       }
       this.callByConfig([res], data);

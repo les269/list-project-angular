@@ -1,0 +1,9 @@
+<div class="title">{{ 'title.setting' | translate }}</div>
+<div>
+  @for (item of routes; track $index) {
+    <app-setting-link
+      [text]="item.text | translate"
+      [link]="item.link"
+      [active]="router.url === item.link"></app-setting-link>
+  }
+</div>

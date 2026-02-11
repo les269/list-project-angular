@@ -5,7 +5,7 @@
   > div.topbar-component {
     background: #2196f3 !important;
     padding: 0.5rem 1rem;
-    height: 100%;
+    height: var(--header-height);
     display: flex;
     flex-direction: row;
     justify-content: space-between;

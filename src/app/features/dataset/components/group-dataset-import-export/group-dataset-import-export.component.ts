@@ -11,7 +11,7 @@ import {
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { GroupDatasetDataService } from '../../service/group-dataset-data.service';
-import { EMPTY, filter, map, of, switchMap } from 'rxjs';
+import { EMPTY, filter, map, switchMap } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import {
   downloadJsonFile,
@@ -33,8 +33,8 @@ import { GroupDatasetData } from '../../model';
     ReactiveFormsModule,
     FormsModule,
     MatIconModule,
-    MatButtonModule
-],
+    MatButtonModule,
+  ],
   templateUrl: './group-dataset-import-export.component.html',
 })
 export class GroupDatasetImportExportComponent {
@@ -82,13 +82,13 @@ export class GroupDatasetImportExportComponent {
           ),
           switchMap(req => {
             if (req.length === 0) {
-              this.snackbarService.openByI18N('msg.importError');
+              this.snackbarService.openI18N('msg.importError');
               return EMPTY;
             } // 中斷流程，如果資料不正確
             return this.messageBoxService
-              .openI18N('msg.importNum', { number: req.length })
+              .openI18N('msg.importNum', { params: { number: req.length } })
               .pipe(
-                filter(confirmation => confirmation),
+                filter(confirmation => isNotBlank(confirmation)),
                 switchMap(() =>
                   this.groupDatasetDataService.updateGroupDatasetDataList(req)
                 )
@@ -96,7 +96,7 @@ export class GroupDatasetImportExportComponent {
           })
         )
         .subscribe(x => {
-          this.snackbarService.openByI18N('msg.importSuccess');
+          this.snackbarService.openI18N('msg.importSuccess');
         });
       reader.readAsText(input.files[0]);
       input.value = '';
@@ -125,7 +125,7 @@ export class GroupDatasetImportExportComponent {
           item.hasOwnProperty('json')
       );
       if (!isValidFormat) {
-        this.snackbarService.openByI18N('msg.importError');
+        this.snackbarService.openI18N('msg.importError');
         return [];
       }
       return data.map(item => ({

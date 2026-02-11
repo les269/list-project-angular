@@ -150,6 +150,16 @@ export const routes: Routes = [
         mod => mod.SettingComponent
       ),
     data: { title: 'title.setting', sidenav: true },
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import(
+            './features/setting/page/setting-database/setting-database.component'
+          ).then(mod => mod.SettingDatabaseComponent),
+        data: { subtitle: 'title.database' },
+      },
+    ],
   },
   { path: '**', redirectTo: '' },
 ];

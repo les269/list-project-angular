@@ -97,7 +97,7 @@ export class DatasetListComponent implements OnInit, AfterViewInit {
       .subscribe(result => {
         if (isNotBlank(result)) {
           this.datasetService.deleteDataset(e.name).subscribe(() => {
-            this.snackbarService.openByI18N('msg.deleteSuccess');
+            this.snackbarService.openI18N('msg.deleteSuccess');
             this.getList();
           });
         }
@@ -114,7 +114,7 @@ export class DatasetListComponent implements OnInit, AfterViewInit {
       .afterClosed()
       .subscribe(result => {
         if (isNotBlank(result)) {
-          this.snackbarService.openByI18N('msg.copySuccess');
+          this.snackbarService.openI18N('msg.copySuccess');
           this.getList();
         }
       });
@@ -126,7 +126,7 @@ export class DatasetListComponent implements OnInit, AfterViewInit {
     this.isRefreshing = true;
     this.datasetService.refreshData(e.name).subscribe(
       x => {
-        this.snackbarService.openByI18N('msg.refreshSuccess');
+        this.snackbarService.openI18N('msg.refreshSuccess');
       },
       e => {
         this.isRefreshing = false;
