@@ -1,0 +1,23 @@
+<div mat-dialog-title>
+  {{ 'disk.addDisk' | translate }}
+</div>
+
+<div mat-dialog-content>
+  <mat-form-field>
+    <mat-label>{{ 'disk.diskCode' | translate }}</mat-label>
+    <mat-select [(value)]="selectedDisk">
+      <mat-option *ngFor="let option of diskOptions" [value]="option">
+        {{ option }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
+<div mat-dialog-actions>
+  <button mat-button (click)="onCancel()">
+    {{ 'g.cancel' | translate }}
+  </button>
+  <button mat-button (click)="onConfirm()">
+    {{ 'g.confirm' | translate }}
+  </button>
+</div>

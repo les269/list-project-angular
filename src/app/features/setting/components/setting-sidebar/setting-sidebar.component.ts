@@ -19,5 +19,9 @@ export class SettingSidebarComponent {
       link: '/setting',
       text: 'title.database',
     },
+    {
+      link: '/setting/disk',
+      text: 'title.disk',
+    },
   ];
 }

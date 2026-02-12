@@ -18,3 +18,7 @@
 .cuurent-database-text {
   color: var(--spec-text-secondary);
 }
+.mat-row > td,
+.mat-header-row > th {
+  border-bottom: solid #ccc 1px;
+}

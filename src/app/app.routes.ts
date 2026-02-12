@@ -159,6 +159,14 @@ export const routes: Routes = [
           ).then(mod => mod.SettingDatabaseComponent),
         data: { subtitle: 'title.database' },
       },
+      {
+        path: 'disk',
+        loadComponent: () =>
+          import(
+            './features/setting/page/disk-management/disk-management.component'
+          ).then(mod => mod.DiskManagementComponent),
+        data: { subtitle: 'title.disk' },
+      },
     ],
   },
   { path: '**', redirectTo: '' },

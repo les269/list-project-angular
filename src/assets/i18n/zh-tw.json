@@ -2,6 +2,7 @@
   "msg": {
     "blank": "{{name}} 不可以為空",
     "deleteSuccess": "刪除成功",
+    "deleteFailed": "刪除失敗",
     "copySuccess": "複製成功",
     "commitSuccess": "提交成功",
     "addSuccess": "新增成功",
@@ -50,7 +51,10 @@
     "pleaseTestIfUpdata": "資料已經變動請再次測試連線後再進行保存",
     "configIdExist": "設定ID已經存在",
     "sureDeleteDatabaseConfig": "是否要刪除該資料庫設定?",
-    "changeDatabaseSuccess": "更換資料庫成功"
+    "changeDatabaseSuccess": "更換資料庫成功",
+    "diskFailLoad": "硬碟讀取失敗",
+    "refreshFailed": "刷新失敗",
+    "confirmDeleteDisk": "是否要刪除硬碟 '{{disk}}'?"
   },
   "g": {
     "edit": "編輯",
@@ -62,6 +66,8 @@
     "add": "新增",
     "ok": "確定",
     "no": "取消",
+    "confirm": "確認",
+    "cancel": "取消",
     "filter": "過濾",
     "save": "保存",
     "totalNum": "總數量",
@@ -107,6 +113,18 @@
     "description": "描述",
     "useThis": "使用這個"
   },
+  "disk": {
+    "disk": "硬碟代號",
+    "diskCode": "硬碟代號",
+    "totalSpace": "總容量",
+    "freeSpace": "剩餘容量",
+    "usableSpace": "可用容量",
+    "updateDate": "更新時間",
+    "actions": "操作",
+    "total": "合計",
+    "addDisk": "新增硬碟",
+    "usedSpace": "已使用空間"
+  },
   "title": {
     "home": "主題清單列表",
     "editTheme": "編輯主題",
@@ -134,7 +152,8 @@
     "redirectData": "跳轉網址資訊",
     "setting": "設定",
     "database": "資料庫",
-    "databaseEdit": "資料庫設定"
+    "databaseEdit": "資料庫設定",
+    "disk": "硬碟"
   },
   "home": {
     "createTheme": "創建主題",

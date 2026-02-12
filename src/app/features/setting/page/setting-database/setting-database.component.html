@@ -114,9 +114,13 @@
           </td>
         </ng-container>
         <tr
+          class="mat-header-row"
           mat-header-row
           *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        <tr
+          class="mat-row"
+          mat-row
+          *matRowDef="let row; columns: displayedColumns"></tr>
       </table>
     </div>
   </div>
