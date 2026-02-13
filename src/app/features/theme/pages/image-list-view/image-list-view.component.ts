@@ -174,6 +174,18 @@ export class ImageListViewComponent
                 }
               }
             } else {
+              if (data[label.byKey]?.trim === undefined) {
+                if (Array.isArray(data[label.byKey])) {
+                  for (const element of data[label.byKey]) {
+                    const value = element.toLocaleLowerCase();
+                    if (isNotBlank(element) && value.includes(x)) {
+                      return true;
+                    }
+                  }
+                }
+                console.log(data);
+                return false;
+              }
               const value = data[label.byKey]?.trim()?.toLowerCase();
               if (isNotBlank(value) && value.includes(x)) {
                 return true;
