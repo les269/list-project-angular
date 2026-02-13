@@ -5,44 +5,53 @@
       <div class="form-section">
         <!-- Config ID -->
         <div class="form-group">
-          <label for="configId">設定ID <span class="required">*</span></label>
+          <label for="configId"
+            >{{ 'disk.configId' | translate }}
+            <span class="required">*</span></label
+          >
           <input
             id="configId"
             type="text"
             formControlName="configId"
-            placeholder="請輸入設定ID"
+            [placeholder]="'disk.configIdPlaceholder' | translate"
             [disabled]="!data.isAdd" />
           @if (form.get('configId')?.invalid && form.get('configId')?.touched) {
-            <span class="error">設定ID是必填項</span>
+            <span class="error">{{ 'disk.configIdRequired' | translate }}</span>
           }
           @if (
             form.hasError('configIdIsDefault') && form.get('configId')?.touched
           ) {
-            <span class="error">設定ID不能為 default</span>
+            <span class="error">{{
+              'disk.configIdIsDefault' | translate
+            }}</span>
           }
         </div>
 
         <!-- Config Name -->
         <div class="form-group">
           <label for="configName"
-            >設定名稱 <span class="required">*</span></label
+            >{{ 'disk.configName' | translate }}
+            <span class="required">*</span></label
           >
           <input
             id="configName"
             type="text"
             formControlName="configName"
-            placeholder="請輸入設定名稱" />
+            [placeholder]="'disk.configNamePlaceholder' | translate" />
           @if (
             form.get('configName')?.invalid && form.get('configName')?.touched
           ) {
-            <span class="error">設定名稱是必填項</span>
+            <span class="error">{{
+              'disk.configNameRequired' | translate
+            }}</span>
           }
         </div>
 
         <!-- Database Type -->
         <div class="form-group">
           <label for="databaseType"
-            >數據庫類型 <span class="required">*</span></label
+            >{{ 'disk.databaseType' | translate }}
+            <span class="required">*</span></label
           >
           <select id="databaseType" formControlName="databaseType">
             @for (item of databaseTypes; track $index) {
@@ -57,25 +66,30 @@
             form.get('databaseType')?.invalid &&
             form.get('databaseType')?.touched
           ) {
-            <span class="error">數據庫類型是必填項</span>
+            <span class="error">{{
+              'disk.databaseTypeRequired' | translate
+            }}</span>
           }
         </div>
         @if (isSqlite) {
           <!-- SQLite 檔案位置 -->
           <div class="form-group">
             <label for="sqliteFilePath"
-              >SQLite 檔案位置 <span class="required">*</span></label
+              >{{ 'disk.sqliteFilePath' | translate }}
+              <span class="required">*</span></label
             >
             <input
               id="sqliteFilePath"
               type="text"
               formControlName="sqliteFilePath"
-              placeholder="例如: c:/path/to/database.db" />
+              [placeholder]="'disk.sqliteFilePathPlaceholder' | translate" />
             @if (
               form.hasError('sqlitePathRequired') &&
               form.get('sqliteFilePath')?.touched
             ) {
-              <span class="error">SQLite 檔案位置是必填項</span>
+              <span class="error">{{
+                'disk.sqliteFilePathRequired' | translate
+              }}</span>
             }
           </div>
         }
@@ -84,81 +98,98 @@
       <!-- PostgreSQL Specific Fields -->
       @if (isPostgresql) {
         <div class="form-section">
-          <h3>PostgreSQL 設定</h3>
+          <h3>{{ 'disk.postgreSQLSetting' | translate }}</h3>
 
           <!-- Host -->
           <div class="form-group">
-            <label for="host">主機地址 <span class="required">*</span></label>
+            <label for="host"
+              >{{ 'disk.host' | translate }}
+              <span class="required">*</span></label
+            >
             <input
               id="host"
               type="text"
               formControlName="host"
-              placeholder="例如: localhost" />
+              [placeholder]="'disk.hostPlaceholder' | translate" />
             @if (form.get('host')?.invalid && form.get('host')?.touched) {
-              <span class="error">主機地址是必填項</span>
+              <span class="error">{{ 'disk.hostRequired' | translate }}</span>
             }
           </div>
 
           <!-- Port -->
           <div class="form-group">
-            <label for="port">端口 <span class="required">*</span></label>
+            <label for="port"
+              >{{ 'disk.port' | translate }}
+              <span class="required">*</span></label
+            >
             <input
               id="port"
               type="number"
               formControlName="port"
-              placeholder="例如: 5432" />
+              [placeholder]="'disk.portPlaceholder' | translate" />
             @if (form.get('port')?.invalid && form.get('port')?.touched) {
-              <span class="error">端口是必填項</span>
+              <span class="error">{{ 'disk.portRequired' | translate }}</span>
             }
           </div>
 
           <!-- Database Name -->
           <div class="form-group">
             <label for="databaseName"
-              >數據庫名 <span class="required">*</span></label
+              >{{ 'disk.databaseName' | translate }}
+              <span class="required">*</span></label
             >
             <input
               id="databaseName"
               type="text"
               formControlName="databaseName"
-              placeholder="請輸入數據庫名" />
+              [placeholder]="'disk.databaseNamePlaceholder' | translate" />
             @if (
               form.get('databaseName')?.invalid &&
               form.get('databaseName')?.touched
             ) {
-              <span class="error">數據庫名是必填項</span>
+              <span class="error">{{
+                'disk.databaseNameRequired' | translate
+              }}</span>
             }
           </div>
 
           <!-- Username -->
           <div class="form-group">
             <label for="username"
-              >使用者名稱 <span class="required">*</span></label
+              >{{ 'disk.username' | translate }}
+              <span class="required">*</span></label
             >
             <input
               id="username"
               type="text"
               formControlName="username"
-              placeholder="請輸入使用者名稱" />
+              [placeholder]="'disk.usernamePlaceholder' | translate" />
             @if (
               form.get('username')?.invalid && form.get('username')?.touched
             ) {
-              <span class="error"> 使用者名稱是必填項 </span>
+              <span class="error">{{
+                'disk.usernameRequired' | translate
+              }}</span>
             }
           </div>
 
           <!-- Password -->
           <div class="form-group">
-            <label for="password">密碼 <span class="required">*</span></label>
+            <label for="password"
+              >{{ 'disk.password' | translate }}
+              <span class="required">*</span></label
+            >
             <input
               id="password"
               type="password"
               formControlName="password"
-              placeholder="請輸入密碼" />
+              [placeholder]="'disk.passwordPlaceholder' | translate" />
             @if (
               form.get('password')?.invalid && form.get('password')?.touched
             ) {
-              <span class="error"> 密碼是必填項 </span>
+              <span class="error">{{
+                'disk.passwordRequired' | translate
+              }}</span>
             }
           </div>
 
@@ -184,17 +215,20 @@
 
       <!-- Additional Info -->
       <div class="form-section">
-        <h3>補充信息</h3>
+        <h3>{{ 'disk.otherInfo' | translate }}</h3>
 
         <!-- Description -->
         <div class="form-group">
           <label for="description"
-            >描述 <span class="optional">(可選)</span></label
+            >{{ 'g.description' | translate }}
+            <span class="optional"
+              >({{ 'g.optional' | translate }})</span
+            ></label
           >
           <textarea
             id="description"
             formControlName="description"
-            placeholder="請輸入設定描述"
+            [placeholder]="'disk.descriptionPlaceholder' | translate"
             rows="4"></textarea>
         </div>
       </div>
@@ -203,7 +237,13 @@
 </mat-dialog-content>
 
 <mat-dialog-actions>
-  <button mat-button type="submit" (click)="onSubmit()">保存</button>
-  <button mat-button (click)="testConnection()">測試連線</button>
-  <button mat-button mat-dialog-close type="reset">取消</button>
+  <button mat-button type="submit" (click)="onSubmit()">
+    {{ 'g.save' | translate }}
+  </button>
+  <button mat-button (click)="testConnection()">
+    {{ 'disk.testConnection' | translate }}
+  </button>
+  <button mat-button mat-dialog-close type="reset">
+    {{ 'g.cancel' | translate }}
+  </button>
 </mat-dialog-actions>
