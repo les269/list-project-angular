@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { DatasetService } from '../../service/dataset.service';
 import { debounceTime, EMPTY, filter, switchMap } from 'rxjs';
 import { isBlank, isNotBlank } from '../../../../shared/util/helper';
-import { CodeEditor, CodeEditorModule } from '@acrodata/code-editor';
+import { CodeEditorModule } from '@acrodata/code-editor';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -63,16 +63,13 @@ export class DatasetEditComponent implements OnInit {
   scrapyPaginationList: ScrapyPagination[] = [];
   languages = languages;
 
-  constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    private datasetService: DatasetService,
-    private translateService: TranslateService,
-    private snackbarService: SnackbarService,
-    private selectTableService: SelectTableService,
-    private groupDatasetService: GroupDatasetService,
-    private scrapyPaginationService: ScrapyPaginationService
-  ) {}
+  router = inject(Router);
+  route = inject(ActivatedRoute);
+  datasetService = inject(DatasetService);
+  snackbarService = inject(SnackbarService);
+  selectTableService = inject(SelectTableService);
+  groupDatasetService = inject(GroupDatasetService);
+  scrapyPaginationService = inject(ScrapyPaginationService);
 
   ngOnInit() {
     this.groupDatasetService.getAllGroupDataset().subscribe(res => {
@@ -104,7 +101,9 @@ export class DatasetEditComponent implements OnInit {
   }
 
   onBack() {
-    this.router.navigate(['dataset-list']);
+    this.router.navigate(['dataset-list'], {
+      queryParams: this.route.snapshot.queryParams,
+    });
   }
 
   //驗證保存資料

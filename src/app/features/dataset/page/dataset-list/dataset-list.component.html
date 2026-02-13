@@ -3,15 +3,31 @@
     <button type="button" class="btn btn-primary" (click)="onAdd()">
       {{ 'dataset.createDataset' | translate }}
     </button>
-    <div class="mx-2" style="flex: 1; max-width: 420px">
+    <div
+      class="mx-2"
+      style="flex: 1; max-width: 420px; display: flex; gap: 8px">
       <input
         class="form-control"
         [placeholder]="'g.filter' | translate"
+        [value]="filterValue()"
         (input)="applyFilter($event)" />
     </div>
+
+    <button
+      type="button"
+      class="btn btn-primary"
+      [disabled]="!filterValue()"
+      (click)="clearFilter()">
+      {{ 'g.clear' | translate }}
+    </button>
   </div>
   <div class="card table-container scrollbar-primary">
-    <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort>
+    <table
+      mat-table
+      [dataSource]="dataSource"
+      multiTemplateDataRows
+      matSort
+      (matSortChange)="onSortChange($event)">
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'dataset.name' | translate }}
