@@ -1,7 +1,6 @@
 .expanded {
   display: flex;
   justify-content: center;
-  width: calc(100vw - var(--setting-sidebar-width));
   > .content {
     margin: 0px 36px;
     width: 100%;
@@ -14,13 +13,19 @@
       padding-bottom: 24px;
     }
   }
+  > .actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  > .card {
+    display: flex;
+    > table {
+      width: 100%;
+    }
+  }
 }
 
-.actions {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 12px;
-}
 .mat-row > td,
 .mat-header-row > th {
   border-bottom: solid #ccc 1px;
