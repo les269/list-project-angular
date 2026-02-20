@@ -33,6 +33,70 @@
       [placeholder]="'otherSetting.checkFileExistPH' | translate"
       [(ngModel)]="themeOtherSetting.checkFileExist" />
   </div>
+  <div class="mb-3">
+    <label class="form-label">{{
+      'otherSetting.quickRefresh' | translate
+    }}</label>
+    <div>
+      <mat-checkbox [(ngModel)]="themeOtherSetting.useQuickRefresh">
+        {{ 'otherSetting.useQuickRefresh' | translate }}
+      </mat-checkbox>
+    </div>
+  </div>
+
+  @if (themeOtherSetting.useQuickRefresh) {
+    <div class="d-flex gap-2 justify-content-start align-items-center mb-2">
+      @if (themeOtherSetting.useSpider) {
+        <mat-chip
+          >{{ themeOtherSetting.useSpider }}
+          <button matChipRemove (click)="themeOtherSetting.useSpider = ''">
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip>
+      }
+      <button
+        class="btn btn-outline-primary d-flex"
+        (click)="selectUseSpider()">
+        <mat-icon class="material-icons-outlined"
+          ><span class="material-symbols-outlined">
+            select_window_2
+          </span></mat-icon
+        >
+      </button>
+    </div>
+    <div class="mb-3">
+      <div>
+        <div class="form-check form-check-inline mb-2">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="refreshByParams"
+            id="refreshByParams"
+            value="params"
+            [(ngModel)]="themeOtherSetting.quickRefreshType" />
+          <label class="form-check-label" for="refreshByParams">
+            {{ 'otherSetting.refreshByParams' | translate }}
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="refreshByUrl"
+            id="refreshByUrl"
+            value="url"
+            [(ngModel)]="themeOtherSetting.quickRefreshType" />
+          <label class="form-check-label" for="refreshByUrl">
+            {{ 'otherSetting.refreshByUrl' | translate }}
+          </label>
+        </div>
+      </div>
+      <input
+        class="form-control"
+        [placeholder]="'otherSetting.quickRefreshPH' | translate"
+        [(ngModel)]="themeOtherSetting.quickRefresh" />
+    </div>
+  }
 }
 <label class="h3">{{ 'title.topCustom' | translate }}</label>
 <app-theme-top-custom-table

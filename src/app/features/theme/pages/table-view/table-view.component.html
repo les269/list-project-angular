@@ -1,34 +1,37 @@
 <div class="mt-3">
   <div class="d-flex mb-2 mx-4">
     <div class="d-flex col-4">
-      @if (themeDatasetList && themeDatasetList.length > 1) {
+      @if (store.themeDatasetList().length > 1) {
         <select
           class="form-select"
-          [compareWith]="compareDataset"
-          [(ngModel)]="useDataset"
+          [compareWith]="store.compareDataset"
+          [ngModel]="store.useDataset()"
           [matTooltip]="'themeDataset.selectDataset' | translate"
-          (change)="changeDataset()">
-          @for (dataset of themeDatasetList; track $index) {
+          (ngModelChange)="store.changeDataset($event)">
+          @for (dataset of store.themeDatasetList(); track $index) {
             <option [ngValue]="dataset">
               {{ dataset.label }}
             </option>
           }
         </select>
       }
-      @if (themeTagListForSelect && themeTagListForSelect.length > 1) {
+      @if (
+        store.themeTagListForSelect() &&
+        store.themeTagListForSelect().length > 1
+      ) {
         <select
           class="form-select"
-          [compareWith]="compareTag"
-          [(ngModel)]="useTag"
+          [compareWith]="store.compareShareTag"
+          [ngModel]="store.useShareTag()"
           [matTooltip]="'themeTag.selectTag' | translate"
-          (change)="changeTag()">
-          @for (tag of themeTagListForSelect; track $index) {
+          (ngModelChange)="store.changeShareTag($event)">
+          @for (tag of store.themeTagListForSelect(); track $index) {
             <option [ngValue]="tag">
               {{ tag.shareTagId }}
               {{
                 tag.seq === -1
                   ? ''
-                  : '(' + getTagValueLength(tag.shareTagId) + ')'
+                  : '(' + store.getTagValueLength(tag.shareTagId) + ')'
               }}
             </option>
           }
@@ -38,7 +41,7 @@
         class="d-flex"
         mat-icon-button
         [matTooltip]="'g.refresh' | translate"
-        (click)="onRefresh()">
+        (click)="store.onRefresh()">
         <mat-icon>loop</mat-icon>
       </button>
     </div>
@@ -47,10 +50,11 @@
         type="text"
         class="form-control"
         [matAutocomplete]="auto"
-        [(ngModel)]="searchValue"
-        (keydown.enter)="searchChange()" />
+        [ngModel]="store.searchValue()"
+        (ngModelChange)="this.store.searchValue.set($event)"
+        (keydown.enter)="store.onSearch(store.searchValue())" />
       <mat-autocomplete #auto="matAutocomplete">
-        @for (option of filterAutoCompleteList(); track option) {
+        @for (option of store.filterAutoCompleteList(); track option) {
           <mat-option [value]="option">{{ option }}</mat-option>
         }
       </mat-autocomplete>
@@ -58,7 +62,7 @@
         mat-icon-button
         class="d-flex"
         [matTooltip]="'g.popupSelect' | translate"
-        (click)="selectMultipleValue()">
+        (click)="store.selectMultipleValue()">
         <mat-icon class="material-icons-outlined"
           ><span class="material-symbols-outlined">
             select_window_2
@@ -69,25 +73,25 @@
         mat-icon-button
         class="d-flex"
         [matTooltip]="'g.clear' | translate"
-        (click)="searchValue = []; searchChange()">
+        (click)="store.onSearch('')">
         <mat-icon>clear</mat-icon>
       </button>
       <button
         mat-icon-button
         class="d-flex"
         [matTooltip]="'g.search' | translate"
-        (click)="searchChange()">
+        (click)="store.onSearch(store.searchValue())">
         <mat-icon>search</mat-icon>
       </button>
     </div>
     <div class="d-flex col-4 justify-content-end">
-      @if (defaultKey && themeOtherSetting.showDuplicate) {
+      @if (store.defaultKey() && store.themeOtherSetting()?.showDuplicate) {
         <button mat-button (click)="showDuplicate()">
           {{ 'themeTopCustom.showDuplicate' | translate }}
         </button>
       }
-      @if (defaultKey && themeCustomList.length > 0) {
-        <button mat-button (click)="isExpand = !isExpand">
+      @if (store.defaultKey() && store.themeCustomList().length > 0) {
+        <button mat-button (click)="isExpand.set(!isExpand)">
           {{ 'themeCustom.showCustomButton' | translate }}
         </button>
       }
@@ -95,16 +99,18 @@
   </div>
   <div class="d-flex mb-2 mx-4">
     <app-top-custom-buttons
-      [themeTopCustomList]="themeTopCustomList"
-      [headerId]="headerId"
-      [topCustomValueMap]="topCustomValueMap"></app-top-custom-buttons>
+      [themeTopCustomList]="store.themeTopCustomList()"
+      [headerId]="store.headerId()"
+      [topCustomValueMap]="
+        store.topCustomValueMap.value()
+      "></app-top-custom-buttons>
   </div>
   <mat-paginator
     class="mat-paginator"
     [pageSizeOptions]="[100, 300, 500]"
     [showFirstLastButtons]="true"></mat-paginator>
   <table mat-table [dataSource]="list" multiTemplateDataRows matSort>
-    @for (label of themeLabelList; track $index; let index = $index) {
+    @for (label of store.visibleLabelList(); track $index; let index = $index) {
       <ng-container [matColumnDef]="label.byKey">
         <th
           mat-header-cell
@@ -120,14 +126,14 @@
             width: getWidth(label, 'width'),
             'max-width': getWidth(label, 'maxWidth'),
             'min-width': getWidth(label, 'minWidth'),
-            'border-bottom': isExpand ? 'none' : 'solid #ccc 1px',
+            'border-bottom': isExpand() ? 'none' : 'solid #ccc 1px',
           }">
           <app-list-item-value
             [themeLabel]="label"
             [data]="element"
             [isHover]="true"
-            [seqKey]="seqKey"
-            (searchChange)="searchChange($event)"></app-list-item-value>
+            [seqKey]="store.seqKey()"
+            (searchChange)="store.onSearch($event)"></app-list-item-value>
         </td>
         <td mat-footer-cell *matFooterCellDef>
           @switch (label.type) {
@@ -145,10 +151,10 @@
         mat-cell
         *matCellDef="let element; let i = dataIndex"
         [ngStyle]="{
-          'border-bottom': isExpand ? 'none' : 'solid #ccc 1px',
+          'border-bottom': isExpand() ? 'none' : 'solid #ccc 1px',
         }">
         <div class="row flex-nowrap">
-          @if (defaultKey) {
+          @if (store.defaultKey()) {
             <button
               class="d-flex"
               mat-icon-button
@@ -165,7 +171,7 @@
             class="d-flex"
             mat-icon-button
             [matTooltip]="'themeDataset.editData' | translate"
-            (click)="openEditData(element)">
+            (click)="store.openEditData(element)">
             <mat-icon class="material-icons-outlined"
               ><span class="material-symbols-outlined"> edit </span></mat-icon
             >
@@ -180,18 +186,22 @@
         *matCellDef="let element; let i = dataIndex"
         [attr.colspan]="displayedColumns.length"
         [ngStyle]="{
-          'border-bottom': isExpand ? 'solid #ccc 1px' : 'none',
+          'border-bottom': isExpand() ? 'solid #ccc 1px' : 'none',
           'border-top': 'none',
         }">
-        <div [@detailExpand]="isExpand ? 'expanded' : 'collapsed'">
-          <app-custom-buttons
-            [themeCustomList]="themeCustomList"
-            [data]="element"
-            [headerId]="headerId"
-            [defaultKey]="defaultKey"
-            [customValueMap]="customValueMap"
-            [fileExist]="fileExist"
-            [themeHeaderType]="themeHeader.type"></app-custom-buttons>
+        <div [@detailExpand]="isExpand() ? 'expanded' : 'collapsed'">
+          @if (store.themeHeader.value()) {
+            <app-custom-buttons
+              [themeCustomList]="store.themeCustomList()"
+              [data]="element"
+              [headerId]="store.headerId()"
+              [defaultKey]="store.defaultKey()"
+              [customValueMap]="store.customValueMap.value()"
+              [fileExist]="store.fileExistResource.value()"
+              [themeHeaderType]="
+                store.themeHeader.value()!.type
+              "></app-custom-buttons>
+          }
         </div>
       </td>
     </ng-container>
@@ -203,15 +213,15 @@
       mat-row
       *matRowDef="let row; columns: displayedColumns; let i = dataIndex"
       class="mat-row"
-      [style.backgroundColor]="list.data[i][colorStr] || ''"
+      [style.backgroundColor]="list.data[i][COLOR_KEY] || ''"
       [ngStyle]="{
-        'border-bottom': isExpand ? 'none' : 'solid #ccc 1px',
+        'border-bottom': isExpand() ? 'none' : 'solid #ccc 1px',
       }"></tr>
     <tr
       mat-row
       *matRowDef="let row; columns: ['expanded']; let i = dataIndex"
       style="height: 0px"
-      [style.backgroundColor]="list.data[i][colorStr] || ''"></tr>
+      [style.backgroundColor]="list.data[i][COLOR_KEY] || ''"></tr>
     <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
   </table>
 </div>

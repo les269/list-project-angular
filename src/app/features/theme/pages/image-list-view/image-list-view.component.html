@@ -1,34 +1,37 @@
 <div class="content">
   <div class="content-header">
     <div class="header-left col-4">
-      @if (themeDatasetList && themeDatasetList.length > 1) {
+      @if (store.themeDatasetList() && store.themeDatasetList().length > 1) {
         <select
           class="list-select"
-          [compareWith]="compareDataset"
-          [(ngModel)]="useDataset"
+          [compareWith]="store.compareDataset"
+          [ngModel]="store.useDataset()"
           [matTooltip]="'themeDataset.selectDataset' | translate"
-          (change)="changeQueryParams()">
-          @for (dataset of themeDatasetList; track $index) {
+          (ngModelChange)="store.changeDataset($event)">
+          @for (dataset of store.themeDatasetList(); track $index) {
             <option [ngValue]="dataset">
               {{ dataset.label }}
             </option>
           }
         </select>
       }
-      @if (themeTagListForSelect && themeTagListForSelect.length > 1) {
+      @if (
+        store.themeTagListForSelect() &&
+        store.themeTagListForSelect().length > 1
+      ) {
         <select
           class="list-select"
-          [compareWith]="compareTag"
-          [(ngModel)]="useTag"
+          [compareWith]="store.compareShareTag"
+          [ngModel]="store.useShareTag()"
           [matTooltip]="'themeTag.selectTag' | translate"
-          (change)="changeQueryParams()">
-          @for (tag of themeTagListForSelect; track $index) {
+          (ngModelChange)="store.changeShareTag($event)">
+          @for (tag of store.themeTagListForSelect(); track $index) {
             <option [ngValue]="tag">
-              {{ shareTagNameMap[tag.shareTagId] || tag.shareTagId }}
+              {{ store.shareTagNameMap()[tag.shareTagId] || tag.shareTagId }}
               {{
                 tag.seq === -1
                   ? ''
-                  : '(' + getTagValueLength(tag.shareTagId) + ')'
+                  : '(' + store.getTagValueLength(tag.shareTagId) + ')'
               }}
             </option>
           }
@@ -38,7 +41,7 @@
         class="d-flex"
         mat-icon-button
         [matTooltip]="'g.refresh' | translate"
-        (click)="onRefresh()">
+        (click)="store.onRefresh()">
         <mat-icon>loop</mat-icon>
       </button>
     </div>
@@ -48,21 +51,22 @@
           type="text"
           class="form-control"
           [matAutocomplete]="auto"
-          [(ngModel)]="searchValue"
-          (keydown.enter)="changeQueryParams()" />
+          [ngModel]="store.searchValue()"
+          (ngModelChange)="store.searchValue.set($event)"
+          (keydown.enter)="store.onSearch(store.searchValue())" />
         <mat-autocomplete
           #auto="matAutocomplete"
-          (optionSelected)="searchChange()">
-          @for (option of filterAutoCompleteList(); track option) {
+          (optionSelected)="store.onSearch($event.option.value)">
+          @for (option of store.filterAutoCompleteList(); track option) {
             <mat-option [value]="option">{{ option }}</mat-option>
           }
         </mat-autocomplete>
-        @if (autoCompleteList.length > 0) {
+        @if (store.autoCompleteList().length > 0) {
           <button
             mat-icon-button
             class="d-flex"
             [matTooltip]="'g.popupSelect' | translate"
-            (click)="selectMultipleValue()">
+            (click)="store.selectMultipleValue()">
             <mat-icon class="material-icons-outlined"
               ><span class="material-symbols-outlined">
                 select_window_2
@@ -74,22 +78,22 @@
           mat-icon-button
           class="d-flex"
           [matTooltip]="'g.clear' | translate"
-          (click)="searchValue = []; changeQueryParams()">
+          (click)="store.onSearch('')">
           <mat-icon>clear</mat-icon>
         </button>
         <button
           mat-icon-button
           class="d-flex"
           [matTooltip]="'g.search' | translate"
-          (click)="changeQueryParams()">
+          (click)="store.onSearch(store.searchValue())">
           <mat-icon>search</mat-icon>
         </button>
-        @if (defaultKey !== '') {
+        @if (store.defaultKey() !== '') {
           <button
             mat-icon-button
             class="d-flex"
             [matTooltip]="'g.random' | translate"
-            (click)="randomSearch()">
+            (click)="store.randomSearch()">
             <mat-icon>shuffle</mat-icon>
           </button>
         }
@@ -101,13 +105,15 @@
   </div>
   <div class="d-flex mb-2">
     <app-top-custom-buttons
-      [themeTopCustomList]="themeTopCustomList"
-      [headerId]="headerId"
-      [topCustomValueMap]="topCustomValueMap"></app-top-custom-buttons>
+      [themeTopCustomList]="store.themeTopCustomList()"
+      [headerId]="store.headerId()"
+      [topCustomValueMap]="
+        store.topCustomValueMap.value()
+      "></app-top-custom-buttons>
   </div>
   <div class="list-content">
     <div class="py-2">
-      {{ 'g.totalNum' | translate }}: {{ filterData?.length }}
+      {{ 'g.totalNum' | translate }}: {{ store.filterData().length }}
     </div>
     <ng-container *ngTemplateOutlet="dataListRef"></ng-container>
   </div>
@@ -121,49 +127,50 @@
 </div>
 
 <ng-template #headerRight>
-  @if (sortArray.length > 0) {
+  @if (store.sortArray().length > 0) {
     <select
       class="list-select"
       [matTooltip]="'g.sort' | translate"
-      [compareWith]="compareSort"
-      [(ngModel)]="sortValue"
-      (change)="toTop(); changeQueryParams()">
-      @for (sort of sortArray; track $index) {
+      [compareWith]="store.compareSort"
+      [ngModel]="store.sortValue()"
+      (ngModelChange)="changeSort($event)">
+      @for (sort of store.sortArray(); track $index) {
         <option [ngValue]="sort">
           {{ sort.label }}
         </option>
       }
     </select>
     <div class="d-flex flex-column justify-content-center">
-      <mat-icon
-        class="sortAsc"
-        (click)="sortAsc = !sortAsc; toTop(); changeQueryParams()"
-        >{{ sortAsc ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</mat-icon
-      >
+      <mat-icon class="sortAsc" (click)="changeAsc()">{{
+        this.store.ascFlag() ? 'keyboard_arrow_down' : 'keyboard_arrow_up'
+      }}</mat-icon>
     </div>
   }
-  @if (pages.length > 1) {
+  @if (store.pages().length > 1) {
     <select
       class="list-select"
-      [(ngModel)]="currentPage"
-      (change)="toTop(); changeQueryParams()">
-      @for (page of pages; track $index) {
+      [ngModel]="store.currentPage()"
+      (ngModelChange)="changePage($event)">
+      @for (page of store.pages(); track $index) {
         <option [ngValue]="page">{{ page }} {{ 'g.page' | translate }}</option>
       }
     </select>
     <div class="d-flex flex-column justify-content-center" style="height: 34px">
-      @if (currentPage !== 1 && pages.length !== 1) {
+      @if (store.currentPage() !== 1 && store.pages().length !== 1) {
         <mat-icon
           class="prePage"
-          (click)="prePage()"
+          (click)="store.prePage()"
           [matTooltip]="'g.prePage' | translate"
           >keyboard_arrow_up</mat-icon
         >
       }
-      @if (currentPage !== pages.length && pages.length !== 1) {
+      @if (
+        store.currentPage() !== store.pages().length &&
+        store.pages().length !== 1
+      ) {
         <mat-icon
           class="nextPage"
-          (click)="nextPage()"
+          (click)="store.nextPage()"
           [matTooltip]="'g.nextPage' | translate"
           >keyboard_arrow_down</mat-icon
         >
@@ -172,29 +179,44 @@
   }
 </ng-template>
 <ng-template #dataListRef>
-  @for (data of viewData; track $index; let i = $index) {
+  @for (data of store.viewData(); track $index; let i = $index) {
     <div
       class="d-flex card"
-      (mouseenter)="hoveredIndex = i"
-      (mouseleave)="hoveredIndex = null">
+      (mouseenter)="store.hoveredIndex.set(i)"
+      (mouseleave)="store.hoveredIndex.set(-1)">
       <div class="card-body">
         <app-img-content
           class="img-content"
-          [url]="getImageUrl(data, themeImage)"
+          [url]="getImageUrl(data)"
           [priority]="i === 0"
-          [ctrlPressed]="ctrlPressed"
-          [refreshDate]="refreshDate()"
+          [ctrlPressed]="ctrlPressed()"
+          [refreshDate]="store.refreshDate()"
           (hiddenFixedImage)="fixedImage.closeModal()"
           (visibleFixedImage)="fixedImage.show()"
-          (changeFixedImagePath)="fixedImagePath = $event"></app-img-content>
+          (changeFixedImagePath)="
+            store.fixedImagePath.set($event)
+          "></app-img-content>
         <div class="detail-content">
           <div class="edit-button">
-            @if (hoveredIndex === i) {
+            @if (store.hoveredIndex() === i) {
+              @if (store.themeOtherSetting()?.useQuickRefresh) {
+                <button
+                  class="d-flex"
+                  mat-icon-button
+                  [matTooltip]="'themeDataset.quickRefresh' | translate"
+                  (click)="quickRefresh(data)">
+                  <mat-icon class="material-icons-outlined"
+                    ><span class="material-symbols-outlined">
+                      refresh
+                    </span></mat-icon
+                  >
+                </button>
+              }
               <button
                 class="d-flex"
                 mat-icon-button
                 [matTooltip]="'themeDataset.editData' | translate"
-                (click)="openEditData(data)">
+                (click)="store.openEditData(data)">
                 <mat-icon class="material-icons-outlined"
                   ><span class="material-symbols-outlined">
                     edit
@@ -205,7 +227,11 @@
           </div>
 
           <div class="detail-rows scrollbar-primary">
-            @for (label of themeLabelList; track $index; let idx = $index) {
+            @for (
+              label of store.visibleLabelList();
+              track $index;
+              let idx = $index
+            ) {
               @if (
                 label.isVisible &&
                 checkValueVisible(data[label.byKey]) &&
@@ -216,38 +242,42 @@
                   <app-list-item-value
                     [data]="data"
                     [themeLabel]="label"
-                    [isHover]="hoveredIndex === i"
-                    [seqKey]="seqKey"
-                    (searchChange)="searchChange($event)"></app-list-item-value>
+                    [isHover]="store.hoveredIndex() === i"
+                    [seqKey]="store.seqKey()"
+                    (searchChange)="
+                      store.onSearch($event)
+                    "></app-list-item-value>
                 </div>
               }
             }
-            @if (themeTagList.length > 0) {
+            @if (store.themeTagList().length > 0) {
               <div class="detail-row">
                 <div class="row-label">{{ 'g.tag' | translate }}</div>
                 <app-item-tag-buttons
-                  [value]="data[defaultKey]"
-                  [data]="data"
-                  [themeTagList]="themeTagList"
-                  [shareTagValueMap]="shareTagValueMap"
+                  [value]="data[store.defaultKey()]"
+                  [data]="getData(data)"
+                  [themeTagList]="store.themeTagList()"
+                  [shareTagValueMap]="store.shareTagValueMap()"
                   (tagValueUpdate)="tagValueUpdate($event)"
-                  [shareTagNameMap]="shareTagNameMap"></app-item-tag-buttons>
+                  [shareTagNameMap]="
+                    store.shareTagNameMap()
+                  "></app-item-tag-buttons>
               </div>
             }
           </div>
 
-          @if (defaultKey && themeCustomList.length > 0) {
+          @if (store.defaultKey() && store.themeCustomList().length > 0) {
             <div class="buttons-panel">
               <app-custom-buttons
-                [themeCustomList]="themeCustomList"
+                [themeCustomList]="store.themeCustomList()"
                 [data]="data"
-                [headerId]="headerId"
-                [defaultKey]="defaultKey"
-                [customValueMap]="customValueMap"
-                [fileExist]="fileExist"
-                [themeHeaderType]="themeHeaderType"
+                [headerId]="store.headerId()"
+                [defaultKey]="store.defaultKey()"
+                [customValueMap]="store.customValueMap.value()"
+                [fileExist]="store.fileExistResource.value()"
+                [themeHeaderType]="store.themeHeaderType()"
                 [currentDatasetName]="
-                  datasetDataMap[datasetSeq - 1].themeDataset.label
+                  store.useDataset().label
                 "></app-custom-buttons>
             </div>
           }
@@ -260,4 +290,4 @@
 <app-scrollTop></app-scrollTop>
 <app-fixed-image
   #fixedImage
-  [fixedImagePath]="fixedImagePath"></app-fixed-image>
+  [fixedImagePath]="store.fixedImagePath()"></app-fixed-image>

@@ -12,7 +12,7 @@ import { Params } from '@angular/router';
 
 //是否為空值
 export const isBlank = (s: any): boolean =>
-  s === undefined || s === null || s.trim() === '';
+  s === undefined || s === null || s.trim === undefined || s.trim() === '';
 //是否為不為空值
 export const isNotBlank = (s: any): boolean => !isBlank(s);
 
@@ -23,8 +23,11 @@ export const isNotNull = (s: any): boolean => !isNull(s);
 export const isDuplicate = (arr: any[]): boolean =>
   arr.length !== arr.filter((e, i, arr2) => arr2.indexOf(e) === i).length;
 
-export const getHeaderId = ({ name, version, type }: ThemeHeader) =>
-  'ThemeHeader:' + name + ',' + version + ',' + type;
+export const getHeaderId = (
+  name: string,
+  version: string,
+  type: ThemeHeaderType
+) => 'ThemeHeader:' + name + ',' + version + ',' + type;
 export const parseHeaderId = (
   headerId: string
 ): { name: string; version: string; type: ThemeHeaderType } | null => {

@@ -8,5 +8,5 @@ export const updateTitle = createAction(
 );
 export const updateList = createAction(
   'update list',
-  props<{ [key in ThemeHeaderType]: ThemeHeader[] }>()
+  props<Record<ThemeHeaderType, ThemeHeader[]>>()
 );

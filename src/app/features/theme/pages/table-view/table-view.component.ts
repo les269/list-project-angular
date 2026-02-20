@@ -1,8 +1,10 @@
 import {
   AfterViewInit,
   Component,
-  Injector,
+  inject,
   OnInit,
+  signal,
+  viewChild,
   ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -53,11 +55,8 @@ import {
   pipe,
   toArray,
 } from 'rxjs';
-import {
-  MatAutocompleteActivatedEvent,
-  MatAutocompleteModule,
-  MatAutocompleteSelectedEvent,
-} from '@angular/material/autocomplete';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { ListBaseViewStore } from '../../components/list-base-view.store';
 
 @Component({
   selector: 'app-table-view',
@@ -94,110 +93,22 @@ import {
   templateUrl: './table-view.component.html',
   styleUrl: './table-view.component.scss',
 })
-export class TableViewComponent
-  extends ListBaseViewComponent
-  implements OnInit, AfterViewInit
-{
-  override themeHeaderType: ThemeHeaderType = ThemeHeaderType.table;
-  list = new MatTableDataSource<any>();
-  isExpand = false;
+export class TableViewComponent implements AfterViewInit {
+  readonly store = inject(ListBaseViewStore);
 
-  rowColor: string[] = DEFAULT_ROW_COLOR;
+  readonly list = new MatTableDataSource<any>();
 
-  @ViewChild(MatSort) sort!: MatSort;
-  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
-  customValueMap: ThemeCustomValueResponse = {};
+  readonly COLOR_KEY = '__color';
+  readonly rowColor: string[] = DEFAULT_ROW_COLOR;
 
-  constructor(injector: Injector) {
-    super(injector);
-  }
+  readonly isExpand = signal(false);
+  readonly sort = viewChild(MatSort);
+  readonly paginator = viewChild(MatPaginator);
 
+  readonly displayedColumns = this.store.displayedColumns();
   ngAfterViewInit(): void {
-    this.list.sort = this.sort;
-    this.list.paginator = this.paginator;
-  }
-
-  override initData() {
-    this.changeDataset();
-    this.seqKey = this.themeLabelList.find(x => x.type === 'seq')?.byKey ?? '';
-    //設定序列號
-    if (isNotBlank(this.seqKey)) {
-      this.list.data = this.list.data.map((x: any, i: number) => {
-        x[this.seqKey] = i + 1;
-        return x;
-      });
-    }
-  }
-  override changeDatasetBefore() {
-    this.searchValue = [];
-    this.datasetSeq = this.useDataset?.seq
-      ? parseInt(this.useDataset.seq + '')
-      : -1;
-  }
-  override changeDatasetAfter() {
-    this.list.data = this.useData;
-    this.autoCompleteList = this.getAutoComplete(this.list.data);
-    this.doTableColor();
-    this.getCustomValueMap();
-  }
-
-  override onSearch() {
-    if (this.searchValue.length === 0) {
-      this.searchValue = [];
-      this.list.data = this.useData;
-    } else if (this.searchLabel.length > 0) {
-      // 搜尋值轉小寫搜尋, 先把搜尋資料取出並轉小寫並不能為空值
-      const searchValue = this.searchValue.map(x => x.toLocaleLowerCase());
-      this.list.data = this.useData.filter((data: any) => {
-        return searchValue.every(x => {
-          for (const label of this.searchLabel) {
-            if (
-              label.type === 'stringArray' &&
-              Array.isArray(data[label.byKey])
-            ) {
-              for (const element of data[label.byKey]) {
-                const value = element.toLocaleLowerCase();
-                if (isNotBlank(element) && value.includes(x)) {
-                  return true;
-                }
-              }
-            } else {
-              const value = data[label.byKey]?.trim()?.toLowerCase();
-              if (isNotBlank(value) && value.includes(x)) {
-                return true;
-              }
-            }
-          }
-          return false;
-        });
-      });
-    }
-    this.doTableColor();
-    this.getCustomValueMap();
-  }
-
-  // 改變當前選擇的標籤 url上的
-  override changeTag() {
-    this.searchChange();
-    if (this.useTag.seq !== -1) {
-      const valueList = this.shareTagValueMap[this.useTag.shareTagId];
-      this.list.data = this.list.data.filter((x: any) =>
-        valueList.includes(x[this.defaultKey])
-      );
-    }
-  }
-
-  override searchChange(text?: string) {
-    if (typeof this.searchValue === 'string') {
-      this.searchValue = (this.searchValue + '')
-        .split(',')
-        .map(x => x.trim())
-        .filter(x => isNotBlank(x));
-    }
-    if (isNotBlank(text) && !this.searchValue.includes(text!)) {
-      this.searchValue = [text!];
-    }
-    this.onSearch();
+    this.list.sort = this.sort();
+    this.list.paginator = this.paginator();
   }
 
   fileSizeTotal(byKey: string): number {
@@ -218,15 +129,16 @@ export class TableViewComponent
   }
 
   doTableColor() {
-    if (isNotBlank(this.defaultKey) && this.rowColor.length > 0) {
+    const defaultKey = this.store.defaultKey();
+    if (isNotBlank(defaultKey) && this.rowColor.length > 0) {
       const keyMap: { [key in string]: string } = {};
 
       this.list.data.forEach((data, index) => {
-        const key = data[this.defaultKey].toUpperCase();
+        const key = data[defaultKey].toUpperCase();
         if (isBlank(keyMap[key])) {
           keyMap[key] = this.rowColor[index % this.rowColor.length];
         }
-        data[this.colorStr] = keyMap[key];
+        data[this.COLOR_KEY] = keyMap[key];
       });
     }
   }
@@ -238,9 +150,18 @@ export class TableViewComponent
     return 'auto';
   }
   onSetTag(data: any) {
-    this.openSelectTag(data).subscribe(() => {
-      this.changeTag();
-    });
+    // this.openSelectTag(data).subscribe(() => {
+    // });
+  }
+  openSelectTag(data: any) {
+    // const value = data[this.defaultKey()];
+    // const selected = Object.entries(this.shareTagValueMap)
+    //   .filter(([shareTagId, valueList]) => valueList.includes(value))
+    //   .map(
+    //     ([shareTagId, valueList]) =>
+    //       this.shareTags().find(x => x.shareTagId === shareTagId)!
+    //   );
+    // return this.selectTableService.selectMutipleTag(this.shareTags(), selected);
   }
   /**
    * 從資料庫取得當前頁面的自定義資料
@@ -266,28 +187,28 @@ export class TableViewComponent
   }
 
   showDuplicate() {
-    const dataList = this.datasetDataMap
-      .flatMap(x => x.datasetDataList)
-      .filter(
-        (v, i, arr) => arr.findIndex(z => z.datasetName === v.datasetName) === i
-      )
-      .flatMap(x => x.data);
-    from(dataList)
-      .pipe(
-        // 排序-檔名
-        groupBy(data => data[this.defaultKey]),
-        // 每筆資料轉為陣列
-        mergeMap(group => group.pipe(toArray())),
-        // 資料大於為重複
-        filter(data => data.length > 1),
-        // 取出所有陣列資料
-        concatMap(data => from(data)),
-        // 將所有資料合併為同一陣列
-        toArray()
-      )
-      .subscribe((data: any[]) => {
-        this.list.data = data;
-        this.doTableColor();
-      });
+    // const dataList = this.datasetDataMap()
+    //   .flatMap(x => x.datasetDataList)
+    //   .filter(
+    //     (v, i, arr) => arr.findIndex(z => z.datasetName === v.datasetName) === i
+    //   )
+    //   .flatMap(x => x.data);
+    // from(dataList)
+    //   .pipe(
+    //     // 排序-檔名
+    //     groupBy(data => data[this.defaultKey]),
+    //     // 每筆資料轉為陣列
+    //     mergeMap(group => group.pipe(toArray())),
+    //     // 資料大於為重複
+    //     filter(data => data.length > 1),
+    //     // 取出所有陣列資料
+    //     concatMap(data => from(data)),
+    //     // 將所有資料合併為同一陣列
+    //     toArray()
+    //   )
+    //   .subscribe((data: any[]) => {
+    //     this.list.data = data;
+    //     this.doTableColor();
+    //   });
   }
 }

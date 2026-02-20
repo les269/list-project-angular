@@ -30,6 +30,7 @@ import { ThemeDatasetTableComponent } from '../../components/theme-dataset-table
 import { ThemeTagTableComponent } from '../../components/theme-tag-table/theme-tag-table.component';
 import { ThemeOtherSettingComponent } from '../../components/theme-other-setting/theme-other-setting.component';
 import { Store } from '@ngrx/store';
+import { QuickRefreshType } from '../../../dataset/model';
 @Component({
   standalone: true,
   imports: [
@@ -76,6 +77,10 @@ export class ThemeEditComponent implements OnInit {
       showDuplicate: false,
       checkFileExist: '',
       themeVisible: true,
+      useQuickRefresh: false,
+      quickRefresh: '',
+      quickRefreshType: QuickRefreshType.url,
+      useSpider: '',
     },
   };
   eThemeHeaderType = ThemeHeaderType;
@@ -86,8 +91,7 @@ export class ThemeEditComponent implements OnInit {
     private route: ActivatedRoute,
     private themeService: ThemeService,
     private snackbarService: SnackbarService,
-    private translateService: TranslateService,
-    private store: Store
+    private translateService: TranslateService
   ) {}
 
   ngOnInit() {
@@ -177,6 +181,7 @@ export class ThemeEditComponent implements OnInit {
       this.validationDataset() &&
       this.validCustom() &&
       this.validationTag() &&
+      this.validationOther() &&
       this.validationOther()
     );
   }
@@ -366,6 +371,20 @@ export class ThemeEditComponent implements OnInit {
     ) {
       this.snackbarService.openI18N('otherSetting.listPageSizeMoreZero');
       return false;
+    }
+    if (this.model.themeOtherSetting.useQuickRefresh) {
+      if (isBlank(this.model.themeOtherSetting.useSpider)) {
+        this.snackbarService.openI18N('msg.quickRefreshSpiderEmpty');
+        return false;
+      }
+      if (isBlank(this.model.themeOtherSetting.quickRefreshType)) {
+        this.snackbarService.openI18N('otherSetting.quickRefreshTypeRequired');
+        return false;
+      }
+      if (isBlank(this.model.themeOtherSetting.quickRefresh)) {
+        this.snackbarService.isBlankMessage('otherSetting.quickRefresh');
+        return false;
+      }
     }
     for (let custom of this.model.themeOtherSetting.themeTopCustomList) {
       if (isBlank(custom.label)) {

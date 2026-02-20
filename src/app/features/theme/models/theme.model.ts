@@ -1,4 +1,5 @@
 import { ApiConfig } from '../../api-config/model';
+import { QuickRefreshType } from '../../dataset/model';
 
 export interface ThemeHeader {
   name: string;
@@ -21,6 +22,10 @@ export interface ThemeOtherSetting {
   themeTopCustomList: ThemeTopCustom[];
   checkFileExist: string;
   themeVisible: boolean;
+  useQuickRefresh: boolean;
+  quickRefresh: string;
+  quickRefreshType: QuickRefreshType;
+  useSpider: string;
 }
 export interface ThemeHeaderCopy {
   name: string;
@@ -196,3 +201,17 @@ export interface ThemeTopCustomValue {
 export interface ThemeTopCustomValueResponse {
   [byKey: string]: string;
 }
+
+export enum QueryActionType {
+  search = 'search',
+  sort = 'sort',
+  page = 'page',
+  dataset = 'dataset',
+  tag = 'tag',
+}
+export type QueryAction =
+  | { type: QueryActionType.search }
+  | { type: QueryActionType.sort; key: string; asc: boolean }
+  | { type: QueryActionType.page; page: number }
+  | { type: QueryActionType.dataset; seq: number }
+  | { type: QueryActionType.tag; seq: number };

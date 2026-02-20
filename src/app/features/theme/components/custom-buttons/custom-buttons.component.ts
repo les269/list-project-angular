@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input, Input } from '@angular/core';
 
 import { MatIconModule } from '@angular/material/icon';
 import {
@@ -32,8 +32,7 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
   styleUrl: './custom-buttons.component.scss',
 })
 export class CustomButtonsComponent {
-  @Input({ required: true }) themeHeaderType: ThemeHeaderType =
-    ThemeHeaderType.imageList;
+  themeHeaderType = input.required<ThemeHeaderType>();
   @Input({ required: true }) themeCustomList: ThemeCustom[] = [];
   @Input({ required: true }) data: any;
   @Input({ required: true }) headerId: string = '';
@@ -246,7 +245,7 @@ export class CustomButtonsComponent {
   }
   visibleByDatasetName(custom: ThemeCustom): boolean {
     if (
-      this.themeHeaderType === ThemeHeaderType.imageList &&
+      this.themeHeaderType() === ThemeHeaderType.imageList &&
       Array.isArray(custom.visibleDatasetNameList) &&
       custom.visibleDatasetNameList.length > 0 &&
       !custom.visibleDatasetNameList.includes(this.currentDatasetName)

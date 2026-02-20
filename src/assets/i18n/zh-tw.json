@@ -54,7 +54,9 @@
     "changeDatabaseSuccess": "更換資料庫成功",
     "diskFailLoad": "硬碟讀取失敗",
     "refreshFailed": "刷新失敗",
-    "confirmDeleteDisk": "是否要刪除硬碟 '{{disk}}'?"
+    "confirmDeleteDisk": "是否要刪除硬碟 '{{disk}}'?",
+    "quickRefreshSpiderEmpty": "選擇快速刷新要使用的爬蟲",
+    "quickRefreshTypeRequired": "選擇快速刷新要使用的哪種參數方式"
   },
   "g": {
     "edit": "編輯",
@@ -242,7 +244,8 @@
     "datasetEmpty": "設定資料集不能為空",
     "selectDataset": "選擇變更資料集",
     "editData": "編輯資料",
-    "refreshData": "刷新資料"
+    "refreshData": "刷新資料",
+    "quickRefresh": "快速刷新"
   },
   "themeCustom": {
     "title": "資料自定義功能",
@@ -300,7 +303,12 @@
     "defaultColor": "重設為預設顏色",
     "listPageSizeMoreZero": "圖片清單每頁預設顯示數量要大於0",
     "checkFileExist": "檢查檔案是否存在",
-    "checkFileExistPH": "ex: C:\\file\\${fileName} ${fileName}=>id是指data的fileName"
+    "checkFileExistPH": "ex: C:\\file\\${fileName} ${fileName}=>id是指data的fileName",
+    "quickRefresh": "快速刷新設定",
+    "useQuickRefresh": "是否使用快速刷新",
+    "refreshByParams": "使用參數",
+    "refreshByUrl": "使用網址",
+    "quickRefreshPH": "填入key值,例如填入id那就會把data的id當參數進行刷新,使用參數時可以使用','號進行分隔例如id,name那就會把data的id跟name當參數進行刷新"
   },
   "themeTag": {
     "title": "標籤設定",

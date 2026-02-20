@@ -13,11 +13,8 @@ export class FileService {
   moveTo(req: FileRequest): Observable<boolean> {
     return this.http.post<boolean>('/file/move-to', req);
   }
-  fileExist(req: FileExistRequest[]): Observable<{ [key in string]: boolean }> {
-    return this.http.post<{ [key in string]: boolean }>(
-      '/file/file-exist',
-      req
-    );
+  fileExist(req: FileExistRequest[]): Observable<Record<string, boolean>> {
+    return this.http.post<Record<string, boolean>>('/file/file-exist', req);
   }
   openFolder(req: FileRequest): Observable<boolean> {
     return this.http.post<boolean>('/file/open-file', req);

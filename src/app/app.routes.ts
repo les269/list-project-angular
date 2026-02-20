@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { ThemeHeaderType } from './features/theme/models';
 
 export const routes: Routes = [
   {
@@ -127,6 +128,7 @@ export const routes: Routes = [
       import('./features/theme/pages/image-list-view/image-list-view.component').then(
         mod => mod.ImageListViewComponent
       ),
+    data: { type: ThemeHeaderType.imageList },
   },
   {
     path: 'table/:name/:version',
@@ -134,6 +136,7 @@ export const routes: Routes = [
       import('./features/theme/pages/table-view/table-view.component').then(
         mod => mod.TableViewComponent
       ),
+    data: { type: ThemeHeaderType.table },
   },
   {
     path: 'replace-value-map',

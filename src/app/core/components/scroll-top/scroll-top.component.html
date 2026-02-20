@@ -1,5 +1,9 @@
 @if (isVisible) {
-  <div class="go-to-top" @fadeInOut (click)="scrollToTop()">
+  <div
+    class="go-to-top"
+    animate.enter="fade-in"
+    animate.leave="fade-out"
+    (click)="scrollToTop()">
     <mat-icon>arrow_upward</mat-icon>
   </div>
 }

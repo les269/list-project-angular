@@ -21,12 +21,33 @@
     margin: 4px;
   }
 }
+.fade-in {
+  animation: fade-in 100ms ease-in;
+}
+.fade-out {
+  animation: fade-out 100ms ease-out;
+}
 
-@keyframes test {
-  from {
-    left: 0;
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    display: none;
   }
-  to {
-    left: 100px;
+
+  100% {
+    opacity: 1;
+    display: block;
+  }
+}
+
+@keyframes fade-out {
+  0% {
+    opacity: 1;
+    display: block;
+  }
+
+  100% {
+    opacity: 0;
+    display: none;
   }
 }

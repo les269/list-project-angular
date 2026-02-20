@@ -51,3 +51,16 @@ export enum DatasetConfigType {
   text = 'text',
   pagination = 'pagination',
 }
+export enum QuickRefreshType {
+  params = 'params',
+  url = 'url',
+}
+export interface DatasetQuickRefreshTO {
+  byKey: string;
+  primeKey: string;
+  scrapyName: string;
+  datasetName: string;
+  url: string;
+  params: string[];
+  quickRefreshType: QuickRefreshType;
+}
