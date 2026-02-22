@@ -1,4 +1,10 @@
-import { computed, inject, Injectable, resource, signal } from '@angular/core';
+import {
+  computed,
+  inject,
+  Injectable,
+  linkedSignal,
+  signal,
+} from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -170,14 +176,13 @@ export class ListBaseViewStore {
   });
 
   refreshDate = signal<Date>(new Date());
-  queryAction = signal<QueryAction | null>(null);
   queryParamsSearchValue = toSignal(
     this.route.queryParamMap.pipe(
       map(params => params.get('searchValue') ?? '')
     ),
     { initialValue: '' }
   );
-  searchValue = signal<string>(this.queryParamsSearchValue());
+  searchValue = linkedSignal(() => this.queryParamsSearchValue());
   searchValueDebounced = toSignal(
     toObservable(this.searchValue).pipe(
       debounceTime(300),
@@ -292,7 +297,7 @@ export class ListBaseViewStore {
     ),
     { initialValue: -1 }
   );
-  datasetSeq = signal(this.queryParamsDataset());
+  datasetSeq = linkedSignal(() => this.queryParamsDataset());
   useDataset = computed<ThemeDataset>(() => {
     const list = this.themeDatasetList();
     const seq = this.datasetSeq();
@@ -319,7 +324,7 @@ export class ListBaseViewStore {
     ),
     { initialValue: -1 }
   );
-  shareTagSeq = signal(this.queryParamsShareTag());
+  shareTagSeq = linkedSignal(() => this.queryParamsShareTag());
   useShareTag = computed<ThemeTag>(() => {
     const seq = this.shareTagSeq();
     if (seq === -1) {
@@ -471,7 +476,7 @@ export class ListBaseViewStore {
     this.route.queryParamMap.pipe(map(params => params.get('sort') ?? '')),
     { initialValue: '' }
   );
-  sortKey = signal(this.queryParamsSort());
+  sortKey = linkedSignal(() => this.queryParamsSort());
   sortValue = computed<SortType | undefined>(() => {
     const sortArray = this.sortArray();
     if (sortArray.length === 0) return;
@@ -496,12 +501,12 @@ export class ListBaseViewStore {
     ),
     { initialValue: 1 }
   );
-  currentPage = signal(this.queryParamsPage());
+  currentPage = linkedSignal(() => this.queryParamsPage());
   queryParamsAsc = toSignal(
     this.route.queryParamMap.pipe(map(params => params.get('asc') === 'true')),
     { initialValue: true }
   );
-  ascFlag = signal(this.queryParamsAsc());
+  ascFlag = linkedSignal(() => this.queryParamsAsc());
 
   customValueRequest = computed(() => {
     const headerId = this.headerId();
