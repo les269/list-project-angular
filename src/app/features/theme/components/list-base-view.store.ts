@@ -58,6 +58,9 @@ import { updateTitle } from '../../../shared/state/layout.actions';
 import { EditGroupDatasetDataComponent } from '../../dataset/components/edit-group-dataset-data/edit-group-dataset-data.component';
 import { DatasetData } from '../../dataset/model';
 
+/**
+ * @deprecated 已拆分
+ */
 @Injectable()
 export class ListBaseViewStore {
   readonly themeService = inject(ThemeService);

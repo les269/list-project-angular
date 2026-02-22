@@ -129,11 +129,24 @@ export class DataStore {
     return themeTagListForSelect[seq];
   });
 
+  shareTagValueListReq = computed(() =>
+    this.headerStore.themeTagList().map(t => t.shareTagId)
+  );
+
+  shareTagValueList = rxResource({
+    params: () => this.shareTagValueListReq(),
+    stream: ({ params }) => this.shareTagService.getShareTagValues(params),
+    defaultValue: [],
+  });
+
   // placeholder for shareTagValueMap (will be expanded in ResourceStore)
   shareTagValueMap = computed<Record<string, string[]>>(() => {
     const result: Record<string, string[]> = {};
     for (const t of this.headerStore.themeTagList()) {
       result[t.shareTagId] = [];
+    }
+    for (const v of this.shareTagValueList.value() ?? []) {
+      (result[v.shareTagId] ??= []).push(v.value);
     }
     return result;
   });

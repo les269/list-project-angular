@@ -101,9 +101,6 @@ export class ListBaseViewStoreAdapter {
   get topCustomValueMap() {
     return this.headerStore.topCustomValueMap;
   }
-  get shareTagValueList() {
-    return this.headerStore.shareTagValueList;
-  }
   get themeTopCustomList() {
     return this.headerStore.themeTopCustomList;
   }
@@ -140,6 +137,9 @@ export class ListBaseViewStoreAdapter {
   }
   get shareTagNameMap() {
     return this.dataStore.shareTagNameMap;
+  }
+  get shareTagValueList() {
+    return this.dataStore.shareTagValueList;
   }
   changeDataset = (event: ThemeDataset) =>
     this.dataStore.changeDataset(event.seq);

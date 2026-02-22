@@ -95,16 +95,6 @@ export class HeaderStore {
       .sort(sortSeq);
   });
 
-  shareTagValueListReq = computed(() =>
-    this.themeTagList().map(t => t.shareTagId)
-  );
-
-  shareTagValueList = rxResource({
-    params: () => this.shareTagValueListReq(),
-    stream: ({ params }) => this.shareTagService.getShareTagValues(params),
-    defaultValue: [],
-  });
-
   topCustomValueMap = rxResource({
     params: () => this.headerId(),
     stream: ({ params }) => this.themeService.findTopCustomValue(params),
