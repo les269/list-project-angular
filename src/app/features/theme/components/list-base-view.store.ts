@@ -333,9 +333,7 @@ export class ListBaseViewStore {
     }
     return this.themeTagListForSelect()[seq];
   });
-  refreshTrigger = signal(0);
   useData = computed(() => {
-    this.refreshTrigger();
     const dataset = this.useDataset();
     const dataList = this.datasetDataMap().find(
       x => x.themeDataset.label === dataset.label
@@ -669,7 +667,7 @@ export class ListBaseViewStore {
     this.datasetService
       .refreshDataByNameList(this.useDataset().datasetList)
       .subscribe(x => {
-        this.refreshTrigger.update(v => v + 1);
+        this.datasetDataList.reload();
         this.refreshDate.set(new Date());
         this.snackbarService.openI18N('msg.refreshSuccess');
       });
