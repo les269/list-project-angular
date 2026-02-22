@@ -34,7 +34,6 @@ import {
 import { CustomMatPaginatorIntl } from '../../../../core/components/custom-mat-paginatorIntl/custom-mat-paginatorIntl';
 import { MatIconModule } from '@angular/material/icon';
 import { ListItemValueComponent } from '../../components/list-item-value/list-item-value.component';
-import { ListBaseViewComponent } from '../../components/list-base-view.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonModule } from '@angular/material/button';
 import { CustomButtonsComponent } from '../../components/custom-buttons/custom-buttons.component';

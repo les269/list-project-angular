@@ -32,7 +32,6 @@ import {
   ThemeOtherSetting,
   ThemeTag,
   ThemeTopCustom,
-  ThemeTopCustomValueResponse,
 } from '../models';
 import {
   debounceTime,
@@ -121,6 +120,8 @@ export class ListBaseViewStore {
     const asc = this.queryParamsAsc();
 
     let data = this.filterBySearch();
+    // avoid mutating original array when sorting
+    data = data.slice();
     if (tag && tag.seq !== -1) {
       const valueSet = new Set(tagValueMap[tag.shareTagId] ?? []);
       data = data.filter(x => valueSet.has(x[defaultKey]));
@@ -207,7 +208,10 @@ export class ListBaseViewStore {
   visibleLabelList = computed<ThemeLabel[]>(() => {
     const labelList = this.themeHeader.value()?.themeLabelList;
     return Array.isArray(labelList)
-      ? labelList.sort(sortSeq).filter(x => x.isVisible)
+      ? labelList
+          .slice()
+          .sort(sortSeq)
+          .filter(x => x.isVisible)
       : [];
   });
   themeDatasetList = computed<ThemeDataset[]>(() => {
@@ -215,7 +219,7 @@ export class ListBaseViewStore {
     if (this.themeHeader.status() !== 'resolved') {
       return [];
     }
-    return this.themeHeader.value().themeDatasetList.sort(sortSeq);
+    return this.themeHeader.value().themeDatasetList.slice().sort(sortSeq);
   });
   datasetDataListReq = computed(() => {
     const list = this.themeDatasetList().flatMap(x => x.datasetList);
@@ -247,13 +251,14 @@ export class ListBaseViewStore {
     defaultValue: [],
   });
   themeCustomList = computed<ThemeCustom[]>(
-    () => this.themeHeader.value()?.themeCustomList.sort(sortSeq) ?? []
+    () => this.themeHeader.value()?.themeCustomList?.slice().sort(sortSeq) ?? []
   );
   themeTopCustomList = computed<ThemeTopCustom[]>(
     () =>
       this.themeHeader
         .value()
-        ?.themeOtherSetting?.themeTopCustomList.sort(sortSeq) ?? []
+        ?.themeOtherSetting?.themeTopCustomList?.slice()
+        .sort(sortSeq) ?? []
   );
   displayedColumns = computed<string[]>(() => [
     ...this.visibleLabelList().map(x => x.byKey),
@@ -599,22 +604,23 @@ export class ListBaseViewStore {
 
   //上一頁
   prePage() {
-    const page = this.queryParamsPage() - 1;
-    this.currentPage.set(page);
-    this.patchQuery({
-      type: QueryActionType.page,
-      page: page > 0 ? page : 1,
-    });
+    this.setPage(this.currentPage() - 1);
   }
   //下一頁
   nextPage() {
-    const page = this.queryParamsPage() + 1;
-    const totalPage = this.pages().length;
-    this.currentPage.set(page);
-    this.patchQuery({
-      type: QueryActionType.page,
-      page: page > totalPage ? totalPage : page,
-    });
+    this.setPage(this.currentPage() + 1);
+  }
+
+  /**
+   * Set page with clamping and update query params atomically
+   */
+  setPage(page: number) {
+    const total = Math.max(1, this.pages().length);
+    const target = Number.isFinite(page)
+      ? Math.min(Math.max(1, page), total)
+      : 1;
+    this.currentPage.set(target);
+    this.patchQuery({ type: QueryActionType.page, page: target });
   }
 
   /**

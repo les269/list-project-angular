@@ -31,7 +31,13 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FixedImageComponent } from '../../../../core/components/fixed-image/fixed-image.component';
 import { ItemTagButtonsComponent } from '../../components/item-tag-buttons/item-tag-buttons.component';
 import { ImgContentComponent } from '../../components/img-content/img-content.component';
-import { ListBaseViewStore } from '../../components/list-base-view.store';
+import { ListBaseViewStoreAdapter } from '../../stores/list-base-view.adapter';
+import { RouteStore } from '../../stores/route.store';
+import { HeaderStore } from '../../stores/header.store';
+import { DataStore } from '../../stores/data.store';
+import { FilterStore } from '../../stores/filter.store';
+import { ResourceStore } from '../../stores/resource.store';
+import { UIStateStore } from '../../stores/ui.state.store';
 
 @Component({
   standalone: true,
@@ -52,13 +58,21 @@ import { ListBaseViewStore } from '../../components/list-base-view.store';
     ItemTagButtonsComponent,
     ImgContentComponent,
   ],
-  providers: [ListBaseViewStore],
+  providers: [
+    ListBaseViewStoreAdapter,
+    RouteStore,
+    HeaderStore,
+    DataStore,
+    FilterStore,
+    ResourceStore,
+    UIStateStore,
+  ],
   selector: 'app-image-list-view',
   templateUrl: 'image-list-view.component.html',
   styleUrl: 'image-list-view.component.scss',
 })
 export class ImageListViewComponent {
-  readonly store = inject(ListBaseViewStore);
+  readonly store = inject(ListBaseViewStoreAdapter);
 
   replaceImageUrl = replaceValue;
   ctrlPressed = signal<boolean>(false);
@@ -66,18 +80,27 @@ export class ImageListViewComponent {
   fixedImage = viewChild<FixedImageComponent>('fixedImage');
 
   constructor() {
+    // 監聽路由變化並滾動到頂部
     effect(() => {
       this.store.queryParamMap();
       setTimeout(() => this.toTop());
     });
+
+    // 驗證必要的 headerId
     effect(() => {
       if (isBlank(this.store.headerId())) {
         this.store.router.navigate(['']);
       }
     });
   }
-  toTop() {
+
+  private toTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  private updateQueryAndScroll(action: any) {
+    this.store.patchQuery(action);
+    this.toTop();
   }
 
   getImageUrl(data: any) {
@@ -128,15 +151,14 @@ export class ImageListViewComponent {
   tagValueUpdate(event: ShareTagValue) {
     const list = this.store.shareTagValueMap()[event.shareTagId];
     const index = list.indexOf(event.value);
-    if (index > -1) {
-      this.store.shareTagService.deleteTagValue(event).subscribe(() => {
-        this.store.shareTagValueList.reload();
-      });
-    } else {
-      this.store.shareTagService.addTagValue(event).subscribe(() => {
-        this.store.shareTagValueList.reload();
-      });
-    }
+    const service$ =
+      index > -1
+        ? this.store.shareTagService.deleteTagValue(event)
+        : this.store.shareTagService.addTagValue(event);
+
+    service$.subscribe(() => {
+      this.store.shareTagValueList.reload();
+    });
   }
 
   quickRefresh(element: any) {
@@ -144,17 +166,17 @@ export class ImageListViewComponent {
     const byKey = this.store.defaultKey();
     const primeKey = element[byKey];
     const otherSetting = this.store.themeOtherSetting();
+
     if (!otherSetting) return;
+
     const scrapyName = otherSetting.useSpider;
-    var params = [];
-    var url = '';
-    if (otherSetting.quickRefreshType === 'params') {
-      params = element[otherSetting.quickRefresh]
-        .split(',')
-        .map((x: string) => element[x.trim()]);
-    } else if (otherSetting.quickRefreshType === 'url') {
-      url = element[otherSetting.quickRefresh].trim();
-    }
+    const isParamType = otherSetting.quickRefreshType === 'params';
+    const params = isParamType
+      ? element[otherSetting.quickRefresh]
+          .split(',')
+          .map((x: string) => element[x.trim()])
+      : [];
+    const url = isParamType ? '' : element[otherSetting.quickRefresh].trim();
 
     this.store.datasetService
       .quickRefreshDataset({
@@ -177,51 +199,38 @@ export class ImageListViewComponent {
 
   changeSort(event: SortType) {
     this.store.sortKey.set(event.key);
-    this.store.patchQuery({
+    this.updateQueryAndScroll({
       type: QueryActionType.sort,
       key: event.key,
       asc: this.store.queryParamsAsc(),
     });
-    this.toTop();
   }
+
   changeAsc() {
     this.store.ascFlag.update(x => !x);
-    this.store.patchQuery({
+    this.updateQueryAndScroll({
       type: QueryActionType.sort,
       key: this.store.queryParamsSort(),
       asc: this.store.ascFlag(),
     });
-    this.toTop();
   }
+
   changePage(page: number) {
-    this.store.currentPage.set(page);
-    this.store.patchQuery({
-      type: QueryActionType.page,
-      page,
-    });
+    this.store.setPage(page);
     this.toTop();
   }
 
   getData(data: any) {
-    const id = data[this.store.defaultKey()];
-    const refreshData = this.store.quickRefreshResult()[id];
-    if (refreshData) {
-      return { ...data, ...refreshData };
-    }
-    return data;
+    const refreshData =
+      this.store.quickRefreshResult()[data[this.store.defaultKey()]];
+    return refreshData ? { ...data, ...refreshData } : data;
   }
 
   @HostListener('window:keydown', ['$event'])
-  onKeyDown(event: KeyboardEvent) {
-    if (event.key === 'Control') {
-      this.ctrlPressed.set(true);
-    }
-  }
-
   @HostListener('window:keyup', ['$event'])
-  onKeyUp(event: KeyboardEvent) {
+  onKeyToggle(event: KeyboardEvent) {
     if (event.key === 'Control') {
-      this.ctrlPressed.set(false);
+      this.ctrlPressed.set(event.type === 'keydown');
     }
   }
 }

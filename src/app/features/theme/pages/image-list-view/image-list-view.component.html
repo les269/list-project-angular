@@ -8,7 +8,7 @@
           [ngModel]="store.useDataset()"
           [matTooltip]="'themeDataset.selectDataset' | translate"
           (ngModelChange)="store.changeDataset($event)">
-          @for (dataset of store.themeDatasetList(); track $index) {
+          @for (dataset of store.themeDatasetList(); track dataset.seq) {
             <option [ngValue]="dataset">
               {{ dataset.label }}
             </option>
@@ -25,7 +25,7 @@
           [ngModel]="store.useShareTag()"
           [matTooltip]="'themeTag.selectTag' | translate"
           (ngModelChange)="store.changeShareTag($event)">
-          @for (tag of store.themeTagListForSelect(); track $index) {
+          @for (tag of store.themeTagListForSelect(); track tag.shareTagId) {
             <option [ngValue]="tag">
               {{ store.shareTagNameMap()[tag.shareTagId] || tag.shareTagId }}
               {{
@@ -135,7 +135,7 @@
       [compareWith]="store.compareSort"
       [ngModel]="store.sortValue()"
       (ngModelChange)="changeSort($event)">
-      @for (sort of store.sortArray(); track $index) {
+      @for (sort of store.sortArray(); track sort.key) {
         <option [ngValue]="sort">
           {{ sort.label }}
         </option>
@@ -152,7 +152,7 @@
       class="list-select"
       [ngModel]="store.currentPage()"
       (ngModelChange)="changePage($event)">
-      @for (page of store.pages(); track $index) {
+      @for (page of store.pages(); track page) {
         <option [ngValue]="page">{{ page }} {{ 'g.page' | translate }}</option>
       }
     </select>
@@ -180,7 +180,11 @@
   }
 </ng-template>
 <ng-template #dataListRef>
-  @for (data of store.viewData(); track $index; let i = $index) {
+  @for (
+    data of store.viewData();
+    track store.defaultKey() ? data[store.defaultKey()] : $index;
+    let i = $index
+  ) {
     <div
       class="d-flex card"
       (mouseenter)="store.hoveredIndex.set(i)"
@@ -230,7 +234,7 @@
           <div class="detail-rows scrollbar-primary">
             @for (
               label of store.visibleLabelList();
-              track $index;
+              track label.byKey;
               let idx = $index
             ) {
               @if (
