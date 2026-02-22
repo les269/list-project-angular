@@ -1,5 +1,5 @@
 <div class="buttons">
-  @for (custom of themeTopCustomList; track $index) {
+  @for (custom of themeTopCustomList(); track $index) {
     @switch (custom.type) {
       @case ('openUrl') {
         <a

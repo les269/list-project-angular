@@ -1,12 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  input,
-  Input,
-  OnInit,
-  output,
-  Output,
-} from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 
 import { ShareTagValue, ThemeTag } from '../../models';
 import { MatIconModule } from '@angular/material/icon';
@@ -22,13 +14,17 @@ export class ItemTagButtonsComponent {
   value = input.required<string>();
   themeTagList = input.required<ThemeTag[]>();
   data = input.required<any>();
-  shareTagNameMap = input.required<{ [key in string]: string }>();
-  shareTagValueMap = input.required<{ [key in string]: string[] }>();
+  shareTagNameMap = input.required<Record<string, string>>();
+  shareTagValueMap = input.required<Record<string, string[]>>();
   tagValueUpdate = output<ShareTagValue>();
 
-  showTagCheck(shareTagId: string): boolean {
-    return this.shareTagValueMap()[shareTagId]?.includes(this.value());
-  }
+  checkedTags = computed(() => {
+    const valueMap = this.shareTagValueMap();
+    const currentValue = this.value();
+    return new Set(
+      Object.keys(valueMap).filter(id => valueMap[id]?.includes(currentValue))
+    );
+  });
 
   onSetTag(shareTagId: string) {
     this.tagValueUpdate.emit({

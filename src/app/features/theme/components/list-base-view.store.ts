@@ -143,6 +143,7 @@ export class ListBaseViewStore {
 
     return data;
   });
+  totalLength = computed(() => this.filterData().length);
   viewData = computed(() => {
     const page = this.queryParamsPage();
     const pageSize = this.pageSize();

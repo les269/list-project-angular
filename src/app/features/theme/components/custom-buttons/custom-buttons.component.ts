@@ -1,4 +1,12 @@
-import { Component, input, Input } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  signal,
+  effect,
+  linkedSignal,
+} from '@angular/core';
 
 import { MatIconModule } from '@angular/material/icon';
 import {
@@ -12,7 +20,6 @@ import {
   isBlank,
   isNotBlank,
   isNotNull,
-  isNull,
   replaceValue,
 } from '../../../../shared/util/helper';
 import { ThemeService } from '../../services/theme.service';
@@ -32,126 +39,104 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
   styleUrl: './custom-buttons.component.scss',
 })
 export class CustomButtonsComponent {
+  private readonly themeService = inject(ThemeService);
+  private readonly matDialog = inject(MatDialog);
+  private readonly apiConfigService = inject(ApiConfigService);
+  private readonly fileService = inject(FileService);
+  private readonly snackbarService = inject(SnackbarService);
+
   themeHeaderType = input.required<ThemeHeaderType>();
-  @Input({ required: true }) themeCustomList: ThemeCustom[] = [];
-  @Input({ required: true }) data: any;
-  @Input({ required: true }) headerId: string = '';
-  @Input({ required: true }) defaultKey: string = '';
-  @Input({ required: true }) customValueMap: ThemeCustomValueResponse = {};
-  @Input({ required: true }) fileExist: { [key in string]: boolean } = {};
-  @Input() currentDatasetName: string = '';
+  themeCustomList = input.required<ThemeCustom[]>();
+  data = input.required<any>();
+  headerId = input.required<string>();
+  defaultKey = input.required<string>();
+  customValueMap = input.required<ThemeCustomValueResponse>();
+  currentDatasetName = input<string>('');
+  fileExist = input<Record<string, boolean>>({});
+  fileExistSync = linkedSignal(() => ({ ...this.fileExist() }));
   replaceValue = replaceValue;
 
-  constructor(
-    private themeService: ThemeService,
-    private matDialog: MatDialog,
-    private apiConfigService: ApiConfigService,
-    private fileService: FileService,
-    private snackbarService: SnackbarService
-  ) {}
+  customValueCache = computed(() => {
+    const map = this.customValueMap();
+    const dataKey = this.data()[this.defaultKey()];
+    return map[dataKey] ?? {};
+  });
 
-  /**
-   * 檢查是否有存在自訂字串
-   * @param data
-   * @param custom
-   * @returns
-   */
-  checkCustomValueExist(data: any, custom: ThemeCustom): boolean {
-    if (
-      isBlank(this.defaultKey) ||
-      isBlank(data[this.defaultKey]) ||
-      isNull(this.customValueMap[data[this.defaultKey]]) ||
-      isNull(this.customValueMap[data[this.defaultKey]][custom.byKey])
-    ) {
-      return false;
-    }
-    return true;
-  }
+  fileExistForCurrentData = computed(() => {
+    return this.fileExistSync()[this.data()[this.defaultKey()]] ?? false;
+  });
 
-  getCustomValue(data: any, custom: ThemeCustom) {
-    if (this.checkCustomValueExist(data, custom)) {
-      return this.customValueMap[data[this.defaultKey]][custom.byKey];
-    }
-    return '';
+  getCustomValue(custom: ThemeCustom): string {
+    return this.customValueCache()[custom.byKey] ?? '';
   }
 
   /**
    * 取得UI要使用的自定義資料的字串
-   * @param data
-   * @param custom
-   * @returns
    */
-  getCustomValueForUI(data: any, custom: ThemeCustom) {
-    let result: any = '';
-    let value = '';
-    if (this.checkCustomValueExist(data, custom)) {
-      value = this.customValueMap[data[this.defaultKey]][custom.byKey];
-    }
+  getCustomValueForUI(custom: ThemeCustom): any {
+    const value = this.getCustomValue(custom);
 
     switch (custom.type) {
       case 'buttonIconBoolean':
-        if (isBlank(value) || value === 'true') {
-          result = custom.buttonIconTrue;
-        } else {
-          result = custom.buttonIconFalse;
-        }
-        break;
+        return isBlank(value) || value === 'true'
+          ? custom.buttonIconTrue
+          : custom.buttonIconFalse;
       case 'buttonIconFill':
-        result = value === 'true';
-        break;
+        return value === 'true';
+      default:
+        return '';
     }
-    return result;
   }
 
   /**
    * 執行更新自定義字串
-   * @param custom
-   * @param data
-   * @param value
    */
   changeCustomValue(
-    data: any,
     custom: ThemeCustom,
     value?: any,
     options?: { isDialogSave?: boolean }
   ) {
-    let req: ThemeCustomValue = {
-      headerId: this.headerId,
-      byKey: custom.byKey,
-      correspondDataValue: data[this.defaultKey],
-      customValue: value,
-    };
-    let x = this.getCustomValue(data, custom);
-    //定義每種資料改變方式
+    const currentValue = this.getCustomValue(custom);
+    let newValue = value;
+
     switch (custom.type) {
       case 'buttonIconBoolean':
-        req.customValue = isBlank(x) || x === 'true' ? 'false' : 'true';
+        newValue =
+          isBlank(currentValue) || currentValue === 'true' ? 'false' : 'true';
         break;
       case 'buttonIconFill':
-        req.customValue = !(x === 'true') + '';
+        newValue = !(currentValue === 'true') + '';
         break;
       case 'buttonInputUrl':
-        req.customValue = value;
+        newValue = value;
         break;
     }
 
+    const req: ThemeCustomValue = {
+      headerId: this.headerId(),
+      byKey: custom.byKey,
+      correspondDataValue: this.data()[this.defaultKey()],
+      customValue: newValue,
+    };
+
     this.themeService.updateCustomValue(req).subscribe(() => {
-      this.customValueMap[req.correspondDataValue][req.byKey] = req.customValue;
+      this.customValueMap()[req.correspondDataValue][req.byKey] =
+        req.customValue;
       if (options?.isDialogSave) {
         this.snackbarService.openI18N('msg.saveSuccess');
       }
     });
   }
 
-  openButtonInputUrlDialog(data: any, custom: ThemeCustom) {
+  openButtonInputUrlDialog(custom: ThemeCustom) {
     const dialogRef = this.matDialog.open(ButtonInputUrlDialog, {
       width: '600px',
-      data: this.getCustomValue(data, custom),
+      data: this.getCustomValue(custom),
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (isNotNull(result)) {
-        this.changeCustomValue(data, custom, result);
+        this.changeCustomValue(custom, result);
       }
     });
   }
@@ -164,23 +149,16 @@ export class CustomButtonsComponent {
     window.open(text, target);
   }
 
-  onOpenUrl(data: any, custom: ThemeCustom) {
-    this.openNewPage(
-      replaceValue(custom.openUrl, data),
-      custom.openWindowsTarget
-    );
-  }
-
-  openNoteDialog(data: any, custom: ThemeCustom, type: 'read' | 'write') {
+  openNoteDialog(custom: ThemeCustom, type: 'read' | 'write') {
     this.matDialog
       .open(ThemeNoteComponent, {
         data: {
           title: custom.label,
-          value: this.getCustomValue(data, custom) ?? '',
+          value: this.getCustomValue(custom) ?? '',
           disabled: type === 'read',
           save: (result: string) => {
             if (isNotNull(result)) {
-              this.changeCustomValue(data, custom, result, {
+              this.changeCustomValue(custom, result, {
                 isDialogSave: true,
               });
             }
@@ -192,23 +170,27 @@ export class CustomButtonsComponent {
       .afterClosed()
       .subscribe(result => {
         if (isNotNull(result)) {
-          this.changeCustomValue(data, custom, result);
+          this.changeCustomValue(custom, result);
         }
       });
   }
 
-  callApi(data: any, custom: ThemeCustom) {
+  callApi(custom: ThemeCustom) {
     if (custom.apiConfig) {
-      this.apiConfigService.callSingleApi(custom.apiConfig, data);
+      this.apiConfigService.callSingleApi(custom.apiConfig, this.data());
     }
   }
 
-  deleteFile(data: any, custom: ThemeCustom) {
+  deleteFile(custom: ThemeCustom) {
     if (isNotBlank(custom.deleteFile)) {
       this.fileService
-        .delete({ path: replaceValue(custom.deleteFile, data) })
+        .delete({ path: replaceValue(custom.deleteFile, this.data()) })
         .subscribe(x => {
-          this.fileExist[this.data[this.defaultKey]] = !x;
+          const currentKey = this.data()[this.defaultKey()];
+          this.fileExistSync.update(map => ({
+            ...map,
+            [currentKey]: !x,
+          }));
           this.snackbarService.openI18N(
             x ? 'msg.deleteFileSuccess' : 'msg.deleteFail'
           );
@@ -216,15 +198,19 @@ export class CustomButtonsComponent {
     }
   }
 
-  moveTo(data: any, custom: ThemeCustom) {
+  moveTo(custom: ThemeCustom) {
     if (isNotBlank(custom.moveTo) && isNotBlank(custom.filePathForMoveTo)) {
       this.fileService
         .moveTo({
-          path: replaceValue(custom.filePathForMoveTo, data),
-          moveTo: replaceValue(custom.moveTo, data),
+          path: replaceValue(custom.filePathForMoveTo, this.data()),
+          moveTo: replaceValue(custom.moveTo, this.data()),
         })
         .subscribe(x => {
-          this.fileExist[this.data[this.defaultKey]] = !x;
+          const currentKey = this.data()[this.defaultKey()];
+          this.fileExistSync.update(map => ({
+            ...map,
+            [currentKey]: !x,
+          }));
           this.snackbarService.openI18N(
             x ? 'msg.moveToFileSuccess' : 'msg.moveToFileFail'
           );
@@ -232,10 +218,10 @@ export class CustomButtonsComponent {
     }
   }
 
-  openFolder(data: any, custom: ThemeCustom) {
+  openFolder(custom: ThemeCustom) {
     if (isNotBlank(custom.openFolder)) {
       this.fileService
-        .openFolder({ path: replaceValue(custom.openFolder, data) })
+        .openFolder({ path: replaceValue(custom.openFolder, this.data()) })
         .subscribe(x => {
           this.snackbarService.openI18N(
             x ? 'msg.openFolderSuccess' : 'msg.openFolderFail'
@@ -243,12 +229,13 @@ export class CustomButtonsComponent {
         });
     }
   }
+
   visibleByDatasetName(custom: ThemeCustom): boolean {
     if (
       this.themeHeaderType() === ThemeHeaderType.imageList &&
       Array.isArray(custom.visibleDatasetNameList) &&
       custom.visibleDatasetNameList.length > 0 &&
-      !custom.visibleDatasetNameList.includes(this.currentDatasetName)
+      !custom.visibleDatasetNameList.includes(this.currentDatasetName())
     ) {
       return false;
     }

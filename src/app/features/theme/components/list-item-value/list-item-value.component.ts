@@ -1,8 +1,8 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ArrayTextComponent } from '../array-text/array-text.component';
 import { FileSizePipe } from '../../../../shared/util/util.pipe';
-import { ThemeLabel } from '../../models/theme.model';
+import { ThemeLabel, ThemeLabelType } from '../../models/theme.model';
 import { MatIconModule } from '@angular/material/icon';
 import { CopyDirective } from '../../../../shared/util/util.directive';
 import { isBlank, isNotBlank } from '../../../../shared/util/helper';
@@ -21,21 +21,26 @@ import { isBlank, isNotBlank } from '../../../../shared/util/helper';
   styleUrl: './list-item-value.component.scss',
 })
 export class ListItemValueComponent {
-  @Input({ required: true }) themeLabel!: ThemeLabel;
-  @Input({ required: true }) data!: any;
-  @Input({ required: true }) isHover: boolean = false;
-  @Input({ required: true }) seqKey: string = '';
-  @Output() searchChange = new EventEmitter<string>();
+  themeLabel = input.required<ThemeLabel>();
+  data = input.required<any>();
+  isHover = input.required<boolean>();
+  seqKey = input.required<string>();
+  searchChange = output<string>();
+  themeLabelType = ThemeLabelType;
 
-  getStringSplit(label: ThemeLabel, view: any): string[] {
-    if (isBlank(view[label.byKey])) {
+  stringSplitData = computed(() => {
+    const label = this.themeLabel();
+    const view = this.data();
+    const value = view[label.byKey];
+
+    if (isBlank(value)) {
       return [];
     }
-    return view[label.byKey]
+    return value
       .split(label.splitBy)
       .filter((x: string) => isNotBlank(x))
       .map((x: string) => x.trim());
-  }
+  });
 
   searchValue(value: string) {
     this.searchChange.emit(value);

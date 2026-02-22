@@ -1,59 +1,59 @@
-@switch (themeLabel.type) {
-  @case ('string') {
+@switch (themeLabel().type) {
+  @case (themeLabelType.string) {
     <div
       class="row-text"
       ngCopy
-      [enableCopy]="themeLabel.isCopy && !themeLabel.isSearchButton">
-      @if (themeLabel.isSearchButton) {
+      [enableCopy]="themeLabel().isCopy && !themeLabel().isSearchButton">
+      @if (themeLabel().isSearchButton) {
         <a
           class="text-link"
           href="javascript:void(0);"
-          (click)="searchValue(data[themeLabel.byKey])">
-          {{ data[themeLabel.byKey] }}</a
+          (click)="searchValue(data()[themeLabel().byKey])">
+          {{ data()[themeLabel().byKey] }}</a
         >
       } @else {
-        <ng-container>{{ data[themeLabel.byKey] }}</ng-container>
+        <ng-container>{{ data()[themeLabel().byKey] }}</ng-container>
       }
-      @if (themeLabel.isCopy && themeLabel.isSearchButton && isHover) {
+      @if (themeLabel().isCopy && themeLabel().isSearchButton && isHover()) {
         <mat-icon
           class="copy-icon"
           fontIcon="content_copy"
-          [ngCopy]="data[themeLabel.byKey]"></mat-icon>
+          [ngCopy]="data()[themeLabel().byKey]"></mat-icon>
       }
     </div>
   }
-  @case ('stringSplit') {
+  @case (themeLabelType.stringSplit) {
     <app-array-text
-      [themeLabel]="themeLabel"
-      [array]="getStringSplit(themeLabel, data)"
-      [isHover]="isHover"
+      [themeLabel]="themeLabel()"
+      [array]="stringSplitData()"
+      [isHover]="isHover()"
       (searchChange)="searchValue($event)"></app-array-text>
   }
-  @case ('stringArray') {
+  @case (themeLabelType.stringArray) {
     <app-array-text
-      [themeLabel]="themeLabel"
-      [array]="data[themeLabel.byKey]"
-      [isHover]="isHover"
+      [themeLabel]="themeLabel()"
+      [array]="data()[themeLabel().byKey]"
+      [isHover]="isHover()"
       (searchChange)="searchValue($event)"></app-array-text>
   }
-  @case ('seq') {
-    <div>{{ data[seqKey] }}</div>
+  @case (themeLabelType.seq) {
+    <div>{{ data()[seqKey()] }}</div>
   }
-  @case ('fileSize') {
-    <div>{{ data[themeLabel.byKey] | fileSize }}</div>
+  @case (themeLabelType.fileSize) {
+    <div>{{ data()[themeLabel().byKey] | fileSize }}</div>
   }
-  @case ('date') {
+  @case (themeLabelType.date) {
     <div>
       {{
-        data[themeLabel.byKey]
+        data()[themeLabel().byKey]
           | date
-            : (themeLabel.dateFormat !== ''
-                ? themeLabel.dateFormat
+            : (themeLabel().dateFormat !== ''
+                ? themeLabel().dateFormat
                 : 'yyyy-MM-dd')
       }}
     </div>
   }
   @default {
-    <div>{{ data[themeLabel.byKey] }}</div>
+    <div>{{ data()[themeLabel().byKey] }}</div>
   }
 }

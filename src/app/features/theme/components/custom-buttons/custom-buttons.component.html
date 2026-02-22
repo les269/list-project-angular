@@ -1,16 +1,14 @@
 <div class="buttons">
-  @for (custom of themeCustomList; track $index) {
+  @for (custom of themeCustomList(); track custom.byKey) {
     @if (visibleByDatasetName(custom)) {
       @switch (custom.type) {
         @case ('buttonIconBoolean') {
           <div class="custom-button-group">
-            <button
-              class="custom-button"
-              (click)="changeCustomValue(data, custom)">
+            <button class="custom-button" (click)="changeCustomValue(custom)">
               <label class="px-2">{{ custom.label }}</label>
               <mat-icon class="material-icons-outlined">
                 <span class="material-symbols-outlined">
-                  {{ getCustomValueForUI(data, custom) }}
+                  {{ getCustomValueForUI(custom) }}
                 </span>
               </mat-icon>
             </button>
@@ -18,19 +16,17 @@
         }
         @case ('buttonIconFill') {
           <div class="custom-button-group">
-            <button
-              class="custom-button"
-              (click)="changeCustomValue(data, custom)">
+            <button class="custom-button" (click)="changeCustomValue(custom)">
               <label class="px-2">{{ custom.label }}</label>
               <mat-icon
                 [style.color]="
-                  getCustomValueForUI(data, custom)
+                  getCustomValueForUI(custom)
                     ? custom.buttonIconFillColor
                     : '#000'
                 "
                 ><span
                   [class]="
-                    getCustomValueForUI(data, custom)
+                    getCustomValueForUI(custom)
                       ? ''
                       : 'material-symbols-outlined'
                   ">
@@ -44,20 +40,17 @@
           <div class="custom-button-group">
             <button
               class="custom-button"
-              (click)="openButtonInputUrlDialog(data, custom)">
+              (click)="openButtonInputUrlDialog(custom)">
               <label class="px-2">{{ custom.label }}</label>
             </button>
-            @if (getCustomValue(data, custom) !== '') {
-              <button
+            @let customValue = getCustomValue(custom);
+            @if (customValue !== '') {
+              <a
                 class="custom-button custom-icon"
-                (click)="
-                  openNewPage(
-                    getCustomValue(data, custom),
-                    custom.openWindowsTarget
-                  )
-                ">
+                [href]="customValue"
+                [target]="custom.openWindowsTarget">
                 <mat-icon>open_in_new</mat-icon>
-              </button>
+              </a>
             }
           </div>
         }
@@ -65,7 +58,7 @@
           <div class="custom-button-group">
             <button
               class="custom-button"
-              [ngCopy]="replaceValue(custom.copyValue, data)">
+              [ngCopy]="replaceValue(custom.copyValue, data())">
               <label class="px-2">{{ custom.label }}</label>
             </button>
           </div>
@@ -74,7 +67,7 @@
           <div class="custom-button-group">
             <a
               class="custom-button"
-              [href]="replaceValue(custom.openUrl, data)"
+              [href]="replaceValue(custom.openUrl, data())"
               [target]="custom.openWindowsTarget"
               rel="noopener noreferrer">
               <label class="px-2">{{ custom.label }}</label>
@@ -85,13 +78,14 @@
           <div class="custom-button-group">
             <button
               class="custom-button"
-              (click)="openNoteDialog(data, custom, 'write')">
+              (click)="openNoteDialog(custom, 'write')">
               <label class="px-2">{{ custom.label }}</label>
             </button>
-            @if (getCustomValue(data, custom) !== '') {
+            @let noteValue = getCustomValue(custom);
+            @if (noteValue !== '') {
               <button
                 class="custom-button custom-icon"
-                (click)="openNoteDialog(data, custom, 'read')">
+                (click)="openNoteDialog(custom, 'read')">
                 <mat-icon class="material-icons-outlined">description</mat-icon>
               </button>
             }
@@ -99,7 +93,7 @@
         }
         @case ('apiConfig') {
           <div class="custom-button-group">
-            <button class="custom-button" (click)="callApi(data, custom)">
+            <button class="custom-button" (click)="callApi(custom)">
               <label class="px-2">{{ custom.label }}</label>
             </button>
           </div>
@@ -108,11 +102,9 @@
           <div class="custom-button-group">
             <button
               class="custom-button"
-              (click)="deleteFile(data, custom)"
+              (click)="deleteFile(custom)"
               [disabled]="
-                themeHeaderType() === 'imageList' && fileExist
-                  ? !fileExist[data[defaultKey]]
-                  : false
+                themeHeaderType() === 'imageList' && !fileExistForCurrentData()
               ">
               <label class="px-2">{{ custom.label }}</label>
             </button>
@@ -122,11 +114,9 @@
           <div class="custom-button-group">
             <button
               class="custom-button"
-              (click)="moveTo(data, custom)"
+              (click)="moveTo(custom)"
               [disabled]="
-                themeHeaderType() === 'imageList' && fileExist
-                  ? !fileExist[data[defaultKey]]
-                  : false
+                themeHeaderType() === 'imageList' && !fileExistForCurrentData()
               ">
               <label class="px-2">{{ custom.label }}</label>
             </button>
@@ -136,11 +126,9 @@
           <div class="custom-button-group">
             <button
               class="custom-button"
-              (click)="openFolder(data, custom)"
+              (click)="openFolder(custom)"
               [disabled]="
-                themeHeaderType() === 'imageList' && fileExist
-                  ? !fileExist[data[defaultKey]]
-                  : false
+                themeHeaderType() === 'imageList' && !fileExistForCurrentData()
               ">
               <label class="px-2">{{ custom.label }}</label>
             </button>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 
 import {
   ThemeHeaderType,
@@ -7,11 +7,7 @@ import {
   ThemeTopCustomValueResponse,
 } from '../../models';
 import { MatIconModule } from '@angular/material/icon';
-import {
-  isNotBlank,
-  isNotNull,
-  parseHeaderId,
-} from '../../../../shared/util/helper';
+import { isNotBlank, isNotNull } from '../../../../shared/util/helper';
 import { MatDialog } from '@angular/material/dialog';
 import { ApiConfigService } from '../../../api-config/service/api-config.service';
 import { ThemeService } from '../../services/theme.service';
@@ -25,26 +21,16 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
   templateUrl: './top-custom-buttons.component.html',
   styleUrl: './top-custom-buttons.component.scss',
 })
-export class TopCustomButtonsComponent implements OnInit {
-  @Input({ required: true }) themeTopCustomList: ThemeTopCustom[] = [];
-  @Input({ required: true }) headerId: string = '';
-  @Input({ required: true }) topCustomValueMap: ThemeTopCustomValueResponse =
-    {};
-  type: ThemeHeaderType = ThemeHeaderType.imageList;
-  constructor(
-    private themeService: ThemeService,
-    private matDialog: MatDialog,
-    private apiConfigService: ApiConfigService,
-    private snackbarService: SnackbarService
-  ) {}
-  ngOnInit(): void {
-    if (isNotBlank(this.headerId)) {
-      const id = parseHeaderId(this.headerId);
-      if (id) {
-        this.type = id.type;
-      }
-    }
-  }
+export class TopCustomButtonsComponent {
+  themeTopCustomList = input.required<ThemeTopCustom[]>();
+  headerId = input.required<string>();
+  topCustomValueMap = input.required<ThemeTopCustomValueResponse>();
+  type = input.required<ThemeHeaderType>();
+
+  themeService = inject(ThemeService);
+  matDialog = inject(MatDialog);
+  apiConfigService = inject(ApiConfigService);
+  snackbarService = inject(SnackbarService);
 
   openNewPage(text: string) {
     window.open(text, '_blank');
@@ -88,12 +74,12 @@ export class TopCustomButtonsComponent implements OnInit {
    * @returns
    */
   checkCustomValueExist(custom: ThemeTopCustom): boolean {
-    return isNotBlank(this.topCustomValueMap[custom.byKey]);
+    return isNotBlank(this.topCustomValueMap()[custom.byKey]);
   }
 
   getCustomValue(custom: ThemeTopCustom) {
     if (this.checkCustomValueExist(custom)) {
-      return this.topCustomValueMap[custom.byKey];
+      return this.topCustomValueMap()[custom.byKey];
     }
     return '';
   }
@@ -103,13 +89,13 @@ export class TopCustomButtonsComponent implements OnInit {
     options?: { isDialogSave?: boolean }
   ) {
     let req: ThemeTopCustomValue = {
-      headerId: this.headerId,
+      headerId: this.headerId(),
       byKey: custom.byKey,
       customValue: value,
     };
 
     this.themeService.updateTopCustomValue(req).subscribe(() => {
-      this.topCustomValueMap[req.byKey] = value;
+      this.topCustomValueMap()[req.byKey] = value;
       if (options?.isDialogSave) {
         this.snackbarService.openI18N('msg.saveSuccess');
       }

@@ -107,13 +107,14 @@
     <app-top-custom-buttons
       [themeTopCustomList]="store.themeTopCustomList()"
       [headerId]="store.headerId()"
+      [type]="store.themeHeaderType()"
       [topCustomValueMap]="
         store.topCustomValueMap.value()
       "></app-top-custom-buttons>
   </div>
   <div class="list-content">
     <div class="py-2">
-      {{ 'g.totalNum' | translate }}: {{ store.filterData().length }}
+      {{ 'g.totalNum' | translate }}: {{ store.totalLength() }}
     </div>
     <ng-container *ngTemplateOutlet="dataListRef"></ng-container>
   </div>

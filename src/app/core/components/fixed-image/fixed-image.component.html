@@ -2,12 +2,6 @@
   <div class="fixedImage-overlay" (click)="closeModal($event)">
     <!-- 按鈕組 -->
     <div class="fixedImage-buttons" (click)="$event.stopPropagation()">
-      <!-- <button
-        class="btn-icon"
-        (click)="zoomIn()"
-        [title]="'g.zoomIn' | translate">
-        <mat-icon>zoom_in</mat-icon>
-      </button> -->
       <button
         class="btn-icon"
         (click)="openNewWindow()"

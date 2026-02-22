@@ -47,11 +47,6 @@ export class FixedImageComponent {
     this.isVisible.set(false);
   }
 
-  // zoomIn() {
-  //   const currentZoom = this.zoomLevel();
-  //   this.zoomLevel.set(Math.min(currentZoom + 0.2, 3));
-  // }
-
   openNewWindow() {
     window.open(this.fixedImagePath(), '_blank');
   }

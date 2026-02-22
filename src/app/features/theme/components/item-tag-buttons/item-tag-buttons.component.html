@@ -1,8 +1,8 @@
 <div class="d-flex custom-button-group">
-  @for (themeTag of themeTagList(); track $index) {
+  @for (themeTag of themeTagList(); track themeTag.shareTagId) {
     <button class="custom-button" (click)="onSetTag(themeTag.shareTagId)">
       <label class="px-2">{{ shareTagNameMap()[themeTag.shareTagId] }}</label>
-      @if (showTagCheck(themeTag.shareTagId)) {
+      @if (checkedTags().has(themeTag.shareTagId)) {
         <mat-icon class="material-icons-outlined">
           <span class="material-symbols-outlined"> check </span>
         </mat-icon>

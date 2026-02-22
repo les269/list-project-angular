@@ -204,9 +204,9 @@ export class ImageListViewComponent {
 
   getData(data: any) {
     const id = data[this.store.defaultKey()];
-    const refreshData = this.store.quickRefreshResult();
-    if (this.store.quickRefreshResult()[id]) {
-      return { ...data, ...this.store.quickRefreshResult()[id] };
+    const refreshData = this.store.quickRefreshResult()[id];
+    if (refreshData) {
+      return { ...data, ...refreshData };
     }
     return data;
   }
