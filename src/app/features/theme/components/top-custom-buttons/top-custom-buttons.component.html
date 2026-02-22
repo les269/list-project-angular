@@ -2,11 +2,13 @@
   @for (custom of themeTopCustomList; track $index) {
     @switch (custom.type) {
       @case ('openUrl') {
-        <button
+        <a
           class="btn btn-outline-primary"
-          (click)="openNewPage(custom.openUrl)">
+          [href]="custom.openUrl"
+          target="_blank"
+          rel="noopener noreferrer">
           <label class="px-2">{{ custom.label }}</label>
-        </button>
+        </a>
       }
       @case ('writeNote') {
         <div class="btn-group">

@@ -72,9 +72,13 @@
         }
         @case ('openUrl') {
           <div class="custom-button-group">
-            <button class="custom-button" (click)="onOpenUrl(data, custom)">
+            <a
+              class="custom-button"
+              [href]="replaceValue(custom.openUrl, data)"
+              [target]="custom.openWindowsTarget"
+              rel="noopener noreferrer">
               <label class="px-2">{{ custom.label }}</label>
-            </button>
+            </a>
           </div>
         }
         @case ('writeNote') {
