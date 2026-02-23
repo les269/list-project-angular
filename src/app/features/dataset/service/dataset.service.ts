@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, shareReplay } from 'rxjs';
+import { Observable, of, shareReplay } from 'rxjs';
 import {
   Dataset,
   DatasetData,
@@ -20,6 +20,9 @@ export class DatasetService {
   }
 
   findDatasetDataByNameList(nameList: string[]): Observable<DatasetData[]> {
+    if (nameList.length === 0) {
+      return of([]); // return empty array if nameList is empty to avoid unnecessary HTTP request
+    }
     return this.http.post<DatasetData[]>(
       `/dataset/name-list/get-data`,
       nameList

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import {
   CopyThemeRequest,
   ThemeCustomValue,
@@ -75,6 +75,9 @@ export class ThemeService {
   findCustomValue(
     req: ThemeCustomValueRequest
   ): Observable<ThemeCustomValueResponse> {
+    if (req.valueList.length === 0) {
+      return of({});
+    }
     return this.http.post<ThemeCustomValueResponse>('/theme/custom/value', req);
   }
   //更新custom value

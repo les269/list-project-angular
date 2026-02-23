@@ -1,5 +1,4 @@
 import { computed, inject, Injectable } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { toSignal, rxResource } from '@angular/core/rxjs-interop';
 import { map, filter, tap } from 'rxjs';
 import { ThemeService } from '../services/theme.service';
@@ -62,7 +61,7 @@ export class HeaderStore {
   });
 
   themeOtherSetting = computed<ThemeOtherSetting | undefined>(() => {
-    if (this.themeHeader.status() !== 'resolved') return undefined;
+    if (this.themeHeader.isLoading()) return undefined;
     return this.themeHeader.value()?.themeOtherSetting;
   });
 
@@ -85,7 +84,7 @@ export class HeaderStore {
   );
 
   themeDatasetList = computed<ThemeDataset[]>(() => {
-    if (this.themeHeader.status() !== 'resolved') return [];
+    if (this.themeHeader.isLoading()) return [];
     return this.themeHeader.value().themeDatasetList.slice().sort(sortSeq);
   });
 

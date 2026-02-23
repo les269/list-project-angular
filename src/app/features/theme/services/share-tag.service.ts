@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { ShareTag, ShareTagValue } from '../models';
 
 @Injectable({ providedIn: 'root' })
@@ -37,6 +37,9 @@ export class ShareTagService {
   }
 
   getShareTagValues(shareTagIds: string[]): Observable<ShareTagValue[]> {
+    if (shareTagIds.length === 0) {
+      return of([]); // return empty array if shareTagIds is empty to avoid unnecessary HTTP request
+    }
     return this.http.post<ShareTagValue[]>(
       '/share-tag/value/by-ids',
       shareTagIds

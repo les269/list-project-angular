@@ -6,6 +6,7 @@ import { RouteStore } from './route.store';
 import { DatasetData } from '../../dataset/model';
 import { QueryActionType, ShareTag, ThemeDataset } from '../models';
 import { ShareTagService } from '../services/share-tag.service';
+import { EMPTY } from 'rxjs';
 
 @Injectable()
 export class DataStore {
@@ -27,8 +28,9 @@ export class DataStore {
 
   datasetDataList = rxResource({
     params: () => this.datasetDataListReq(),
-    stream: ({ params }) =>
-      this.datasetService.findDatasetDataByNameList(params),
+    stream: ({ params }) => {
+      return this.datasetService.findDatasetDataByNameList(params);
+    },
     defaultValue: [] as DatasetData[],
   });
 
@@ -73,22 +75,10 @@ export class DataStore {
     );
   });
 
-  // stable random cache
-  private randomValueMap = new Map<string, number>();
-  getRandomForKey(key: string) {
-    let v = this.randomValueMap.get(key);
-    if (v === undefined) {
-      v = crypto.getRandomValues(new Uint32Array(1))[0];
-      this.randomValueMap.set(key, v);
-    }
-    return v;
-  }
-
   // clear cache when underlying dataset data or header changes
   private _clearEffect = effect(() => {
     this.datasetDataList.value();
     this.headerStore.headerId();
-    this.randomValueMap.clear();
   });
 
   // assemble useData for the selected dataset

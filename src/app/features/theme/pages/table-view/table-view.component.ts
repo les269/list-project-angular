@@ -55,7 +55,13 @@ import {
   toArray,
 } from 'rxjs';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { ListBaseViewStore } from '../../components/list-base-view.store';
+import { ListBaseViewStoreAdapter } from '../../stores/list-base-view.adapter';
+import { DataStore } from '../../stores/data.store';
+import { FilterStore } from '../../stores/filter.store';
+import { HeaderStore } from '../../stores/header.store';
+import { ResourceStore } from '../../stores/resource.store';
+import { RouteStore } from '../../stores/route.store';
+import { UIStateStore } from '../../stores/ui.state.store';
 
 @Component({
   selector: 'app-table-view',
@@ -88,12 +94,21 @@ import { ListBaseViewStore } from '../../components/list-base-view.store';
       ),
     ]),
   ],
-  providers: [{ provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl }],
+  providers: [
+    { provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl },
+    ListBaseViewStoreAdapter,
+    RouteStore,
+    HeaderStore,
+    DataStore,
+    FilterStore,
+    ResourceStore,
+    UIStateStore,
+  ],
   templateUrl: './table-view.component.html',
   styleUrl: './table-view.component.scss',
 })
 export class TableViewComponent implements AfterViewInit {
-  readonly store = inject(ListBaseViewStore);
+  readonly store = inject(ListBaseViewStoreAdapter);
 
   readonly list = new MatTableDataSource<any>();
 

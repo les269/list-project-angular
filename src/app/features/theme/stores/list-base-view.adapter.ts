@@ -201,9 +201,6 @@ export class ListBaseViewStoreAdapter {
   readonly DATASET_NAME_KEY = '__datasetName';
   readonly webApi = api;
 
-  // additional helper methods (from original store)
-  getRandomForKey = (key: string) => this.dataStore.getRandomForKey(key);
-
   getTagValueLength(shareTagId: string) {
     const nameList = this.dataStore.useDataNameSet();
     const map = this.dataStore.shareTagValueMap();
