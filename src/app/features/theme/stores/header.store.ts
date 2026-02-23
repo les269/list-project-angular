@@ -1,6 +1,7 @@
 import { computed, inject, Injectable } from '@angular/core';
 import { toSignal, rxResource } from '@angular/core/rxjs-interop';
 import { map, filter, tap } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 import { ThemeService } from '../services/theme.service';
 import { ShareTagService } from '../services/share-tag.service';
 import {
@@ -17,11 +18,10 @@ import { getHeaderId, isBlank, sortSeq } from '../../../shared/util/helper';
 import { Store } from '@ngrx/store';
 import { updateTitle } from '../../../shared/state/layout.actions';
 import { TranslateService } from '@ngx-translate/core';
-import { RouteStore } from './route.store';
 
 @Injectable()
 export class HeaderStore {
-  readonly route = inject(RouteStore).route;
+  readonly route = inject(ActivatedRoute);
   readonly themeService = inject(ThemeService);
   readonly shareTagService = inject(ShareTagService);
   readonly store = inject(Store);
@@ -74,6 +74,14 @@ export class HeaderStore {
           .filter(x => x.isVisible)
       : [];
   });
+  defaultSortLabel = computed(() => {
+    return this.visibleLabelList().find(x => x.isSort)?.label ?? '';
+  });
+
+  displayedColumns = computed<string[]>(() => [
+    ...this.visibleLabelList().map(x => x.byKey),
+    'other',
+  ]);
 
   // 是否有使用序列號有的話key值為何
   seqKey = computed(
@@ -87,6 +95,11 @@ export class HeaderStore {
     if (this.themeHeader.isLoading()) return [];
     return this.themeHeader.value().themeDatasetList.slice().sort(sortSeq);
   });
+  defaultDataset = computed(
+    () =>
+      this.themeDatasetList().find(x => x.isDefault)?.seq ??
+      this.themeDatasetList()[0].seq
+  );
 
   themeTagList = computed<ThemeTag[]>(() => {
     return (this.themeHeader.value()?.themeTagList ?? [])

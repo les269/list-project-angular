@@ -119,6 +119,10 @@ export class ListBaseViewStoreAdapter {
     return this.headerStore.themeCustomList;
   }
 
+  get displayedColumns() {
+    return this.headerStore.displayedColumns;
+  }
+
   // expose data store properties
   get useDataset() {
     return this.dataStore.useDataset;

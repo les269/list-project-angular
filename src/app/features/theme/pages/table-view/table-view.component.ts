@@ -107,26 +107,26 @@ import { UIStateStore } from '../../stores/ui.state.store';
   templateUrl: './table-view.component.html',
   styleUrl: './table-view.component.scss',
 })
-export class TableViewComponent implements AfterViewInit {
+export class TableViewComponent {
   readonly store = inject(ListBaseViewStoreAdapter);
 
-  readonly list = new MatTableDataSource<any>();
+  readonly list = this.store.viewData();
 
   readonly COLOR_KEY = '__color';
   readonly rowColor: string[] = DEFAULT_ROW_COLOR;
 
   readonly isExpand = signal(false);
-  readonly sort = viewChild(MatSort);
-  readonly paginator = viewChild(MatPaginator);
+  // readonly sort = viewChild(MatSort);
+  // readonly paginator = viewChild(MatPaginator);
 
   readonly displayedColumns = this.store.displayedColumns();
-  ngAfterViewInit(): void {
-    this.list.sort = this.sort();
-    this.list.paginator = this.paginator();
-  }
+  // ngAfterViewInit(): void {
+  //   this.list.sort = this.sort();
+  //   this.list.paginator = this.paginator();
+  // }
 
   fileSizeTotal(byKey: string): number {
-    return this.list.data
+    return this.list
       .map(x => {
         let value = x[byKey];
         if (typeof value === 'number') {
@@ -147,7 +147,7 @@ export class TableViewComponent implements AfterViewInit {
     if (isNotBlank(defaultKey) && this.rowColor.length > 0) {
       const keyMap: { [key in string]: string } = {};
 
-      this.list.data.forEach((data, index) => {
+      this.list.forEach((data, index) => {
         const key = data[defaultKey].toUpperCase();
         if (isBlank(keyMap[key])) {
           keyMap[key] = this.rowColor[index % this.rowColor.length];

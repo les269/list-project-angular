@@ -1,13 +1,41 @@
-import { computed, inject, Injectable, linkedSignal } from '@angular/core';
+import {
+  computed,
+  inject,
+  Injectable,
+  linkedSignal,
+  effect,
+} from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { QueryAction, QueryActionType } from '../models';
+import { HeaderStore } from './header.store';
 
 @Injectable()
 export class RouteStore {
   readonly router = inject(Router);
   readonly route = inject(ActivatedRoute);
+  readonly headerStore = inject(HeaderStore);
+
+  // ensure base query params are present when user clears URL query params
+  // (e.g., user manually removes them) — merge defaults with current params
+  // and navigate only when different to avoid loops.
+  constructor() {
+    effect(() => {
+      // read the signal so effect re-runs on changes
+      this.queryParamMap();
+      const current = { ...this.route.snapshot.queryParams };
+      const defaults = this.baseQueryParams();
+      // if defaults is not ready, skip
+      if (!defaults) return;
+      const merged = { ...defaults, ...current };
+      const currentStr = JSON.stringify(current || {});
+      const mergedStr = JSON.stringify(merged || {});
+      if (currentStr !== mergedStr) {
+        this.router.navigate([], { queryParams: merged });
+      }
+    });
+  }
 
   // raw queryParamMap accessor (signal) for effects
   queryParamMap = toSignal(this.route.queryParamMap);
@@ -80,6 +108,20 @@ export class RouteStore {
   );
   shareTagSeq = linkedSignal(() => this.queryParamsShareTag());
 
+  baseQueryParams = computed<Record<string, any>>(() => {
+    // guard against header not loaded yet
+    const sort = this.headerStore.defaultSortLabel();
+    const dataset = this.headerStore.defaultDataset();
+    return {
+      searchValue: '',
+      sort,
+      asc: true,
+      page: 1,
+      dataset,
+      tag: -1,
+    };
+  });
+
   patchQuery(action: QueryAction) {
     const queryParams = { ...this.route.snapshot.queryParams };
     switch (action.type) {
@@ -100,7 +142,10 @@ export class RouteStore {
         queryParams['tag'] = action.seq;
         break;
     }
-    this.router.navigate([], { queryParams });
+
+    this.router.navigate([], {
+      queryParams: { ...queryParams },
+    });
   }
 
   // convenience setter for page that delegates to patchQuery
