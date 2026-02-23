@@ -2,11 +2,20 @@
   class="img-content"
   (click)="refreshImage($event)"
   [ngStyle]="{ cursor: ctrlPressed() ? 'wait' : 'default' }">
-  <img
-    alt=""
-    [ngSrc]="displaySrc()"
-    fill
-    [priority]="priority()"
-    (error)="onError()"
-    (click)="clickImg($event)" />
+  @if (priority()) {
+    <img
+      alt=""
+      [ngSrc]="displaySrc()"
+      fill
+      priority
+      (error)="onError()"
+      (click)="clickImg($event)" />
+  } @else {
+    <img
+      alt=""
+      [ngSrc]="displaySrc()"
+      fill
+      (error)="onError()"
+      (click)="clickImg($event)" />
+  }
 </div>
