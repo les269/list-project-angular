@@ -27,6 +27,8 @@ export class HeaderStore {
   readonly store = inject(Store);
   readonly translateService = inject(TranslateService);
 
+  readonly RANDOM_KEY = '__random';
+
   themeHeaderType = toSignal(
     this.route.data.pipe(map(x => x['type'] ?? ThemeHeaderType.imageList)),
     { initialValue: ThemeHeaderType.imageList }
@@ -75,7 +77,7 @@ export class HeaderStore {
       : [];
   });
   defaultSortLabel = computed(() => {
-    return this.visibleLabelList().find(x => x.isSort)?.label ?? '';
+    return this.visibleLabelList().find(x => x.isSort)?.byKey ?? '';
   });
 
   displayedColumns = computed<string[]>(() => [

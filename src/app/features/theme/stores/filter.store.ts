@@ -1,4 +1,4 @@
-import { computed, inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable, effect } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { DataStore } from './data.store';
@@ -15,7 +15,15 @@ export class FilterStore {
   readonly routeStore = inject(RouteStore);
   readonly translateService = inject(TranslateService);
 
-  readonly RANDOM_KEY = '__random';
+  constructor() {
+    effect(() => {
+      const page = this.currentPage();
+      const total = Math.max(1, this.pages().length);
+      if (page > total) {
+        this.routeStore.setPage(1);
+      }
+    });
+  }
 
   // search value with debounce
   searchValue = this.routeStore.searchValue;
@@ -43,7 +51,7 @@ export class FilterStore {
   });
 
   randomSortType: SortType = {
-    key: this.RANDOM_KEY,
+    key: this.headerStore.RANDOM_KEY,
     label: this.translateService.instant('g.randomSort'),
   };
 
@@ -118,10 +126,9 @@ export class FilterStore {
     }
 
     if (sortValue) {
-      if (sortValue.key === this.RANDOM_KEY) {
-        data.sort((a: any, b: any) =>
-          a[this.RANDOM_KEY] > b[this.RANDOM_KEY] ? 1 : -1
-        );
+      const ramdomKey = this.headerStore.RANDOM_KEY;
+      if (sortValue.key === ramdomKey) {
+        data.sort((a: any, b: any) => (a[ramdomKey] > b[ramdomKey] ? 1 : -1));
       } else {
         data.sort(dynamicSort(sortValue.key, asc));
       }

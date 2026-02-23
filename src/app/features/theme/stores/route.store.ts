@@ -24,15 +24,58 @@ export class RouteStore {
     effect(() => {
       // read the signal so effect re-runs on changes
       this.queryParamMap();
+      if (this.headerStore.themeHeader.isLoading()) return; // wait for header to load before validating
       const current = { ...this.route.snapshot.queryParams };
       const defaults = this.baseQueryParams();
       // if defaults is not ready, skip
       if (!defaults) return;
-      const merged = { ...defaults, ...current };
+      // validate each param according to rules
+      const visibleLabels = this.headerStore.visibleLabelList?.() ?? [];
+      const sortKeys = visibleLabels.map(x => x.byKey);
+
+      const datasetList = this.headerStore.themeDatasetList?.() ?? [];
+      const datasetSeqs = datasetList.map(x => x.seq);
+
+      const tagList = this.headerStore.themeTagList?.() ?? [];
+      const tagSeqs = tagList.map(x => x.seq);
+
+      const validated: Record<string, any> = {};
+
+      // sort: must be a label that exists
+      const curSort = current['sort'] ?? '';
+      validated['sort'] = [...sortKeys, this.headerStore.RANDOM_KEY].includes(
+        curSort
+      )
+        ? curSort
+        : defaults['sort'];
+
+      // asc: must be 'true' or 'false' string; otherwise default
+      const curAsc = current['asc'];
+      if (curAsc === 'true' || curAsc === 'false') {
+        validated['asc'] = curAsc;
+      } else {
+        validated['asc'] = defaults['asc'];
+      }
+
+      // page: numeric >=1 else default
+      const p = Number(current['page']);
+      validated['page'] =
+        Number.isFinite(p) && p >= 1 ? Math.floor(p) : defaults['page'];
+
+      // dataset: must be numeric and present in datasetSeqs
+      const d = Number(current['dataset']);
+      validated['dataset'] =
+        Number.isFinite(d) && datasetSeqs.includes(d) ? d : defaults['dataset'];
+
+      // tag: must be numeric and present in tagSeqs
+      const t = Number(current['tag']);
+      validated['tag'] =
+        Number.isFinite(t) && tagSeqs.includes(t) ? t : defaults['tag'];
+
       const currentStr = JSON.stringify(current || {});
-      const mergedStr = JSON.stringify(merged || {});
-      if (currentStr !== mergedStr) {
-        this.router.navigate([], { queryParams: merged });
+      const validatedStr = JSON.stringify(validated || {});
+      if (currentStr !== validatedStr) {
+        this.router.navigate([], { queryParams: validated });
       }
     });
   }
@@ -110,8 +153,13 @@ export class RouteStore {
 
   baseQueryParams = computed<Record<string, any>>(() => {
     // guard against header not loaded yet
-    const sort = this.headerStore.defaultSortLabel();
-    const dataset = this.headerStore.defaultDataset();
+    if (this.headerStore.themeHeader.isLoading()) return {};
+    const sort = this.headerStore.defaultSortLabel?.() ?? '';
+    const datasetList = this.headerStore.themeDatasetList?.() ?? [];
+    const dataset =
+      datasetList.length > 0
+        ? (this.headerStore.defaultDataset?.() ?? datasetList[0].seq)
+        : -1;
     return {
       searchValue: '',
       sort,
