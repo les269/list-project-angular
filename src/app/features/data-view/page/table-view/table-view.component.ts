@@ -12,7 +12,7 @@ import {
   isNotBlank,
   isValidWidth,
 } from '../../../../shared/util/helper';
-import { ThemeLabel } from '../../models';
+import { ThemeLabel } from '../../../theme/models';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { ScrollTopComponent } from '../../../../core/components/scroll-top/scroll-top.component';
@@ -30,23 +30,18 @@ import { ListItemValueComponent } from '../../components/list-item-value/list-it
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonModule } from '@angular/material/button';
 import { CustomButtonsComponent } from '../../components/custom-buttons/custom-buttons.component';
-import {
-  trigger,
-  state,
-  style,
-  transition,
-  animate,
-} from '@angular/animations';
 import { TopCustomButtonsComponent } from '../../components/top-custom-buttons/top-custom-buttons.component';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { ListBaseViewStoreAdapter } from '../../stores/list-base-view.adapter';
-import { DataStore } from '../../stores/data.store';
-import { FilterStore } from '../../stores/filter.store';
-import { HeaderStore } from '../../stores/header.store';
-import { ResourceStore } from '../../stores/resource.store';
-import { RouteStore } from '../../stores/route.store';
-import { UIStateStore } from '../../stores/ui.state.store';
 import { ItemTagButtonsComponent } from '../../components/item-tag-buttons/item-tag-buttons.component';
+import {
+  DataStore,
+  FilterStore,
+  HeaderStore,
+  ListBaseViewStoreAdapter,
+  ResourceStore,
+  RouteStore,
+  UIStateStore,
+} from '../../stores/index.store';
 
 @Component({
   selector: 'app-table-view',
@@ -69,16 +64,6 @@ import { ItemTagButtonsComponent } from '../../components/item-tag-buttons/item-
     TopCustomButtonsComponent,
     MatAutocompleteModule,
     ItemTagButtonsComponent,
-  ],
-  animations: [
-    trigger('detailExpand', [
-      state('collapsed,void', style({ height: '0px', minHeight: '0' })),
-      state('expanded', style({ height: '*' })),
-      transition(
-        'expanded <=> collapsed',
-        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')
-      ),
-    ]),
   ],
   providers: [
     { provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl },

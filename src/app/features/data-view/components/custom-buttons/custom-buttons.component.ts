@@ -3,8 +3,6 @@ import {
   computed,
   inject,
   input,
-  signal,
-  effect,
   linkedSignal,
 } from '@angular/core';
 
@@ -14,18 +12,17 @@ import {
   ThemeCustom,
   ThemeCustomValue,
   ThemeCustomValueResponse,
-  ThemeHeaderType,
-} from '../../models';
+} from '../../../theme/models';
 import {
   isBlank,
   isNotBlank,
   isNotNull,
   replaceValue,
 } from '../../../../shared/util/helper';
-import { ThemeService } from '../../services/theme.service';
-import { ButtonInputUrlDialog } from '../button-input-url.dialog';
+import { ThemeService } from '../../../theme/services/theme.service';
+import { ButtonInputUrlDialog } from '../../../theme/components/button-input-url.dialog';
 import { MatDialog } from '@angular/material/dialog';
-import { ThemeNoteComponent } from '../theme-note/theme-note.component';
+import { ThemeNoteComponent } from '../../../theme/components/theme-note/theme-note.component';
 import { ApiConfigService } from '../../../api-config/service/api-config.service';
 import { CopyDirective } from '../../../../shared/util/util.directive';
 import { FileService } from '../../../../core/services/file.service';

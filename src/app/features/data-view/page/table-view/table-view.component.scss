@@ -1,0 +1,45 @@
+table {
+  width: 100%;
+  background-color: var(--mat-table-background-color, var(--mat-app-surface));
+}
+.mat-row > td,
+.mat-header-row > th {
+  border-bottom: solid #ccc 1px;
+}
+.mat-paginator {
+  background-color: #9ebeff;
+}
+
+.expanded-in {
+  animation: expanded-in 225ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.expanded-out {
+  animation: expanded-out 225ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes expanded-in {
+  0% {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+  }
+
+  100% {
+    max-height: 1000px;
+    opacity: 1;
+    overflow: visible;
+  }
+}
+
+@keyframes expanded-out {
+  0% {
+    max-height: 1000px;
+    opacity: 1;
+    overflow: visible;
+  }
+
+  100% {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+  }
+}

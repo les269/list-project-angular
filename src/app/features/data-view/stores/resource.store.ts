@@ -2,11 +2,11 @@ import { computed, inject, Injectable } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { of } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ThemeService } from '../services/theme.service';
 import { FileService } from '../../../core/services/file.service';
 import { FilterStore } from './filter.store';
 import { HeaderStore } from './header.store';
 import { replaceValue } from '../../../shared/util/helper';
+import { ThemeService } from '../../theme/services/theme.service';
 
 interface FileExistReq {
   path: string;

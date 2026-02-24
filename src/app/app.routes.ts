@@ -125,7 +125,7 @@ export const routes: Routes = [
   {
     path: 'imageList/:name/:version',
     loadComponent: () =>
-      import('./features/theme/pages/image-list-view/image-list-view.component').then(
+      import('./features/data-view/page/image-list-view/image-list-view.component').then(
         mod => mod.ImageListViewComponent
       ),
     data: { type: ThemeHeaderType.imageList },
@@ -133,7 +133,7 @@ export const routes: Routes = [
   {
     path: 'table/:name/:version',
     loadComponent: () =>
-      import('./features/theme/pages/table-view/table-view.component').then(
+      import('./features/data-view/page/table-view/table-view.component').then(
         mod => mod.TableViewComponent
       ),
     data: { type: ThemeHeaderType.table },

@@ -1,6 +1,6 @@
 import { Component, computed, input, output } from '@angular/core';
 
-import { ShareTagValue, ThemeTag } from '../../models';
+import { ShareTagValue, ThemeTag } from '../../../theme/models';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({

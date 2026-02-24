@@ -4,9 +4,9 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { DataStore } from './data.store';
 import { HeaderStore } from './header.store';
 import { RouteStore } from './route.store';
-import { SortType } from '../models';
 import { dynamicSort, isNotBlank, sortSeq } from '../../../shared/util/helper';
 import { TranslateService } from '@ngx-translate/core';
+import { SortType } from '../../theme/models';
 
 @Injectable()
 export class FilterStore {

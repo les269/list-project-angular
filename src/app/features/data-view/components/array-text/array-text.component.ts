@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { MatIconModule } from '@angular/material/icon';
-import { ThemeLabel } from '../../models';
+import { ThemeLabel } from '../../../theme/models';
 import { CopyDirective } from '../../../../shared/util/util.directive';
 
 @Component({

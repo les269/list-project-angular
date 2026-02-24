@@ -7,22 +7,22 @@ import { DataStore } from './data.store';
 import { FilterStore } from './filter.store';
 import { ResourceStore } from './resource.store';
 import { UIStateStore } from './ui.state.store';
-import {
-  QueryActionType,
-  ShareTagValue,
-  SortType,
-  ThemeDataset,
-  ThemeLabel,
-  ThemeTag,
-} from '../models';
 import { DatasetService } from '../../dataset/service/dataset.service';
 import { GroupDatasetService } from '../../dataset/service/group-dataset.service';
 import { SelectTableService } from '../../../core/services/select-table.service';
 import { SnackbarService } from '../../../core/services/snackbar.service';
-import { ShareTagService } from '../services/share-tag.service';
 import { getRandomInt } from '../../../shared/util/helper';
 import { EditGroupDatasetDataComponent } from '../../dataset/components/edit-group-dataset-data/edit-group-dataset-data.component';
 import { api } from '../../../../environments/environment';
+import {
+  ThemeDataset,
+  ThemeTag,
+  ThemeLabel,
+  QueryActionType,
+  ShareTagValue,
+  SortType,
+} from '../../theme/models';
+import { ShareTagService } from '../../theme/services/share-tag.service';
 
 /**
  * Adapter store that composes all sub-stores and provides

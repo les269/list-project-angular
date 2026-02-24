@@ -5,13 +5,13 @@ import {
   ThemeTopCustom,
   ThemeTopCustomValue,
   ThemeTopCustomValueResponse,
-} from '../../models';
+} from '../../../theme/models';
 import { MatIconModule } from '@angular/material/icon';
 import { isNotBlank, isNotNull } from '../../../../shared/util/helper';
 import { MatDialog } from '@angular/material/dialog';
 import { ApiConfigService } from '../../../api-config/service/api-config.service';
-import { ThemeService } from '../../services/theme.service';
-import { ThemeNoteComponent } from '../theme-note/theme-note.component';
+import { ThemeService } from '../../../theme/services/theme.service';
+import { ThemeNoteComponent } from '../../../theme/components/theme-note/theme-note.component';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 
 @Component({

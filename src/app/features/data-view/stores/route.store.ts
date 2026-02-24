@@ -8,8 +8,8 @@ import {
 import { Router, ActivatedRoute } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
-import { QueryAction, QueryActionType } from '../models';
 import { HeaderStore } from './header.store';
+import { QueryAction, QueryActionType } from '../../theme/models';
 
 @Injectable()
 export class RouteStore {

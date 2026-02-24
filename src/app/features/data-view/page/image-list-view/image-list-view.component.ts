@@ -11,12 +11,7 @@ import {
   isNotBlank,
   replaceValue,
 } from '../../../../shared/util/helper';
-import {
-  QueryActionType,
-  ShareTagValue,
-  SortType,
-  ThemeLabel,
-} from '../../../theme/models';
+import { QueryActionType, SortType } from '../../../theme/models';
 import { NgTemplateOutlet } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule } from '@ngx-translate/core';
@@ -24,20 +19,22 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ScrollTopComponent } from '../../../../core/components/scroll-top/scroll-top.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { ListItemValueComponent } from '../../../data-view/components/list-item-value/list-item-value.component';
-import { CustomButtonsComponent } from '../../../data-view/components/custom-buttons/custom-buttons.component';
-import { TopCustomButtonsComponent } from '../../../data-view/components/top-custom-buttons/top-custom-buttons.component';
+import { ListItemValueComponent } from '../../components/list-item-value/list-item-value.component';
+import { CustomButtonsComponent } from '../../components/custom-buttons/custom-buttons.component';
+import { TopCustomButtonsComponent } from '../../components/top-custom-buttons/top-custom-buttons.component';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FixedImageComponent } from '../../../../core/components/fixed-image/fixed-image.component';
-import { ItemTagButtonsComponent } from '../../../data-view/components/item-tag-buttons/item-tag-buttons.component';
-import { ImgContentComponent } from '../../../data-view/components/img-content/img-content.component';
-import { ListBaseViewStoreAdapter } from '../../../theme/stores/list-base-view.adapter';
-import { RouteStore } from '../../../theme/stores/route.store';
-import { HeaderStore } from '../../../theme/stores/header.store';
-import { DataStore } from '../../../theme/stores/data.store';
-import { FilterStore } from '../../../theme/stores/filter.store';
-import { ResourceStore } from '../../../theme/stores/resource.store';
-import { UIStateStore } from '../../../theme/stores/ui.state.store';
+import { ItemTagButtonsComponent } from '../../components/item-tag-buttons/item-tag-buttons.component';
+import { ImgContentComponent } from '../../components/img-content/img-content.component';
+import {
+  DataStore,
+  FilterStore,
+  HeaderStore,
+  ListBaseViewStoreAdapter,
+  ResourceStore,
+  RouteStore,
+  UIStateStore,
+} from '../../stores/index.store';
 
 @Component({
   standalone: true,

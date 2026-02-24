@@ -2,7 +2,7 @@ import { Component, computed, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ArrayTextComponent } from '../array-text/array-text.component';
 import { FileSizePipe } from '../../../../shared/util/util.pipe';
-import { ThemeLabel, ThemeLabelType } from '../../models/theme.model';
+import { ThemeLabel, ThemeLabelType } from '../../../theme/models/theme.model';
 import { MatIconModule } from '@angular/material/icon';
 import { CopyDirective } from '../../../../shared/util/util.directive';
 import { isBlank, isNotBlank } from '../../../../shared/util/helper';

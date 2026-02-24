@@ -5,14 +5,13 @@ import { HeaderStore } from './header.store';
 import { RouteStore } from './route.store';
 import { DatasetData } from '../../dataset/model';
 import {
-  QueryActionType,
-  ShareTag,
-  ShareTagValue,
   ThemeDataset,
+  ShareTag,
+  QueryActionType,
   ThemeLabel,
-} from '../models';
-import { ShareTagService } from '../services/share-tag.service';
-import { EMPTY } from 'rxjs';
+  ShareTagValue,
+} from '../../theme/models';
+import { ShareTagService } from '../../theme/services/share-tag.service';
 
 @Injectable()
 export class DataStore {

@@ -1,15 +1,12 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable, of } from 'rxjs';
 import { ShareTag, ShareTagValue } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class ShareTagService {
-  constructor(
-    private readonly http: HttpClient,
-    private store: Store
-  ) {}
+  http = inject(HttpClient);
 
   getAllTag(): Observable<ShareTag[]> {
     return this.http.get<ShareTag[]>('/share-tag/all');

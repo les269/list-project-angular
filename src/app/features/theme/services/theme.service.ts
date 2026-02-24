@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import {
   CopyThemeRequest,
@@ -16,10 +16,8 @@ import { updateList } from '../../../shared/state/layout.actions';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-  constructor(
-    private readonly http: HttpClient,
-    private store: Store
-  ) {}
+  http = inject(HttpClient);
+  store = inject(Store);
 
   getAllTheme(): Observable<ThemeHeader[]> {
     return this.http.get<ThemeHeader[]>('/theme/all');
