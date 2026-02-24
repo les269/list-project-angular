@@ -41,6 +41,9 @@ export class RouteStore {
 
       const validated: Record<string, any> = {};
 
+      validated['searchValue'] =
+        current['searchValue'] ?? defaults['searchValue']; // searchValue: default if missing, no validation needed
+
       // sort: must be a label that exists
       const curSort = current['sort'] ?? '';
       validated['sort'] = [...sortKeys, this.headerStore.RANDOM_KEY].includes(

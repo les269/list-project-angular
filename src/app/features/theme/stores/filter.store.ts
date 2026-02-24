@@ -17,6 +17,7 @@ export class FilterStore {
 
   constructor() {
     effect(() => {
+      if (this.dataStore.useData().length === 0) return; // wait for data to load before validating
       const page = this.currentPage();
       const total = Math.max(1, this.pages().length);
       if (page > total) {
@@ -26,9 +27,8 @@ export class FilterStore {
   }
 
   // search value with debounce
-  searchValue = this.routeStore.searchValue;
   searchValueDebounced = toSignal(
-    toObservable(this.searchValue).pipe(
+    toObservable(this.routeStore.searchValue).pipe(
       debounceTime(300),
       distinctUntilChanged()
     ),
@@ -85,7 +85,8 @@ export class FilterStore {
 
   // filter data by search criteria
   filterBySearch(): any[] {
-    const searchRaw = this.routeStore.searchValue();
+    //只會在queryParamsSearchValue更新時觸發，避免每次input change都觸發
+    const searchRaw = this.routeStore.queryParamsSearchValue();
     const dataList = this.dataStore.useData();
     const labels = this.headerStore
       .visibleLabelList()

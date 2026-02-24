@@ -4,7 +4,7 @@ import { DatasetService } from '../../dataset/service/dataset.service';
 import { HeaderStore } from './header.store';
 import { RouteStore } from './route.store';
 import { DatasetData } from '../../dataset/model';
-import { QueryActionType, ShareTag, ThemeDataset } from '../models';
+import { QueryActionType, ShareTag, ThemeDataset, ThemeLabel } from '../models';
 import { ShareTagService } from '../services/share-tag.service';
 import { EMPTY } from 'rxjs';
 
@@ -169,5 +169,12 @@ export class DataStore {
   // convenience to change shareTag via RouteStore
   changeShareTag(seq: number) {
     this.routeStore.patchQuery({ type: QueryActionType.tag, seq });
+  }
+  checkVisibleByDataset(themeLabel: ThemeLabel): boolean {
+    if (themeLabel.visibleDatasetNameList?.length > 0) {
+      const label = this.useDataset().label;
+      return themeLabel.visibleDatasetNameList.includes(label);
+    }
+    return true;
   }
 }

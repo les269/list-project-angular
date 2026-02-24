@@ -1,35 +1,28 @@
 import {
-  AfterViewInit,
   Component,
+  computed,
+  effect,
   inject,
-  OnInit,
   signal,
   viewChild,
-  ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   isBlank,
   isNotBlank,
-  isNotNull,
   isValidWidth,
 } from '../../../../shared/util/helper';
-import {
-  DEFAULT_ROW_COLOR,
-  ThemeCustomValueResponse,
-  ThemeHeaderType,
-  ThemeLabel,
-} from '../../models';
+import { ThemeLabel } from '../../models';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatTableModule } from '@angular/material/table';
 import { ScrollTopComponent } from '../../../../core/components/scroll-top/scroll-top.component';
 import { FileSizePipe } from '../../../../shared/util/util.pipe';
 import { TranslateModule } from '@ngx-translate/core';
-import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import {
-  MatPaginator,
   MatPaginatorIntl,
   MatPaginatorModule,
+  PageEvent,
 } from '@angular/material/paginator';
 import { CustomMatPaginatorIntl } from '../../../../core/components/custom-mat-paginatorIntl/custom-mat-paginatorIntl';
 import { MatIconModule } from '@angular/material/icon';
@@ -45,15 +38,6 @@ import {
   animate,
 } from '@angular/animations';
 import { TopCustomButtonsComponent } from '../../components/top-custom-buttons/top-custom-buttons.component';
-import {
-  concatMap,
-  filter,
-  from,
-  groupBy,
-  mergeMap,
-  pipe,
-  toArray,
-} from 'rxjs';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { ListBaseViewStoreAdapter } from '../../stores/list-base-view.adapter';
 import { DataStore } from '../../stores/data.store';
@@ -110,23 +94,49 @@ import { UIStateStore } from '../../stores/ui.state.store';
 export class TableViewComponent {
   readonly store = inject(ListBaseViewStoreAdapter);
 
-  readonly list = this.store.viewData();
-
   readonly COLOR_KEY = '__color';
-  readonly rowColor: string[] = DEFAULT_ROW_COLOR;
-
+  readonly rowColor: string[] = this.store.rowColor();
   readonly isExpand = signal(false);
-  // readonly sort = viewChild(MatSort);
-  // readonly paginator = viewChild(MatPaginator);
 
-  readonly displayedColumns = this.store.displayedColumns();
-  // ngAfterViewInit(): void {
-  //   this.list.sort = this.sort();
-  //   this.list.paginator = this.paginator();
-  // }
+  readonly dataSource = computed(() => {
+    const defaultKey = this.store.defaultKey();
+    const data = this.store.viewData().slice(); // create a copy to avoid mutating original
+    if (isNotBlank(defaultKey) && this.rowColor.length > 0) {
+      return data.map((d, index) => {
+        d[this.COLOR_KEY] = this.rowColor[index % this.rowColor.length];
+        return d;
+      });
+    }
+    return data;
+  });
+
+  readonly matSort = viewChild(MatSort);
+
+  constructor() {
+    // Initialize matSort based on query params when sort changes
+    effect(() => {
+      const sort = this.matSort();
+      if (sort?.active) return; // skip if already initialized
+      const sortKey = this.store.sortKey();
+      const asc = this.store.ascFlag();
+
+      if (sort && sortKey) {
+        sort.active = sortKey;
+        sort.direction = asc ? 'asc' : 'desc';
+      }
+    });
+  }
+
+  displayedColumns = computed(() => [
+    ...this.store
+      .visibleLabelList()
+      .filter(this.store.checkVisibleByDataset)
+      .map(x => x.byKey),
+    'other',
+  ]);
 
   fileSizeTotal(byKey: string): number {
-    return this.list
+    return this.dataSource()
       .map(x => {
         let value = x[byKey];
         if (typeof value === 'number') {
@@ -147,7 +157,7 @@ export class TableViewComponent {
     if (isNotBlank(defaultKey) && this.rowColor.length > 0) {
       const keyMap: { [key in string]: string } = {};
 
-      this.list.forEach((data, index) => {
+      this.dataSource().forEach((data, index) => {
         const key = data[defaultKey].toUpperCase();
         if (isBlank(keyMap[key])) {
           keyMap[key] = this.rowColor[index % this.rowColor.length];
@@ -162,6 +172,18 @@ export class TableViewComponent {
       return element[type];
     }
     return 'auto';
+  }
+
+  onSortChange(sort: Sort) {
+    this.store.patchQuery({
+      type: 'sort',
+      key: sort.active,
+      asc: sort.direction === 'asc' || sort.direction === '',
+    });
+  }
+
+  onPageChange(event: PageEvent) {
+    this.store.setPage(event.pageIndex + 1);
   }
   onSetTag(data: any) {
     // this.openSelectTag(data).subscribe(() => {

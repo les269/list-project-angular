@@ -13,6 +13,7 @@ import {
   ThemeTopCustom,
   ThemeOtherSetting,
   ThemeCustom,
+  DEFAULT_ROW_COLOR,
 } from '../models';
 import { getHeaderId, isBlank, sortSeq } from '../../../shared/util/helper';
 import { Store } from '@ngrx/store';
@@ -126,4 +127,10 @@ export class HeaderStore {
   themeCustomList = computed<ThemeCustom[]>(
     () => this.themeHeader.value()?.themeCustomList?.slice().sort(sortSeq) ?? []
   );
+
+  rowColor = computed<string[]>(() => {
+    return (
+      this.themeHeader.value()?.themeOtherSetting?.rowColor ?? DEFAULT_ROW_COLOR
+    );
+  });
 }

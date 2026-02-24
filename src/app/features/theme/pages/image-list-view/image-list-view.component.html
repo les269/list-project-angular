@@ -240,7 +240,7 @@
               @if (
                 label.isVisible &&
                 checkValueVisible(data[label.byKey]) &&
-                checkVisibleByDataset(label)
+                store.checkVisibleByDataset(label)
               ) {
                 <div class="detail-row">
                   <div class="row-label">{{ label.label }}</div>
@@ -280,7 +280,6 @@
                 [defaultKey]="store.defaultKey()"
                 [customValueMap]="store.customValueMap.value()"
                 [fileExist]="store.fileExistResource.value()"
-                [themeHeaderType]="store.themeHeaderType()"
                 [currentDatasetName]="
                   store.useDataset().label
                 "></app-custom-buttons>

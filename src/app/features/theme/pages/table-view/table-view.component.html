@@ -51,9 +51,11 @@
         class="form-control"
         [matAutocomplete]="auto"
         [ngModel]="store.searchValue()"
-        (ngModelChange)="this.store.searchValue.set($event)"
+        (ngModelChange)="store.searchValue.set($event)"
         (keydown.enter)="store.onSearch(store.searchValue())" />
-      <mat-autocomplete #auto="matAutocomplete">
+      <mat-autocomplete
+        #auto="matAutocomplete"
+        (optionSelected)="store.onSearch($event.option.value)">
         @for (option of store.filterAutoCompleteList(); track option) {
           <mat-option [value]="option">{{ option }}</mat-option>
         }
@@ -85,13 +87,13 @@
       </button>
     </div>
     <div class="d-flex col-4 justify-content-end">
-      @if (store.defaultKey() && store.themeOtherSetting()?.showDuplicate) {
+      <!-- @if (store.defaultKey() && store.themeOtherSetting()?.showDuplicate) {
         <button mat-button (click)="showDuplicate()">
           {{ 'themeTopCustom.showDuplicate' | translate }}
         </button>
-      }
+      } -->
       @if (store.defaultKey() && store.themeCustomList().length > 0) {
-        <button mat-button (click)="isExpand.set(!isExpand)">
+        <button mat-button (click)="isExpand.set(!isExpand())">
           {{ 'themeCustom.showCustomButton' | translate }}
         </button>
       }
@@ -106,17 +108,27 @@
         store.topCustomValueMap.value()
       "></app-top-custom-buttons>
   </div>
-  <!-- <mat-paginator
+  <mat-paginator
     class="mat-paginator"
-    [pageSizeOptions]="[this.store.pageSize()]"
-    [showFirstLastButtons]="true"></mat-paginator> -->
-  <table mat-table [dataSource]="list" multiTemplateDataRows>
-    @for (label of store.visibleLabelList(); track $index; let index = $index) {
-      <ng-container [matColumnDef]="label.byKey">
+    [pageIndex]="store.currentPage() - 1"
+    [length]="store.filterData().length"
+    [pageSize]="store.pageSize()"
+    [showFirstLastButtons]="true"
+    hidePageSize
+    (page)="onPageChange($event)"></mat-paginator>
+  <table
+    mat-table
+    [dataSource]="dataSource()"
+    multiTemplateDataRows
+    matSort
+    (matSortChange)="onSortChange($event)">
+    @for (label of store.visibleLabelList(); track label.byKey) {
+      @let key = label.byKey;
+      <ng-container [matColumnDef]="key">
         <th
           mat-header-cell
           *matHeaderCellDef
-          [mat-sort-header]="label.byKey"
+          [mat-sort-header]="key"
           [disabled]="!label.isSort">
           {{ label.label }}
         </th>
@@ -139,7 +151,7 @@
         <td mat-footer-cell *matFooterCellDef>
           @switch (label.type) {
             @case ('fileSize') {
-              {{ fileSizeTotal(label.byKey) | fileSize }}
+              {{ fileSizeTotal(key) | fileSize }}
             }
           }
         </td>
@@ -155,19 +167,6 @@
           'border-bottom': isExpand() ? 'none' : 'solid #ccc 1px',
         }">
         <div class="row flex-nowrap">
-          @if (store.defaultKey()) {
-            <button
-              class="d-flex"
-              mat-icon-button
-              [matTooltip]="'themeTag.setTag' | translate"
-              (click)="onSetTag(element)">
-              <mat-icon class="material-icons-outlined"
-                ><span class="material-symbols-outlined">
-                  bookmark
-                </span></mat-icon
-              >
-            </button>
-          }
           <button
             class="d-flex"
             mat-icon-button
@@ -185,7 +184,7 @@
       <td
         mat-cell
         *matCellDef="let element; let i = dataIndex"
-        [attr.colspan]="displayedColumns.length"
+        [attr.colspan]="displayedColumns().length"
         [ngStyle]="{
           'border-bottom': isExpand() ? 'solid #ccc 1px' : 'none',
           'border-top': 'none',
@@ -199,8 +198,8 @@
               [defaultKey]="store.defaultKey()"
               [customValueMap]="store.customValueMap.value()"
               [fileExist]="store.fileExistResource.value()"
-              [themeHeaderType]="
-                store.themeHeader.value()!.type
+              [currentDatasetName]="
+                store.useDataset().label
               "></app-custom-buttons>
           }
         </div>
@@ -209,32 +208,21 @@
     <tr
       class="mat-header-row"
       mat-header-row
-      *matHeaderRowDef="displayedColumns"></tr>
-    <!-- <tr
-      mat-row
-      *matRowDef="let row; columns: displayedColumns; let i = dataIndex"
-      class="mat-row"
-      [style.backgroundColor]="list.data[i][COLOR_KEY] || ''"
-      [ngStyle]="{
-        'border-bottom': isExpand() ? 'none' : 'solid #ccc 1px',
-      }"></tr>
+      *matHeaderRowDef="displayedColumns()"></tr>
     <tr
       mat-row
-      *matRowDef="let row; columns: ['expanded']; let i = dataIndex"
+      *matRowDef="let row; columns: displayedColumns()"
+      class="mat-row"
+      [ngStyle]="{
+        'border-bottom': isExpand() ? 'none' : 'solid #ccc 1px',
+      }"
+      [style.backgroundColor]="row[COLOR_KEY] || ''"></tr>
+    <tr
+      mat-row
+      *matRowDef="let row; columns: ['expanded']"
       style="height: 0px"
-      [style.backgroundColor]="list.data[i][COLOR_KEY] || ''"></tr> -->
-    <tr
-      mat-row
-      *matRowDef="let row; columns: displayedColumns; let i = dataIndex"
-      class="mat-row"
-      [ngStyle]="{
-        'border-bottom': isExpand() ? 'none' : 'solid #ccc 1px',
-      }"></tr>
-    <tr
-      mat-row
-      *matRowDef="let row; columns: ['expanded']; let i = dataIndex"
-      style="height: 0px"></tr>
-    <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
+      [style.backgroundColor]="row[COLOR_KEY] || ''"></tr>
+    <tr mat-footer-row *matFooterRowDef="displayedColumns()"></tr>
   </table>
 </div>
 <app-scrollTop></app-scrollTop>

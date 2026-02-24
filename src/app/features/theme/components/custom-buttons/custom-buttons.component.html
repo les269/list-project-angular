@@ -103,9 +103,7 @@
             <button
               class="custom-button"
               (click)="deleteFile(custom)"
-              [disabled]="
-                themeHeaderType() === 'imageList' && !fileExistForCurrentData()
-              ">
+              [disabled]="!fileExistForCurrentData()">
               <label class="px-2">{{ custom.label }}</label>
             </button>
           </div>
@@ -115,9 +113,7 @@
             <button
               class="custom-button"
               (click)="moveTo(custom)"
-              [disabled]="
-                themeHeaderType() === 'imageList' && !fileExistForCurrentData()
-              ">
+              [disabled]="!fileExistForCurrentData()">
               <label class="px-2">{{ custom.label }}</label>
             </button>
           </div>
@@ -127,9 +123,7 @@
             <button
               class="custom-button"
               (click)="openFolder(custom)"
-              [disabled]="
-                themeHeaderType() === 'imageList' && !fileExistForCurrentData()
-              ">
+              [disabled]="!fileExistForCurrentData()">
               <label class="px-2">{{ custom.label }}</label>
             </button>
           </div>

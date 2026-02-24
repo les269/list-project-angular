@@ -45,7 +45,6 @@ export class CustomButtonsComponent {
   private readonly fileService = inject(FileService);
   private readonly snackbarService = inject(SnackbarService);
 
-  themeHeaderType = input.required<ThemeHeaderType>();
   themeCustomList = input.required<ThemeCustom[]>();
   data = input.required<any>();
   headerId = input.required<string>();
@@ -232,7 +231,6 @@ export class CustomButtonsComponent {
 
   visibleByDatasetName(custom: ThemeCustom): boolean {
     if (
-      this.themeHeaderType() === ThemeHeaderType.imageList &&
       Array.isArray(custom.visibleDatasetNameList) &&
       custom.visibleDatasetNameList.length > 0 &&
       !custom.visibleDatasetNameList.includes(this.currentDatasetName())

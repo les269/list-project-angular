@@ -7,7 +7,13 @@ import { DataStore } from './data.store';
 import { FilterStore } from './filter.store';
 import { ResourceStore } from './resource.store';
 import { UIStateStore } from './ui.state.store';
-import { QueryActionType, SortType, ThemeDataset, ThemeTag } from '../models';
+import {
+  QueryActionType,
+  SortType,
+  ThemeDataset,
+  ThemeLabel,
+  ThemeTag,
+} from '../models';
 import { DatasetService } from '../../dataset/service/dataset.service';
 import { GroupDatasetService } from '../../dataset/service/group-dataset.service';
 import { SelectTableService } from '../../../core/services/select-table.service';
@@ -123,6 +129,10 @@ export class ListBaseViewStoreAdapter {
     return this.headerStore.displayedColumns;
   }
 
+  get rowColor() {
+    return this.headerStore.rowColor;
+  }
+
   // expose data store properties
   get useDataset() {
     return this.dataStore.useDataset;
@@ -149,6 +159,8 @@ export class ListBaseViewStoreAdapter {
     this.dataStore.changeDataset(event.seq);
   changeShareTag = (event: ThemeTag) =>
     this.dataStore.changeShareTag(event.seq);
+  checkVisibleByDataset = (themeLabel: ThemeLabel): boolean =>
+    this.dataStore.checkVisibleByDataset(themeLabel);
 
   // expose filter store properties
   get filterData() {

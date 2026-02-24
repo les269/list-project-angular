@@ -140,13 +140,6 @@ export class ImageListViewComponent {
 
     return true;
   }
-  checkVisibleByDataset(themeLabel: ThemeLabel): boolean {
-    if (themeLabel.visibleDatasetNameList?.length > 0) {
-      const label = this.store.useDataset().label;
-      return themeLabel.visibleDatasetNameList.includes(label);
-    }
-    return true;
-  }
 
   tagValueUpdate(event: ShareTagValue) {
     const list = this.store.shareTagValueMap()[event.shareTagId];
