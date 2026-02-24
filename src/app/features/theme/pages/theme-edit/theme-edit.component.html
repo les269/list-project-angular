@@ -19,7 +19,7 @@
           name="name"
           #name="ngModel"
           required
-          [disabled]="status === 'edit'" />
+          [disabled]="status() === themeEditMode.edit" />
       </div>
       <div class="mb-3">
         <label for="version" class="form-label require">{{
@@ -32,7 +32,7 @@
           id="version"
           name="version"
           required
-          [disabled]="status === 'edit'" />
+          [disabled]="status() === themeEditMode.edit" />
       </div>
       <div class="mb-3">
         <label class="form-label" for="type">{{
@@ -43,7 +43,7 @@
           [(ngModel)]="model.type"
           name="type"
           required
-          [disabled]="status === 'edit'">
+          [disabled]="status() === themeEditMode.edit">
           @for (type of eThemeHeaderType | keyvalue; track type) {
             <option [ngValue]="type.key">
               {{ 'themeHeader.' + type.key | translate }}
@@ -134,7 +134,7 @@
           model.themeOtherSetting
         "></app-theme-other-setting>
       <div>
-        @if (status === 'edit') {
+        @if (status() === themeEditMode.edit) {
           <div class="my-4">
             <button
               type="submit"

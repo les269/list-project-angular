@@ -1,0 +1,18 @@
+// Button styles for visibility toggle
+.visible-btn {
+  color: #4caf50 !important;
+  font-weight: 500;
+
+  &:hover {
+    background-color: rgba(76, 175, 80, 0.08);
+  }
+}
+
+.hidden-btn {
+  color: #f44336 !important;
+  font-weight: 500;
+
+  &:hover {
+    background-color: rgba(244, 67, 54, 0.08);
+  }
+}

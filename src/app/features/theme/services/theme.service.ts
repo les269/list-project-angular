@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { map, Observable, of, shareReplay } from 'rxjs';
 import {
   CopyThemeRequest,
   ThemeCustomValue,
@@ -23,27 +23,40 @@ export class ThemeService {
     return this.http.get<ThemeHeader[]>('/theme/all');
   }
 
+  getAllThemeMapType(): Observable<Record<ThemeHeaderType, ThemeHeader[]>> {
+    return this.http.get<ThemeHeader[]>('/theme/all').pipe(
+      map(res => ({
+        [ThemeHeaderType.imageList]: res
+          .filter(x => x.type === ThemeHeaderType.imageList)
+          .sort((a, b) => (a.seq > b.seq ? 1 : -1)),
+        [ThemeHeaderType.table]: res
+          .filter(x => x.type === ThemeHeaderType.table)
+          .sort((a, b) => (a.seq > b.seq ? 1 : -1)),
+      }))
+    );
+  }
+
   updateAllTheme(): void {
-    this.http.get<ThemeHeader[]>('/theme/all').subscribe(res => {
-      this.store.dispatch(
-        updateList({
-          [ThemeHeaderType.imageList]: res
-            .filter(
-              x =>
-                x.type === ThemeHeaderType.imageList &&
-                x.themeOtherSetting.themeVisible
-            )
-            .sort((a, b) => (a.seq > b.seq ? 1 : -1)),
-          [ThemeHeaderType.table]: res
-            .filter(
-              x =>
-                x.type === ThemeHeaderType.table &&
-                x.themeOtherSetting.themeVisible
-            )
-            .sort((a, b) => (a.seq > b.seq ? 1 : -1)),
+    this.getAllThemeMapType()
+      .pipe(
+        map(res => {
+          res.imageList = res.imageList.filter(
+            x => x.themeOtherSetting.themeVisible
+          );
+          res.table = res.table.filter(x => x.themeOtherSetting.themeVisible);
+          return res;
         })
-      );
-    });
+      )
+      .subscribe(res => {
+        this.store.dispatch(updateList(res));
+      });
+  }
+
+  updateThemeStore(req: Record<ThemeHeaderType, ThemeHeader[]>): void {
+    const res = { ...req };
+    res.imageList = req.imageList.filter(x => x.themeOtherSetting.themeVisible);
+    res.table = req.table.filter(x => x.themeOtherSetting.themeVisible);
+    this.store.dispatch(updateList(res));
   }
 
   getByHeaderId(req: Partial<string>): Observable<ThemeHeader> {

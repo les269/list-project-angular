@@ -215,3 +215,8 @@ export type QueryAction =
   | { type: QueryActionType.page; page: number }
   | { type: QueryActionType.dataset; seq: number }
   | { type: QueryActionType.tag; seq: number };
+
+export enum ThemeEditMode {
+  create = 'create',
+  edit = 'edit',
+}

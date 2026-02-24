@@ -100,6 +100,11 @@ export class TableViewComponent {
   readonly matSort = viewChild(MatSort);
 
   constructor() {
+    effect(() => {
+      if (isBlank(this.store.headerId())) {
+        this.store.router.navigate(['']);
+      }
+    });
     // Initialize matSort based on query params when sort changes
     effect(() => {
       const sort = this.matSort();
@@ -139,21 +144,6 @@ export class TableViewComponent {
       .reduce((a, b) => a + b, 0);
   }
 
-  doTableColor() {
-    const defaultKey = this.store.defaultKey();
-    if (isNotBlank(defaultKey) && this.rowColor.length > 0) {
-      const keyMap: { [key in string]: string } = {};
-
-      this.dataSource().forEach((data, index) => {
-        const key = data[defaultKey].toUpperCase();
-        if (isBlank(keyMap[key])) {
-          keyMap[key] = this.rowColor[index % this.rowColor.length];
-        }
-        data[this.COLOR_KEY] = keyMap[key];
-      });
-    }
-  }
-
   getWidth(element: ThemeLabel, type: 'width' | 'maxWidth' | 'minWidth') {
     if (isNotBlank(element[type]) && isValidWidth(element[type])) {
       return element[type];
@@ -171,42 +161,6 @@ export class TableViewComponent {
 
   onPageChange(event: PageEvent) {
     this.store.setPage(event.pageIndex + 1);
-  }
-  onSetTag(data: any) {
-    // this.openSelectTag(data).subscribe(() => {
-    // });
-  }
-  openSelectTag(data: any) {
-    // const value = data[this.defaultKey()];
-    // const selected = Object.entries(this.shareTagValueMap)
-    //   .filter(([shareTagId, valueList]) => valueList.includes(value))
-    //   .map(
-    //     ([shareTagId, valueList]) =>
-    //       this.shareTags().find(x => x.shareTagId === shareTagId)!
-    //   );
-    // return this.selectTableService.selectMutipleTag(this.shareTags(), selected);
-  }
-  /**
-   * 從資料庫取得當前頁面的自定義資料
-   */
-  getCustomValueMap() {
-    // if (isNotBlank(this.defaultKey)) {
-    //   const req = {
-    //     headerId: this.headerId,
-    //     valueList: this.list.data.map((x: any) => x[this.defaultKey]),
-    //   };
-    //   this.themeService.findCustomValue(req).subscribe(res => {
-    //     this.customValueMap = res;
-    //     this.customValueMap = this.list.data
-    //       .map((x: any) => x[this.defaultKey])
-    //       .reduce((a: ThemeCustomValueResponse, b: string) => {
-    //         if (!a.hasOwnProperty(b)) {
-    //           a[b] = {};
-    //         }
-    //         return a;
-    //       }, this.customValueMap);
-    //   });
-    // }
   }
 
   showDuplicate() {

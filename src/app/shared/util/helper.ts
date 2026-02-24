@@ -171,20 +171,17 @@ export const readJsonFile = (reader: FileReader): Observable<Object> => {
 export const sortSeq = (a: any, b: any): number =>
   parseInt(a.seq) > parseInt(b.seq) ? 1 : -1;
 
-export const getQueryParamsByHeader = (header: ThemeHeader): Params | null => {
-  if (header.type === ThemeHeaderType.imageList) {
-    const sortArray = header.themeLabelList.filter(x => x.isSort);
-    const defaultDataset = header.themeDatasetList.find(x => x.isDefault);
-    return {
-      searchValue: '',
-      sort: sortArray.length > 0 ? sortArray[0].byKey : '', //
-      asc: true,
-      page: 1,
-      dataset: defaultDataset ? defaultDataset.seq : 1, //
-      tag: -1,
-    };
-  }
-  return null;
+export const getQueryParamsByHeader = (header: ThemeHeader): Params => {
+  const sortArray = header.themeLabelList.filter(x => x.isSort);
+  const defaultDataset = header.themeDatasetList.find(x => x.isDefault);
+  return {
+    searchValue: '',
+    sort: sortArray.length > 0 ? sortArray[0].byKey : '',
+    asc: true,
+    page: 1,
+    dataset: defaultDataset ? defaultDataset.seq : 1,
+    tag: -1,
+  };
 };
 
 export function groupBy<T, K extends string | number>(

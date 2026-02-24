@@ -1,8 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, Input, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { selectLayoutByKey } from '../../../shared/state/layout.selectors';
+import {
+  selectLayoutList,
+  selectLayoutOpen,
+} from '../../../shared/state/layout.selectors';
 import {
   changeSidenav,
   updateList,
@@ -13,6 +15,7 @@ import { ThemeService } from '../../../features/theme/services/theme.service';
 import { ThemeHeader, ThemeHeaderType } from '../../../features/theme/models';
 import { routes } from '../../../app.routes';
 import { getQueryParamsByHeader } from '../../../shared/util/helper';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   standalone: true,
@@ -22,26 +25,25 @@ import { getQueryParamsByHeader } from '../../../shared/util/helper';
   styleUrls: ['sidenav.component.scss'],
 })
 export class SidenavComponent implements OnInit {
+  router = inject(Router);
+  store = inject(Store);
+  themeService = inject(ThemeService);
+
   eThemeHeaderType = ThemeHeaderType;
-  openSidenav$: Observable<Readonly<boolean>>;
+  openSidenav = toSignal(this.store.pipe(selectLayoutOpen()), {
+    initialValue: false,
+  });
   routes = routes
     .filter(x => x.data && x.data['sidenav'])
     .map(x => ({ path: x.path, title: x.data!['title'] }));
-  list$: Observable<
-    Readonly<{
-      [key in ThemeHeaderType]: ThemeHeader[];
-    }>
-  >;
+  list = toSignal(this.store.pipe(selectLayoutList()), {
+    initialValue: {
+      [ThemeHeaderType.imageList]: [],
+      [ThemeHeaderType.table]: [],
+    },
+  });
   getQueryParamsByHeader = getQueryParamsByHeader;
 
-  constructor(
-    private router: Router,
-    private themeService: ThemeService,
-    private store: Store
-  ) {
-    this.openSidenav$ = this.store.pipe(selectLayoutByKey('openSidenav'));
-    this.list$ = this.store.pipe(selectLayoutByKey('list'));
-  }
   ngOnInit() {
     this.themeService.updateAllTheme();
   }
@@ -49,6 +51,7 @@ export class SidenavComponent implements OnInit {
   close() {
     this.store.dispatch(changeSidenav());
   }
+
   navigateList(item: ThemeHeader) {
     return this.router
       .createUrlTree([item.type, item.name, item.version])

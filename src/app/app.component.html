@@ -6,6 +6,6 @@
   </div>
   <div
     class="layout-mask"
-    [ngClass]="{ 'layout-mask-activity': (openSidenav$ | async) }"
+    [ngClass]="{ 'layout-mask-activity': openSidenav() }"
     (click)="closeSidenav()"></div>
 </div>

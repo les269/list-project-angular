@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ThemeHeader, ThemeHeaderType } from '../../models';
 import { CommonModule } from '@angular/common';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { ThemeService } from '../../services/theme.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -12,11 +12,11 @@ import {
   getQueryParamsByHeader,
   isNotBlank,
 } from '../../../../shared/util/helper';
-import { selectLayoutByKey } from '../../../../shared/state/layout.selectors';
-import { Observable } from 'rxjs';
+import { selectLayoutList } from '../../../../shared/state/layout.selectors';
 import { ThemeVisibleComponent } from '../../components/theme-visible/theme-visible.component';
 import { ShareTagListComponent } from '../../components/share-tag-list/share-tag-list.component';
 import { CopyThemeComponent } from '../../components/copy-theme/copy-theme.component';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   standalone: true,
@@ -25,28 +25,21 @@ import { CopyThemeComponent } from '../../components/copy-theme/copy-theme.compo
   templateUrl: 'theme-list.component.html',
   styleUrl: 'theme-list.component.scss',
 })
-export class ThemeListComponent implements OnInit {
+export class ThemeListComponent {
+  readonly router = inject(Router);
+  readonly themeService = inject(ThemeService);
+  readonly snackbarService = inject(SnackbarService);
+  readonly store = inject(Store);
+  readonly matDialog = inject(MatDialog);
+  readonly messageBoxService = inject(MessageBoxService);
+
   eThemeHeaderType = ThemeHeaderType;
-  list$: Observable<
-    Readonly<{
-      [key in ThemeHeaderType]: ThemeHeader[];
-    }>
-  >;
-
-  constructor(
-    private router: Router,
-    private themeService: ThemeService,
-    private snackbarService: SnackbarService,
-    private store: Store,
-    private matDialog: MatDialog,
-    private messageBoxService: MessageBoxService
-  ) {
-    this.list$ = this.store.pipe(selectLayoutByKey('list'));
-  }
-
-  ngOnInit() {
-    this.updateAllTheme();
-  }
+  list = toSignal(this.store.pipe(selectLayoutList()), {
+    initialValue: {
+      [ThemeHeaderType.imageList]: [],
+      [ThemeHeaderType.table]: [],
+    },
+  });
 
   updateAllTheme() {
     this.themeService.updateAllTheme();
@@ -63,15 +56,17 @@ export class ThemeListComponent implements OnInit {
     });
   }
   onCopy(item: ThemeHeader) {
-    const dialogRef = this.matDialog.open(CopyThemeComponent, {
-      data: { themeHeader: item },
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      if (isNotBlank(result)) {
-        this.snackbarService.openI18N('msg.copySuccess');
-        this.updateAllTheme();
-      }
-    });
+    this.matDialog
+      .open(CopyThemeComponent, {
+        data: { themeHeader: item },
+      })
+      .afterClosed()
+      .subscribe(result => {
+        if (isNotBlank(result)) {
+          this.snackbarService.openI18N('msg.copySuccess');
+          this.updateAllTheme();
+        }
+      });
   }
   onDelete(item: ThemeHeader) {
     this.messageBoxService.openI18N('msg.sureDeleteTheme').subscribe(result => {

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,6 +9,7 @@ import { MatListModule } from '@angular/material/list';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import {
   DEFAULT_ROW_COLOR,
+  ThemeEditMode,
   ThemeHeader,
   ThemeHeaderType,
   ThemeImageType,
@@ -54,7 +55,14 @@ import { QuickRefreshType } from '../../../dataset/model';
   styleUrls: ['theme-edit.component.scss'],
 })
 export class ThemeEditComponent implements OnInit {
-  status: 'new' | 'edit' = 'new';
+  router = inject(Router);
+  route = inject(ActivatedRoute);
+  themeService = inject(ThemeService);
+  snackbarService = inject(SnackbarService);
+  translateService = inject(TranslateService);
+
+  themeEditMode = ThemeEditMode;
+  status = signal(ThemeEditMode.create);
   model: ThemeHeader = {
     name: '',
     version: '',
@@ -86,14 +94,6 @@ export class ThemeEditComponent implements OnInit {
   eThemeHeaderType = ThemeHeaderType;
   eThemeImageType = ThemeImageType;
 
-  constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    private themeService: ThemeService,
-    private snackbarService: SnackbarService,
-    private translateService: TranslateService
-  ) {}
-
   ngOnInit() {
     this.route.queryParams
       .pipe(
@@ -116,7 +116,7 @@ export class ThemeEditComponent implements OnInit {
           this.router.navigate(['']);
           return;
         }
-        this.status = 'edit';
+        this.status.set(ThemeEditMode.edit);
         this.model = res;
       });
   }
@@ -133,11 +133,11 @@ export class ThemeEditComponent implements OnInit {
       .existTheme(this.model)
       .pipe(
         switchMap(exist => {
-          if (this.status === 'new' && exist) {
+          if (this.status() === ThemeEditMode.create && exist) {
             this.snackbarService.openI18N('msg.themeExist');
             return EMPTY;
           }
-          if (this.status === 'edit' && !exist) {
+          if (this.status() === ThemeEditMode.edit && !exist) {
             this.snackbarService.openI18N('msg.themeNotExist');
             return EMPTY;
           }

@@ -16,82 +16,72 @@
       {{ 'home.shareTagList' | translate }}
     </button>
   </div>
-  @for (type of eThemeHeaderType | keyvalue; track $index) {
-    @if (list$ | async; as list) {
-      @if (list[type.value].length > 0) {
-        <h4 class="d-flex mt-4">{{ 'themeHeader.' + type.key | translate }}</h4>
-        <div class="d-flex flex-wrap">
-          @for (item of list[type.value]; track $index) {
-            <div class="col-lg-4 col-md-6 col-xs-12">
-              <div class="theme-content">
-                <div class="theme-detail" (click)="navigateList(item)">
-                  <div class="row">
-                    <div class="fw-bold" style="width: 100px">
-                      {{ 'themeHeader.name' | translate }}
-                    </div>
-                    <div
-                      class="row-text col-9"
-                      style="width: calc(100% - 100px)">
-                      {{ item.name }}
-                    </div>
+  @for (type of eThemeHeaderType | keyvalue; track type.key) {
+    @if (list()[type.value].length > 0) {
+      <h4 class="d-flex mt-4">{{ 'themeHeader.' + type.key | translate }}</h4>
+      <div class="d-flex flex-wrap">
+        @for (item of list()[type.value]; track $index) {
+          <div class="col-lg-4 col-md-6 col-xs-12">
+            <div class="theme-content">
+              <div class="theme-detail" (click)="navigateList(item)">
+                <div class="row">
+                  <div class="fw-bold" style="width: 100px">
+                    {{ 'themeHeader.name' | translate }}
                   </div>
-                  <div class="row">
-                    <div class="fw-bold" style="width: 100px">
-                      {{ 'themeHeader.version' | translate }}
-                    </div>
-                    <div
-                      class="row-text col-9"
-                      style="width: calc(100% - 100px)">
-                      {{ item.version }}
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="fw-bold" style="width: 100px">
-                      {{ 'themeHeader.title' | translate }}
-                    </div>
-                    <div
-                      class="row-text col-9"
-                      style="width: calc(100% - 100px)">
-                      {{ item.title }}
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="fw-bold" style="width: 100px">
-                      {{ 'themeHeader.type' | translate }}
-                    </div>
-                    <div
-                      class="row-text col-9"
-                      style="width: calc(100% - 100px)">
-                      {{ 'themeHeader.' + item.type | translate }}
-                    </div>
+                  <div class="row-text col-9" style="width: calc(100% - 100px)">
+                    {{ item.name }}
                   </div>
                 </div>
-                <span class="border-top"></span>
-                <div class="theme-buttons">
-                  <button
-                    type="button"
-                    class="btn btn-primary"
-                    (click)="onEdit(item)">
-                    {{ 'g.edit' | translate }}
-                  </button>
-                  <button
-                    type="button"
-                    class="btn btn-primary"
-                    (click)="onCopy(item)">
-                    {{ 'g.copy' | translate }}
-                  </button>
-                  <button
-                    type="button"
-                    class="btn btn-primary"
-                    (click)="onDelete(item)">
-                    {{ 'g.delete' | translate }}
-                  </button>
+                <div class="row">
+                  <div class="fw-bold" style="width: 100px">
+                    {{ 'themeHeader.version' | translate }}
+                  </div>
+                  <div class="row-text col-9" style="width: calc(100% - 100px)">
+                    {{ item.version }}
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="fw-bold" style="width: 100px">
+                    {{ 'themeHeader.title' | translate }}
+                  </div>
+                  <div class="row-text col-9" style="width: calc(100% - 100px)">
+                    {{ item.title }}
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="fw-bold" style="width: 100px">
+                    {{ 'themeHeader.type' | translate }}
+                  </div>
+                  <div class="row-text col-9" style="width: calc(100% - 100px)">
+                    {{ 'themeHeader.' + item.type | translate }}
+                  </div>
                 </div>
               </div>
+              <span class="border-top"></span>
+              <div class="theme-buttons">
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  (click)="onEdit(item)">
+                  {{ 'g.edit' | translate }}
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  (click)="onCopy(item)">
+                  {{ 'g.copy' | translate }}
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  (click)="onDelete(item)">
+                  {{ 'g.delete' | translate }}
+                </button>
+              </div>
             </div>
-          }
-        </div>
-      }
+          </div>
+        }
+      </div>
     }
   }
 </div>
