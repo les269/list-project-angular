@@ -26,7 +26,7 @@
       <div class="table-container">
         <table
           mat-table
-          [dataSource]="dataSource"
+          [dataSource]="dataSource.value()"
           multiTemplateDataRows
           matSort>
           <!-- ID Column -->
@@ -96,7 +96,7 @@
           <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
         </table>
       </div>
-      @if (!dataSource.data || dataSource.data.length === 0) {
+      @if (!dataSource.value().data || dataSource.value().data.length === 0) {
         <div class="empty mt-2">
           {{ 'shareTag.noTags' | translate }}
         </div>
@@ -116,15 +116,20 @@
       <input
         type="text"
         class="form-control"
-        [(ngModel)]="newTagId"
-        [disabled]="isEdit" />
+        [ngModel]="newTagId()"
+        (ngModelChange)="newTagId.set($event)"
+        [disabled]="isEdit()" />
     </div>
 
     <div class="mb-3">
       <label for="shareTagName" class="form-label">{{
         'shareTag.tagName' | translate
       }}</label>
-      <input type="text" class="form-control" [(ngModel)]="newTagName" />
+      <input
+        type="text"
+        class="form-control"
+        [ngModel]="newTagName()"
+        (ngModelChange)="newTagName.set($event)" />
     </div>
   </mat-dialog-content>
   <mat-dialog-actions>

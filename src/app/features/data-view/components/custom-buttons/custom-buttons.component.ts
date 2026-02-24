@@ -20,13 +20,13 @@ import {
   replaceValue,
 } from '../../../../shared/util/helper';
 import { ThemeService } from '../../../theme/services/theme.service';
-import { ButtonInputUrlDialog } from '../../../theme/components/button-input-url.dialog';
 import { MatDialog } from '@angular/material/dialog';
 import { ThemeNoteComponent } from '../../../theme/components/theme-note/theme-note.component';
 import { ApiConfigService } from '../../../api-config/service/api-config.service';
 import { CopyDirective } from '../../../../shared/util/util.directive';
 import { FileService } from '../../../../core/services/file.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
+import { ButtonInputUrlComponent } from '../button-input-url/button-input-url.component';
 
 @Component({
   selector: 'app-custom-buttons',
@@ -125,7 +125,7 @@ export class CustomButtonsComponent {
   }
 
   openButtonInputUrlDialog(custom: ThemeCustom) {
-    const dialogRef = this.matDialog.open(ButtonInputUrlDialog, {
+    const dialogRef = this.matDialog.open(ButtonInputUrlComponent, {
       width: '600px',
       data: this.getCustomValue(custom),
     });

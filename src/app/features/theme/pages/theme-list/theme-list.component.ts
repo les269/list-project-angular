@@ -7,7 +7,6 @@ import { ThemeService } from '../../services/theme.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { Store } from '@ngrx/store';
 import { MatDialog } from '@angular/material/dialog';
-import { CopyThemeComponent } from '../../components/copy-theme.dialog';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import {
   getQueryParamsByHeader,
@@ -17,6 +16,7 @@ import { selectLayoutByKey } from '../../../../shared/state/layout.selectors';
 import { Observable } from 'rxjs';
 import { ThemeVisibleComponent } from '../../components/theme-visible/theme-visible.component';
 import { ShareTagListComponent } from '../../components/share-tag-list/share-tag-list.component';
+import { CopyThemeComponent } from '../../components/copy-theme/copy-theme.component';
 
 @Component({
   standalone: true,

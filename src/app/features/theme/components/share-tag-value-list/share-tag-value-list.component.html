@@ -35,7 +35,7 @@
       <div class="table-container">
         <table
           mat-table
-          [dataSource]="dataSource"
+          [dataSource]="dataSource.value()"
           multiTemplateDataRows
           matSort>
           <!-- Checkbox Column -->
@@ -105,7 +105,7 @@
           <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
         </table>
       </div>
-      @if (!dataSource.data || dataSource.data.length === 0) {
+      @if (!dataSource.value().data || dataSource.value().data.length === 0) {
         <div class="empty mt-2">
           {{ 'shareTag.noTagValue' | translate }}
         </div>

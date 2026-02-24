@@ -1,0 +1,70 @@
+<h2 mat-dialog-title>{{ 'title.copyTheme' | translate }}</h2>
+<mat-dialog-content>
+  <form #f="ngForm">
+    <div class="mb-3">
+      <label for="name" class="form-label">{{
+        'themeHeader.name' | translate
+      }}</label>
+      <input
+        type="text"
+        class="form-control"
+        [(ngModel)]="target.name"
+        id="name"
+        name="name"
+        required
+        #name="ngModel" />
+    </div>
+    <div class="mb-3">
+      <label for="version" class="form-label">{{
+        'themeHeader.version' | translate
+      }}</label>
+      <input
+        type="text"
+        class="form-control"
+        [(ngModel)]="target().version"
+        id="version"
+        name="version"
+        required />
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="type">{{
+        'themeHeader.type' | translate
+      }}</label>
+      <select
+        class="form-control form-select"
+        [(ngModel)]="target().type"
+        name="type"
+        required>
+        @for (type of eThemeHeaderType | keyvalue; track type) {
+          <option [ngValue]="type.key">
+            {{ 'themeHeader.' + type.key | translate }}
+          </option>
+        }
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="title" class="form-label">{{
+        'themeHeader.title' | translate
+      }}</label>
+      <input
+        type="text"
+        class="form-control"
+        [(ngModel)]="target().title"
+        id="title"
+        name="title"
+        required />
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>
+    {{ 'g.no' | translate }}
+  </button>
+  <button
+    mat-button
+    cdkFocusInitial
+    (click)="ok()"
+    [disabled]="f.invalid || isProcessing">
+    {{ 'g.ok' | translate }}
+  </button>
+</mat-dialog-actions>
