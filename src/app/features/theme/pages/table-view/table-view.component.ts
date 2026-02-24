@@ -46,6 +46,7 @@ import { HeaderStore } from '../../stores/header.store';
 import { ResourceStore } from '../../stores/resource.store';
 import { RouteStore } from '../../stores/route.store';
 import { UIStateStore } from '../../stores/ui.state.store';
+import { ItemTagButtonsComponent } from '../../components/item-tag-buttons/item-tag-buttons.component';
 
 @Component({
   selector: 'app-table-view',
@@ -67,6 +68,7 @@ import { UIStateStore } from '../../stores/ui.state.store';
     CustomButtonsComponent,
     TopCustomButtonsComponent,
     MatAutocompleteModule,
+    ItemTagButtonsComponent,
   ],
   animations: [
     trigger('detailExpand', [

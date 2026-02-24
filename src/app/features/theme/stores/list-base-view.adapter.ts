@@ -9,6 +9,7 @@ import { ResourceStore } from './resource.store';
 import { UIStateStore } from './ui.state.store';
 import {
   QueryActionType,
+  ShareTagValue,
   SortType,
   ThemeDataset,
   ThemeLabel,
@@ -188,6 +189,9 @@ export class ListBaseViewStoreAdapter {
   onSearch = (text?: string) => {
     this.routeStore.searchValue.set(text ?? '');
     this.routeStore.patchQuery({ type: QueryActionType.search });
+  };
+  tagValueUpdate = (event: ShareTagValue) => {
+    this.dataStore.tagValueUpdate(event);
   };
 
   // expose resource store properties

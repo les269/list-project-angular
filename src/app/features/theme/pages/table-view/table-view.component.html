@@ -190,17 +190,32 @@
           'border-top': 'none',
         }">
         <div [@detailExpand]="isExpand() ? 'expanded' : 'collapsed'">
+          @if (store.themeTagList().length > 0) {
+            <div class="mb-2">
+              <app-item-tag-buttons
+                [value]="element[store.defaultKey()]"
+                [data]="element"
+                [themeTagList]="store.themeTagList()"
+                [shareTagValueMap]="store.shareTagValueMap()"
+                (tagValueUpdate)="store.tagValueUpdate($event)"
+                [shareTagNameMap]="
+                  store.shareTagNameMap()
+                "></app-item-tag-buttons>
+            </div>
+          }
           @if (store.themeHeader.value()) {
-            <app-custom-buttons
-              [themeCustomList]="store.themeCustomList()"
-              [data]="element"
-              [headerId]="store.headerId()"
-              [defaultKey]="store.defaultKey()"
-              [customValueMap]="store.customValueMap.value()"
-              [fileExist]="store.fileExistResource.value()"
-              [currentDatasetName]="
-                store.useDataset().label
-              "></app-custom-buttons>
+            <div class="mb-2">
+              <app-custom-buttons
+                [themeCustomList]="store.themeCustomList()"
+                [data]="element"
+                [headerId]="store.headerId()"
+                [defaultKey]="store.defaultKey()"
+                [customValueMap]="store.customValueMap.value()"
+                [fileExist]="store.fileExistResource.value()"
+                [currentDatasetName]="
+                  store.useDataset().label
+                "></app-custom-buttons>
+            </div>
           }
         </div>
       </td>

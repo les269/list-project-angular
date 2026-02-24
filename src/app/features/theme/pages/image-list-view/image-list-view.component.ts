@@ -141,19 +141,6 @@ export class ImageListViewComponent {
     return true;
   }
 
-  tagValueUpdate(event: ShareTagValue) {
-    const list = this.store.shareTagValueMap()[event.shareTagId];
-    const index = list.indexOf(event.value);
-    const service$ =
-      index > -1
-        ? this.store.shareTagService.deleteTagValue(event)
-        : this.store.shareTagService.addTagValue(event);
-
-    service$.subscribe(() => {
-      this.store.shareTagValueList.reload();
-    });
-  }
-
   quickRefresh(element: any) {
     const datasetName = element[this.store.DATASET_NAME_KEY];
     const byKey = this.store.defaultKey();
@@ -183,7 +170,7 @@ export class ImageListViewComponent {
       })
       .subscribe(res => {
         this.store.quickRefreshResult.update(x => {
-          x[byKey] = res;
+          x[primeKey] = res;
           return x;
         });
         this.store.snackbarService.openI18N('msg.refreshSuccess');

@@ -4,7 +4,13 @@ import { DatasetService } from '../../dataset/service/dataset.service';
 import { HeaderStore } from './header.store';
 import { RouteStore } from './route.store';
 import { DatasetData } from '../../dataset/model';
-import { QueryActionType, ShareTag, ThemeDataset, ThemeLabel } from '../models';
+import {
+  QueryActionType,
+  ShareTag,
+  ShareTagValue,
+  ThemeDataset,
+  ThemeLabel,
+} from '../models';
 import { ShareTagService } from '../services/share-tag.service';
 import { EMPTY } from 'rxjs';
 
@@ -176,5 +182,17 @@ export class DataStore {
       return themeLabel.visibleDatasetNameList.includes(label);
     }
     return true;
+  }
+  tagValueUpdate(event: ShareTagValue) {
+    const list = this.shareTagValueMap()[event.shareTagId];
+    const index = list.indexOf(event.value);
+    const service$ =
+      index > -1
+        ? this.shareTagService.deleteTagValue(event)
+        : this.shareTagService.addTagValue(event);
+
+    service$.subscribe(() => {
+      this.shareTagValueList.reload();
+    });
   }
 }

@@ -237,15 +237,16 @@
               track label.byKey;
               let idx = $index
             ) {
+              @let newData = getData(data);
               @if (
                 label.isVisible &&
-                checkValueVisible(data[label.byKey]) &&
+                checkValueVisible(newData[label.byKey]) &&
                 store.checkVisibleByDataset(label)
               ) {
                 <div class="detail-row">
                   <div class="row-label">{{ label.label }}</div>
                   <app-list-item-value
-                    [data]="data"
+                    [data]="newData"
                     [themeLabel]="label"
                     [isHover]="store.hoveredIndex() === i"
                     [seqKey]="store.seqKey()"
@@ -260,10 +261,10 @@
                 <div class="row-label">{{ 'g.tag' | translate }}</div>
                 <app-item-tag-buttons
                   [value]="data[store.defaultKey()]"
-                  [data]="getData(data)"
+                  [data]="data"
                   [themeTagList]="store.themeTagList()"
                   [shareTagValueMap]="store.shareTagValueMap()"
-                  (tagValueUpdate)="tagValueUpdate($event)"
+                  (tagValueUpdate)="store.tagValueUpdate($event)"
                   [shareTagNameMap]="
                     store.shareTagNameMap()
                   "></app-item-tag-buttons>
