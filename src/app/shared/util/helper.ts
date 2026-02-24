@@ -176,12 +176,12 @@ export const getQueryParamsByHeader = (header: ThemeHeader): Params | null => {
     const sortArray = header.themeLabelList.filter(x => x.isSort);
     const defaultDataset = header.themeDatasetList.find(x => x.isDefault);
     return {
-      page: 1,
       searchValue: '',
-      dataset: defaultDataset ? defaultDataset.seq : 1, //
-      tag: -1,
       sort: sortArray.length > 0 ? sortArray[0].byKey : '', //
       asc: true,
+      page: 1,
+      dataset: defaultDataset ? defaultDataset.seq : 1, //
+      tag: -1,
     };
   }
   return null;
