@@ -1,4 +1,17 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  inject,
+  signal,
+  computed,
+  effect,
+} from '@angular/core';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,32 +21,39 @@ import { CommonModule } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import {
-  DEFAULT_ROW_COLOR,
   ThemeEditMode,
   ThemeHeader,
   ThemeHeaderType,
   ThemeImageType,
+  ThemeItemType,
+  ThemeOtherSetting,
 } from '../../models';
 import { ThemeService } from '../../services/theme.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import {
   isBlank,
+  getHeaderId,
   isNotBlank,
   isNull,
-  isDuplicate,
-  isValidWidth,
 } from '../../../../shared/util/helper';
 import { ActivatedRoute, Router } from '@angular/router';
-import { EMPTY, filter, switchMap } from 'rxjs';
+import { EMPTY, filter, map, switchMap, tap } from 'rxjs';
 import { ThemeCustomTableComponent } from '../../components/theme-custom-table/theme-custom-table.component';
 import { ThemeLabelTableComponent } from '../../components/theme-label-table/theme-label-table.component';
 import { ThemeDatasetTableComponent } from '../../components/theme-dataset-table/theme-dataset-table.component';
 import { ThemeTagTableComponent } from '../../components/theme-tag-table/theme-tag-table.component';
 import { ThemeOtherSettingComponent } from '../../components/theme-other-setting/theme-other-setting.component';
-import { Store } from '@ngrx/store';
+import { ThemeTopCustomTableComponent } from '../../components/theme-top-custom-table/theme-top-custom-table.component';
 import { QuickRefreshType } from '../../../dataset/model';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
+import { ThemeImageComponent } from '../../components/theme-image/theme-image.component';
+import { FormInvalidsComponent } from '../../../../core/components/form-invalids/form-invalids.component';
+import { FormAlert } from '../../../../core/model';
+import { ThemeItemService } from '../../services';
+import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 @Component({
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
     MatTableModule,
@@ -48,89 +68,253 @@ import { QuickRefreshType } from '../../../dataset/model';
     ThemeDatasetTableComponent,
     ThemeTagTableComponent,
     ThemeOtherSettingComponent,
+    ThemeTopCustomTableComponent,
     ThemeCustomTableComponent,
+    ThemeImageComponent,
+    FormInvalidsComponent,
+    TrimOnBlurDirective,
   ],
   selector: 'app-theme-edit',
   templateUrl: 'theme-edit.component.html',
   styleUrls: ['theme-edit.component.scss'],
 })
-export class ThemeEditComponent implements OnInit {
-  router = inject(Router);
-  route = inject(ActivatedRoute);
-  themeService = inject(ThemeService);
-  snackbarService = inject(SnackbarService);
-  translateService = inject(TranslateService);
+export class ThemeEditComponent {
+  //inject
+  readonly router = inject(Router);
+  readonly route = inject(ActivatedRoute);
+  readonly themeService = inject(ThemeService);
+  readonly snackbarService = inject(SnackbarService);
+  readonly translateService = inject(TranslateService);
+  readonly fb = inject(FormBuilder);
+  readonly themeItemService = inject(ThemeItemService);
 
-  themeEditMode = ThemeEditMode;
-  status = signal(ThemeEditMode.create);
-  model: ThemeHeader = {
-    name: '',
-    version: '',
-    title: '',
-    type: ThemeHeaderType.imageList,
-    themeImage: {
-      type: ThemeImageType.key,
-      imageKey: '',
-      imageUrl: '',
-    },
-    themeLabelList: [],
-    themeDatasetList: [],
-    themeCustomList: [],
-    themeTagList: [],
-    seq: 0,
-    themeOtherSetting: {
-      rowColor: DEFAULT_ROW_COLOR,
-      listPageSize: 30,
-      themeTopCustomList: [],
-      showDuplicate: false,
-      checkFileExist: '',
-      themeVisible: true,
-      useQuickRefresh: false,
-      quickRefresh: '',
-      quickRefreshType: QuickRefreshType.url,
-      useSpider: '',
-    },
-  };
-  eThemeHeaderType = ThemeHeaderType;
-  eThemeImageType = ThemeImageType;
+  // enums
+  readonly eThemeEditMode = ThemeEditMode;
+  readonly eThemeHeaderType = ThemeHeaderType;
+  readonly eThemeImageType = ThemeImageType;
 
-  ngOnInit() {
-    this.route.queryParams
-      .pipe(
-        filter(
-          params =>
-            isNotBlank(params['name']) &&
-            isNotBlank(params['version']) &&
-            isNotBlank(params['type'])
-        ),
-        switchMap(params =>
-          this.themeService.findTheme({
-            name: params['name'],
-            version: params['version'],
-            type: params['type'],
-          })
-        )
-      )
-      .subscribe(res => {
-        if (res === null) {
-          this.router.navigate(['']);
-          return;
-        }
-        this.status.set(ThemeEditMode.edit);
-        this.model = res;
-      });
+  //signals
+  readonly isValidating = signal(false);
+  readonly status = signal(ThemeEditMode.create);
+  readonly isEditMode = computed(() => this.status() === ThemeEditMode.edit);
+  readonly currentHeaderId = computed(() => {
+    const req = this.themeReq();
+    if (this.status() !== ThemeEditMode.edit || !req) {
+      return '';
+    }
+    return getHeaderId(req.name, req.version, req.type);
+  });
+  readonly themeItems = rxResource({
+    params: () => this.currentHeaderId(),
+    stream: ({ params }) => this.themeItemService.getItemsByHeaderId(params),
+  });
+
+  //TODO資料轉移後刪除
+  readonly imageItem = computed(() => {
+    const items = this.themeItems.value();
+    if (!items) return undefined;
+    return items.find(item => item.type === ThemeItemType.IMAGE) ?? undefined;
+  });
+  readonly imageRawData = computed(
+    () =>
+      this.headerResource.value()?.themeImage ?? {
+        type: ThemeImageType.key,
+        imageKey: '',
+        imageUrl: '',
+      }
+  );
+  readonly labelItem = computed(() => {
+    const items = this.themeItems.value();
+    if (!items) return undefined;
+    return items.find(item => item.type === ThemeItemType.LABEL) ?? undefined;
+  });
+  readonly labelRawData = computed(
+    () => this.headerResource.value()?.themeLabelList ?? []
+  );
+  readonly datasetRawData = computed(
+    () => this.headerResource.value()?.themeDatasetList ?? []
+  );
+  readonly datasetItem = computed(() => {
+    const items = this.themeItems.value();
+    if (!items) return undefined;
+    return items.find(item => item.type === ThemeItemType.DATASET) ?? undefined;
+  });
+  readonly customRawData = computed(
+    () => this.headerResource.value()?.themeCustomList ?? []
+  );
+  readonly customItem = computed(() => {
+    const items = this.themeItems.value();
+    if (!items) return undefined;
+    return items.find(item => item.type === ThemeItemType.CUSTOM) ?? undefined;
+  });
+  readonly tagRawData = computed(
+    () => this.headerResource.value()?.themeTagList ?? []
+  );
+  readonly tagItem = computed(() => {
+    const items = this.themeItems.value();
+    if (!items) return undefined;
+    return items.find(item => item.type === ThemeItemType.TAG) ?? undefined;
+  });
+  readonly otherSettingItem = computed(() => {
+    const items = this.themeItems.value();
+    if (!items) return undefined;
+    return (
+      items.find(item => item.type === ThemeItemType.OTHERSETTING) ?? undefined
+    );
+  });
+  readonly otherSettingRawData = computed(
+    () =>
+      this.headerResource.value()?.themeOtherSetting ??
+      ({
+        rowColor: [],
+        listPageSize: 0,
+        showDuplicate: false,
+        themeTopCustomList: [],
+        checkFileExist: '',
+        themeVisible: false,
+        useQuickRefresh: false,
+        quickRefresh: '',
+        quickRefreshType: QuickRefreshType.params,
+        useSpider: '',
+      } satisfies ThemeOtherSetting)
+  );
+  readonly topCustomRawData = computed(
+    () => this.otherSettingRawData().themeTopCustomList ?? []
+  );
+  readonly topCustomItem = computed(() => {
+    const items = this.themeItems.value();
+    if (!items) return undefined;
+    return (
+      items.find(item => item.type === ThemeItemType.TOPCUSTOM) ?? undefined
+    );
+  });
+
+  // form
+  readonly form: FormGroup = this.fb.group({
+    name: [{ value: '', disabled: this.isEditMode() }, [Validators.required]],
+    version: [
+      { value: '', disabled: this.isEditMode() },
+      [Validators.required],
+    ],
+    title: [{ value: '', disabled: this.isEditMode() }, [Validators.required]],
+    type: [ThemeHeaderType.imageList, [Validators.required]],
+    seq: [
+      0,
+      [Validators.required, Validators.min(0), Validators.pattern('^[0-9]+$')],
+    ],
+  });
+  readonly nameControl = this.form.get('name') as FormControl;
+  readonly versionControl = this.form.get('version') as FormControl;
+  readonly typeControl = this.form.get('type') as FormControl;
+  readonly titleControl = this.form.get('title') as FormControl;
+  readonly seqControl = this.form.get('seq') as FormControl;
+
+  readonly themeReq = toSignal(
+    this.route.queryParams.pipe(
+      filter(
+        params =>
+          isNotBlank(params['name']) &&
+          isNotBlank(params['version']) &&
+          isNotBlank(params['type'])
+      ),
+      map(params => ({
+        name: params['name'],
+        version: params['version'],
+        type: params['type'],
+      }))
+    )
+  );
+  readonly headerResource = rxResource({
+    params: () => this.themeReq(),
+    stream: ({ params }) => {
+      this.status.set(ThemeEditMode.edit);
+      return this.themeService.findTheme(params).pipe(
+        tap(theme => {
+          if (theme === null) {
+            this.onBack();
+          } else {
+            this.form.patchValue(theme);
+          }
+        })
+      );
+    },
+  });
+  readonly formAlertsObj = computed(() => {
+    const required = {
+      errorId: 'required',
+      msg: this.translateService.instant('msg.required'),
+    };
+    return {
+      name: [required],
+      version: [required],
+      title: [required],
+      seq: [
+        required,
+        {
+          errorId: 'pattern',
+          msg: this.translateService.instant('msg.integer'),
+        },
+        {
+          errorId: 'min',
+          msg: this.translateService.instant('msg.nonNegative'),
+        },
+      ],
+    } satisfies Record<string, FormAlert[]>;
+  });
+
+  get themeHeaderType() {
+    return this.form.get('type')?.value as ThemeHeaderType;
+  }
+
+  constructor() {
+    effect(() => {
+      if (this.isEditMode()) {
+        this.form.get('name')?.disable();
+        this.form.get('version')?.disable();
+        this.form.get('type')?.disable();
+      } else {
+        this.form.get('name')?.enable();
+        this.form.get('version')?.enable();
+        this.form.get('type')?.enable();
+      }
+    });
   }
 
   onBack() {
     this.router.navigate(['']);
   }
 
+  // Read full model from the form + list controls
+  private getModelFromForm() {
+    const base = { ...this.form.value } as ThemeHeader;
+    base.themeLabelList = this.form.get('themeLabelList')?.value || [];
+    base.themeDatasetList = this.form.get('themeDatasetList')?.value || [];
+    base.themeCustomList = this.form.get('themeCustomList')?.value || [];
+    base.themeTagList = this.form.get('themeTagList')?.value || [];
+    base.themeOtherSetting =
+      this.form.get('themeOtherSetting')?.value || base.themeOtherSetting;
+    // ensure nested objects exist
+    if (!base.themeImage)
+      base.themeImage = {
+        type: this.eThemeImageType.key,
+        imageKey: '',
+        imageUrl: '',
+      };
+    return base;
+  }
+
   update(back: boolean, type: 'save' | 'commit') {
-    if (!this.validationModel()) {
+    if (!this.form.valid) {
+      this.snackbarService.openI18N('msg.formInvalid');
       return;
     }
+
+    // Build model from form
+    const currentModel = this.form.value as ThemeHeader;
+
+    this.isValidating.set(true);
     this.themeService
-      .existTheme(this.model)
+      .existTheme(currentModel)
       .pipe(
         switchMap(exist => {
           if (this.status() === ThemeEditMode.create && exist) {
@@ -141,273 +325,47 @@ export class ThemeEditComponent implements OnInit {
             this.snackbarService.openI18N('msg.themeNotExist');
             return EMPTY;
           }
-          return this.themeService.updateTheme(this.model);
+          return this.themeService.updateTheme(currentModel);
         })
       )
-      .subscribe(() => {
-        if (back) {
-          this.router.navigate(['']);
-        }
-        this.snackbarService.openI18N(
-          type === 'commit' ? 'msg.commitSuccess' : 'msg.saveSuccess'
-        );
-        this.themeService.updateAllTheme();
+      .subscribe({
+        next: () => {
+          if (back) {
+            this.router.navigate(['']);
+          }
+          this.snackbarService.openI18N(
+            type === 'commit' ? 'msg.commitSuccess' : 'msg.saveSuccess'
+          );
+          this.themeService.updateAllTheme();
+          this.isValidating.set(false);
+        },
+        error: () => {
+          this.isValidating.set(false);
+        },
       });
   }
-  //驗證資料正確
-  validationModel(): boolean {
-    if (isBlank(this.model.name)) {
-      this.snackbarService.isBlankMessage('themeHeader.name');
-      return false;
-    }
-    if (isBlank(this.model.version)) {
-      this.snackbarService.isBlankMessage('themeHeader.version');
-      return false;
-    }
-    if (isBlank(this.model.title)) {
-      this.snackbarService.isBlankMessage('themeHeader.title');
-      return false;
-    }
-    if (this.model.seq === null) {
-      this.model.seq = 0;
-    }
-    this.model.name = this.model.name.trim();
-    this.model.version = this.model.version.trim();
-    this.model.title = this.model.title.trim();
 
-    return (
-      this.validationImage() &&
-      this.validationLabel() &&
-      this.validationDataset() &&
-      this.validCustom() &&
-      this.validationTag() &&
-      this.validationOther() &&
-      this.validationOther()
-    );
-  }
-
-  validationImage() {
-    const { themeImage } = this.model;
-    if (this.model.type === ThemeHeaderType.imageList) {
-      if (
-        themeImage.type === ThemeImageType.key &&
-        isBlank(themeImage.imageKey)
-      ) {
-        this.snackbarService.isBlankMessage('themeImage.imageKey');
-        return false;
-      }
-      if (
-        themeImage.type === ThemeImageType.url &&
-        isBlank(themeImage.imageUrl)
-      ) {
-        this.snackbarService.isBlankMessage('themeImage.imageUrl');
-        return false;
-      }
-      themeImage.imageKey = themeImage.imageKey.trim();
-      themeImage.imageUrl = themeImage.imageUrl.trim();
-    }
-    return true;
-  }
-
-  validationLabel() {
-    for (let label of this.model.themeLabelList) {
-      if (isBlank(label.label)) {
-        this.snackbarService.isBlankMessage('themeLabel.labelName');
-        return false;
-      }
-      if (isBlank(label.byKey)) {
-        this.snackbarService.isBlankMessage('themeLabel.byKey');
-        return false;
-      }
-
-      if (this.model.type === 'table') {
-        if (isNotBlank(label.width) && !isValidWidth(label.width)) {
-          this.snackbarService.openI18N('msg.lengthError', {
-            label: this.translateService.instant('themeLabel.width'),
-          });
-          return false;
-        }
-        if (isNotBlank(label.minWidth) && !isValidWidth(label.minWidth)) {
-          this.snackbarService.openI18N('msg.lengthError', {
-            label: this.translateService.instant('themeLabel.minWidth'),
-          });
-          return false;
-        }
-        if (isNotBlank(label.maxWidth) && !isValidWidth(label.maxWidth)) {
-          this.snackbarService.openI18N('msg.lengthError', {
-            label: this.translateService.instant('themeLabel.maxWidth'),
-          });
-          return false;
-        }
-      }
-      if (isDuplicate(this.model.themeLabelList.map(x => x.byKey))) {
-        this.snackbarService.openI18N('msg.duplicateColumn', {
-          text: this.translateService.instant('themeLabel.byKey'),
-        });
-        return false;
-      }
-      if (
-        !Array.isArray(label.visibleDatasetNameList) &&
-        isBlank(label.visibleDatasetNameList)
-      ) {
-        label.visibleDatasetNameList = [];
-      }
-      if (!Array.isArray(label.visibleDatasetNameList)) {
-        label.visibleDatasetNameList = (label.visibleDatasetNameList + '')
-          .split(',')
-          .map(x => x.trim())
-          .filter(x => isNotBlank(x));
-      }
-    }
-
-    return true;
-  }
-
-  validationDataset() {
-    for (let dataset of this.model.themeDatasetList) {
-      if (dataset.datasetList.length === 0) {
-        this.snackbarService.openI18N('themeDataset.datasetEmpty');
-        return false;
-      }
-      if (isBlank(dataset.label)) {
-        this.snackbarService.isBlankMessage('themeDataset.label');
-        return false;
-      }
-    }
-    if (isDuplicate(this.model.themeDatasetList.map(x => x.label))) {
-      this.snackbarService.openI18N('themeDataset.labelDuplicate');
-      return false;
-    }
-
-    return true;
-  }
-
-  validationTag() {
-    for (let tag of this.model.themeTagList) {
-      if (isBlank(tag.shareTagId)) {
-        this.snackbarService.isBlankMessage('themeTag.tag');
-        return false;
-      }
-    }
-    if (isDuplicate(this.model.themeTagList.map(x => x.shareTagId))) {
-      this.snackbarService.openI18N('themeTag.tagDuplicate');
-      return false;
-    }
-    return true;
-  }
-  validCustom() {
-    //byKey不可重複
-    if (isDuplicate(this.model.themeCustomList.map(x => x.byKey))) {
-      this.snackbarService.openI18N('msg.duplicateColumn', {
-        text: this.translateService.instant('themeCustom.byKey'),
-      });
-      return false;
-    }
-    for (let custom of this.model.themeCustomList) {
-      if (isBlank(custom.label)) {
-        this.snackbarService.isBlankMessage('themeCustom.labelName');
-        return false;
-      }
-      if (isBlank(custom.byKey)) {
-        this.snackbarService.isBlankMessage('themeCustom.byKey');
-        return false;
-      }
-      if (
-        !Array.isArray(custom.visibleDatasetNameList) &&
-        isBlank(custom.visibleDatasetNameList)
-      ) {
-        custom.visibleDatasetNameList = [];
-      }
-      if (!Array.isArray(custom.visibleDatasetNameList)) {
-        custom.visibleDatasetNameList = (custom.visibleDatasetNameList + '')
-          .split(',')
-          .map(x => x.trim())
-          .filter(x => isNotBlank(x));
-      }
-      switch (custom.type) {
-        case 'openUrl':
-          if (isBlank(custom.openUrl)) {
-            this.snackbarService.isBlankMessage('themeCustom.openUrl');
-            return false;
-          }
-          break;
-        case 'copyValue':
-          if (isBlank(custom.copyValue)) {
-            this.snackbarService.isBlankMessage('themeCustom.copyValue');
-            return false;
-          }
-          break;
-        case 'buttonIconBoolean':
-          if (
-            isBlank(custom.buttonIconTrue) ||
-            isBlank(custom.buttonIconFalse)
-          ) {
-            this.snackbarService.isBlankMessage('themeCustom.buttonIconTrue');
-            return false;
-          }
-          break;
-        case 'buttonIconFill':
-          if (isBlank(custom.buttonIconFill)) {
-            this.snackbarService.isBlankMessage('themeCustom.buttonIconFill');
-            return false;
-          }
-          break;
-        case 'apiConfig':
-          if (isNull(custom.apiConfig)) {
-            this.snackbarService.isBlankMessage('themeCustom.apiConfig');
-            return false;
-          }
-          break;
-      }
-    }
-
-    return true;
-  }
-
-  validationOther() {
+  validationOther(header: ThemeHeader) {
+    let model = { ...header };
     if (
-      this.model.type === 'imageList' &&
-      this.model.themeOtherSetting.listPageSize <= 0
+      model.type === 'imageList' &&
+      model.themeOtherSetting.listPageSize <= 0
     ) {
       this.snackbarService.openI18N('otherSetting.listPageSizeMoreZero');
       return false;
     }
-    if (this.model.themeOtherSetting.useQuickRefresh) {
-      if (isBlank(this.model.themeOtherSetting.useSpider)) {
+    if (model.themeOtherSetting.useQuickRefresh) {
+      if (isBlank(model.themeOtherSetting.useSpider)) {
         this.snackbarService.openI18N('msg.quickRefreshSpiderEmpty');
         return false;
       }
-      if (isBlank(this.model.themeOtherSetting.quickRefreshType)) {
+      if (isBlank(model.themeOtherSetting.quickRefreshType)) {
         this.snackbarService.openI18N('otherSetting.quickRefreshTypeRequired');
         return false;
       }
-      if (isBlank(this.model.themeOtherSetting.quickRefresh)) {
+      if (isBlank(model.themeOtherSetting.quickRefresh)) {
         this.snackbarService.isBlankMessage('otherSetting.quickRefresh');
         return false;
-      }
-    }
-    for (let custom of this.model.themeOtherSetting.themeTopCustomList) {
-      if (isBlank(custom.label)) {
-        this.snackbarService.isBlankMessage('themeOtherSetting.labelName');
-        return false;
-      }
-      if (isBlank(custom.byKey)) {
-        this.snackbarService.isBlankMessage('themeOtherSetting.byKey');
-        return false;
-      }
-      switch (custom.type) {
-        case 'openUrl':
-          if (isBlank(custom.openUrl)) {
-            this.snackbarService.isBlankMessage('themeTopCustom.openUrl');
-            return false;
-          }
-          break;
-        case 'apiConfig':
-          if (isNull(custom.apiConfig)) {
-            this.snackbarService.isBlankMessage('themeTopCustom.apiConfig');
-            return false;
-          }
-          break;
       }
     }
     return true;

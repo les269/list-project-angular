@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { SnackbarService } from '../../core/services/snackbar.service';
 import { isNotBlank } from './helper';
+import { NgControl } from '@angular/forms';
 
 @Directive({ selector: '[ngCopy]', standalone: true })
 export class CopyDirective {
@@ -39,5 +40,21 @@ export class CopyDirective {
       this.renderer.removeChild(document.body, textarea);
     }
     this.snackbarService.openI18N('msg.copyText', { text });
+  }
+}
+
+@Directive({
+  selector: '[trimOnBlur]',
+  standalone: true,
+})
+export class TrimOnBlurDirective {
+  constructor(private control: NgControl) {}
+
+  @HostListener('blur')
+  onBlur() {
+    const value = this.control.control?.value;
+    if (typeof value === 'string') {
+      this.control.control?.setValue(value.trim());
+    }
   }
 }

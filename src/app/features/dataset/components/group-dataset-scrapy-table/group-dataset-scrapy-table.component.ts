@@ -1,13 +1,14 @@
-import {
-  Component,
-  EventEmitter,
-  Injector,
-  Input,
-  Output,
-} from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 
 import { MatTableModule } from '@angular/material/table';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormsModule,
+  FormArray,
+  FormControl,
+  FormBuilder,
+  Validators,
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import {
   MatCheckboxChange,
@@ -18,15 +19,17 @@ import { TranslateModule } from '@ngx-translate/core';
 import { GroupDatasetScrapy } from '../../model';
 import { MatChipsModule } from '@angular/material/chips';
 import { ScrapyService } from '../../../scrapy/services/scrapy.service';
+import { CdkDropList, CdkDrag } from '@angular/cdk/drag-drop';
+import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import {
-  CdkDropList,
-  CdkDrag,
-  CdkDragDrop,
-  moveItemInArray,
-} from '@angular/cdk/drag-drop';
-import { switchMap } from 'rxjs';
-import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
+  ChipSelectColumn,
+  GenericColumnType,
+  GenericTableColumn,
+  ToFormArray,
+} from '../../../../core/model/generic-table';
+import { ScrapyConfig } from '../../../scrapy/model';
 
 @Component({
   selector: 'app-group-dataset-scrapy-table',
@@ -40,57 +43,76 @@ import { GenericTableComponent } from '../../../../core/components/generic-table
     MatIconModule,
     MatCheckboxModule,
     MatChipsModule,
-    CdkDropList,
-    CdkDrag
-],
+    GenericTableComponent,
+  ],
   templateUrl: './group-dataset-scrapy-table.component.html',
 })
-export class GroupDatasetScrapyTableComponent extends GenericTableComponent<GroupDatasetScrapy> {
+export class GroupDatasetScrapyTableComponent {
+  formArray = input.required<ToFormArray<GroupDatasetScrapy>>();
   displayedColumns = [
-    'seq',
     'name',
     'label',
     'isDefault',
     'visibleJson',
     'visibleUrl',
-    'other',
   ];
 
-  override item: GroupDatasetScrapy = {
-    seq: 0,
-    name: '',
-    label: '',
-    isDefault: false,
-    visibleJson: false,
-    visibleUrl: false,
-  };
+  nameColumn = computed(
+    () =>
+      ({
+        key: 'name',
+        label: 'dataset.scrapyName',
+        columnType: GenericColumnType.chipSelect,
+        data: this.configs.value(),
+        dataValue: 'name',
+        dataLabel: item => item.name,
+        openDialog: () =>
+          this.selectTableService.selectSingleScrapy(this.configs.value()),
+      }) satisfies ChipSelectColumn<ScrapyConfig>
+  );
+  cols = computed(
+    () =>
+      [
+        this.nameColumn(),
+        {
+          key: 'label',
+          label: 'dataset.scrapyLabel',
+          columnType: GenericColumnType.input,
+        },
+        {
+          key: 'isDefault',
+          label: 'dataset.scrapyDefault',
+          columnType: GenericColumnType.radio,
+        },
+        {
+          key: 'visibleJson',
+          label: 'dataset.visibleJson',
+          columnType: GenericColumnType.checkbox,
+        },
+        {
+          key: 'visibleUrl',
+          label: 'dataset.visibleUrl',
+          columnType: GenericColumnType.checkbox,
+        },
+      ] satisfies GenericTableColumn[]
+  );
 
-  scrapyService: ScrapyService;
+  readonly fb = inject(FormBuilder);
+  selectTableService = inject(SelectTableService);
+  scrapyService = inject(ScrapyService);
 
-  constructor(injector: Injector) {
-    super(injector);
-    this.scrapyService = this.injector.get(ScrapyService);
-  }
-
-  //改變資料欄位的預設欄位,只能有一筆或無
-  changeDefaultKey(event: MatCheckboxChange, index: number) {
-    if (event.checked) {
-      this.list.map((x, i) => {
-        if (i !== index) {
-          x.isDefault = false;
-        }
-        return x;
-      });
-    }
-    this.listChange.emit(this.list);
-  }
-
-  selectScrapy(e: GroupDatasetScrapy) {
-    this.scrapyService
-      .getAllConfig()
-      .pipe(switchMap(x => this.selectTableService.selectSingleScrapy(x)))
-      .subscribe(res => {
-        e.name = res.name;
-      });
+  configs = rxResource({
+    stream: () => this.scrapyService.getAllConfig(),
+    defaultValue: [],
+  });
+  createGroup() {
+    return this.fb.group({
+      seq: [0],
+      name: ['', [Validators.required]],
+      label: ['', [Validators.required]],
+      isDefault: [false],
+      visibleJson: [false],
+      visibleUrl: [false],
+    });
   }
 }

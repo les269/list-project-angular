@@ -1,253 +1,227 @@
+<label class="h3">{{ 'themeCustom.title' | translate }}</label>
 <div class="card mb-3">
-  <table
-    mat-table
-    [dataSource]="list"
-    multiTemplateDataRows
-    cdkDropList
-    (cdkDropListDropped)="drop($event)"
-    cdkDropListData="themeCustomList">
-    <ng-container matColumnDef="order">
-      <th mat-header-cell *matHeaderCellDef>
-        {{ 'g.order' | translate }}
-      </th>
-      <td mat-cell *matCellDef="let element">
-        <div
-          class="d-flex align-items-center user-select-none"
-          (mouseout)="dragDisabled = true"
-          (mouseover)="dragDisabled = false">
-          <mat-icon class="drag-cursor">reorder</mat-icon>
-          <span>{{ element.seq }}</span>
+  <div class="card-body">
+    <app-theme-item-manage
+      [headerId]="headerId()"
+      [type]="eThemeItemType.CUSTOM"
+      [form]="form"
+      [defaultBinding]="defaultBinding()"
+      (jsonReset)="jsonReset($event)">
+    </app-theme-item-manage>
+    <app-form-alerts
+      [form]="formArray"
+      [formAlerts]="formAlerts()"></app-form-alerts>
+    <div class="card mb-3">
+      <app-generic-table
+        [class.table-invalid]="formArray.invalid"
+        [formArray]="formArray"
+        [initData]="initData()"
+        [createGroup]="createGroup.bind(this)"
+        [cols]="cols"
+        [displayedColumns]="displayedColumns"
+        [expandedTmpl]="expandedTmpl"></app-generic-table>
+    </div>
+  </div>
+</div>
+<ng-template #expandedTmpl let-element>
+  <div class="d-flex flex-column mb-2" [formGroup]="element">
+    @switch (element.get('type')?.value) {
+      <!-- 按鈕圖案自定義正反 -->
+      @case (eThemeCustomType.buttonIconBoolean) {
+        @let buttonIconTrue = element.get('buttonIconTrue');
+        @let buttonIconFalse = element.get('buttonIconFalse');
+        <div class="d-flex align-items-center">
+          <h6 class="mb-0">
+            {{ 'themeCustom.writeIconName' | translate }}
+          </h6>
+          <a
+            href="https://fonts.google.com/icons"
+            class="card-link text-nowrap p-2"
+            target="_blank"
+            >{{ 'themeCustom.googleIconUrl' | translate }}</a
+          >
         </div>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="type">
-      <th mat-header-cell *matHeaderCellDef>
-        {{ 'themeLabel.type' | translate }}
-      </th>
-      <td mat-cell *matCellDef="let element; let i = dataIndex">
+        <div class="d-flex align-items-center">
+          <div class="mx-1 d-flex">
+            <mat-icon class="material-icons-outlined"
+              ><span class="material-symbols-outlined">
+                {{ buttonIconTrue?.value }}
+              </span></mat-icon
+            >
+          </div>
+          <div class="mx-1 d-flex">
+            <mat-icon class="material-icons-outlined"
+              ><span class="material-symbols-outlined">
+                {{ buttonIconFalse?.value }}
+              </span></mat-icon
+            >
+          </div>
+          <input
+            type="text"
+            class="form-control"
+            [placeholder]="'themeCustom.buttonIconTrue' | translate"
+            [formControl]="buttonIconTrue"
+            [class.is-invalid]="
+              buttonIconTrue.invalid && buttonIconTrue.touched
+            "
+            required />
+          <input
+            type="text"
+            class="form-control"
+            [placeholder]="'themeCustom.buttonIconFalse' | translate"
+            [formControl]="buttonIconFalse"
+            [class.is-invalid]="
+              buttonIconFalse.invalid && buttonIconFalse.touched
+            "
+            required />
+        </div>
+        <app-form-invalids
+          [control]="buttonIconTrue"
+          [formAlerts]="formAlertsObj().buttonIconTrue"></app-form-invalids>
+        <app-form-invalids
+          [control]="buttonIconFalse"
+          [formAlerts]="formAlertsObj().buttonIconFalse"></app-form-invalids>
+      }
+      <!-- 按鈕圖案自定義填充顏色 -->
+      @case (eThemeCustomType.buttonIconFill) {
+        @let buttonIconFill = element.get('buttonIconFill');
+        @let buttonIconFillColor = element.get('buttonIconFillColor');
+        <div class="d-flex align-items-center">
+          <h6 class="mb-0">
+            {{ 'themeCustom.writeIconName' | translate }}
+          </h6>
+          <a
+            href="https://fonts.google.com/icons"
+            class="card-link text-nowrap p-2"
+            target="_blank"
+            >{{ 'themeCustom.googleIconUrl' | translate }}</a
+          >
+        </div>
+        <div class="d-flex align-items-center">
+          <div class="mx-1 d-flex">
+            <mat-icon class="material-icons-outlined"
+              ><span class="material-symbols-outlined">
+                {{ buttonIconFill?.value }}
+              </span></mat-icon
+            >
+          </div>
+          <div class="mx-1 d-flex">
+            <mat-icon [ngStyle]="{ color: buttonIconFillColor?.value }">{{
+              buttonIconFill?.value
+            }}</mat-icon>
+          </div>
+          <input
+            class="form-control mt-1"
+            [placeholder]="'themeCustom.fillIcon' | translate"
+            [formControl]="buttonIconFill"
+            required />
+          <input
+            type="color"
+            [placeholder]="'themeCustom.fillIconColor' | translate"
+            class="form-control form-control-color mt-1"
+            [formControl]="buttonIconFillColor" />
+        </div>
+        <app-form-invalids
+          [control]="buttonIconFill"
+          [formAlerts]="formAlertsObj().buttonIconFill"></app-form-invalids>
+      }
+      <!-- 複製自定義內容 -->
+      @case (eThemeCustomType.copyValue) {
+        @let copyValue = element.get('copyValue');
+        <input
+          class="form-control mt-1"
+          [placeholder]="'themeCustom.copyValuePH' | translate"
+          [formControl]="copyValue" />
+      }
+      <!-- 開啟自定義網址 -->
+      @case (eThemeCustomType.openUrl) {
+        @let openUrl = element.get('openUrl');
+        @let openWindowsTarget = element.get('openWindowsTarget');
+        <input
+          class="form-control mt-1"
+          [placeholder]="'themeCustom.openUrlPH' | translate"
+          [formControl]="openUrl"
+          required="" />
         <select
-          [(ngModel)]="element.type"
+          [formControl]="openWindowsTarget"
           class="form-control"
           style="min-width: 200px">
-          @for (type of eThemeCustomType | keyvalue; track $index) {
+          @for (type of eOpenWindowTargetType | keyvalue; track type.key) {
             <option [value]="type.key">
               {{ 'themeCustom.' + type.key | translate }}
             </option>
           }
         </select>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="byKey">
-      <th mat-header-cell *matHeaderCellDef>
-        {{ 'themeCustom.byKey' | translate }}
-      </th>
-      <td mat-cell *matCellDef="let element; let i = dataIndex">
-        <input class="form-control" [(ngModel)]="element.byKey" />
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="label">
-      <th mat-header-cell *matHeaderCellDef>
-        {{ 'themeCustom.labelName' | translate }}
-      </th>
-      <td mat-cell *matCellDef="let element; let i = dataIndex">
-        <input class="form-control" [(ngModel)]="element.label" />
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="other">
-      <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
-      <td mat-cell *matCellDef="let element; let i = dataIndex">
-        <div class="row flex-nowrap">
-          <button mat-icon-button (click)="onDelete(i)">
-            <mat-icon>delete</mat-icon>
-          </button>
+        <app-form-invalids
+          [control]="openUrl"
+          [formAlerts]="formAlertsObj().openUrl"></app-form-invalids>
+      }
+      <!-- 呼叫API -->
+      @case (eThemeCustomType.apiConfig) {
+        <div class="mt-1 d-flex flex-wrap gap-3 align-items-center">
+          <app-chip-select-button
+            valueKey="apiName"
+            [formControl]="element.get('apiName')"
+            [selectTable]="selectApi.bind(this)"
+            [options]="apis.value()"
+            [labelKey]="getApiLabelName"
+            [required]="true"
+            [requiredMsg]="
+              'msg.requiredSelectOne' | translate
+            "></app-chip-select-button>
         </div>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="add">
-      <td
-        mat-footer-cell
-        *matFooterCellDef
-        [attr.colspan]="displayedColumns.length">
-        <div class="row justify-content-center">
-          <button mat-button class="rounded" (click)="onAdd()">
-            <mat-icon>add</mat-icon>
-          </button>
-        </div>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="expandedDetail">
-      <td
-        mat-cell
-        *matCellDef="let element; let i = dataIndex"
-        [attr.colspan]="displayedColumns.length">
-        <div class="d-flex flex-column mb-2">
-          @switch (element.type) {
-            @case ('buttonIconBoolean') {
-              <div class="d-flex align-items-center">
-                <h6 class="mb-0">
-                  {{ 'themeCustom.writeIconName' | translate }}
-                </h6>
-                <a
-                  href="https://fonts.google.com/icons"
-                  class="card-link text-nowrap p-2"
-                  target="_blank"
-                  >{{ 'themeCustom.googleIconUrl' | translate }}</a
-                >
-              </div>
-
-              <div class="d-flex align-items-center">
-                <div class="mx-1 d-flex">
-                  <mat-icon class="material-icons-outlined"
-                    ><span class="material-symbols-outlined">
-                      {{ element.buttonIconTrue }}
-                    </span></mat-icon
-                  >
-                </div>
-                <div class="mx-1 d-flex">
-                  <mat-icon class="material-icons-outlined"
-                    ><span class="material-symbols-outlined">
-                      {{ element.buttonIconFalse }}
-                    </span></mat-icon
-                  >
-                </div>
-                <input
-                  class="form-control"
-                  [placeholder]="'themeCustom.clickBeforeIcon' | translate"
-                  [(ngModel)]="element.buttonIconTrue" />
-                <input
-                  class="form-control"
-                  [placeholder]="'themeCustom.clickAfterIcon' | translate"
-                  [(ngModel)]="element.buttonIconFalse" />
-              </div>
-            }
-            @case ('buttonIconFill') {
-              <div class="d-flex align-items-center">
-                <h6 class="mb-0">
-                  {{ 'themeCustom.writeIconName' | translate }}
-                </h6>
-                <a
-                  href="https://fonts.google.com/icons"
-                  class="card-link text-nowrap p-2"
-                  target="_blank"
-                  >{{ 'themeCustom.googleIconUrl' | translate }}</a
-                >
-              </div>
-              <div class="d-flex align-items-center">
-                <div class="mx-1 d-flex">
-                  <mat-icon class="material-icons-outlined"
-                    ><span class="material-symbols-outlined">
-                      {{ element.buttonIconFill }}
-                    </span></mat-icon
-                  >
-                </div>
-                <div class="mx-1 d-flex">
-                  <mat-icon
-                    [ngStyle]="{ color: element.buttonIconFillColor }"
-                    >{{ element.buttonIconFill }}</mat-icon
-                  >
-                </div>
-                <input
-                  class="form-control mt-1"
-                  [placeholder]="'themeCustom.fillIcon' | translate"
-                  [(ngModel)]="element.buttonIconFill" />
-                <input
-                  type="color"
-                  [placeholder]="'themeCustom.fillIconColor' | translate"
-                  class="form-control form-control-color mt-1"
-                  [(ngModel)]="element.buttonIconFillColor" />
-              </div>
-            }
-            @case ('copyValue') {
-              <input
-                class="form-control mt-1"
-                [placeholder]="'themeCustom.copyValuePH' | translate"
-                [(ngModel)]="element.copyValue" />
-            }
-            @case ('openUrl') {
-              <input
-                class="form-control mt-1"
-                [placeholder]="'themeCustom.openUrlPH' | translate"
-                [(ngModel)]="element.openUrl" />
-              <select
-                [(ngModel)]="element.openWindowsTarget"
-                class="form-control"
-                style="min-width: 200px">
-                @for (type of eOpenWindowTargetType | keyvalue; track $index) {
-                  <option [value]="type.key">
-                    {{ 'themeCustom.' + type.key | translate }}
-                  </option>
-                }
-              </select>
-            }
-            @case ('apiConfig') {
-              <div class="mt-1 d-flex flex-wrap gap-3 align-items-center">
-                @if (element.apiConfig) {
-                  <mat-chip
-                    >{{ element.apiConfig.apiName }}
-                    <button matChipRemove (click)="removeApi(element)">
-                      <mat-icon>cancel</mat-icon>
-                    </button>
-                  </mat-chip>
-                }
-                <button
-                  class="btn btn-outline-primary d-flex"
-                  (click)="selectApi(element)">
-                  <mat-icon class="material-icons-outlined"
-                    ><span class="material-symbols-outlined">
-                      select_window_2
-                    </span></mat-icon
-                  >
-                </button>
-              </div>
-            }
-            @case ('deleteFile') {
-              <input
-                class="form-control mt-1"
-                [placeholder]="'themeCustom.deleteFilePH' | translate"
-                [(ngModel)]="element.deleteFile" />
-            }
-            @case ('moveTo') {
-              <div class="d-flex input-group">
-                <input
-                  class="form-control"
-                  [placeholder]="'themeCustom.filePathForMoveToPH' | translate"
-                  [(ngModel)]="element.filePathForMoveTo" />
-                <input
-                  class="form-control"
-                  [placeholder]="'themeCustom.moveToPH' | translate"
-                  [(ngModel)]="element.moveTo" />
-              </div>
-            }
-            @case ('openFolder') {
-              <input
-                class="form-control mt-1"
-                [placeholder]="'themeCustom.openFolderPH' | translate"
-                [(ngModel)]="element.openFolder" />
-            }
-          }
+      }
+      <!-- 刪除檔案 -->
+      @case (eThemeCustomType.deleteFile) {
+        @let deleteFile = element.get('deleteFile');
+        <input
+          class="form-control mt-1"
+          [placeholder]="'themeCustom.deleteFilePH' | translate"
+          [formControl]="deleteFile" />
+        <app-form-invalids
+          [control]="deleteFile"
+          [formAlerts]="formAlertsObj().deleteFile"></app-form-invalids>
+      }
+      <!-- 移動檔案 -->
+      @case (eThemeCustomType.moveTo) {
+        @let moveTo = element.get('moveTo');
+        @let filePathForMoveTo = element.get('filePathForMoveTo');
+        <div class="d-flex input-group">
           <input
             class="form-control"
-            [placeholder]="'themeCustom.visibleDatasetNameListPH' | translate"
-            [(ngModel)]="element.visibleDatasetNameList" />
+            [placeholder]="'themeCustom.filePathForMoveToPH' | translate"
+            [formControl]="filePathForMoveTo"
+            required />
+          <input
+            class="form-control"
+            [placeholder]="'themeCustom.moveToPH' | translate"
+            [formControl]="moveTo"
+            required />
         </div>
-      </td>
-    </ng-container>
-
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr
-      mat-row
-      *matRowDef="let row; columns: displayedColumns"
-      class="expand-row"
-      cdkDrag
-      [cdkDragData]="row"
-      [cdkDragDisabled]="dragDisabled"
-      (cdkDragReleased)="dragDisabled = true">
-      >
-    </tr>
-    <tr
-      mat-row
-      class="h-auto"
-      *matRowDef="let row; columns: ['expandedDetail']"></tr>
-    <tr mat-footer-row *matFooterRowDef="['add']"></tr>
-  </table>
-</div>
+        <app-form-invalids
+          [control]="filePathForMoveTo"
+          [formAlerts]="formAlertsObj().filePathForMoveTo"></app-form-invalids>
+        <app-form-invalids
+          [control]="moveTo"
+          [formAlerts]="formAlertsObj().moveTo"></app-form-invalids>
+      }
+      <!-- 開啟資料夾 -->
+      @case (eThemeCustomType.openFolder) {
+        @let openFolder = element.get('openFolder');
+        <input
+          class="form-control mt-1"
+          [placeholder]="'themeCustom.openFolderPH' | translate"
+          [formControl]="openFolder" />
+        <app-form-invalids
+          [control]="openFolder"
+          [formAlerts]="formAlertsObj().openFolder"></app-form-invalids>
+      }
+    }
+    <div class="mt-1">
+      <app-chip-input
+        [label]="'themeLabel.visibleDatasetNameListPH' | translate"
+        formControlName="visibleDatasetNameList">
+      </app-chip-input>
+    </div>
+  </div>
+</ng-template>

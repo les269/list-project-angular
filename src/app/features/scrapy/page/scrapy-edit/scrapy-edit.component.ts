@@ -33,8 +33,6 @@ import { CssSelectTableComponent } from '../../components/css-select-table/css-s
     MatTabsModule,
     MatTooltipModule,
     MatCheckboxModule,
-    CookieTableComponent,
-    CssSelectTableComponent,
   ],
   selector: 'app-scrapy-edit',
   templateUrl: 'scrapy-edit.component.html',

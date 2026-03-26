@@ -1,0 +1,76 @@
+<div class="row g-2 align-items-end">
+  <div [formGroup]="form()">
+    <label class="form-label require">{{ itemIdLabelKey() | translate }}</label>
+    <input
+      type="text"
+      class="form-control"
+      trimOnBlur
+      [formControl]="itemIdControl()"
+      [class.is-invalid]="itemIdControl().invalid && itemIdControl().touched" />
+    @if (itemIdControl().invalid && itemIdControl().touched) {
+      <div class="invalid-feedback d-block">
+        {{ 'msg.blank' | translate: { name: (itemIdLabelKey() | translate) } }}
+      </div>
+    }
+  </div>
+  <div>
+    <label class="form-label">{{ 'g.description' | translate }}</label>
+    <input
+      type="text"
+      class="form-control"
+      trimOnBlur
+      [formControl]="descriptionControl()" />
+  </div>
+  <div class="col-md-3 d-flex gap-2 justify-content-md-end"></div>
+</div>
+<div class="d-flex gap-2 justify-content-end my-3">
+  @if (!isBinding()) {
+    <button
+      type="button"
+      class="btn btn-outline-primary"
+      (click)="openItemSelector()">
+      {{ 'g.read' | translate }}
+    </button>
+  }
+  @if (!isEditMode()) {
+    <button
+      type="button"
+      class="btn btn-outline-primary"
+      (click)="addItem()"
+      [disabled]="!form().valid">
+      {{ 'g.add' | translate }}
+    </button>
+  }
+
+  @if (isEditMode()) {
+    <button
+      type="button"
+      class="btn btn-outline-primary"
+      (click)="saveItem()"
+      [disabled]="!form().valid">
+      {{ 'g.save' | translate }}
+    </button>
+    <button type="button" class="btn btn-outline-primary" (click)="copyItem()">
+      {{ 'g.copy' | translate }}
+    </button>
+  }
+
+  @if (showBindButton()) {
+    <button
+      type="button"
+      class="btn btn-outline-primary"
+      (click)="toggleBind()">
+      {{ (isBinding() ? 'g.unbind' : 'g.bind') | translate }}
+    </button>
+  }
+  @if (!isBinding()) {
+    <button type="button" class="btn btn-danger" (click)="onClear()">
+      {{ 'g.clear' | translate }}
+    </button>
+  }
+  @if (showDeleteButton()) {
+    <button type="button" class="btn btn-danger" (click)="deleteItem()">
+      {{ 'g.delete' | translate }}
+    </button>
+  }
+</div>

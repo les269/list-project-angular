@@ -136,9 +136,9 @@
           mat-cell
           *matCellDef="let element"
           [ngStyle]="{
-            width: getWidth(label, 'width'),
-            'max-width': getWidth(label, 'maxWidth'),
-            'min-width': getWidth(label, 'minWidth'),
+            width: getWidth(label['width']),
+            'max-width': getWidth(label['maxWidth']),
+            'min-width': getWidth(label['minWidth']),
             'border-bottom': isExpand() ? 'none' : 'solid #ccc 1px',
           }">
           <app-list-item-value

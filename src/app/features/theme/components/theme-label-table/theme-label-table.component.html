@@ -1,176 +1,152 @@
 <label class="h3">{{ 'themeLabel.title' | translate }}</label>
 <div class="card mb-3">
-  <table
-    mat-table
-    [dataSource]="list"
-    multiTemplateDataRows
-    cdkDropList
-    (cdkDropListDropped)="drop($event)"
-    cdkDropListData="themeLabelList">
-    <ng-container matColumnDef="seq">
-      <th mat-header-cell *matHeaderCellDef>
-        {{ 'g.order' | translate }}
-      </th>
-      <td mat-cell *matCellDef="let element">
-        <div
-          class="d-flex align-items-center user-select-none"
-          (mouseout)="dragDisabled = true"
-          (mouseover)="dragDisabled = false">
-          <mat-icon class="drag-cursor">reorder</mat-icon>
-          <span>{{ element.seq }}</span>
-        </div>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="byKey">
-      <th mat-header-cell *matHeaderCellDef>
-        {{ 'themeLabel.byKey' | translate }}
-      </th>
-      <td mat-cell *matCellDef="let element; let i = dataIndex">
-        <input class="form-control" [(ngModel)]="element.byKey" />
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="label">
-      <th mat-header-cell *matHeaderCellDef>
-        {{ 'themeLabel.labelName' | translate }}
-      </th>
-      <td mat-cell *matCellDef="let element; let i = dataIndex">
-        <input class="form-control" [(ngModel)]="element.label" />
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="type">
-      <th mat-header-cell *matHeaderCellDef>
-        {{ 'themeLabel.type' | translate }}
-      </th>
-      <td mat-cell *matCellDef="let element; let i = dataIndex">
-        <select
-          [(ngModel)]="element.type"
-          class="form-control"
-          style="width: 120px"
-          (ngModelChange)="changeType(element.type, i)">
-          @for (type of eThemeLabelType | keyvalue; track $index) {
-            <option [value]="type.key">
-              {{ 'themeLabel.' + type.key | translate }}
-            </option>
-          }
-        </select>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="other">
-      <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
-      <td mat-cell *matCellDef="let element; let i = dataIndex">
-        <div class="row flex-nowrap">
-          <button mat-icon-button (click)="onDelete(i)">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="expandedDetail">
-      <td
-        mat-cell
-        *matCellDef="let element; let i = dataIndex"
-        [attr.colspan]="displayedColumns.length">
-        <div class="d-flex">
-          <div class="column p-1">
-            @if (element.type === 'stringSplit') {
-              <div class="input-group">
-                <input
-                  type="text"
-                  class="form-control"
-                  [placeholder]="'themeLabel.splitByPh' | translate"
-                  [(ngModel)]="element.splitBy" />
-                <input
-                  type="text"
-                  class="form-control"
-                  [placeholder]="'themeLabel.useSpacePh' | translate"
-                  [(ngModel)]="element.useSpace" />
-              </div>
-            }
-            @if (element.type === 'date') {
-              <div class="input-group">
-                <input
-                  type="text"
-                  class="form-control"
-                  [placeholder]="'themeLabel.dateFormatPh' | translate"
-                  [(ngModel)]="element.dateFormat" />
-              </div>
-            }
-            @if (type === 'table') {
-              <div class="input-group">
-                <input
-                  type="text"
-                  class="form-control"
-                  [placeholder]="'themeLabel.width' | translate"
-                  [(ngModel)]="element.width" />
-                <input
-                  type="text"
-                  class="form-control"
-                  [placeholder]="'themeLabel.minWidth' | translate"
-                  [(ngModel)]="element.minWidth" />
-                <input
-                  type="text"
-                  class="form-control"
-                  [placeholder]="'themeLabel.maxWidth' | translate"
-                  [(ngModel)]="element.maxWidth" />
-              </div>
-            }
-            <mat-checkbox [(ngModel)]="element.isVisible">
-              {{ 'themeLabel.isVisible' | translate }}
-            </mat-checkbox>
-            <mat-checkbox
-              [checked]="element.isSort"
-              [(ngModel)]="element.isSort"
-              >{{ 'themeLabel.isSort' | translate }}</mat-checkbox
-            >
-            @if (element.type !== 'seq') {
-              <mat-checkbox [(ngModel)]="element.isSearchValue">{{
-                'themeLabel.isSearchValue' | translate
-              }}</mat-checkbox>
-            }
-
-            <mat-checkbox [(ngModel)]="element.isSearchButton">{{
-              'themeLabel.isSearchButton' | translate
-            }}</mat-checkbox>
-            <mat-checkbox [(ngModel)]="element.isCopy">{{
-              'themeLabel.isCopy' | translate
-            }}</mat-checkbox>
-            <mat-checkbox
-              [(ngModel)]="element.isDefaultKey"
-              (change)="changeDefaultKey($event, i)"
-              >{{ 'themeLabel.isDefaultKey' | translate }}</mat-checkbox
-            >
-            <mat-checkbox [(ngModel)]="element.autoComplete">{{
-              'themeLabel.autoComplete' | translate
-            }}</mat-checkbox>
-            <input
-              class="form-control"
-              [placeholder]="'themeLabel.visibleDatasetNameListPH' | translate"
-              [(ngModel)]="element.visibleDatasetNameList" />
-          </div>
-        </div>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="addItem">
-      <td mat-footer-cell *matFooterCellDef colspan="5">
-        <div class="row justify-content-center">
-          <button mat-button class="rounded" (click)="onAdd()">
-            <mat-icon>add</mat-icon>
-          </button>
-        </div>
-      </td>
-    </ng-container>
-
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr
-      mat-row
-      *matRowDef="let row; columns: displayedColumns"
-      class="expand-row"
-      cdkDrag
-      [cdkDragData]="row"
-      [cdkDragDisabled]="dragDisabled"
-      (cdkDragReleased)="dragDisabled = true"></tr>
-    <tr mat-row *matRowDef="let row; columns: ['expandedDetail']"></tr>
-    <tr mat-footer-row *matFooterRowDef="['addItem']"></tr>
-  </table>
+  <div class="card-body">
+    <app-theme-item-manage
+      [headerId]="headerId()"
+      [type]="eThemeItemType.LABEL"
+      [form]="form"
+      [defaultBinding]="defaultBinding()"
+      (jsonReset)="jsonReset($event)">
+    </app-theme-item-manage>
+    <app-form-alerts
+      [form]="formArray"
+      [formAlerts]="formAlerts()"></app-form-alerts>
+    <div class="card mb-3">
+      <app-generic-table
+        [class.table-invalid]="formArray.invalid"
+        [initData]="initData()"
+        [formArray]="formArray"
+        [createGroup]="createGroup.bind(this)"
+        [displayedColumns]="displayedColumns"
+        [cols]="cols"
+        [expandedTmpl]="expandedDetail">
+      </app-generic-table>
+    </div>
+  </div>
 </div>
+
+<ng-template #expandedDetail let-element let-index="index">
+  <div class="d-flex" [formGroup]="element">
+    <div class="column p-1">
+      @let type = element.get('type');
+      @if (type?.value === eThemeLabelType.stringSplit) {
+        <div class="input-group">
+          <input
+            type="text"
+            class="form-control"
+            [placeholder]="'themeLabel.splitByPh' | translate"
+            formControlName="splitBy" />
+          <input
+            type="text"
+            class="form-control"
+            [placeholder]="'themeLabel.useSpacePh' | translate"
+            formControlName="useSpace" />
+        </div>
+      }
+      @if (type?.value === eThemeLabelType.date) {
+        <div class="input-group">
+          <input
+            type="text"
+            class="form-control"
+            [placeholder]="'themeLabel.dateFormatPh' | translate"
+            formControlName="dateFormat" />
+        </div>
+      }
+      @if (themeHeaderType() === eThemeHeaderType.table) {
+        <div>
+          <div class="input-group">
+            <input
+              type="text"
+              class="form-control"
+              [placeholder]="'themeLabel.width' | translate"
+              formControlName="width"
+              [class.is-invalid]="
+                element.hasError('invalidWidth') &&
+                element.get('width')?.touched
+              " />
+            <input
+              type="text"
+              class="form-control"
+              [placeholder]="'themeLabel.minWidth' | translate"
+              formControlName="minWidth"
+              [class.is-invalid]="
+                element.hasError('invalidMinWidth') &&
+                element.get('minWidth')?.touched
+              " />
+            <input
+              type="text"
+              class="form-control"
+              [placeholder]="'themeLabel.maxWidth' | translate"
+              formControlName="maxWidth"
+              [class.is-invalid]="
+                element.hasError('invalidMaxWidth') &&
+                element.get('maxWidth')?.touched
+              " />
+          </div>
+          @if (
+            (element.hasError('invalidWidth') &&
+              element.get('width')?.touched) ||
+            (element.hasError('invalidMinWidth') &&
+              element.get('minWidth')?.touched) ||
+            (element.hasError('invalidMaxWidth') &&
+              element.get('maxWidth')?.touched)
+          ) {
+            <div class="invalid-feedback d-flex">
+              <span class="w-100 d-flex justify-content-center">
+                @if (element.hasError('invalidWidth')) {
+                  {{ 'msg.widthError' | translate }}
+                }
+              </span>
+              <span class="w-100 d-flex justify-content-center">
+                @if (element.hasError('invalidMinWidth')) {
+                  {{ 'msg.widthError' | translate }}
+                }
+              </span>
+              <span class="w-100 d-flex justify-content-center">
+                @if (element.hasError('invalidMaxWidth')) {
+                  {{ 'msg.widthError' | translate }}
+                }
+              </span>
+            </div>
+          }
+        </div>
+      }
+      <mat-checkbox
+        formControlName="isDefaultKey"
+        (change)="changeDefaultKey(index)"
+        >{{ 'themeLabel.isDefaultKey' | translate }}</mat-checkbox
+      >
+      <mat-checkbox formControlName="isVisible">
+        {{ 'themeLabel.isVisible' | translate }}
+      </mat-checkbox>
+      <mat-checkbox formControlName="isSort">{{
+        'themeLabel.isSort' | translate
+      }}</mat-checkbox>
+      @if (type?.value !== eThemeLabelType.seq) {
+        <mat-checkbox formControlName="isSearchValue">{{
+          'themeLabel.isSearchValue' | translate
+        }}</mat-checkbox>
+      }
+
+      <mat-checkbox formControlName="isSearchButton">{{
+        'themeLabel.isSearchButton' | translate
+      }}</mat-checkbox>
+      <mat-checkbox formControlName="isCopy">{{
+        'themeLabel.isCopy' | translate
+      }}</mat-checkbox>
+
+      <mat-checkbox formControlName="autoComplete">{{
+        'themeLabel.autoComplete' | translate
+      }}</mat-checkbox>
+      <mat-checkbox formControlName="useVisibleDataset">{{
+        'themeLabel.useVisibleDataset' | translate
+      }}</mat-checkbox>
+      @if (element.get('useVisibleDataset')?.value) {
+        <app-chip-input
+          [label]="'themeLabel.visibleDatasetNameListPH' | translate"
+          formControlName="visibleDatasetNameList">
+        </app-chip-input>
+      }
+    </div>
+  </div>
+</ng-template>

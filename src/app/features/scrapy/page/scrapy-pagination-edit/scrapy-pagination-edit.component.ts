@@ -38,8 +38,6 @@ import { ScrapyPaginationService } from '../../services/scrapy-pagination.servic
     CommonModule,
     MatIconModule,
     TranslateModule,
-    CookieTableComponent,
-    CssSelectTableComponent,
     MatButtonModule,
     CodeEditorModule,
     MatFormFieldModule,
@@ -72,7 +70,6 @@ export class ScrapyPaginationEditComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private scrapyPaginationService: ScrapyPaginationService,
-    private translateService: TranslateService,
     private snackbarService: SnackbarService
   ) {}
   ngOnInit(): void {

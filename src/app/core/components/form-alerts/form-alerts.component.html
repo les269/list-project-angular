@@ -1,0 +1,8 @@
+@for (item of formAlerts(); track $index) {
+  @if (form().hasError(item.errorId)) {
+    <div class="alert alert-danger mb-2 d-flex">
+      <mat-icon>error</mat-icon>
+      {{ item.msg }}
+    </div>
+  }
+}

@@ -1,0 +1,25 @@
+<div class="d-flex align-items-center gap-2 flex-wrap">
+  @for (value of selectedData(); track $index) {
+    <mat-chip
+      >{{ displayLabel(value) }}
+      <button matChipRemove (click)="removeChip(value)">
+        <mat-icon>cancel</mat-icon>
+      </button>
+    </mat-chip>
+  }
+  @if (required() && requiredMsg().length > 0 && selectedData().length === 0) {
+    <div>
+      {{ requiredMsg() }}
+    </div>
+  }
+
+  <button
+    type="button"
+    class="btn btn-outline-primary d-flex"
+    [disabled]="disabled()"
+    (click)="openSelectTable()">
+    <mat-icon class="material-icons-outlined">
+      <span class="material-symbols-outlined">select_window_2</span>
+    </mat-icon>
+  </button>
+</div>

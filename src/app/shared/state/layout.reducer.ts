@@ -10,6 +10,7 @@ export const initialState: Readonly<LayoutState> = {
     [ThemeHeaderType.imageList]: [],
     [ThemeHeaderType.table]: [],
   },
+  themeHiddenList: [],
 };
 
 export const LayoutReducer = createReducer(

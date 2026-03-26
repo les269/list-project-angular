@@ -70,6 +70,7 @@ export interface ThemeLabel {
   minWidth: string;
   autoComplete: boolean;
   visibleDatasetNameList: string[];
+  useVisibleDataset: boolean;
 }
 
 export enum ThemeLabelType {
@@ -219,4 +220,8 @@ export type QueryAction =
 export enum ThemeEditMode {
   create = 'create',
   edit = 'edit',
+}
+export interface ThemeHiddenTO {
+  headerId: string;
+  updatedTime?: string;
 }

@@ -1,6 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { Component, computed, inject, signal } from '@angular/core';
+import {
+  FormBuilder,
+  FormControl,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import {
   MatDialogActions,
@@ -10,18 +15,19 @@ import {
   MAT_DIALOG_DATA,
   MatDialogRef,
 } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { switchMap, EMPTY, take, finalize } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { isBlank } from '../../../../shared/util/helper';
 import { CopyThemeData, ThemeHeaderType, ThemeHeaderCopy } from '../../models';
 import { ThemeService } from '../../services/theme.service';
+import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
+import { FormAlert } from '../../../../core/model';
+import { FormInvalidsComponent } from '../../../../core/components/form-invalids/form-invalids.component';
 
 @Component({
   selector: 'app-copy-theme',
   imports: [
     ReactiveFormsModule,
-    FormsModule,
     MatButtonModule,
     MatDialogActions,
     MatDialogClose,
@@ -29,44 +35,62 @@ import { ThemeService } from '../../services/theme.service';
     MatDialogContent,
     TranslateModule,
     CommonModule,
+    TrimOnBlurDirective,
+    FormInvalidsComponent,
   ],
   templateUrl: './copy-theme.component.html',
-  styleUrl: './copy-theme.component.scss',
 })
 export class CopyThemeComponent {
+  //inject
   readonly dialogRef = inject(MatDialogRef<CopyThemeComponent>);
   readonly data = inject<CopyThemeData>(MAT_DIALOG_DATA);
+  readonly formBuilder = inject(FormBuilder);
+  readonly themeService = inject(ThemeService);
+  readonly snackbarService = inject(SnackbarService);
+  readonly translateService = inject(TranslateService);
+  //enum
   readonly eThemeHeaderType = ThemeHeaderType;
-  readonly target = signal<ThemeHeaderCopy>({
-    ...this.data.themeHeader,
+  readonly form = this.formBuilder.nonNullable.group({
+    name: [this.data.themeHeader.name, [Validators.required]],
+    version: [this.data.themeHeader.version, [Validators.required]],
+    type: [this.data.themeHeader.type, [Validators.required]],
+    title: [this.data.themeHeader.title, [Validators.required]],
   });
-  private readonly themeService = inject(ThemeService);
-  private readonly snackbarService = inject(SnackbarService);
-  isProcessing = false;
+
+  //signals
+  readonly nameControl = this.form.get('name') as FormControl;
+  readonly versionControl = this.form.get('version') as FormControl;
+  readonly typeControl = this.form.get('type') as FormControl;
+  readonly titleControl = this.form.get('title') as FormControl;
+  readonly isProcessing = signal(false);
+
+  readonly formAlertsObj = computed(() => {
+    const required = {
+      errorId: 'required',
+      msg: this.translateService.instant('msg.required'),
+    };
+    return {
+      name: [required],
+      version: [required],
+      title: [required],
+    } satisfies Record<string, FormAlert[]>;
+  });
 
   ok() {
-    const { name, version, title } = this.target();
-    if (isBlank(name)) {
-      this.snackbarService.isBlankMessage('themeHeader.name');
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
-    if (isBlank(version)) {
-      this.snackbarService.isBlankMessage('themeHeader.version');
-      return;
-    }
-    if (isBlank(title)) {
-      this.snackbarService.isBlankMessage('themeHeader.title');
-      return;
-    }
-    this.target.update(current => ({
-      ...current,
-      name: name.trim(),
-      version: version.trim(),
-      title: title.trim(),
-    }));
-    this.isProcessing = true;
+
+    const formValue = this.form.getRawValue();
+    const target: ThemeHeaderCopy = {
+      ...this.data.themeHeader,
+      ...formValue,
+    };
+
+    this.isProcessing.set(true);
     this.themeService
-      .existTheme(this.target())
+      .existTheme(target)
       .pipe(
         switchMap(res => {
           if (res) {
@@ -75,11 +99,11 @@ export class CopyThemeComponent {
           }
           return this.themeService.copyTheme({
             source: this.data.themeHeader,
-            target: this.target(),
+            target,
           });
         }),
         take(1),
-        finalize(() => (this.isProcessing = false))
+        finalize(() => this.isProcessing.set(false))
       )
       .subscribe(() => {
         this.dialogRef.close('ok');

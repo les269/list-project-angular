@@ -1,0 +1,39 @@
+<h2 mat-dialog-title>{{ 'title.copyThemeItem' | translate }}</h2>
+<mat-dialog-content>
+  <form #f="ngForm">
+    <div class="mb-3">
+      <label for="sourceItemId" class="form-label">{{
+        'themeItem.sourceItemId' | translate
+      }}</label>
+      <input
+        id="sourceItemId"
+        name="sourceItemId"
+        type="text"
+        class="form-control"
+        [ngModel]="data.sourceItemId"
+        readonly />
+    </div>
+
+    <div class="mb-3">
+      <label for="targetItemId" class="form-label require">{{
+        'themeItem.targetItemId' | translate
+      }}</label>
+      <input
+        id="targetItemId"
+        name="targetItemId"
+        type="text"
+        class="form-control"
+        [ngModel]="targetItemId()"
+        (ngModelChange)="targetItemId.set($event)"
+        required />
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>
+    {{ 'g.no' | translate }}
+  </button>
+  <button mat-button cdkFocusInitial (click)="ok()" [disabled]="f.invalid">
+    {{ 'g.ok' | translate }}
+  </button>
+</mat-dialog-actions>

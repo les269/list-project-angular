@@ -21,7 +21,7 @@ import {
 } from '../../../../shared/util/helper';
 import { ThemeService } from '../../../theme/services/theme.service';
 import { MatDialog } from '@angular/material/dialog';
-import { ThemeNoteComponent } from '../../../theme/components/theme-note/theme-note.component';
+import { ThemeNoteComponent } from '../theme-note/theme-note.component';
 import { ApiConfigService } from '../../../api-config/service/api-config.service';
 import { CopyDirective } from '../../../../shared/util/util.directive';
 import { FileService } from '../../../../core/services/file.service';

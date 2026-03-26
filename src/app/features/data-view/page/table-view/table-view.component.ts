@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
+  getWidth,
   isBlank,
   isNotBlank,
   isValidWidth,
@@ -98,6 +99,7 @@ export class TableViewComponent {
   });
 
   readonly matSort = viewChild(MatSort);
+  getWidth = getWidth;
 
   constructor() {
     effect(() => {
@@ -142,13 +144,6 @@ export class TableViewComponent {
         return 0;
       })
       .reduce((a, b) => a + b, 0);
-  }
-
-  getWidth(element: ThemeLabel, type: 'width' | 'maxWidth' | 'minWidth') {
-    if (isNotBlank(element[type]) && isValidWidth(element[type])) {
-      return element[type];
-    }
-    return 'auto';
   }
 
   onSortChange(sort: Sort) {

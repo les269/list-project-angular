@@ -1,125 +1,36 @@
 <div class="card">
-  <table
-    mat-table
-    [dataSource]="list"
-    multiTemplateDataRows
-    cdkDropList
-    (cdkDropListDropped)="drop($event)"
-    cdkDropListData="fieldList">
-    <ng-container matColumnDef="seq">
-      <th mat-header-cell *matHeaderCellDef>
-        {{ 'dataset.fieldSeq' | translate }}
-      </th>
-      <td mat-cell *matCellDef="let element">
-        <div
-          class="d-flex align-items-center user-select-none"
-          (mouseout)="dragDisabled = true"
-          (mouseover)="dragDisabled = false">
-          <mat-icon class="drag-cursor">reorder</mat-icon>
-          <span>{{ element.seq }}</span>
-        </div>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="key">
-      <th mat-header-cell *matHeaderCellDef>
-        {{ 'dataset.fieldKey' | translate }}
-      </th>
-      <td mat-cell *matCellDef="let element">
-        <input class="form-control" [(ngModel)]="element.key" />
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="label">
-      <th mat-header-cell *matHeaderCellDef>
-        {{ 'dataset.fieldLabel' | translate }}
-      </th>
-      <td mat-cell *matCellDef="let element">
-        <input class="form-control" [(ngModel)]="element.label" />
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="type">
-      <th mat-header-cell *matHeaderCellDef>
-        {{ 'dataset.type' | translate }}
-      </th>
-      <td mat-cell *matCellDef="let element">
-        <select class="form-control form-select" [(ngModel)]="element.type">
-          @for (type of eDatasetFieldType | keyvalue; track type) {
-            <option
-              [ngValue]="type.key">
-              {{ 'dataset.' + type.key | translate }}
-            </option>
-          }
-        </select>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="other">
-      <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
-      <td mat-cell *matCellDef="let element; let i = dataIndex">
-        <div class="row flex-nowrap">
-          <button mat-icon-button (click)="onDelete(i)">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="add">
-      <td
-        mat-footer-cell
-        *matFooterCellDef
-        [attr.colspan]="displayedColumns.length">
-        <div class="row justify-content-center">
-          <button mat-button class="rounded" (click)="onAdd()">
-            <mat-icon>add</mat-icon>
-          </button>
-        </div>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="expanded">
-      <td
-        mat-cell
-        *matCellDef="let element; let i = dataIndex"
-        [attr.colspan]="displayedColumns.length">
-        <div class="d-flex flex-column">
-          @if (element.type === 'fixedString') {
-            <div class="d-flex input-group my-1 align-items-center">
-              <label class="input-group-text">{{
-                'dataset.fixedString' | translate
-              }}</label>
-              <input
-                class="form-control"
-                [placeholder]="'dataset.fixedStringPH' | translate"
-                [(ngModel)]="element.fixedString" />
-              </div>
-            }
-            <div class="d-flex input-group my-1 align-items-center">
-              <label class="input-group-text">{{
-                'dataset.replaceReg' | translate
-              }}</label>
-              <input
-                class="form-control"
-                [placeholder]="'dataset.replaceRegular' | translate"
-                [(ngModel)]="element.replaceRegular" />
-                <input
-                  class="form-control"
-                  [placeholder]="'dataset.replaceRegularTo' | translate"
-                  [(ngModel)]="element.replaceRegularTo" />
-                </div>
-              </div>
-            </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr
-            mat-row
-            *matRowDef="let row; columns: displayedColumns"
-            class="expand-row"
-            cdkDrag
-            [cdkDragData]="row"
-            [cdkDragDisabled]="dragDisabled"
-          (cdkDragReleased)="dragDisabled = true"></tr>
-          <tr
-            mat-row
-            *matRowDef="let row; columns: ['expanded']"
-          style="height: 0px"></tr>
-          <tr mat-footer-row *matFooterRowDef="['add']"></tr>
-        </table>
+  <app-generic-table
+    [formArray]="formArray()"
+    [cols]="cols"
+    [displayedColumns]="displayedColumns"
+    [createGroup]="createGroup.bind(this)"
+    [expandedTmpl]="expandedTmpl"></app-generic-table>
+</div>
+<ng-template #expandedTmpl let-element>
+  <div class="d-flex flex-column">
+    @if (element.type === 'fixedString') {
+      <div class="d-flex input-group my-1 align-items-center">
+        <label class="input-group-text">{{
+          'dataset.fixedString' | translate
+        }}</label>
+        <input
+          class="form-control"
+          [placeholder]="'dataset.fixedStringPH' | translate"
+          [(ngModel)]="element.fixedString" />
       </div>
+    }
+    <div class="d-flex input-group my-1 align-items-center">
+      <label class="input-group-text">{{
+        'dataset.replaceReg' | translate
+      }}</label>
+      <input
+        class="form-control"
+        [placeholder]="'dataset.replaceRegular' | translate"
+        [(ngModel)]="element.replaceRegular" />
+      <input
+        class="form-control"
+        [placeholder]="'dataset.replaceRegularTo' | translate"
+        [(ngModel)]="element.replaceRegularTo" />
+    </div>
+  </div>
+</ng-template>

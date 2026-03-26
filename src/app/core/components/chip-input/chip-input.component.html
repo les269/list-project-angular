@@ -1,20 +1,23 @@
-<mat-form-field appearance="outline" style="width: 100%">
-  @if (label) {
-    <mat-label>{{ label }}</mat-label>
+<mat-form-field
+  appearance="outline"
+  style="width: 100%"
+  subscriptSizing="dynamic">
+  @if (label()) {
+    <mat-label>{{ label() }}</mat-label>
   }
   <mat-chip-grid #chipGrid>
-    @if (type === 'color') {
+    @if (type() === 'color') {
       <div class="d-flex align-items-center flex-wrap">
-        @for (value of chipList; track value; let i = $index) {
+        @for (value of chipList(); track value; let i = $index) {
           <mat-chip-row
             (removed)="removeChip(i)"
             [editable]="true"
             (edited)="editChip(i, $event.value)">
             <div
-            [ngStyle]="{
-              'background-color': getLuminance(value) < 0.5 ? '' : '#525252',
-              color: value,
-            }">
+              [ngStyle]="{
+                'background-color': getLuminance(value) < 0.5 ? '' : '#525252',
+                color: value,
+              }">
               {{ value }}
             </div>
             <button matChipRemove>
@@ -25,13 +28,13 @@
         <input
           class="form-control form-control-color"
           style="max-width: 30px"
-          [type]="type"
+          [type]="type()"
           [matChipInputFor]="chipGrid"
           [matChipInputAddOnBlur]="true"
           (matChipInputTokenEnd)="addChip($event)" />
       </div>
     } @else {
-      @for (value of chipList; track value; let i = $index) {
+      @for (value of chipList(); track value; let i = $index) {
         <mat-chip-row
           (removed)="removeChip(i)"
           [editable]="true"
@@ -43,7 +46,7 @@
         </mat-chip-row>
       }
       <input
-        [type]="type"
+        [type]="type()"
         [matChipInputFor]="chipGrid"
         [matChipInputAddOnBlur]="true"
         (matChipInputTokenEnd)="addChip($event)" />

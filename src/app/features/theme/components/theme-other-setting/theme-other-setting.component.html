@@ -1,103 +1,124 @@
 <label class="h3">{{ 'otherSetting.title' | translate }}</label>
-@if (type === 'table') {
-  <app-chip-input
-    [type]="'color'"
-    [(chipList)]="themeOtherSetting.rowColor"
-    [label]="'otherSetting.rowColor' | translate"
-    [canUpdate]="checkColor"></app-chip-input>
-  <button class="btn btn-primary" (click)="setDefaultColor()">
-    {{ 'otherSetting.defaultColor' | translate }}
-  </button>
-  <div class="my-2">
-    <mat-checkbox [(ngModel)]="themeOtherSetting.showDuplicate">
-      {{ 'themeTopCustom.displayDuplicateButton' | translate }}
-    </mat-checkbox>
-  </div>
-}
-@if (type === 'imageList') {
-  <div class="mb-3">
-    <label class="form-label">{{
-      'otherSetting.listPageSize' | translate
-    }}</label>
-    <input
-      type="number"
-      class="form-control"
-      [(ngModel)]="themeOtherSetting.listPageSize" />
-  </div>
-  <div class="mb-3">
-    <label class="form-label">{{
-      'otherSetting.checkFileExist' | translate
-    }}</label>
-    <input
-      class="form-control"
-      [placeholder]="'otherSetting.checkFileExistPH' | translate"
-      [(ngModel)]="themeOtherSetting.checkFileExist" />
-  </div>
-  <div class="mb-3">
-    <label class="form-label">{{
-      'otherSetting.quickRefresh' | translate
-    }}</label>
-    <div>
-      <mat-checkbox [(ngModel)]="themeOtherSetting.useQuickRefresh">
-        {{ 'otherSetting.useQuickRefresh' | translate }}
-      </mat-checkbox>
-    </div>
-  </div>
+<div class="card mb-3">
+  <div class="card-body">
+    <app-theme-item-manage
+      [headerId]="headerId()"
+      [type]="eThemeItemType.OTHERSETTING"
+      [form]="form"
+      [defaultBinding]="defaultBinding()">
+    </app-theme-item-manage>
+    <form [formGroup]="group()" class="theme-other-setting">
+      @if (themeHeaderType() === eThemeHeaderType.table) {
+        <app-chip-input
+          [type]="'color'"
+          [(chipList)]="rowColor.value"
+          [label]="'otherSetting.rowColor' | translate"
+          [canUpdate]="checkColor"></app-chip-input>
+        <button class="btn btn-primary" (click)="setDefaultColor()">
+          {{ 'otherSetting.defaultColor' | translate }}
+        </button>
+        <div class="my-2">
+          <mat-checkbox formControlName="showDuplicate">
+            {{ 'themeTopCustom.displayDuplicateButton' | translate }}
+          </mat-checkbox>
+        </div>
+      } @else if (themeHeaderType() === eThemeHeaderType.imageList) {
+        <div class="mb-3">
+          <label class="form-label">{{
+            'otherSetting.listPageSize' | translate
+          }}</label>
+          <input
+            type="number"
+            class="form-control"
+            formControlName="listPageSize" />
+          @if (listPageSize.invalid && listPageSize.touched) {
+            <div class="text-danger small">
+              {{
+                listPageSize.errors?.['required']
+                  ? ('otherSetting.listPageSizeRequired' | translate)
+                  : listPageSize.errors?.['min']
+                    ? ('otherSetting.listPageSizeMin' | translate)
+                    : ''
+              }}
+            </div>
+          }
+        </div>
+        <div class="mb-3">
+          <label class="form-label">{{
+            'otherSetting.checkFileExist' | translate
+          }}</label>
+          <input
+            class="form-control"
+            [placeholder]="'otherSetting.checkFileExistPH' | translate"
+            formControlName="checkFileExist" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">{{
+            'otherSetting.quickRefresh' | translate
+          }}</label>
+          <div>
+            <mat-checkbox formControlName="useQuickRefresh">
+              {{ 'otherSetting.useQuickRefresh' | translate }}
+            </mat-checkbox>
+          </div>
+        </div>
 
-  @if (themeOtherSetting.useQuickRefresh) {
-    <div class="d-flex gap-2 justify-content-start align-items-center mb-2">
-      @if (themeOtherSetting.useSpider) {
-        <mat-chip
-          >{{ themeOtherSetting.useSpider }}
-          <button matChipRemove (click)="themeOtherSetting.useSpider = ''">
-            <mat-icon>cancel</mat-icon>
-          </button>
-        </mat-chip>
+        @if (useQuickRefresh.value) {
+          <div
+            class="d-flex gap-2 justify-content-start align-items-center mb-2">
+            @if (useSpiderControl.value) {
+              <mat-chip
+                >{{ useSpiderControl.value }}
+                <button matChipRemove (click)="useSpiderControl.setValue('')">
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip>
+            }
+            <button
+              class="btn btn-outline-primary d-flex"
+              (click)="selectUseSpider()">
+              <mat-icon class="material-icons-outlined"
+                ><span class="material-symbols-outlined">
+                  select_window_2
+                </span></mat-icon
+              >
+            </button>
+          </div>
+          @if (useSpiderControl.invalid && useSpiderControl.touched) {
+            <div class="text-danger small">
+              {{ 'otherSetting.useSpiderRequired' | translate }}
+            </div>
+          }
+          <div class="mb-3">
+            <mat-radio-group formControlName="quickRefreshType">
+              <mat-radio-button [value]="eQuickRefreshType.params">{{
+                'otherSetting.refreshByParams' | translate
+              }}</mat-radio-button>
+              <mat-radio-button [value]="eQuickRefreshType.url">{{
+                'otherSetting.refreshByUrl' | translate
+              }}</mat-radio-button>
+            </mat-radio-group>
+            @if (quickRefreshType.invalid && quickRefreshType.touched) {
+              <div class="text-danger small">
+                {{ 'otherSetting.refreshTypeRequired' | translate }}
+              </div>
+            }
+            <input
+              class="form-control"
+              [placeholder]="'otherSetting.quickRefreshPH' | translate"
+              formControlName="quickRefresh" />
+            @if (quickRefresh.invalid && quickRefresh.touched) {
+              <div class="text-danger small">
+                {{
+                  quickRefresh.errors?.['required']
+                    ? ('otherSetting.quickRefreshRequired' | translate)
+                    : ''
+                }}
+              </div>
+            }
+          </div>
+        }
       }
-      <button
-        class="btn btn-outline-primary d-flex"
-        (click)="selectUseSpider()">
-        <mat-icon class="material-icons-outlined"
-          ><span class="material-symbols-outlined">
-            select_window_2
-          </span></mat-icon
-        >
-      </button>
-    </div>
-    <div class="mb-3">
-      <div>
-        <div class="form-check form-check-inline mb-2">
-          <input
-            class="form-check-input"
-            type="radio"
-            name="refreshByParams"
-            id="refreshByParams"
-            value="params"
-            [(ngModel)]="themeOtherSetting.quickRefreshType" />
-          <label class="form-check-label" for="refreshByParams">
-            {{ 'otherSetting.refreshByParams' | translate }}
-          </label>
-        </div>
-        <div class="form-check form-check-inline">
-          <input
-            class="form-check-input"
-            type="radio"
-            name="refreshByUrl"
-            id="refreshByUrl"
-            value="url"
-            [(ngModel)]="themeOtherSetting.quickRefreshType" />
-          <label class="form-check-label" for="refreshByUrl">
-            {{ 'otherSetting.refreshByUrl' | translate }}
-          </label>
-        </div>
-      </div>
-      <input
-        class="form-control"
-        [placeholder]="'otherSetting.quickRefreshPH' | translate"
-        [(ngModel)]="themeOtherSetting.quickRefresh" />
-    </div>
-  }
-}
-<label class="h3">{{ 'title.topCustom' | translate }}</label>
-<app-theme-top-custom-table
-  [(list)]="themeOtherSetting.themeTopCustomList"></app-theme-top-custom-table>
+    </form>
+  </div>
+</div>

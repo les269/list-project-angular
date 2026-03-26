@@ -1,23 +1,21 @@
-import {
-  AfterContentInit,
-  AfterViewInit,
-  Component,
-  EventEmitter,
-  inject,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
-  signal,
-  SimpleChanges,
-} from '@angular/core';
+import { Component, computed, effect, inject, input } from '@angular/core';
+import { FormArray, Validators } from '@angular/forms';
 
 import {
   DEFAULT_ROW_COLOR,
   ThemeHeaderType,
+  ThemeItem,
+  ThemeItemType,
   ThemeOtherSetting,
+  ThemeOtherSettingItem,
 } from '../../models';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormsModule,
+  FormGroup,
+  FormBuilder,
+  FormControl,
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
@@ -27,11 +25,12 @@ import { TranslateModule } from '@ngx-translate/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatChipsModule } from '@angular/material/chips';
 import { ChipInputComponent } from '../../../../core/components/chip-input/chip-input.component';
-import { ThemeTopCustomTableComponent } from '../theme-top-custom-table/theme-top-custom-table.component';
-import { S } from '@angular/cdk/keycodes';
 import { SelectTableService } from '../../../../core/services/select-table.service';
-import { ScrapyConfig } from '../../../scrapy/model';
 import { ScrapyService } from '../../../scrapy/services/scrapy.service';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { MatRadioModule } from '@angular/material/radio';
+import { QuickRefreshType } from '../../../dataset/model';
+import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage.component';
 
 @Component({
   selector: 'app-theme-other-setting',
@@ -48,37 +47,95 @@ import { ScrapyService } from '../../../scrapy/services/scrapy.service';
     MatFormFieldModule,
     MatChipsModule,
     ChipInputComponent,
-    ThemeTopCustomTableComponent,
+    ThemeItemManageComponent,
+    MatRadioModule,
   ],
   templateUrl: './theme-other-setting.component.html',
-  styleUrl: './theme-other-setting.component.scss',
 })
-export class ThemeOtherSettingComponent implements OnInit, OnChanges {
-  @Input({ required: true }) type: ThemeHeaderType = ThemeHeaderType.table;
-  @Input({ required: true }) themeOtherSetting!: ThemeOtherSetting;
-  @Output() themeOtherSettingChange = new EventEmitter<ThemeOtherSetting>();
+export class ThemeOtherSettingComponent {
+  //enums and constants
+  eThemeHeaderType = ThemeHeaderType;
+  eQuickRefreshType = QuickRefreshType;
+  eThemeItemType = ThemeItemType;
+  //inputs
+  headerId = input<string>();
+  otherSettingItem = input<ThemeOtherSettingItem>();
+  themeHeaderType = input<ThemeHeaderType>();
+  oldData = input.required<ThemeOtherSetting>();
+  //inject
+  fb = inject(FormBuilder);
   selectTableService = inject(SelectTableService);
   scrapyService = inject(ScrapyService);
-  scrapyConfigList = signal([] as ScrapyConfig[]);
 
-  ngOnInit(): void {
-    this.scrapyService.getAllConfig().subscribe(res => {
-      this.scrapyConfigList.set(res);
+  //form
+  form = this.fb.group({
+    itemId: ['', [Validators.required]],
+    description: [''],
+    json: this.fb.group({
+      rowColor: [[] as string[]],
+      listPageSize: [30],
+      themeTopCustomList: this.fb.array([]),
+      showDuplicate: [false],
+      checkFileExist: [''],
+      useQuickRefresh: [false],
+      quickRefresh: [''],
+      quickRefreshType: [QuickRefreshType.url],
+      useSpider: [''],
+    }),
+  });
+  group = computed(() => this.form.get('json') as FormGroup);
+  //signals
+  defaultBinding = computed(() => !!this.otherSettingItem());
+  scrapyConfigList = rxResource({
+    stream: () => this.scrapyService.getAllConfig(),
+    defaultValue: [],
+  });
+
+  constructor() {
+    effect(() => {
+      const data = this.otherSettingItem();
+      const oldData = this.oldData();
+      if (data) {
+        this.form.patchValue(data, { emitEvent: false });
+        return;
+      }
+      if (oldData) {
+        this.group().patchValue(oldData, { emitEvent: false });
+      }
     });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (!this.themeOtherSetting.rowColor) {
-      this.themeOtherSetting.rowColor = DEFAULT_ROW_COLOR;
-    }
-    if (!this.themeOtherSetting.listPageSize) {
-      this.themeOtherSetting.listPageSize = 30;
-    }
+  // handy getters for template access
+  get rowColor() {
+    return this.group().get('rowColor') as FormControl<string[]>;
+  }
+
+  get showDuplicate() {
+    return this.group().get('showDuplicate') as FormControl<boolean>;
+  }
+
+  get listPageSize() {
+    return this.group().get('listPageSize') as FormControl<number>;
+  }
+
+  get useQuickRefresh() {
+    return this.group().get('useQuickRefresh') as FormControl<boolean>;
+  }
+
+  get quickRefresh() {
+    return this.group().get('quickRefresh') as FormControl<string>;
+  }
+
+  get quickRefreshType() {
+    return this.group().get('quickRefreshType') as FormControl<string>;
+  }
+
+  get useSpiderControl() {
+    return this.group().get('useSpider') as FormControl<string>;
   }
 
   setDefaultColor() {
-    this.themeOtherSetting.rowColor = DEFAULT_ROW_COLOR;
-    this.themeOtherSettingChange.emit(this.themeOtherSetting);
+    this.rowColor.setValue(DEFAULT_ROW_COLOR);
   }
 
   checkColor(value: string) {
@@ -88,11 +145,10 @@ export class ThemeOtherSettingComponent implements OnInit, OnChanges {
 
   selectUseSpider() {
     this.selectTableService
-      .selectSingleScrapy(this.scrapyConfigList())
+      .selectSingleScrapy(this.scrapyConfigList.value())
       .subscribe(res => {
         if (res) {
-          this.themeOtherSetting.useSpider = res.name;
-          this.themeOtherSettingChange.emit(this.themeOtherSetting);
+          this.useSpiderControl.setValue(res.name);
         }
       });
   }

@@ -1,115 +1,37 @@
 <label class="h3">{{ 'themeDataset.title' | translate }}</label>
 <div class="card mb-3">
-  <table
-    mat-table
-    [dataSource]="list"
-    multiTemplateDataRows
-    cdkDropList
-    (cdkDropListDropped)="drop($event)"
-    cdkDropListData="themeDatasetList">
-    <ng-container matColumnDef="order">
-      <th mat-header-cell *matHeaderCellDef>
-        {{ 'g.order' | translate }}
-      </th>
-      <td mat-cell *matCellDef="let element">
-        <div
-          class="d-flex align-items-center user-select-none"
-          (mouseout)="dragDisabled = true"
-          (mouseover)="dragDisabled = false">
-          <mat-icon class="drag-cursor">reorder</mat-icon>
-          <span>{{ element.seq }}</span>
-        </div>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="dataset">
-      <th mat-header-cell *matHeaderCellDef>
-        {{ 'themeDataset.dataset' | translate }}
-      </th>
-      <td mat-cell *matCellDef="let element">
-        <div class="mt-1 d-flex flex-wrap gap-3 align-items-center">
-          @for (dataset of element.datasetList; track $index) {
-            <mat-chip
-              >{{ dataset }}
-              <button matChipRemove (click)="removeChip(element, dataset)">
-                <mat-icon>cancel</mat-icon>
-              </button>
-            </mat-chip>
-          }
-          <button
-            class="btn btn-outline-primary d-flex"
-            (click)="selectDataset(element)">
-            <mat-icon class="material-icons-outlined"
-              ><span class="material-symbols-outlined">
-                select_window_2
-              </span></mat-icon
-            >
-          </button>
-        </div>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="label">
-      <th mat-header-cell *matHeaderCellDef [ngStyle]="{ 'width.px': 200 }">
-        {{ 'themeDataset.label' | translate }}
-      </th>
-      <td mat-cell *matCellDef="let element; let i = dataIndex">
-        <input
-          class="form-control"
-          name="dbLabel{{ i }}"
-          [(ngModel)]="element.label" />
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="other">
-      <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
-      <td mat-cell *matCellDef="let element; let i = dataIndex">
-        <div class="row flex-nowrap">
-          <button mat-icon-button (click)="onDelete(i)">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="add">
-      <td
-        mat-footer-cell
-        *matFooterCellDef
-        [attr.colspan]="displayedColumns.length">
-        <div class="row justify-content-center">
-          <button mat-button class="rounded" (click)="onAdd()">
-            <mat-icon>add</mat-icon>
-          </button>
-        </div>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="expandedDetail">
-      <td
-        mat-cell
-        *matCellDef="let element; let i = dataIndex"
-        [attr.colspan]="displayedColumns.length">
-        <div class="d-flex">
-          <div class="column p-1">
-            <mat-checkbox
-              [checked]="element.isDefault"
-              [(ngModel)]="element.isDefault"
-              (change)="changeDefaultKey($event, i)">
-              {{ 'themeDataset.isDefault' | translate }}
-            </mat-checkbox>
-          </div>
-        </div>
-      </td>
-    </ng-container>
-
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr
-      mat-row
-      *matRowDef="let row; columns: displayedColumns"
-      class="expand-row"
-      cdkDrag
-      [cdkDragData]="row"
-      [cdkDragDisabled]="dragDisabled"
-      (cdkDragReleased)="dragDisabled = true">
-      >
-    </tr>
-    <tr mat-row *matRowDef="let row; columns: ['expandedDetail']"></tr>
-    <tr mat-footer-row *matFooterRowDef="['add']"></tr>
-  </table>
+  <div class="card-body">
+    <app-theme-item-manage
+      [headerId]="headerId()"
+      [type]="eThemeItemType.DATASET"
+      [form]="form"
+      [defaultBinding]="defaultBinding()"
+      (jsonReset)="jsonReset($event)">
+    </app-theme-item-manage>
+    <app-form-alerts
+      [form]="formArray"
+      [formAlerts]="formAlerts()"></app-form-alerts>
+    <div class="card mb-3">
+      <app-generic-table
+        [class.table-invalid]="formArray.invalid"
+        [initData]="initData()"
+        [formArray]="formArray"
+        [createGroup]="createGroup.bind(this)"
+        [displayedColumns]="displayedColumns"
+        [expandedTmpl]="expandedDetail"
+        [cols]="cols()"></app-generic-table>
+    </div>
+  </div>
 </div>
+
+<ng-template #expandedDetail let-element let-index="index">
+  <div class="d-flex" [formGroup]="element">
+    <div class="column p-1">
+      <mat-checkbox
+        formControlName="isDefault"
+        (change)="changeDefaultKey(index)">
+        {{ 'themeDataset.isDefault' | translate }}
+      </mat-checkbox>
+    </div>
+  </div>
+</ng-template>

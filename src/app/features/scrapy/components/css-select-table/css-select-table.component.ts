@@ -1,12 +1,20 @@
 import {
   Component,
   EventEmitter,
+  inject,
   Injector,
+  input,
   Input,
   Output,
 } from '@angular/core';
 
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormsModule,
+  FormControl,
+  FormArray,
+  FormBuilder,
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
@@ -26,6 +34,12 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
+import { rxResource } from '@angular/core/rxjs-interop';
+import {
+  GenericColumnType,
+  GenericTableColumn,
+  ToFormArray,
+} from '../../../../core/model/generic-table';
 
 @Component({
   selector: 'app-css-select-table',
@@ -40,41 +54,48 @@ import { GenericTableComponent } from '../../../../core/components/generic-table
     MatTooltipModule,
     MatCheckboxModule,
     MatChipsModule,
-    CdkDropList,
-    CdkDrag
-],
+    GenericTableComponent,
+  ],
   templateUrl: './css-select-table.component.html',
 })
-export class CssSelectTableComponent extends GenericTableComponent<CssSelect> {
-  displayedColumns = ['seq', 'key', 'value', 'other'];
-  override item: CssSelect = {
-    seq: 0,
-    key: '',
-    value: '',
-    replaceString: '',
-    attr: '',
-    convertToArray: false,
-    onlyOwn: false,
-    replaceRegular: '',
-    replaceRegularTo: '',
-    replaceValueMapName: '',
-    splitText: '',
-  };
-  replaceValueMapService: ReplaceValueMapService;
+export class CssSelectTableComponent {
+  displayedColumns = ['key', 'value'];
+  readonly fb = inject(FormBuilder);
+  replaceValueMapService = inject(ReplaceValueMapService);
+  selectTableService = inject(SelectTableService);
+  nameList = rxResource({
+    stream: () => this.replaceValueMapService.getNameList(),
+    defaultValue: [],
+  });
+  formArray = input.required<ToFormArray<CssSelect>>();
+  cols: GenericTableColumn[] = [
+    { key: 'key', label: 'g.key', columnType: GenericColumnType.input },
+    {
+      key: 'value',
+      label: 'scrapy.cssSelect',
+      columnType: GenericColumnType.textarea,
+    },
+  ];
 
-  constructor(injector: Injector) {
-    super(injector);
-    this.replaceValueMapService = this.injector.get(ReplaceValueMapService);
+  createGroup() {
+    return this.fb.group({
+      seq: [0],
+      key: [''],
+      value: [''],
+      replaceString: [''],
+      attr: [''],
+      convertToArray: [false],
+      onlyOwn: [false],
+      replaceRegular: [''],
+      replaceRegularTo: [''],
+      replaceValueMapName: [''],
+      splitText: [''],
+    });
   }
 
   selectReplaceValueMap(element: CssSelect) {
-    this.replaceValueMapService
-      .getNameList()
-      .pipe(
-        switchMap(res =>
-          this.selectTableService.selectSingleReplaceValueMap(res)
-        )
-      )
+    this.selectTableService
+      .selectSingleReplaceValueMap(this.nameList.value())
       .subscribe(res => {
         element.replaceValueMapName = res.name;
       });

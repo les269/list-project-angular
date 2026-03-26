@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable, of, shareReplay } from 'rxjs';
+import { forkJoin, map, Observable, of } from 'rxjs';
 import {
   CopyThemeRequest,
   ThemeCustomValue,
@@ -41,9 +41,9 @@ export class ThemeService {
       .pipe(
         map(res => {
           res.imageList = res.imageList.filter(
-            x => x.themeOtherSetting.themeVisible
+            x => x.themeOtherSetting?.themeVisible
           );
-          res.table = res.table.filter(x => x.themeOtherSetting.themeVisible);
+          res.table = res.table.filter(x => x.themeOtherSetting?.themeVisible);
           return res;
         })
       )
@@ -54,8 +54,10 @@ export class ThemeService {
 
   updateThemeStore(req: Record<ThemeHeaderType, ThemeHeader[]>): void {
     const res = { ...req };
-    res.imageList = req.imageList.filter(x => x.themeOtherSetting.themeVisible);
-    res.table = req.table.filter(x => x.themeOtherSetting.themeVisible);
+    res.imageList = req.imageList.filter(
+      x => x.themeOtherSetting?.themeVisible
+    );
+    res.table = req.table.filter(x => x.themeOtherSetting?.themeVisible);
     this.store.dispatch(updateList(res));
   }
 

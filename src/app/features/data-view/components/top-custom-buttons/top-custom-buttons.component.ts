@@ -11,7 +11,7 @@ import { isNotBlank, isNotNull } from '../../../../shared/util/helper';
 import { MatDialog } from '@angular/material/dialog';
 import { ApiConfigService } from '../../../api-config/service/api-config.service';
 import { ThemeService } from '../../../theme/services/theme.service';
-import { ThemeNoteComponent } from '../../../theme/components/theme-note/theme-note.component';
+import { ThemeNoteComponent } from '../theme-note/theme-note.component';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 
 @Component({

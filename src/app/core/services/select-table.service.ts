@@ -1,23 +1,24 @@
-import { inject, Injectable, LOCALE_ID } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ApiConfig } from '../../features/api-config/model';
-import {
-  BaseSelectTableData,
-  SelectTableDialog,
-} from '../components/select-table/select-table.dialog';
+import { SelectTableDialog } from '../components/select-table/select-table.dialog';
 import { ScrapyConfig, ScrapyPagination } from '../../features/scrapy/model';
-import { DatePipe, formatDate } from '@angular/common';
+import { formatDate } from '@angular/common';
 import {
   Dataset,
   GroupDataset,
   GroupDatasetData,
 } from '../../features/dataset/model';
-import { ShareTag } from '../../features/theme/models';
+import {
+  ShareTag,
+  ThemeItem,
+  ThemeItemSummary,
+} from '../../features/theme/models';
 import { ReplaceValueMap } from '../../features/replace-value-map/model';
 import { TranslateService } from '@ngx-translate/core';
 import { isNotBlank } from '../../shared/util/helper';
 import { filter } from 'rxjs';
-import { DatabaseConfig } from '../../features/setting/model';
+import { BaseSelectTableData } from '../model';
 
 @Injectable({ providedIn: 'root' })
 export class SelectTableService {
@@ -71,6 +72,7 @@ export class SelectTableService {
     const data: BaseSelectTableData<Dataset> = {
       displayedColumns: ['name', 'createdTime', 'updatedTime'],
       labels: ['dataset.name', 'g.createdTime', 'g.updatedTime'],
+      columnSorts: { name: true, createdTime: true, updatedTime: true },
       dataSource,
       selectType: 'multiple',
       columnFormats: {
@@ -138,6 +140,26 @@ export class SelectTableService {
         updatedTime: this.dateTransform,
       },
       showTitle: false,
+    };
+    return this.openSelectDialog(data);
+  }
+
+  selectSingleThemeItemSummary(
+    dataSource: ThemeItemSummary[],
+    idLabelKey: string
+  ) {
+    const data: BaseSelectTableData<ThemeItemSummary> = {
+      displayedColumns: ['itemId', 'description', 'updatedTime'],
+      labels: [idLabelKey, 'g.description', 'g.updatedTime'],
+      dataSource,
+      selectType: 'single',
+      columnFormats: {
+        updatedTime: this.dateTransform,
+      },
+      enableFilter: true,
+      title: this.translateService.instant('title.select', {
+        text: this.translateService.instant(idLabelKey),
+      }),
     };
     return this.openSelectDialog(data);
   }

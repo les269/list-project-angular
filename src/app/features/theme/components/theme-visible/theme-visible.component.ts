@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
 import { ThemeService } from '../../services/theme.service';
@@ -11,8 +11,7 @@ import {
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { selectLayoutList } from '../../../../shared/state/layout.selectors';
-import { rxResource, toSignal } from '@angular/core/rxjs-interop';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { tap } from 'rxjs';
 
@@ -56,7 +55,7 @@ export class ThemeVisibleComponent {
       ...item,
       themeOtherSetting: {
         ...item.themeOtherSetting,
-        themeVisible: !item.themeOtherSetting.themeVisible,
+        themeVisible: !item.themeOtherSetting?.themeVisible,
       },
     };
     this.themeService.updateTheme(req).subscribe(() => {

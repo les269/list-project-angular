@@ -28,19 +28,8 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { TranslateModule } from '@ngx-translate/core';
 import { CustomMatPaginatorIntl } from '../custom-mat-paginatorIntl/custom-mat-paginatorIntl';
+import { BaseSelectTableData } from '../../model';
 
-export interface BaseSelectTableData<O> {
-  displayedColumns: string[];
-  labels: string[];
-  dataSource: O[];
-  selectType: 'single' | 'multiple';
-  title?: string;
-  selected?: O[];
-  columnFormats?: { [key: string]: (value: any) => string };
-  columnSorts?: { [key: string]: boolean };
-  enableFilter?: boolean;
-  showTitle?: boolean;
-}
 @Component({
   standalone: true,
   imports: [

@@ -1,9 +1,14 @@
-import { ThemeHeader, ThemeHeaderType } from '../../features/theme/models';
+import {
+  ThemeHeader,
+  ThemeHeaderType,
+  ThemeHiddenTO,
+} from '../../features/theme/models';
 
 export interface LayoutState {
   openSidenav: boolean;
   title: string;
   list: Record<ThemeHeaderType, ThemeHeader[]>;
+  themeHiddenList: ThemeHiddenTO[];
 }
 
 export const myRoutes: { path: string; title: string }[] = [

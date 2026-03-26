@@ -11,6 +11,7 @@
     "updateSuccess": "更新成功",
     "themeExist": "主題已經存在",
     "themeNotExist": "主題不存在",
+    "labelTableInUse": "目前該資料欄位表使用中，需先解除綁定後才可刪除",
     "scrapyExist": "該名稱已經存在",
     "scrapyNotExist": "該名稱不存在",
     "sureDeleteTheme": "是否要刪除該主題?",
@@ -20,6 +21,8 @@
     "sureDeleteDataset": "是否要刪除該資料集?",
     "sureDeleteImage": "是否要刪除該圖片'{{name}}'?",
     "sureDeleteDatasetData": "是否要刪除該資料'{{name}}'?",
+    "sureDeleteLabelTable": "是否要刪除該資料欄位表?",
+    "sureUnbindLabelTable": "是否要取消綁定該資料欄位表?",
     "copyText": "以複製至剪貼簿: {{text}}",
     "duplicateColumn": "{{text}} 不可以有重複欄位",
     "apiExist": "API已經存在,在API名稱跟API標籤不可以重複",
@@ -56,7 +59,17 @@
     "refreshFailed": "刷新失敗",
     "confirmDeleteDisk": "是否要刪除硬碟 '{{disk}}'?",
     "quickRefreshSpiderEmpty": "選擇快速刷新要使用的爬蟲",
-    "quickRefreshTypeRequired": "選擇快速刷新要使用的哪種參數方式"
+    "quickRefreshTypeRequired": "選擇快速刷新要使用的哪種參數方式",
+    "formMinLengthError": "{{name}} 數量不足，至少需要 {{length}} 個",
+    "widthError": "寬度格式錯誤",
+    "requiredSelectOne": "請選擇一筆資料",
+    "required": "此欄位為必填",
+    "integer": "需要為整數",
+    "nonNegative": "不可為負數",
+    "sureClear": "是否要清除所有資料?",
+    "unbindSuccess": "解除綁定成功",
+    "bindSuccess": "綁定成功",
+    "itemIdExist": "該{{text}}已經存在"
   },
   "g": {
     "edit": "編輯",
@@ -114,7 +127,9 @@
     "openNewWindow": "新視窗",
     "description": "描述",
     "useThis": "使用這個",
-    "optional": "可選"
+    "optional": "可選",
+    "bind": "綁定",
+    "unbind": "取消綁定"
   },
   "disk": {
     "disk": "硬碟代號",
@@ -160,6 +175,7 @@
     "home": "主題清單列表",
     "editTheme": "編輯主題",
     "copyTheme": "複製主題",
+    "copyThemeItem": "複製項目",
     "copyScrapy": "複製爬蟲",
     "copyDataset": "複製資料集",
     "copyGroupDataset": "複製資料集群組",
@@ -168,6 +184,7 @@
     "editApi": "編輯API",
     "pleaseSelect": "請選擇",
     "selectReplaceValueMap": "請選擇替換表",
+    "selectThemeLabelTable": "請選擇資料欄位表",
     "scrapyList": "爬蟲設定清單",
     "scrapyEdit": "編輯爬蟲",
     "datasetList": "資料集清單",
@@ -184,7 +201,8 @@
     "setting": "設定",
     "database": "資料庫",
     "databaseEdit": "資料庫設定",
-    "disk": "硬碟"
+    "disk": "硬碟",
+    "select": "請選擇{{text}}"
   },
   "home": {
     "createTheme": "創建主題",
@@ -192,6 +210,7 @@
     "shareTagList": "共享標籤清單"
   },
   "themeHeader": {
+    "headline": "主題設定",
     "name": "主題名稱",
     "version": "版本",
     "title": "標題",
@@ -201,16 +220,23 @@
     "table": "Table表格",
     "seq": "順序"
   },
+  "themeItem": {
+    "sourceItemId": "來源Id",
+    "targetItemId": "目標Id"
+  },
   "themeImage": {
+    "title": "圖片設定",
+    "imageId": "圖片表單ID",
     "imageKey": "圖片json key",
     "imageUrl": "自訂義來源",
     "imageUrlPlaceholder": "設定方法ex: http://localhost/images/${id}.jpg ${id}=>id是指data的id"
   },
   "themeLabel": {
     "title": "資料欄位設定",
+    "labelId": "資料欄位表單ID",
     "order": "順序",
     "byKey": "命名key值",
-    "labelName": "標籤名稱",
+    "label": "標籤名稱",
     "type": "標籤類型",
     "string": "字串",
     "stringSplit": "字串需分割",
@@ -223,8 +249,8 @@
     "isSearchButton": "是否為文字搜尋按鈕",
     "isSearchValue": "是否允許被搜尋",
     "isCopy": "是否為點選複製",
-    "splitByPh": "以哪個字串做分割",
-    "useSpacePh": "分格用字串",
+    "splitByPh": "以哪個字串做分割 ex: ',' '|'",
+    "useSpacePh": "區隔分割用的字串",
     "dateFormat": "日期格式",
     "dateFormatPh": "日期格式化,例如:yyyy-MM-dd",
     "isDefaultKey": "當為預設使用的key值,需使用唯一值且確保不為空值,改變時自定義的資料不會隨之改變或刪除",
@@ -232,23 +258,29 @@
     "maxWidth": "最大寬度",
     "width": "寬度",
     "autoComplete": "加入搜尋清單",
-    "visibleDatasetNameListPH": "是否顯示按鈕為空則全部顯示,對應資料集的名稱列表 ex: dataset1,dataset2"
+    "visibleDatasetNameListPH": "是否顯示為空則全部顯示,對應資料集設定的名稱列表 ex: dataset1,dataset2",
+    "useVisibleDataset": "使用資料集設定的名稱控制顯示欄位"
   },
   "themeDataset": {
     "title": "資料集設定",
     "order": "順序",
     "label": "名稱",
-    "labelDuplicate": "資料集設定名稱不能重複",
+    "duplicateByLabel": "資料集設定名稱不能重複",
     "isDefault": "是否預設使用",
     "dataset": "設定資料集",
+    "tableEmpty": "至少需要新增一筆",
     "datasetEmpty": "設定資料集不能為空",
     "selectDataset": "選擇變更資料集",
     "editData": "編輯資料",
     "refreshData": "刷新資料",
-    "quickRefresh": "快速刷新"
+    "quickRefresh": "快速刷新",
+    "datasetId": "資料集表單ID"
   },
   "themeCustom": {
     "title": "資料自定義功能",
+    "type": "標籤類型",
+    "label": "標籤名稱",
+    "customId": "資料自定義表單ID",
     "openUrl": "開啟自定義網址",
     "openUrlByKey": "開啟網址用key值",
     "writeNote": "編輯Note",
@@ -258,8 +290,8 @@
     "buttonIconFill": "按鈕圖案自定義填充顏色(要先確認是否可以填充)",
     "googleIconUrl": "icon來源",
     "writeIconName": "請填寫要顯示的Icon name",
-    "clickBeforeIcon": "點擊前顯示的icon name",
-    "clickAfterIcon": "點擊後顯示的icon name",
+    "buttonIconTrue": "點擊前顯示的icon name",
+    "buttonIconFalse": "點擊後顯示的icon name",
     "byKey": "命名key值",
     "fillIcon": "輸入可以填充會改變的icon name",
     "fillIconColor": "輸入填充的顏色僅限HEX",
@@ -275,8 +307,10 @@
     "deleteFilePH": "刪除檔案設定 ex: C:\\file\\${fileName} ${fileName}=>id是指data的fileName",
     "openFolder": "開啟資料夾",
     "openFolderPH": "開啟資料夾 ex: C:\\file\\${fileName} ${fileName}=>id是指data的fileName",
+    "filePathForMoveTo": "要移動的檔案路徑",
     "filePathForMoveToPH": "要移動的檔案路徑 ex: C:\\file\\${fileName} ${fileName}=>id是指data的fileName",
     "moveTo": "移動檔案",
+    "moveToDir": "移動到的資料夾",
     "moveToPH": "移動到的資料夾 ex: C:\\file\\${name} ${name}=>id是指data的name",
     "_self": "當前畫面開啟(_self)",
     "_blank": "新開視窗(_blank)",
@@ -285,18 +319,21 @@
     "visibleDatasetNameListPH": "是否顯示按鈕為空則全部顯示,對應資料集的名稱列表 ex: dataset1,dataset2"
   },
   "themeTopCustom": {
+    "type": "類型",
+    "topCustomId": "頂部自定義表單ID",
     "duplicateData": "顯示重複資料",
     "writeNote": "編輯Note",
     "openUrl": "開啟自定義網址",
     "byKey": "命名key值",
     "openUrlPH": "自定義開啟網址 ex: https://www.google.com/search",
-    "labelName": "標籤名稱",
+    "label": "標籤名稱",
     "apiConfig": "呼叫API",
     "showDuplicate": "顯示重複資料",
     "displayDuplicateButton": "是否顯示重複資料按鈕"
   },
   "otherSetting": {
     "title": "其他設定",
+    "settingId": "其他設定表單ID",
     "rowColor": "Table欄顏色設定",
     "listPageSize": "圖片清單每頁預設顯示數量",
     "headerButtons": "頭部按鈕設定",
@@ -313,9 +350,12 @@
   "themeTag": {
     "title": "標籤設定",
     "tag": "標籤名稱",
+    "tagId": "標籤設定表單ID",
     "tagDuplicate": "標籤設定標籤名稱不能重複",
     "selectTag": "選擇標籤",
-    "setTag": "標籤設定"
+    "setTag": "標籤設定",
+    "shareTag": "標籤名稱",
+    "shareTagIdEmpty": "標籤名稱需要選擇"
   },
   "apiConfig": {
     "apiName": "API名稱",

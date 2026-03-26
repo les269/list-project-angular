@@ -1,4 +1,4 @@
-import { Component, Injector } from '@angular/core';
+import { Component } from '@angular/core';
 
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 import { SpringExpressionLang } from '../../model';
@@ -13,26 +13,20 @@ import { MatButtonModule } from '@angular/material/button';
   selector: 'app-spring-expression-lang-table',
   standalone: true,
   imports: [
-    CdkDropList,
-    CdkDrag,
     MatTableModule,
     MatIconModule,
     TranslateModule,
     ReactiveFormsModule,
     FormsModule,
-    MatButtonModule
-],
+    MatButtonModule,
+  ],
   templateUrl: './spring-expression-lang-table.component.html',
 })
-export class SpringExpressionLangTableComponent extends GenericTableComponent<SpringExpressionLang> {
-  displayedColumns = ['seq', 'key', 'expression', 'other'];
-  override item: SpringExpressionLang = {
+export class SpringExpressionLangTableComponent {
+  displayedColumns = ['key', 'expression'];
+  item: SpringExpressionLang = {
     seq: 0,
     key: '',
     expression: '',
   };
-
-  constructor(injector: Injector) {
-    super(injector);
-  }
 }

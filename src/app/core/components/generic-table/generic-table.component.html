@@ -1,0 +1,186 @@
+<table
+  mat-table
+  [dataSource]="formArray().controls"
+  multiTemplateDataRows
+  cdkDropList
+  (cdkDropListDropped)="drop($event)"
+  [cdkDropListData]="formArray().controls">
+  <ng-container matColumnDef="seq">
+    <th mat-header-cell *matHeaderCellDef>
+      {{ 'g.order' | translate }}
+    </th>
+    <td mat-cell *matCellDef="let element">
+      <div
+        class="d-flex align-items-center user-select-none"
+        (mouseout)="dragDisabled.set(true)"
+        (mouseover)="dragDisabled.set(false)">
+        <mat-icon class="drag-cursor">reorder</mat-icon>
+        <span>{{ element.get('seq')?.value }}</span>
+      </div>
+    </td>
+  </ng-container>
+
+  @for (col of cols(); track col.key) {
+    <ng-container [matColumnDef]="col.key">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        [ngStyle]="{
+          width: getWidth(col['width']),
+          'max-width': getWidth(col['maxWidth']),
+          'min-width': getWidth(col['minWidth']),
+        }">
+        {{ col.label | translate }}
+      </th>
+      <td
+        mat-cell
+        *matCellDef="let element; let index = dataIndex"
+        [formGroup]="element">
+        @let colKey = element.get(col.key);
+        @switch (col.columnType) {
+          @case (eGenericColumnType.input) {
+            <input
+              class="form-control"
+              [formControlName]="col.key"
+              trimOnBlur
+              [class.is-invalid]="colKey?.invalid && colKey?.touched" />
+          }
+          @case (eGenericColumnType.textarea) {
+            <textarea
+              class="form-control"
+              [formControlName]="col.key"
+              [class.is-invalid]="
+                colKey?.invalid && colKey?.touched
+              "></textarea>
+          }
+          @case (eGenericColumnType.select) {
+            <select
+              [formControlName]="col.key"
+              class="form-control"
+              [class.is-invalid]="colKey?.invalid && colKey?.touched">
+              @for (option of col.data; track option) {
+                <option [value]="option[col.dataValue]">
+                  {{ col.dataLabel(option) | translate }}
+                </option>
+              }
+            </select>
+          }
+          @case (eGenericColumnType.checkbox) {
+            <mat-checkbox [formControlName]="col.key"></mat-checkbox>
+          }
+          @case (eGenericColumnType.radio) {
+            <mat-radio-button
+              [checked]="formArray().at(index).get(col.key)?.value === true"
+              (change)="onRadioChange(index, col.key)">
+            </mat-radio-button>
+          }
+          @case (eGenericColumnType.chipSelect) {
+            <app-chip-select-button
+              class="d-block pt-2"
+              [formControlName]="col.key"
+              [options]="col.data"
+              [valueKey]="col.dataValue"
+              [labelKey]="col.dataLabel"
+              [selectTable]="col.openDialog"
+              [required]="!!col.required"
+              [requiredMsg]="
+                (col.requiredMsg ? col.requiredMsg : 'msg.requiredSelectOne')
+                  | translate
+              ">
+            </app-chip-select-button>
+          }
+          @case (eGenericColumnType.chipSelectMultiple) {
+            <app-chip-select-multiple-button
+              class="d-block pt-2"
+              [formControlName]="col.key"
+              [options]="col.data"
+              [valueKey]="col.dataValue"
+              [labelKey]="col.dataLabel"
+              [selectTable]="col.openDialog"
+              [required]="!!col.required"
+              [requiredMsg]="
+                (col.requiredMsg ? col.requiredMsg : 'msg.requiredSelectOne')
+                  | translate
+              "></app-chip-select-multiple-button>
+          }
+          @case (eGenericColumnType.custom) {
+            @if (customColTmpls()) {
+              <ng-container
+                *ngTemplateOutlet="
+                  customColTmpls()![col.key];
+                  context: { $implicit: element, index, col }
+                ">
+              </ng-container>
+            }
+          }
+        }
+        @if (col.columnType !== eGenericColumnType.custom) {
+          @let ctrl = element.get(col.key);
+          @if (ctrl?.invalid && ctrl?.touched) {
+            <span class="error-msg">{{ requireError(col, ctrl) }}</span>
+          } @else if (ctrl.error) {
+            @for (item of ctrl.error; track $index) {
+              @if (element.hasError(item.name) && ctrl?.touched) {
+                <span class="error-msg">{{ item.msg | translate }}</span>
+              }
+            }
+          }
+        }
+      </td>
+    </ng-container>
+  }
+  <ng-container matColumnDef="other">
+    <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
+    <td mat-cell *matCellDef="let element; let i = dataIndex">
+      <div class="row flex-nowrap">
+        <button mat-icon-button (click)="onDelete(i)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </td>
+  </ng-container>
+  <ng-container matColumnDef="add">
+    <td
+      mat-footer-cell
+      *matFooterCellDef
+      [attr.colspan]="displayedColumnsWith().length">
+      <div class="row justify-content-center">
+        <button mat-button class="rounded" (click)="onAdd()">
+          <mat-icon>add</mat-icon>
+        </button>
+      </div>
+    </td>
+  </ng-container>
+  @if (expandedTmpl()) {
+    <ng-container matColumnDef="expandedDetail">
+      <td
+        mat-cell
+        *matCellDef="let element; let i = dataIndex"
+        [attr.colspan]="displayedColumnsWith().length">
+        <ng-container
+          *ngTemplateOutlet="
+            expandedTmpl();
+            context: { $implicit: element, index: i }
+          ">
+        </ng-container>
+      </td>
+    </ng-container>
+  }
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumnsWith()"></tr>
+  <tr
+    mat-row
+    *matRowDef="let row; columns: displayedColumnsWith()"
+    class="expand-row"
+    cdkDrag
+    [cdkDragData]="row"
+    [cdkDragDisabled]="dragDisabled()"
+    (cdkDragReleased)="dragDisabled.set(true)"></tr>
+  @if (expandedTmpl()) {
+    <tr
+      mat-row
+      class="h-auto"
+      *matRowDef="let row; columns: ['expandedDetail']"></tr>
+  }
+  <tr mat-footer-row *matFooterRowDef="['add']"></tr>
+</table>

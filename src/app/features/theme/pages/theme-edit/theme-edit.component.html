@@ -6,154 +6,142 @@
       (click)="onBack()">
       <mat-icon>arrow_back</mat-icon>
     </button>
-    <form #themeForm="ngForm">
-      <div class="mb-3">
-        <label for="name" class="form-label require">{{
-          'themeHeader.name' | translate
-        }}</label>
-        <input
-          type="text"
-          class="form-control"
-          [(ngModel)]="model.name"
-          id="name"
-          name="name"
-          #name="ngModel"
-          required
-          [disabled]="status() === themeEditMode.edit" />
-      </div>
-      <div class="mb-3">
-        <label for="version" class="form-label require">{{
-          'themeHeader.version' | translate
-        }}</label>
-        <input
-          type="text"
-          class="form-control"
-          [(ngModel)]="model.version"
-          id="version"
-          name="version"
-          required
-          [disabled]="status() === themeEditMode.edit" />
-      </div>
-      <div class="mb-3">
-        <label class="form-label" for="type">{{
-          'themeHeader.type' | translate
-        }}</label>
-        <select
-          class="form-control form-select"
-          [(ngModel)]="model.type"
-          name="type"
-          required
-          [disabled]="status() === themeEditMode.edit">
-          @for (type of eThemeHeaderType | keyvalue; track type) {
-            <option [ngValue]="type.key">
-              {{ 'themeHeader.' + type.key | translate }}
-            </option>
-          }
-        </select>
-      </div>
-      <div class="mb-3">
-        <label for="title" class="form-label require">{{
-          'themeHeader.title' | translate
-        }}</label>
-        <input
-          type="text"
-          class="form-control"
-          [(ngModel)]="model.title"
-          id="title"
-          name="title"
-          required />
-      </div>
-      <div class="mb-3">
-        <label for="seq" class="form-label">{{
-          'themeHeader.seq' | translate
-        }}</label>
-        <input
-          type="number"
-          class="form-control"
-          [(ngModel)]="model.seq"
-          id="seq"
-          name="seq" />
-      </div>
-
-      @if (model.type === eThemeHeaderType.imageList) {
-        <div>
-          <div class="form-check form-check-inline">
-            <input
-              class="form-check-input"
-              type="radio"
-              name="imageKeyRadio"
-              id="imageKeyRadio"
-              value="key"
-              [(ngModel)]="model.themeImage!.type" />
-            <label class="form-check-label" for="imageKeyRadio">
-              {{ 'themeImage.imageKey' | translate }}
-            </label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input
-              class="form-check-input"
-              type="radio"
-              name="imageUrlRadio"
-              id="imageUrlRadio"
-              value="url"
-              [(ngModel)]="model.themeImage!.type" />
-            <label class="form-check-label" for="imageUrlRadio">
-              {{ 'themeImage.imageUrl' | translate }}
-            </label>
-          </div>
-        </div>
-        @if (model.themeImage.type === 'key') {
-          <div class="mb-3">
-            <input
-              class="form-control"
-              [(ngModel)]="model.themeImage.imageKey"
-              name="imageKey" />
-          </div>
-        } @else if (model.themeImage.type === 'url') {
-          <div class="mb-3">
-            <input
-              class="form-control"
-              name="imageUrl"
-              [placeholder]="'themeImage.imageUrlPlaceholder' | translate"
-              [(ngModel)]="model.themeImage.imageUrl" />
-          </div>
-        }
-      }
-      <app-theme-label-table
-        [(list)]="model.themeLabelList"
-        [type]="model.type"></app-theme-label-table>
-      <app-theme-dataset-table
-        [(list)]="model.themeDatasetList"></app-theme-dataset-table>
-      <label class="h3">{{ 'themeCustom.title' | translate }}</label>
-      <app-theme-custom-table
-        [(list)]="model.themeCustomList"></app-theme-custom-table>
-      <app-theme-tag-table [(list)]="model.themeTagList"></app-theme-tag-table>
-      <app-theme-other-setting
-        [type]="model.type"
-        [(themeOtherSetting)]="
-          model.themeOtherSetting
-        "></app-theme-other-setting>
+    <form [formGroup]="form">
+      <label class="h3">{{ 'themeHeader.headline' | translate }}</label>
       <div>
-        @if (status() === themeEditMode.edit) {
-          <div class="my-4">
-            <button
-              type="submit"
-              class="btn btn-success w-100"
-              (click)="update(false, 'save')">
-              {{ 'g.save' | translate }}
-            </button>
-          </div>
-        }
-
-        <div class="my-4">
+        <div class="mb-3">
+          <label for="name" class="form-label require">{{
+            'themeHeader.name' | translate
+          }}</label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="name"
+            trimOnBlur
+            [class.is-invalid]="nameControl.invalid && nameControl.touched" />
+          <app-form-invalids
+            [control]="nameControl"
+            [formAlerts]="formAlertsObj().name"></app-form-invalids>
+        </div>
+        <div class="mb-3">
+          <label for="version" class="form-label require">{{
+            'themeHeader.version' | translate
+          }}</label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="version"
+            trimOnBlur
+            [class.is-invalid]="
+              versionControl.invalid && versionControl.touched
+            " />
+          @if (versionControl.hasError('required') && versionControl.touched) {
+            <div class="invalid-feedback d-block">
+              {{ 'msg.required' | translate }}
+            </div>
+          }
+          <app-form-invalids
+            [control]="versionControl"
+            [formAlerts]="formAlertsObj().version"></app-form-invalids>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="type">{{
+            'themeHeader.type' | translate
+          }}</label>
+          <select
+            class="form-control form-select"
+            formControlName="type"
+            [class.is-invalid]="typeControl.invalid && typeControl.touched">
+            @for (type of eThemeHeaderType | keyvalue; track type) {
+              <option [ngValue]="type.key">
+                {{ 'themeHeader.' + type.key | translate }}
+              </option>
+            }
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="title" class="form-label require">{{
+            'themeHeader.title' | translate
+          }}</label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="title"
+            trimOnBlur
+            [class.is-invalid]="titleControl.invalid && titleControl.touched"
+            required />
+          <app-form-invalids
+            [control]="titleControl"
+            [formAlerts]="formAlertsObj().title"></app-form-invalids>
+        </div>
+        <div class="mb-3">
+          <label for="seq" class="form-label require">{{
+            'themeHeader.seq' | translate
+          }}</label>
+          <input
+            type="number"
+            class="form-control"
+            formControlName="seq"
+            trimOnBlur
+            [class.is-invalid]="seqControl.invalid && seqControl.touched"
+            required />
+          <app-form-invalids
+            [control]="seqControl"
+            [formAlerts]="formAlertsObj().seq"></app-form-invalids>
+        </div>
+      </div>
+      <div class="d-flex gap-2 justify-content-end">
+        @if (isEditMode()) {
           <button
             type="submit"
-            class="btn btn-success w-100"
-            (click)="update(true, 'commit')">
-            {{ 'g.submit' | translate }}
+            class="btn btn-success"
+            (click)="update(false, 'save')"
+            [disabled]="!form.valid || isValidating()">
+            {{ isValidating() ? 'msg.saving' : ('g.save' | translate) }}
           </button>
-        </div>
+        }
+        <button
+          type="submit"
+          class="btn btn-success"
+          (click)="update(true, 'commit')"
+          [disabled]="!form.valid || isValidating()">
+          {{ isValidating() ? 'msg.submitting' : ('g.submit' | translate) }}
+        </button>
       </div>
+      @if (typeControl.value === eThemeHeaderType.imageList) {
+        <app-theme-image
+          [headerId]="currentHeaderId()"
+          [imageItem]="imageItem()"
+          [oldData]="imageRawData()"
+          [themeHeaderType]="themeHeaderType"></app-theme-image>
+      }
+      <app-theme-label-table
+        [headerId]="currentHeaderId()"
+        [labelItem]="labelItem()"
+        [oldData]="labelRawData()"
+        [themeHeaderType]="themeHeaderType"></app-theme-label-table>
+      <app-theme-dataset-table
+        [headerId]="currentHeaderId()"
+        [datasetItem]="datasetItem()"
+        [oldData]="datasetRawData()"></app-theme-dataset-table>
+      <app-theme-custom-table
+        [headerId]="currentHeaderId()"
+        [customItem]="customItem()"
+        [oldData]="customRawData()"></app-theme-custom-table>
+      <app-theme-tag-table
+        [headerId]="currentHeaderId()"
+        [tagItem]="tagItem()"
+        [oldData]="tagRawData()"></app-theme-tag-table>
+      <app-theme-other-setting
+        [headerId]="currentHeaderId()"
+        [otherSettingItem]="otherSettingItem()"
+        [themeHeaderType]="themeHeaderType"
+        [oldData]="otherSettingRawData()"></app-theme-other-setting>
+      <app-theme-top-custom-table
+        [headerId]="currentHeaderId()"
+        [topCustomItem]="topCustomItem()"
+        [oldData]="topCustomRawData()">
+      </app-theme-top-custom-table>
     </form>
   </div>
 </div>

@@ -1,0 +1,55 @@
+<label class="h3">{{ 'themeImage.title' | translate }}</label>
+<div class="card mb-3">
+  <div class="card-body">
+    <app-theme-item-manage
+      [headerId]="headerId()"
+      [type]="eThemeItemType.IMAGE"
+      [form]="form"
+      [defaultBinding]="defaultBinding()">
+    </app-theme-item-manage>
+    <div [formGroup]="group()">
+      <div class="form-check form-check-inline">
+        <input
+          class="form-check-input"
+          type="radio"
+          [value]="eThemeImageType.key"
+          id="imageKeyRadio"
+          formControlName="type" />
+        <label class="form-check-label" for="imageKeyRadio">
+          {{ 'themeImage.imageKey' | translate }}
+        </label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input
+          class="form-check-input"
+          type="radio"
+          [value]="eThemeImageType.url"
+          id="imageUrlRadio"
+          formControlName="type" />
+        <label class="form-check-label" for="imageUrlRadio">
+          {{ 'themeImage.imageUrl' | translate }}
+        </label>
+      </div>
+      @let type = group().get('type')?.value;
+      @if (type === eThemeImageType.key) {
+        <div class="mb-3">
+          <input
+            class="form-control"
+            formControlName="imageKey"
+            name="imageKey" />
+        </div>
+      } @else if (type === eThemeImageType.url) {
+        <div class="mb-3">
+          <input
+            class="form-control"
+            name="imageUrl"
+            [placeholder]="'themeImage.imageUrlPlaceholder' | translate"
+            formControlName="imageUrl" />
+        </div>
+      }
+      <app-form-alerts
+        [form]="group()"
+        [formAlerts]="formAlerts()"></app-form-alerts>
+    </div>
+  </div>
+</div>

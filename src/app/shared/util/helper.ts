@@ -9,6 +9,7 @@ import {
 } from 'rxjs';
 import { ThemeHeader, ThemeHeaderType } from '../../features/theme/models';
 import { Params } from '@angular/router';
+import { FormGroup } from '@angular/forms';
 
 //是否為空值
 export const isBlank = (s: any): boolean =>
@@ -144,6 +145,13 @@ export const isValidWidth = (value: string) => {
   return regex.test(value);
 };
 
+export const getWidth = (element?: string) => {
+  if (isNotBlank(element) && isValidWidth(element!)) {
+    return element;
+  }
+  return 'auto';
+};
+
 export const isNumber = (value: any) =>
   !isNaN(value) && !isNaN(parseFloat(value));
 
@@ -199,4 +207,18 @@ export function groupBy<T, K extends string | number>(
     },
     {} as Record<K, T[]>
   );
+}
+export function toKeyValueArray<T extends object>(obj: T) {
+  return Object.entries(obj).map(([key, value]) => ({
+    key,
+    value,
+  }));
+}
+export function trimControl(group: FormGroup, key: string) {
+  const control = group.get(key);
+  const value = control?.value;
+
+  if (typeof value === 'string') {
+    control?.setValue(value.trim());
+  }
 }

@@ -33,9 +33,6 @@ import { GroupDatasetApiTableComponent } from '../../components/group-dataset-ap
     CommonModule,
     MatIconModule,
     MatCheckboxModule,
-    GroupDatasetScrapyTableComponent,
-    GroupDatasetFieldTableComponent,
-    GroupDatasetApiTableComponent,
   ],
   templateUrl: './group-dataset-edit.component.html',
 })

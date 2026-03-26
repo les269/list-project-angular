@@ -1,30 +1,37 @@
 <h2 mat-dialog-title>{{ 'title.copyTheme' | translate }}</h2>
 <mat-dialog-content>
-  <form #f="ngForm">
+  <form [formGroup]="form">
     <div class="mb-3">
-      <label for="name" class="form-label">{{
+      <label for="name" class="form-label require">{{
         'themeHeader.name' | translate
       }}</label>
       <input
         type="text"
         class="form-control"
-        [(ngModel)]="target.name"
+        [formControl]="nameControl"
         id="name"
         name="name"
-        required
-        #name="ngModel" />
+        trimOnBlur
+        required />
+      <app-form-invalids
+        [control]="nameControl"
+        [formAlerts]="formAlertsObj().name"></app-form-invalids>
     </div>
     <div class="mb-3">
-      <label for="version" class="form-label">{{
+      <label for="version" class="form-label require">{{
         'themeHeader.version' | translate
       }}</label>
       <input
         type="text"
         class="form-control"
-        [(ngModel)]="target().version"
+        [formControl]="versionControl"
         id="version"
         name="version"
+        trimOnBlur
         required />
+      <app-form-invalids
+        [control]="versionControl"
+        [formAlerts]="formAlertsObj().version"></app-form-invalids>
     </div>
     <div class="mb-3">
       <label class="form-label" for="type">{{
@@ -32,9 +39,8 @@
       }}</label>
       <select
         class="form-control form-select"
-        [(ngModel)]="target().type"
-        name="type"
-        required>
+        [formControl]="typeControl"
+        name="type">
         @for (type of eThemeHeaderType | keyvalue; track type) {
           <option [ngValue]="type.key">
             {{ 'themeHeader.' + type.key | translate }}
@@ -43,16 +49,20 @@
       </select>
     </div>
     <div class="mb-3">
-      <label for="title" class="form-label">{{
+      <label for="title" class="form-label require">{{
         'themeHeader.title' | translate
       }}</label>
       <input
         type="text"
         class="form-control"
-        [(ngModel)]="target().title"
+        [formControl]="titleControl"
         id="title"
         name="title"
+        trimOnBlur
         required />
+      <app-form-invalids
+        [control]="titleControl"
+        [formAlerts]="formAlertsObj().title"></app-form-invalids>
     </div>
   </form>
 </mat-dialog-content>
@@ -64,7 +74,7 @@
     mat-button
     cdkFocusInitial
     (click)="ok()"
-    [disabled]="f.invalid || isProcessing">
+    [disabled]="form.invalid || isProcessing()">
     {{ 'g.ok' | translate }}
   </button>
 </mat-dialog-actions>

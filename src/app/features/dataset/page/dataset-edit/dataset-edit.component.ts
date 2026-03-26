@@ -33,7 +33,6 @@ import { ScrapyPagination } from '../../../scrapy/model';
     CommonModule,
     MatIconModule,
     MatCheckboxModule,
-    DatasetFieldTableComponent,
     MatChipsModule,
     CodeEditorModule,
   ],
