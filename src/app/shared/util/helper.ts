@@ -29,6 +29,8 @@ export const getHeaderId = (
   version: string,
   type: ThemeHeaderType
 ) => 'ThemeHeader:' + name + ',' + version + ',' + type;
+export const getHeaderIdByHeader = (header: ThemeHeader) =>
+  getHeaderId(header.name, header.version, header.type);
 export const parseHeaderId = (
   headerId: string
 ): { name: string; version: string; type: ThemeHeaderType } | null => {

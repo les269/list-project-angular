@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { forkJoin, map, Observable, of } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 import {
   CopyThemeRequest,
   ThemeCustomValue,
@@ -11,13 +11,11 @@ import {
   ThemeTopCustomValue,
   ThemeTopCustomValueResponse,
 } from '../models';
-import { Store } from '@ngrx/store';
-import { updateList } from '../../../shared/state/layout.actions';
+import { LayoutStore } from '../../../core/stores/layout.store';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-  http = inject(HttpClient);
-  store = inject(Store);
+  readonly http = inject(HttpClient);
 
   getAllTheme(): Observable<ThemeHeader[]> {
     return this.http.get<ThemeHeader[]>('/theme/all');
@@ -34,31 +32,6 @@ export class ThemeService {
           .sort((a, b) => (a.seq > b.seq ? 1 : -1)),
       }))
     );
-  }
-
-  updateAllTheme(): void {
-    this.getAllThemeMapType()
-      .pipe(
-        map(res => {
-          res.imageList = res.imageList.filter(
-            x => x.themeOtherSetting?.themeVisible
-          );
-          res.table = res.table.filter(x => x.themeOtherSetting?.themeVisible);
-          return res;
-        })
-      )
-      .subscribe(res => {
-        this.store.dispatch(updateList(res));
-      });
-  }
-
-  updateThemeStore(req: Record<ThemeHeaderType, ThemeHeader[]>): void {
-    const res = { ...req };
-    res.imageList = req.imageList.filter(
-      x => x.themeOtherSetting?.themeVisible
-    );
-    res.table = req.table.filter(x => x.themeOtherSetting?.themeVisible);
-    this.store.dispatch(updateList(res));
   }
 
   getByHeaderId(req: Partial<string>): Observable<ThemeHeader> {

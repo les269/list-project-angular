@@ -16,12 +16,10 @@ import { HeaderComponent } from './core/layout/header/header.component';
 import { SidenavComponent } from './core/layout/sidenav/sidenav.component';
 import { CommonModule } from '@angular/common';
 import { filter, map, mergeMap } from 'rxjs';
-import { Store } from '@ngrx/store';
-import { selectLayoutOpen } from './shared/state/layout.selectors';
-import { changeSidenav, updateTitle } from './shared/state/layout.actions';
 import { Title } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { LayoutStore } from './core/stores/layout.store';
 
 @Component({
   selector: 'app-root',
@@ -32,16 +30,14 @@ import { toSignal } from '@angular/core/rxjs-interop';
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
-  store = inject(Store);
-  titleService = inject(Title);
-  router = inject(Router);
-  activatedRoute = inject(ActivatedRoute);
-  translateService = inject(TranslateService);
+  readonly titleService = inject(Title);
+  readonly router = inject(Router);
+  readonly activatedRoute = inject(ActivatedRoute);
+  readonly translateService = inject(TranslateService);
+  readonly layoutStore = inject(LayoutStore);
 
   // Signals for state management
-  readonly openSidenav = toSignal(this.store.pipe(selectLayoutOpen()), {
-    initialValue: false,
-  });
+  readonly openSidenav = computed(() => this.layoutStore.openSidenav());
 
   private scrollY = 0;
   readonly isFirefox = signal(navigator.userAgent.includes('Firefox'));
@@ -96,12 +92,12 @@ export class AppComponent {
       if (title) {
         const translatedTitle = this.translateService.instant(title);
         this.titleService.setTitle(translatedTitle);
-        this.store.dispatch(updateTitle({ title: translatedTitle }));
+        this.layoutStore.updateTitle(translatedTitle);
       }
     });
   }
 
   closeSidenav() {
-    this.store.dispatch(changeSidenav());
+    this.layoutStore.toggleSidenav();
   }
 }

@@ -13,10 +13,10 @@
       track type.key;
       let isLast = $last
     ) {
-      @if (list.value()[type.value].length > 0) {
+      @if (list()[type.value].length > 0) {
         <div mat-subheader>{{ 'themeHeader.' + type.key | translate }}</div>
-        @for (item of list.value()[type.value]; track $index) {
-          @let themeVisible = item.themeOtherSetting.themeVisible;
+        @for (item of list()[type.value]; track $index) {
+          @let themeVisible = layoutStore.hasHidden(getHeaderIdByHeader(item));
           <mat-list-item>
             <div matListItemTitle>{{ item.title | translate }}</div>
             <button

@@ -21,7 +21,6 @@ export interface ThemeOtherSetting {
   showDuplicate: boolean;
   themeTopCustomList: ThemeTopCustom[];
   checkFileExist: string;
-  themeVisible: boolean;
   useQuickRefresh: boolean;
   quickRefresh: string;
   quickRefreshType: QuickRefreshType;

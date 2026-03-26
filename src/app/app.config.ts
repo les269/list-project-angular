@@ -8,7 +8,6 @@ import {
   withComponentInputBinding,
   withInMemoryScrolling,
 } from '@angular/router';
-import { provideAnimations } from '@angular/platform-browser/animations';
 
 import { routes } from './app.routes';
 import {
@@ -18,8 +17,6 @@ import {
 } from '@angular/common/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-import { provideStore, StoreModule } from '@ngrx/store';
-import { LayoutReducer } from './shared/state/layout.reducer';
 import { apiInterceptor } from './core/interceptors/api.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
@@ -38,7 +35,6 @@ export const appConfig: ApplicationConfig = {
       }),
       withComponentInputBinding()
     ),
-    provideAnimations(),
     provideHttpClient(withInterceptors([apiInterceptor, errorInterceptor])),
     importProvidersFrom(
       TranslateModule.forRoot({
@@ -52,6 +48,5 @@ export const appConfig: ApplicationConfig = {
       MatNativeDateModule,
       MatSnackBarModule
     ),
-    provideStore({ layoutState: LayoutReducer }),
   ],
 };

@@ -3,8 +3,6 @@ import { toSignal, rxResource } from '@angular/core/rxjs-interop';
 import { map, filter, tap } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { getHeaderId, isBlank, sortSeq } from '../../../shared/util/helper';
-import { Store } from '@ngrx/store';
-import { updateTitle } from '../../../shared/state/layout.actions';
 import { TranslateService } from '@ngx-translate/core';
 import {
   ThemeHeaderType,
@@ -19,14 +17,15 @@ import {
 } from '../../theme/models';
 import { ShareTagService } from '../../theme/services/share-tag.service';
 import { ThemeService } from '../../theme/services/theme.service';
+import { LayoutStore } from '../../../core/stores/layout.store';
 
 @Injectable()
 export class HeaderStore {
   readonly route = inject(ActivatedRoute);
   readonly themeService = inject(ThemeService);
   readonly shareTagService = inject(ShareTagService);
-  readonly store = inject(Store);
   readonly translateService = inject(TranslateService);
+  readonly layoutStore = inject(LayoutStore);
 
   readonly RANDOM_KEY = '__random';
 
@@ -52,7 +51,7 @@ export class HeaderStore {
         filter(res => !!res),
         tap(res => {
           document.title = res.title;
-          this.store.dispatch(updateTitle({ title: res.title }));
+          this.layoutStore.updateTitle(res.title);
         })
       ),
     defaultValue: {} as ThemeHeader,

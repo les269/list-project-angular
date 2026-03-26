@@ -1,21 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
-import { Store } from '@ngrx/store';
-import {
-  selectLayoutList,
-  selectLayoutOpen,
-} from '../../../shared/state/layout.selectors';
-import {
-  changeSidenav,
-  updateList,
-} from '../../../shared/state/layout.actions';
+import { Component, OnInit, computed, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { ThemeService } from '../../../features/theme/services/theme.service';
 import { ThemeHeader, ThemeHeaderType } from '../../../features/theme/models';
 import { routes } from '../../../app.routes';
 import { getQueryParamsByHeader } from '../../../shared/util/helper';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { LayoutStore } from '../../stores/layout.store';
+import { ThemeHiddenService } from '../../../features/theme/services';
 
 @Component({
   standalone: true,
@@ -24,32 +16,22 @@ import { toSignal } from '@angular/core/rxjs-interop';
   templateUrl: 'sidenav.component.html',
   styleUrls: ['sidenav.component.scss'],
 })
-export class SidenavComponent implements OnInit {
-  router = inject(Router);
-  store = inject(Store);
-  themeService = inject(ThemeService);
+export class SidenavComponent {
+  readonly router = inject(Router);
+  readonly themeService = inject(ThemeService);
+  readonly themeHiddenService = inject(ThemeHiddenService);
+  readonly layoutStore = inject(LayoutStore);
 
-  eThemeHeaderType = ThemeHeaderType;
-  openSidenav = toSignal(this.store.pipe(selectLayoutOpen()), {
-    initialValue: false,
-  });
-  routes = routes
+  readonly eThemeHeaderType = ThemeHeaderType;
+  readonly openSidenav = computed(() => this.layoutStore.openSidenav());
+  readonly list = computed(() => this.layoutStore.visibleList());
+  readonly routes = routes
     .filter(x => x.data && x.data['sidenav'])
     .map(x => ({ path: x.path, title: x.data!['title'] }));
-  list = toSignal(this.store.pipe(selectLayoutList()), {
-    initialValue: {
-      [ThemeHeaderType.imageList]: [],
-      [ThemeHeaderType.table]: [],
-    },
-  });
-  getQueryParamsByHeader = getQueryParamsByHeader;
-
-  ngOnInit() {
-    this.themeService.updateAllTheme();
-  }
+  readonly getQueryParamsByHeader = getQueryParamsByHeader;
 
   close() {
-    this.store.dispatch(changeSidenav());
+    this.layoutStore.toggleSidenav();
   }
 
   navigateList(item: ThemeHeader) {

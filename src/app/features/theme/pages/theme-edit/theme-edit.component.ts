@@ -51,6 +51,7 @@ import { FormInvalidsComponent } from '../../../../core/components/form-invalids
 import { FormAlert } from '../../../../core/model';
 import { ThemeItemService } from '../../services';
 import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
+import { LayoutStore } from '../../../../core/stores/layout.store';
 @Component({
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -87,6 +88,7 @@ export class ThemeEditComponent {
   readonly translateService = inject(TranslateService);
   readonly fb = inject(FormBuilder);
   readonly themeItemService = inject(ThemeItemService);
+  readonly layoutStore = inject(LayoutStore);
 
   // enums
   readonly eThemeEditMode = ThemeEditMode;
@@ -171,7 +173,6 @@ export class ThemeEditComponent {
         showDuplicate: false,
         themeTopCustomList: [],
         checkFileExist: '',
-        themeVisible: false,
         useQuickRefresh: false,
         quickRefresh: '',
         quickRefreshType: QuickRefreshType.params,
@@ -336,7 +337,7 @@ export class ThemeEditComponent {
           this.snackbarService.openI18N(
             type === 'commit' ? 'msg.commitSuccess' : 'msg.saveSuccess'
           );
-          this.themeService.updateAllTheme();
+          this.layoutStore.loadList();
           this.isValidating.set(false);
         },
         error: () => {

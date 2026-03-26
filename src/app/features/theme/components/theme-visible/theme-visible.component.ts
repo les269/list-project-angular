@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
 import { ThemeService } from '../../services/theme.service';
@@ -12,8 +12,13 @@ import {
 } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { Store } from '@ngrx/store';
 import { tap } from 'rxjs';
+import { ThemeHiddenService } from '../../services';
+import {
+  getHeaderId,
+  getHeaderIdByHeader,
+} from '../../../../shared/util/helper';
+import { LayoutStore } from '../../../../core/stores/layout.store';
 
 @Component({
   selector: 'app-theme-visible',
@@ -32,34 +37,18 @@ import { tap } from 'rxjs';
 })
 export class ThemeVisibleComponent {
   readonly dialogRef = inject(MatDialogRef<ThemeVisibleComponent>);
-  readonly store = inject(Store);
   readonly themeService = inject(ThemeService);
-  eThemeHeaderType = ThemeHeaderType;
-  list = rxResource({
-    stream: () =>
-      this.themeService
-        .getAllThemeMapType()
-        .pipe(tap(res => this.themeService.updateThemeStore(res))),
-    defaultValue: {
-      [ThemeHeaderType.imageList]: [],
-      [ThemeHeaderType.table]: [],
-    },
-  });
+  readonly themeHiddenService = inject(ThemeHiddenService);
+  readonly layoutStore = inject(LayoutStore);
+  readonly eThemeHeaderType = ThemeHeaderType;
+  readonly list = computed(() => this.layoutStore.list());
+  readonly getHeaderIdByHeader = getHeaderIdByHeader;
 
   onNoClick(): void {
     this.dialogRef.close();
   }
 
   changeVisible(item: ThemeHeader) {
-    const req = {
-      ...item,
-      themeOtherSetting: {
-        ...item.themeOtherSetting,
-        themeVisible: !item.themeOtherSetting?.themeVisible,
-      },
-    };
-    this.themeService.updateTheme(req).subscribe(() => {
-      this.list.reload();
-    });
+    this.layoutStore.changeHidden(getHeaderIdByHeader(item));
   }
 }

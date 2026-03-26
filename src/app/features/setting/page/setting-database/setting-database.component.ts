@@ -30,6 +30,7 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import { filter, switchMap, tap } from 'rxjs';
 import { ThemeService } from '../../../theme/services/theme.service';
+import { LayoutStore } from '../../../../core/stores/layout.store';
 
 @Component({
   selector: 'app-setting-database',
@@ -47,13 +48,14 @@ import { ThemeService } from '../../../theme/services/theme.service';
   styleUrl: './setting-database.component.scss',
 })
 export class SettingDatabaseComponent implements OnInit, AfterViewInit {
-  settingService = inject(SettingService);
-  databaseConfigService = inject(DatabaseConfigService);
-  route = inject(ActivatedRoute);
-  matDialog = inject(MatDialog);
-  messageBoxService = inject(MessageBoxService);
-  snackbarService = inject(SnackbarService);
-  themeService = inject(ThemeService);
+  readonly settingService = inject(SettingService);
+  readonly databaseConfigService = inject(DatabaseConfigService);
+  readonly route = inject(ActivatedRoute);
+  readonly matDialog = inject(MatDialog);
+  readonly messageBoxService = inject(MessageBoxService);
+  readonly snackbarService = inject(SnackbarService);
+  readonly themeService = inject(ThemeService);
+  readonly layoutStore = inject(LayoutStore);
 
   currentSetting = signal<Setting>({} as Setting);
   dataSource = new MatTableDataSource<DatabaseConfig>([]);
@@ -199,7 +201,7 @@ export class SettingDatabaseComponent implements OnInit, AfterViewInit {
         })
       )
       .subscribe(() => {
-        this.themeService.updateAllTheme();
+        this.layoutStore.loadList();
         this.getCurrentConfig();
         this.snackbarService.openI18N('msg.changeDatabaseSuccess');
       });
