@@ -59,21 +59,22 @@ import {
   templateUrl: './group-dataset-api-table.component.html',
 })
 export class GroupDatasetApiTableComponent {
-  readonly formArray = input.required<ToFormArray<DatasetField>>();
+  readonly formArray = input.required<ToFormArray<GroupDatasetApi>>();
+  readonly initData = input<GroupDatasetApi[]>();
   readonly fb = inject(FormBuilder);
-  displayedColumns = ['apiName', 'label'];
-  item: GroupDatasetApi = {
+  readonly displayedColumns = ['apiName', 'label'];
+  readonly item: GroupDatasetApi = {
     seq: 0,
     apiName: '',
     label: '',
   };
-  apiConfigService = inject(ApiConfigService);
-  apis = rxResource({
+  readonly apiConfigService = inject(ApiConfigService);
+  readonly apis = rxResource({
     stream: () => this.apiConfigService.getAll(),
     defaultValue: [],
   });
-  selectTableService = inject(SelectTableService);
-  apiNameColumn = computed(
+  readonly selectTableService = inject(SelectTableService);
+  readonly apiNameColumn = computed(
     () =>
       ({
         key: 'apiName',
@@ -86,7 +87,7 @@ export class GroupDatasetApiTableComponent {
           this.selectTableService.selectSingleApi(this.apis.value()),
       }) satisfies ChipSelectColumn<ApiConfig>
   );
-  cols: GenericTableColumn[] = [
+  readonly cols: GenericTableColumn[] = [
     this.apiNameColumn(),
     {
       key: 'label',

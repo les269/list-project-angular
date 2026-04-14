@@ -7,7 +7,6 @@ import { AbstractControl } from '@angular/forms';
   selector: 'app-form-alerts',
   imports: [MatIconModule],
   templateUrl: './form-alerts.component.html',
-  styleUrl: './form-alerts.component.scss',
 })
 export class FormAlertsComponent {
   readonly form = input.required<AbstractControl>();

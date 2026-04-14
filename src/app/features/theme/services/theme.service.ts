@@ -11,7 +11,6 @@ import {
   ThemeTopCustomValue,
   ThemeTopCustomValueResponse,
 } from '../models';
-import { LayoutStore } from '../../../core/stores/layout.store';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {

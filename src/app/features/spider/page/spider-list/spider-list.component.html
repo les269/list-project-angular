@@ -1,0 +1,56 @@
+<div class="col-md-10 offset-md-1 col-xs-12 mt-3">
+  <button type="button" class="btn btn-primary" (click)="onAdd()">
+    {{ 'spider.createSpider' | translate }}
+  </button>
+  <div class="card">
+    <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort>
+      <ng-container matColumnDef="spiderId">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ 'spider.spiderId' | translate }}
+        </th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.spiderId }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ 'g.description' | translate }}
+        </th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.description }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="primeKeySize">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ 'spider.primeKeySize' | translate }}
+        </th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.primeKeySize }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="updatedTime">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ 'g.updatedTime' | translate }}
+        </th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.updatedTime | date: 'yyyy-MM-dd HH:mm' }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="other">
+        <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
+        <td mat-cell *matCellDef="let element">
+          <div class="row flex-nowrap">
+            <button mat-icon-button (click)="onEdit(element)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button (click)="onDelete(element)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+</div>

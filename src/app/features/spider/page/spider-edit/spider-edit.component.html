@@ -1,0 +1,127 @@
+<div class="container d-flex">
+  <div class="col-md-10 offset-md-1 col-xs-12 mt-2">
+    <form [formGroup]="form">
+      <button
+        type="button"
+        mat-icon-button
+        class="d-flex align-content-center"
+        (click)="onBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+
+      <div class="form-group mb-2">
+        <label>{{ 'spider.spiderId' | translate }}</label>
+        <input class="form-control" formControlName="spiderId" />
+      </div>
+
+      <div class="form-group mb-2">
+        <label>{{ 'g.description' | translate }}</label>
+        <input class="form-control" formControlName="description" />
+      </div>
+
+      <div class="form-group mb-2">
+        <label>{{ 'spider.primeKeySize' | translate }}</label>
+        <input
+          class="form-control"
+          type="number"
+          formControlName="primeKeySize" />
+        <label class="form-text">{{
+          'spider.primeKeySizeDesc' | translate
+        }}</label>
+      </div>
+
+      <div class="my-3">
+        <mat-checkbox formControlName="isUrlBased">
+          {{ 'spider.isUrlBased' | translate }}
+        </mat-checkbox>
+      </div>
+      <div class="d-flex gap-2">
+        <button type="button" class="btn btn-success" (click)="update()">
+          {{ 'g.save' | translate }}
+        </button>
+        @if (isEditMode) {
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="onAddItemTab()">
+            {{ 'spider.createSpiderItem' | translate }}
+          </button>
+        }
+      </div>
+
+      @if (isCreateMode) {
+        <div class="form-text mb-2">
+          {{ 'spider.saveFirstHint' | translate }}
+        </div>
+      }
+
+      <mat-tab-group
+        cdkDropList
+        cdkDropListOrientation="horizontal"
+        [cdkDropListDisabled]="!canDragTabs"
+        [cdkDropListData]="items()"
+        cdkDropListElementContainer=".mat-mdc-tab-labels"
+        (cdkDropListDropped)="dropTab($event)"
+        [selectedIndex]="selected()"
+        (selectedIndexChange)="selected.set($event)">
+        @for (item of items(); track $index; let index = $index) {
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <span
+                cdkDrag
+                cdkDragRootElement=".mat-mdc-tab"
+                [cdkDragDisabled]="!canDragTabs"
+                class="me-1">
+                {{
+                  item.spiderItemId
+                    ? item.spiderItemId
+                    : '(' + ('g.unnamed' | translate) + ')'
+                }}
+              </span>
+            </ng-template>
+
+            <app-spider-item
+              [item]="item"
+              [index]="index"
+              [mappingRef]="mappingsRx"></app-spider-item>
+          </mat-tab>
+        }
+
+        <mat-tab [label]="'spider.testArea' | translate">
+          <div formGroupName="testData">
+            <div class="form-group mb-2">
+              <label>{{ 'spider.testPkArray' | translate }}</label>
+              <code-editor
+                formControlName="pkArrayJson"
+                [language]="'json'"
+                [indentWithTab]="true"
+                [languages]="languages" />
+              <label class="form-text w-100">{{
+                'spider.testPkArrayDesc' | translate
+              }}</label>
+              <button type="button" class="btn btn-primary">
+                {{ 'scrapy.test' | translate }}
+              </button>
+            </div>
+
+            <div class="form-group mb-2">
+              <div>{{ 'scrapy.testUrl' | translate }}</div>
+              <input class="form-control mb-2" formControlName="url" />
+              <button type="button" class="btn btn-primary">
+                {{ 'scrapy.test' | translate }}
+              </button>
+            </div>
+            <div class="form-group mb-2">
+              <label>{{ 'spider.testResultJson' | translate }}</label>
+              <code-editor
+                formControlName="resultJson"
+                [language]="'json'"
+                [indentWithTab]="true"
+                [languages]="languages" />
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </form>
+  </div>
+</div>

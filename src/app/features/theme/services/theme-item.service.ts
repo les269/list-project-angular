@@ -35,6 +35,14 @@ export class ThemeItemService {
     });
   }
 
+  getThemeItemByType<K extends ThemeItemType>(
+    type: K
+  ): Observable<ThemeItemMapping[K][]> {
+    return this.http.get<ThemeItemMapping[K][]>(`${this.prefix}/by-type`, {
+      params: { type },
+    });
+  }
+
   updateThemeItem(req: ThemeItem): Observable<void> {
     return this.http.post<void>(`${this.prefix}/update`, req);
   }

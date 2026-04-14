@@ -337,7 +337,7 @@ export class ThemeEditComponent {
           this.snackbarService.openI18N(
             type === 'commit' ? 'msg.commitSuccess' : 'msg.saveSuccess'
           );
-          this.layoutStore.loadList();
+          this.layoutStore.loadThemeList();
           this.isValidating.set(false);
         },
         error: () => {

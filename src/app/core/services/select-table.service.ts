@@ -2,7 +2,11 @@ import { inject, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ApiConfig } from '../../features/api-config/model';
 import { SelectTableDialog } from '../components/select-table/select-table.dialog';
-import { ScrapyConfig, ScrapyPagination } from '../../features/scrapy/model';
+import {
+  CookieListTO,
+  ScrapyConfig,
+  ScrapyPagination,
+} from '../../features/spider/model';
 import { formatDate } from '@angular/common';
 import {
   Dataset,
@@ -221,6 +225,21 @@ export class SelectTableService {
         createdTime: this.dateTransform,
         updatedTime: this.dateTransform,
       },
+    };
+    return this.openSelectDialog(data);
+  }
+
+  selectSingleCookieList(dataSource: CookieListTO[]) {
+    const data: BaseSelectTableData<CookieListTO> = {
+      displayedColumns: ['cookieId', 'description', 'updatedTime'],
+      labels: ['scrapy.cookieListId', 'g.description', 'g.updatedTime'],
+      dataSource,
+      selectType: 'single',
+      columnFormats: {
+        updatedTime: this.dateTransform,
+      },
+      enableFilter: true,
+      title: this.translateService.instant('title.selectCookieList'),
     };
     return this.openSelectDialog(data);
   }

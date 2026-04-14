@@ -19,7 +19,7 @@ import {
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { GroupDatasetService } from '../../service/group-dataset.service';
 import { GroupDatasetDataService } from '../../service/group-dataset-data.service';
-import { ScrapyService } from '../../../scrapy/services/scrapy.service';
+import { ScrapyService } from '../../../spider/services/scrapy.service';
 import { isBlank, isNotBlank } from '../../../../shared/util/helper';
 import { MatIconModule } from '@angular/material/icon';
 import { SelectTableService } from '../../../../core/services/select-table.service';
@@ -31,6 +31,7 @@ import {
 } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
+import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 
 export interface EditGroupDatasetDataType {
   groupName: string;
@@ -51,6 +52,7 @@ export interface EditGroupDatasetDataType {
     MatIconModule,
     MatChipsModule,
     MatFormFieldModule,
+    TrimOnBlurDirective,
   ],
   templateUrl: './edit-group-dataset-data.component.html',
 })

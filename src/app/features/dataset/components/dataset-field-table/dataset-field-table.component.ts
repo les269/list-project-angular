@@ -1,18 +1,6 @@
-import {
-  Component,
-  EventEmitter,
-  inject,
-  input,
-  Input,
-  Output,
-} from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  DatasetField,
-  DatasetFieldType,
-  GroupDatasetField,
-  GroupDatasetFieldType,
-} from '../../model';
+import { DatasetField, DatasetFieldType } from '../../model';
 import {
   ReactiveFormsModule,
   FormsModule,
@@ -24,12 +12,6 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { TranslateModule } from '@ngx-translate/core';
-import {
-  CdkDropList,
-  CdkDrag,
-  CdkDragDrop,
-  moveItemInArray,
-} from '@angular/cdk/drag-drop';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 import {
   GenericColumnType,
@@ -56,11 +38,14 @@ import { toKeyValueArray } from '../../../../shared/util/helper';
   templateUrl: './dataset-field-table.component.html',
 })
 export class DatasetFieldTableComponent {
-  readonly formArray = input.required<ToFormArray<DatasetField>>();
+  // inject
   readonly fb = inject(FormBuilder);
-  eDatasetFieldType = DatasetFieldType;
-  displayedColumns = ['key', 'label', 'type'];
-  typeColumn = {
+  // input
+  readonly formArray = input.required<ToFormArray<DatasetField>>();
+  readonly initData = input<DatasetField[]>();
+  readonly eDatasetFieldType = DatasetFieldType;
+  readonly displayedColumns = ['key', 'label', 'type'];
+  readonly typeColumn = {
     key: 'type',
     label: 'dataset.type',
     columnType: GenericColumnType.select,
@@ -68,7 +53,7 @@ export class DatasetFieldTableComponent {
     dataValue: 'key',
     dataLabel: item => `dataset.${item.key}`,
   } satisfies SelectColumn<{ key: string; value: string }>;
-  cols: GenericTableColumn[] = [
+  readonly cols: GenericTableColumn[] = [
     {
       key: 'key',
       label: 'dataset.fieldKey',

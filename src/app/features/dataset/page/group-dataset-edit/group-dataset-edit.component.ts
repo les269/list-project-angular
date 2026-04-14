@@ -1,24 +1,35 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { DatasetFieldTableComponent } from '../../components/dataset-field-table/dataset-field-table.component';
-import { GroupDatasetScrapyTableComponent } from '../../components/group-dataset-scrapy-table/group-dataset-scrapy-table.component';
+import { TranslateModule } from '@ngx-translate/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import {
   GroupDataset,
+  GroupDatasetApi,
   GroupDatasetConfigType,
+  GroupDatasetField,
   GroupDatasetFieldType,
+  GroupDatasetScrapy,
 } from '../../model';
 import { GroupDatasetService } from '../../service/group-dataset.service';
-import { debounceTime, EMPTY, filter, switchMap } from 'rxjs';
+import { EMPTY, filter, map, switchMap } from 'rxjs';
+import { isNotBlank } from '../../../../shared/util/helper';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
+import { DatasetEditMode } from '../../model';
+import { ControlsOf, ToFormArray } from '../../../../core/model/generic-table';
 import { GroupDatasetFieldTableComponent } from '../../components/group-dataset-field-table/group-dataset-field-table.component';
-import { isBlank, isNotBlank } from '../../../../shared/util/helper';
+import { GroupDatasetScrapyTableComponent } from '../../components/group-dataset-scrapy-table/group-dataset-scrapy-table.component';
 import { GroupDatasetApiTableComponent } from '../../components/group-dataset-api-table/group-dataset-api-table.component';
 
 @Component({
@@ -27,118 +38,165 @@ import { GroupDatasetApiTableComponent } from '../../components/group-dataset-ap
   imports: [
     MatTableModule,
     ReactiveFormsModule,
-    FormsModule,
     MatButtonModule,
     TranslateModule,
     CommonModule,
     MatIconModule,
     MatCheckboxModule,
+    GroupDatasetFieldTableComponent,
+    GroupDatasetScrapyTableComponent,
+    GroupDatasetApiTableComponent,
   ],
   templateUrl: './group-dataset-edit.component.html',
 })
-export class GroupDatasetEditComponent implements OnInit {
-  status: 'new' | 'edit' = 'new';
-  model: GroupDataset = {
-    groupName: '',
-    config: {
-      byKey: '',
-      groupDatasetScrapyList: [],
-      groupDatasetFieldList: [],
-      imageSaveFolder: '',
-      groupDatasetApiList: [],
-      type: GroupDatasetConfigType.scrapy,
+export class GroupDatasetEditComponent {
+  // inject
+  readonly router = inject(Router);
+  readonly route = inject(ActivatedRoute);
+  readonly groupDatasetService = inject(GroupDatasetService);
+  readonly snackbarService = inject(SnackbarService);
+  readonly fb = inject(FormBuilder);
+  // enum
+  readonly eGroupDatasetFieldType = GroupDatasetFieldType;
+  readonly eGroupDatasetConfigType = GroupDatasetConfigType;
+  // signals
+  readonly status = signal(DatasetEditMode.create);
+
+  readonly groupDatasetName = toSignal<string | null>(
+    this.route.paramMap.pipe(
+      map(params => params.get('name')),
+      filter(name => isNotBlank(name))
+    ),
+    { initialValue: undefined }
+  );
+  readonly groupDataset = rxResource({
+    params: () => this.groupDatasetName(),
+    stream: ({ params }) => {
+      if (params === null) return EMPTY;
+      return this.groupDatasetService.getGroupDataset(params);
     },
-  };
-  eGroupDatasetFieldType = GroupDatasetFieldType;
-  eGroupDatasetConfigType = GroupDatasetConfigType;
-  constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    private groupDatasetService: GroupDatasetService,
-    private snackbarService: SnackbarService
-  ) {}
-  ngOnInit(): void {
-    this.route.paramMap
-      .pipe(
-        debounceTime(100),
-        filter(params => isNotBlank(params.get('name'))),
-        switchMap(params =>
-          this.groupDatasetService.getGroupDataset(params.get('name')!)
-        )
-      )
-      .subscribe(res => {
-        if (res === null) {
-          this.router.navigate(['group-dataset-list']);
-          return;
-        }
-        this.model = res;
-        this.status = 'edit';
-      });
+    defaultValue: undefined,
+  });
+
+  // form
+  readonly form = this.fb.nonNullable.group({
+    groupName: ['', [Validators.required]],
+    config: this.fb.nonNullable.group({
+      byKey: ['', [Validators.required]],
+      imageSaveFolder: [''],
+      type: [GroupDatasetConfigType.scrapy],
+      groupDatasetFieldList: this.fb.array<
+        FormGroup<ControlsOf<GroupDatasetField>>
+      >([]),
+      groupDatasetScrapyList: this.fb.array<
+        FormGroup<ControlsOf<GroupDatasetScrapy>>
+      >([]),
+      groupDatasetApiList: this.fb.array<
+        FormGroup<ControlsOf<GroupDatasetApi>>
+      >([]),
+    }),
+  });
+
+  // computed for initial data display
+  readonly fieldListInitData = computed(() => {
+    const groupDataset = this.groupDataset.value();
+    return groupDataset?.config.groupDatasetFieldList ?? [];
+  });
+  readonly scrapyListInitData = computed(() => {
+    const groupDataset = this.groupDataset.value();
+    return groupDataset?.config.groupDatasetScrapyList ?? [];
+  });
+  readonly apiListInitData = computed(() => {
+    const groupDataset = this.groupDataset.value();
+    return groupDataset?.config.groupDatasetApiList ?? [];
+  });
+
+  get isCreateMode() {
+    return this.status() === DatasetEditMode.create;
+  }
+
+  get isEditMode() {
+    return this.status() === DatasetEditMode.edit;
+  }
+
+  get groupNameControl(): FormControl<string> {
+    return this.form.controls.groupName;
+  }
+
+  get configForm() {
+    return this.form.controls.config;
+  }
+
+  get byKeyControl(): FormControl<string> {
+    return this.configForm.controls.byKey;
+  }
+
+  get fieldListControl(): ToFormArray<GroupDatasetField> {
+    return this.configForm.controls.groupDatasetFieldList;
+  }
+
+  get scrapyListControl(): ToFormArray<GroupDatasetScrapy> {
+    return this.configForm.controls.groupDatasetScrapyList;
+  }
+
+  get apiListControl(): ToFormArray<GroupDatasetApi> {
+    return this.configForm.controls.groupDatasetApiList;
+  }
+
+  constructor() {
+    effect(() => {
+      const name = this.groupDatasetName();
+      const groupDataset = this.groupDataset.value();
+      if (name === undefined || groupDataset === undefined) return;
+
+      if (groupDataset === null) {
+        this.router.navigate(['group-dataset-list']);
+        return;
+      }
+
+      this.patchForm(groupDataset);
+      this.status.set(DatasetEditMode.edit);
+      this.form.controls.groupName.disable({ emitEvent: false });
+    });
+  }
+
+  private patchForm(groupDataset: GroupDataset) {
+    const {
+      groupDatasetFieldList,
+      groupDatasetScrapyList,
+      groupDatasetApiList,
+      ...configValues
+    } = groupDataset.config;
+    this.form.patchValue(
+      { groupName: groupDataset.groupName, config: configValues },
+      { emitEvent: false }
+    );
   }
 
   onBack() {
     this.router.navigate(['group-dataset-list']);
   }
-  validationModel(): boolean {
-    if (isBlank(this.model.groupName)) {
-      this.snackbarService.isBlankMessage('dataset.groupName');
-      return false;
-    }
-    if (isBlank(this.model.config.byKey)) {
-      this.snackbarService.isBlankMessage('dataset.byKey');
-      return false;
-    }
-    for (const field of this.model.config.groupDatasetFieldList) {
-      if (isBlank(field.key)) {
-        this.snackbarService.isBlankMessage('dataset.fieldKey');
-        return false;
-      }
-      if (isBlank(field.label)) {
-        this.snackbarService.isBlankMessage('dataset.fieldLabel');
-        return false;
-      }
-    }
 
-    for (const scrapy of this.model.config.groupDatasetScrapyList) {
-      if (isBlank(scrapy.name)) {
-        this.snackbarService.isBlankMessage('dataset.scrapyName');
-        return false;
-      }
-      if (isBlank(scrapy.label)) {
-        this.snackbarService.isBlankMessage('dataset.scrapyLabel');
-        return false;
-      }
-    }
-
-    for (const api of this.model.config.groupDatasetApiList) {
-      if (isBlank(api.apiName)) {
-        this.snackbarService.isBlankMessage('dataset.apiName');
-        return false;
-      }
-      if (isBlank(api.label)) {
-        this.snackbarService.isBlankMessage('dataset.apiLabel');
-        return false;
-      }
-    }
-    return true;
-  }
   update(back: boolean, type: 'save' | 'commit') {
-    if (!this.validationModel()) {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
+    const data = this.form.getRawValue() as GroupDataset;
+
     this.groupDatasetService
-      .existGroupDataset(this.model.groupName)
+      .existGroupDataset(data.groupName)
       .pipe(
         switchMap(exist => {
-          if (this.status === 'new' && exist) {
+          if (this.isCreateMode && exist) {
             this.snackbarService.openI18N('msg.datasetExist');
             return EMPTY;
           }
-          if (this.status === 'edit' && !exist) {
+          if (this.isEditMode && !exist) {
             this.snackbarService.openI18N('msg.datasetNotExist');
             return EMPTY;
           }
-          return this.groupDatasetService.updateGroupDataset(this.model);
+          return this.groupDatasetService.updateGroupDataset(data);
         })
       )
       .subscribe(() => {

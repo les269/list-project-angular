@@ -1,0 +1,209 @@
+<div class="container d-flex">
+  <div class="col-md-10 offset-md-1 col-xs-12 mt-2">
+    <form [formGroup]="form">
+      <button
+        type="button"
+        mat-icon-button
+        class="d-flex align-content-center"
+        (click)="onBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="form-group mb-2">
+        <label>{{ 'scrapy.name' | translate }}</label>
+        <input class="form-control" formControlName="name" />
+      </div>
+      <div class="form-group mb-2">
+        <label>{{ 'scrapy.paramSize' | translate }}</label>
+        <input class="form-control" type="number" formControlName="paramSize" />
+        <label class="form-text">{{
+          'scrapy.paramSizeDesc' | translate
+        }}</label>
+      </div>
+      <button type="button" class="btn btn-primary" (click)="onAddData()">
+        {{ 'scrapy.createScrapy' | translate }}
+      </button>
+      <mat-tab-group
+        [selectedIndex]="selected()"
+        (selectedIndexChange)="selected.set($event)">
+        @for (
+          dataGroup of dataControl.controls;
+          track $index;
+          let index = $index
+        ) {
+          <mat-tab>
+            <ng-template mat-tab-label>
+              @if (dataControl.length !== 1 && index !== 0) {
+                <button
+                  mat-icon-button
+                  (click)="$event.stopPropagation(); moveTab(index, 'left')">
+                  <mat-icon>arrow_left</mat-icon>
+                </button>
+              }
+              {{
+                dataGroup.controls.name.value
+                  ? dataGroup.controls.name.value
+                  : '(' + ('g.unnamed' | translate) + ')'
+              }}
+              @if (
+                dataControl.length !== 1 && index !== dataControl.length - 1
+              ) {
+                <button
+                  mat-icon-button
+                  (click)="$event.stopPropagation(); moveTab(index, 'right')">
+                  <mat-icon>arrow_right</mat-icon>
+                </button>
+              }
+            </ng-template>
+            <button
+              type="button"
+              class="btn btn-primary mt-2"
+              (click)="onDeleteData(index)">
+              {{ 'scrapy.deleteScrapy' | translate }}
+            </button>
+
+            <div class="input-group my-2">
+              <label class="input-group-text">{{
+                'scrapy.tabName' | translate
+              }}</label>
+              <input
+                class="form-control"
+                [formControl]="dataGroup.controls.name" />
+            </div>
+            <div class="input-group my-2">
+              <label class="input-group-text">{{
+                'scrapy.paramReplace' | translate
+              }}</label>
+              <input
+                class="form-control"
+                [matTooltip]="'scrapy.replaceRegular' | translate"
+                [placeholder]="'scrapy.replaceRegular' | translate"
+                [formControl]="dataGroup.controls.replaceRegular" />
+              <input
+                class="form-control"
+                [matTooltip]="'scrapy.replaceRegularTo' | translate"
+                [placeholder]="'scrapy.replaceRegularTo' | translate"
+                [formControl]="dataGroup.controls.replaceRegularTo" />
+            </div>
+            <div class="input-group my-2">
+              <label class="input-group-text">{{
+                'scrapy.url' | translate
+              }}</label>
+              <input
+                class="form-control"
+                [formControl]="dataGroup.controls.url"
+                [placeholder]="'scrapy.urlPH' | translate" />
+            </div>
+            <label class="h6">{{ 'scrapy.cookie' | translate }}</label>
+            <app-cookie-table
+              [formArray]="dataGroup.controls.cookie"
+              [initData]="dataInit()[index]?.cookie"></app-cookie-table>
+            <div class="my-2">
+              <label class="form-label" for="type">{{
+                'scrapy.scrapyPageType' | translate
+              }}</label>
+              <select
+                class="form-control form-select"
+                [formControl]="dataGroup.controls.scrapyPageType">
+                @for (type of eScrapyPageType | keyvalue; track type) {
+                  <option [ngValue]="type.key">
+                    {{ 'scrapy.' + type.key | translate }}
+                  </option>
+                }
+              </select>
+              @if (dataGroup.controls.scrapyPageType.value === 'redirect') {
+                <label class="form-text">{{
+                  'scrapy.redirectRemind' | translate
+                }}</label>
+              }
+            </div>
+            <label class="form-text"
+              ><div [innerHTML]="'scrapy.cssSelectRemind' | translate"></div
+            ></label>
+            <app-css-select-table
+              [formArray]="dataGroup.controls.cssSelectList"
+              [initData]="
+                dataInit()[index]?.cssSelectList
+              "></app-css-select-table>
+            <div class="form-group mb-2">
+              <label>{{ 'scrapy.testHtml' | translate }}</label>
+              <code-editor
+                [style.height]="'400px'"
+                [formControl]="dataGroup.controls.html"
+                [language]="'html'"
+                [indentWithTab]="true"
+                [languages]="languages" />
+              <button
+                type="button"
+                class="btn btn-primary"
+                (click)="onTestParseHtml(index)">
+                {{ 'scrapy.test' | translate }}
+              </button>
+            </div>
+            <label>{{ 'scrapy.testResult' | translate }}</label>
+            <code-editor
+              [ngModel]="testResult()"
+              [ngModelOptions]="{ standalone: true }"
+              [language]="'json'"
+              [indentWithTab]="true"
+              [languages]="languages" />
+          </mat-tab>
+        }
+        <mat-tab [label]="'scrapy.testArea' | translate">
+          <div class="form-group mb-2">
+            <div>{{ 'scrapy.testJson' | translate }}</div>
+            <label class="form-text">{{
+              'scrapy.useJsonRemind' | translate
+            }}</label>
+            <code-editor
+              formControlName="testJson"
+              [language]="'json'"
+              [indentWithTab]="true"
+              [languages]="languages" />
+            <button
+              type="button"
+              class="btn btn-primary"
+              (click)="onTestJson()">
+              {{ 'scrapy.test' | translate }}
+            </button>
+          </div>
+          <div class="form-group mb-2">
+            <div>{{ 'scrapy.testUrl' | translate }}</div>
+            <label class="form-text">{{
+              'scrapy.useUrlRemind' | translate
+            }}</label>
+            <input class="form-control" formControlName="testUrl" />
+            <button type="button" class="btn btn-primary" (click)="onTestUrl()">
+              {{ 'scrapy.test' | translate }}
+            </button>
+          </div>
+          <label>{{ 'scrapy.testResult' | translate }}</label>
+          <code-editor
+            [ngModel]="testResult()"
+            [ngModelOptions]="{ standalone: true }"
+            [language]="'json'"
+            [indentWithTab]="true"
+            [languages]="languages" />
+        </mat-tab>
+      </mat-tab-group>
+      @if (isEditMode) {
+        <div class="my-4">
+          <button
+            type="button"
+            class="btn btn-success w-100"
+            (click)="update(false, 'save')">
+            {{ 'g.save' | translate }}
+          </button>
+        </div>
+      }
+
+      <div class="my-4">
+        <button
+          type="button"
+          class="btn btn-success w-100"
+          (click)="update(true, 'commit')">
+          {{ 'g.submit' | translate }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

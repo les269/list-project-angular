@@ -44,24 +44,17 @@ import { toKeyValueArray } from '../../../../shared/util/helper';
 })
 export class GroupDatasetFieldTableComponent {
   readonly formArray = input.required<ToFormArray<GroupDatasetField>>();
+  readonly initData = input<GroupDatasetField[]>();
   readonly fb = inject(FormBuilder);
-  eGroupDatasetFieldType = GroupDatasetFieldType;
-  displayedColumns = ['key', 'label', 'type'];
-  replaceValueMapService = inject(ReplaceValueMapService);
-  nameList = rxResource({
+  readonly eGroupDatasetFieldType = GroupDatasetFieldType;
+  readonly displayedColumns = ['key', 'label', 'type'];
+  readonly replaceValueMapService = inject(ReplaceValueMapService);
+  readonly nameList = rxResource({
     stream: () => this.replaceValueMapService.getNameList(),
     defaultValue: [],
   });
-  selectTableService = inject(SelectTableService);
-  typeColumn = {
-    key: 'type',
-    label: 'dataset.type',
-    columnType: GenericColumnType.select,
-    data: toKeyValueArray(this.eGroupDatasetFieldType),
-    dataValue: 'key',
-    dataLabel: item => `dataset.${item.key}`,
-  } satisfies SelectColumn<{ key: string; value: string }>;
-  cols: GenericTableColumn[] = [
+  readonly selectTableService = inject(SelectTableService);
+  readonly cols: GenericTableColumn[] = [
     {
       key: 'key',
       label: 'dataset.fieldKey',
@@ -72,7 +65,14 @@ export class GroupDatasetFieldTableComponent {
       label: 'dataset.fieldLabel',
       columnType: GenericColumnType.input,
     },
-    this.typeColumn,
+    {
+      key: 'type',
+      label: 'dataset.type',
+      columnType: GenericColumnType.select,
+      data: toKeyValueArray(this.eGroupDatasetFieldType),
+      dataValue: 'key',
+      dataLabel: item => `dataset.${item.key}`,
+    } satisfies SelectColumn<{ key: string; value: string }>,
   ];
 
   createGroup() {

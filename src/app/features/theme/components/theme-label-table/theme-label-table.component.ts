@@ -49,6 +49,7 @@ import { ChipInputComponent } from '../../../../core/components/chip-input/chip-
 import { FormAlertsComponent } from '../../../../core/components/form-alerts/form-alerts.component';
 import { FormAlert } from '../../../../core/model';
 import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage.component';
+import { LayoutStore } from '../../../../core/stores/layout.store';
 
 @Component({
   standalone: true,
@@ -74,6 +75,7 @@ export class ThemeLabelTableComponent implements OnInit {
   // inject
   readonly fb = inject(FormBuilder);
   readonly translateService = inject(TranslateService);
+  readonly layoutStore = inject(LayoutStore);
 
   // input
   readonly headerId = input<string>();

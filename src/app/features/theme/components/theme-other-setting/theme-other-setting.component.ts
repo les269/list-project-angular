@@ -26,7 +26,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatChipsModule } from '@angular/material/chips';
 import { ChipInputComponent } from '../../../../core/components/chip-input/chip-input.component';
 import { SelectTableService } from '../../../../core/services/select-table.service';
-import { ScrapyService } from '../../../scrapy/services/scrapy.service';
+import { ScrapyService } from '../../../spider/services/scrapy.service';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { MatRadioModule } from '@angular/material/radio';
 import { QuickRefreshType } from '../../../dataset/model';

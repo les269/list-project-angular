@@ -18,7 +18,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule } from '@ngx-translate/core';
 import { GroupDatasetScrapy } from '../../model';
 import { MatChipsModule } from '@angular/material/chips';
-import { ScrapyService } from '../../../scrapy/services/scrapy.service';
+import { ScrapyService } from '../../../spider/services/scrapy.service';
 import { CdkDropList, CdkDrag } from '@angular/cdk/drag-drop';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 import { rxResource } from '@angular/core/rxjs-interop';
@@ -29,7 +29,7 @@ import {
   GenericTableColumn,
   ToFormArray,
 } from '../../../../core/model/generic-table';
-import { ScrapyConfig } from '../../../scrapy/model';
+import { ScrapyConfig } from '../../../spider/model';
 
 @Component({
   selector: 'app-group-dataset-scrapy-table',
@@ -49,6 +49,7 @@ import { ScrapyConfig } from '../../../scrapy/model';
 })
 export class GroupDatasetScrapyTableComponent {
   formArray = input.required<ToFormArray<GroupDatasetScrapy>>();
+  initData = input<GroupDatasetScrapy[]>();
   displayedColumns = [
     'name',
     'label',

@@ -46,6 +46,7 @@ import { isDuplicate } from '../../../../shared/util/helper';
 import { FormAlertsComponent } from '../../../../core/components/form-alerts/form-alerts.component';
 import { FormAlert } from '../../../../core/model';
 import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage.component';
+import { LayoutStore } from '../../../../core/stores/layout.store';
 
 @Component({
   standalone: true,
@@ -73,6 +74,7 @@ export class ThemeDatasetTableComponent implements OnInit {
   readonly datasetService = inject(DatasetService);
   readonly translateService = inject(TranslateService);
   readonly fb = inject(FormBuilder);
+  readonly layoutStore = inject(LayoutStore);
   // constant
   readonly displayedColumns: string[] = ['datasetList', 'label'];
   // input

@@ -40,6 +40,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { ChipSelectButtonComponent } from '../chip-select-button/chip-select-button.component';
 import { ChipSelectMultipleButtonComponent } from '../chip-select-multiple-button/chip-select-multiple-button.component';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { getWidth, trimControl } from '../../../shared/util/helper';
 import { TrimOnBlurDirective } from '../../../shared/util/util.directive';
 
@@ -59,22 +60,22 @@ import { TrimOnBlurDirective } from '../../../shared/util/util.directive';
     ChipSelectButtonComponent,
     ChipSelectMultipleButtonComponent,
     MatRadioModule,
+    MatCheckboxModule,
     TrimOnBlurDirective,
   ],
   templateUrl: './generic-table.component.html',
   styleUrl: './generic-table.component.scss',
 })
 export class GenericTableComponent {
+  // inject
   readonly fb = inject(FormBuilder);
   readonly translate = inject(TranslateService);
-
-  readonly initData = input<any[]>();
-  readonly refreshTrigger = input<number>();
+  // input
   readonly formArray = input.required<ToFormArray<any>>();
   readonly cols = input.required<GenericTableColumn[]>();
   readonly displayedColumns = input.required<string[]>();
   readonly createGroup = input.required<() => FormGroup>();
-  // templateRef
+  readonly initData = input<any[]>();
   readonly customColTmpls = input<Record<string, TemplateRef<any>>>();
   readonly expandedTmpl = input<TemplateRef<any>>();
 

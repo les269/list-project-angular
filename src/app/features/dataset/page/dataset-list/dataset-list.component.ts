@@ -218,7 +218,7 @@ export class DatasetListComponent implements OnInit, AfterViewInit {
       queryParams['asc'] = this.ascSignal();
     }
 
-    if (this.filterValue() !== null || this.filterValue() !== undefined) {
+    if (this.filterValue() !== null && this.filterValue() !== undefined) {
       queryParams['filter'] = this.filterValue();
     }
 

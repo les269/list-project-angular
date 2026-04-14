@@ -201,7 +201,7 @@ export class SettingDatabaseComponent implements OnInit, AfterViewInit {
         })
       )
       .subscribe(() => {
-        this.layoutStore.loadList();
+        this.layoutStore.loadThemeList();
         this.getCurrentConfig();
         this.snackbarService.openI18N('msg.changeDatabaseSuccess');
       });

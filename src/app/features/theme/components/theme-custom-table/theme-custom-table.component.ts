@@ -311,6 +311,9 @@ export class ThemeCustomTableComponent implements OnInit {
         setRequired('deleteFile', true);
         break;
       case ThemeCustomType.buttonIconFill:
+        setRequired('buttonIconFill', true);
+        break;
+      case ThemeCustomType.buttonIconBoolean:
         setRequired('buttonIconTrue', true);
         setRequired('buttonIconFalse', true);
         break;

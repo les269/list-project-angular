@@ -28,7 +28,7 @@ export interface ThemeItemSummary {
   updatedTime?: Date;
 }
 
-export interface ThemeMapTO {
+export interface ThemeItemMap {
   itemId: string;
   headerId: string;
   type: ThemeItemType;

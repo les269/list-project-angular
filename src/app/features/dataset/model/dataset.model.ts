@@ -1,3 +1,8 @@
+export enum DatasetEditMode {
+  create = 'create',
+  edit = 'edit',
+}
+
 export interface Dataset {
   name: string;
   config: DatasetConfig;

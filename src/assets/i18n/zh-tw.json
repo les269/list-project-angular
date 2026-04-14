@@ -14,14 +14,18 @@
     "labelTableInUse": "目前該資料欄位表使用中，需先解除綁定後才可刪除",
     "scrapyExist": "該名稱已經存在",
     "scrapyNotExist": "該名稱不存在",
+    "spiderExist": "該爬蟲已經存在",
+    "spiderNotExist": "該爬蟲不存在",
     "sureDeleteTheme": "是否要刪除該主題?",
     "sureDeleteApi": "是否要刪除該API?",
     "sureDeleteMap": "是否要刪除該替換文字清單?",
     "sureDeleteScrapy": "是否要刪除該爬蟲?",
+    "sureDeleteSpider": "是否要刪除該爬蟲設定?",
     "sureDeleteDataset": "是否要刪除該資料集?",
     "sureDeleteImage": "是否要刪除該圖片'{{name}}'?",
     "sureDeleteDatasetData": "是否要刪除該資料'{{name}}'?",
     "sureDeleteLabelTable": "是否要刪除該資料欄位表?",
+    "sureDeleteCookieList": "是否要刪除該 Cookie 清單?",
     "sureUnbindLabelTable": "是否要取消綁定該資料欄位表?",
     "copyText": "以複製至剪貼簿: {{text}}",
     "duplicateColumn": "{{text}} 不可以有重複欄位",
@@ -69,7 +73,12 @@
     "sureClear": "是否要清除所有資料?",
     "unbindSuccess": "解除綁定成功",
     "bindSuccess": "綁定成功",
-    "itemIdExist": "該{{text}}已經存在"
+    "itemIdExist": "該{{text}}已經存在",
+    "cookieListInUse": "目前該 Cookie 清單使用中，需先解除綁定後才可刪除",
+    "spiderPkArrayError": "測試主鍵資料格式錯誤，請輸入字串陣列 JSON",
+    "spiderSaveFirst": "請先保存爬蟲設定，再建立爬蟲項目",
+    "spiderItemRequired": "請輸入爬蟲項目 ID",
+    "spiderItemSaveFirst": "請先保存項目，再進行綁定"
   },
   "g": {
     "edit": "編輯",
@@ -197,12 +206,15 @@
     "importExport": "匯入匯出",
     "scrapyPaginationList": "爬蟲處理分頁清單",
     "scrapyPaginationEdit": "爬蟲處理分頁編輯",
+    "spiderList": "爬蟲設定清單",
+    "spiderEdit": "編輯爬蟲設定",
     "redirectData": "跳轉網址資訊",
     "setting": "設定",
     "database": "資料庫",
     "databaseEdit": "資料庫設定",
     "disk": "硬碟",
-    "select": "請選擇{{text}}"
+    "select": "請選擇{{text}}",
+    "selectCookieList": "請選擇 Cookie 清單"
   },
   "home": {
     "createTheme": "創建主題",
@@ -219,6 +231,22 @@
     "list": "清單",
     "table": "Table表格",
     "seq": "順序"
+  },
+  "spider": {
+    "createSpider": "新增爬蟲設定",
+    "createSpiderItem": "建立爬蟲項目",
+    "spiderId": "爬蟲ID",
+    "spiderItemId": "爬蟲項目ID",
+    "item": "項目",
+    "testArea": "測試區",
+    "saveFirstHint": "需先保存設定讓爬蟲ID固定後，才能建立並綁定項目",
+    "primeKeySize": "主鍵數量",
+    "primeKeySizeDesc": "非網址型爬蟲至少需要 1 個主鍵；網址型可設為 0",
+    "isUrlBased": "僅使用網址，不使用主鍵",
+    "testPkArray": "測試主鍵資料",
+    "testPkArrayDesc": "請輸入字串陣列 JSON，例如 [\"a\", \"b\"]",
+    "testUrl": "測試網址",
+    "testResultJson": "測試結果 JSON"
   },
   "themeItem": {
     "sourceItemId": "來源Id",
@@ -371,6 +399,7 @@
   },
   "scrapy": {
     "name": "名稱",
+    "cookieListId": "Cookie 清單 ID",
     "paramSize": "參數數量",
     "paramSizeDesc": "設定編輯資料使用爬蟲所需要的輸入欄位數量, 最少為1。",
     "tabName": "Tab名稱",

@@ -7,10 +7,7 @@ import { ThemeService } from '../../services/theme.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
-import {
-  getQueryParamsByHeader,
-  isNotBlank,
-} from '../../../../shared/util/helper';
+import { isNotBlank } from '../../../../shared/util/helper';
 import { ThemeVisibleComponent } from '../../components/theme-visible/theme-visible.component';
 import { ShareTagListComponent } from '../../components/share-tag-list/share-tag-list.component';
 import { CopyThemeComponent } from '../../components/copy-theme/copy-theme.component';
@@ -53,7 +50,7 @@ export class ThemeListComponent {
       .subscribe(result => {
         if (isNotBlank(result)) {
           this.snackbarService.openI18N('msg.copySuccess');
-          this.layoutStore.loadList();
+          this.layoutStore.loadThemeList();
         }
       });
   }
@@ -62,7 +59,7 @@ export class ThemeListComponent {
       if (isNotBlank(result)) {
         this.themeService.deleteTheme(item).subscribe(() => {
           this.snackbarService.openI18N('msg.deleteSuccess');
-          this.layoutStore.loadList();
+          this.layoutStore.loadThemeList();
         });
       }
     });
@@ -70,7 +67,7 @@ export class ThemeListComponent {
 
   navigateList(item: ThemeHeader) {
     this.router.navigate([item.type, item.name, item.version], {
-      queryParams: getQueryParamsByHeader(item),
+      queryParams: this.layoutStore.getQueryParamsByHeader(item),
     });
   }
 

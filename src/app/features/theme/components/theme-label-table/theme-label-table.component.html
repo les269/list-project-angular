@@ -6,7 +6,9 @@
       [type]="eThemeItemType.LABEL"
       [form]="form"
       [defaultBinding]="defaultBinding()"
-      (jsonReset)="jsonReset($event)">
+      (jsonReset)="jsonReset($event)"
+      (afterSave)="layoutStore.loadThemeLabelItemList()"
+      (afterBind)="layoutStore.loadThemeLabelItemMapList()">
     </app-theme-item-manage>
     <app-form-alerts
       [form]="formArray"

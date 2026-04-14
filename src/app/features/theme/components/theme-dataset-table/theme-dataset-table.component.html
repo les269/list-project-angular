@@ -6,7 +6,9 @@
       [type]="eThemeItemType.DATASET"
       [form]="form"
       [defaultBinding]="defaultBinding()"
-      (jsonReset)="jsonReset($event)">
+      (jsonReset)="jsonReset($event)"
+      (afterSave)="layoutStore.loadThemeDatasetItemList()"
+      (afterBind)="layoutStore.loadThemeDatasetItemMapList()">
     </app-theme-item-manage>
     <app-form-alerts
       [form]="formArray"

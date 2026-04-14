@@ -29,7 +29,7 @@ export const routes: Routes = [
   {
     path: 'scrapy-list',
     loadComponent: () =>
-      import('./features/scrapy/page/scrapy-list/scrapy-list.component').then(
+      import('./features/spider/page/scrapy-list/scrapy-list.component').then(
         mod => mod.ScrapyListComponent
       ),
     data: { title: 'title.scrapyList', sidenav: true },
@@ -37,7 +37,7 @@ export const routes: Routes = [
   {
     path: 'scrapy-edit',
     loadComponent: () =>
-      import('./features/scrapy/page/scrapy-edit/scrapy-edit.component').then(
+      import('./features/spider/page/scrapy-edit/scrapy-edit.component').then(
         mod => mod.ScrapyEditComponent
       ),
     data: { title: 'title.scrapyEdit' },
@@ -45,7 +45,7 @@ export const routes: Routes = [
   {
     path: 'scrapy-edit/:name',
     loadComponent: () =>
-      import('./features/scrapy/page/scrapy-edit/scrapy-edit.component').then(
+      import('./features/spider/page/scrapy-edit/scrapy-edit.component').then(
         mod => mod.ScrapyEditComponent
       ),
     data: { title: 'title.scrapyEdit' },
@@ -53,7 +53,7 @@ export const routes: Routes = [
   {
     path: 'scrapy-pagination-list',
     loadComponent: () =>
-      import('./features/scrapy/page/scrapy-pagination-list/scrapy-pagination-list.component').then(
+      import('./features/spider/page/scrapy-pagination-list/scrapy-pagination-list.component').then(
         mod => mod.ScrapyPaginationListComponent
       ),
     data: { title: 'title.scrapyPaginationList', sidenav: true },
@@ -61,7 +61,7 @@ export const routes: Routes = [
   {
     path: 'scrapy-pagination-edit',
     loadComponent: () =>
-      import('./features/scrapy/page/scrapy-pagination-edit/scrapy-pagination-edit.component').then(
+      import('./features/spider/page/scrapy-pagination-edit/scrapy-pagination-edit.component').then(
         mod => mod.ScrapyPaginationEditComponent
       ),
     data: { title: 'title.scrapyPaginationEdit' },
@@ -69,10 +69,34 @@ export const routes: Routes = [
   {
     path: 'scrapy-pagination-edit/:name',
     loadComponent: () =>
-      import('./features/scrapy/page/scrapy-pagination-edit/scrapy-pagination-edit.component').then(
+      import('./features/spider/page/scrapy-pagination-edit/scrapy-pagination-edit.component').then(
         mod => mod.ScrapyPaginationEditComponent
       ),
     data: { title: 'title.scrapyPaginationEdit' },
+  },
+  {
+    path: 'spider-list',
+    loadComponent: () =>
+      import('./features/spider/page/spider-list/spider-list.component').then(
+        mod => mod.SpiderListComponent
+      ),
+    data: { title: 'title.spiderList', sidenav: true },
+  },
+  {
+    path: 'spider-edit',
+    loadComponent: () =>
+      import('./features/spider/page/spider-edit/spider-edit.component').then(
+        mod => mod.SpiderEditComponent
+      ),
+    data: { title: 'title.spiderEdit' },
+  },
+  {
+    path: 'spider-edit/:spiderId',
+    loadComponent: () =>
+      import('./features/spider/page/spider-edit/spider-edit.component').then(
+        mod => mod.SpiderEditComponent
+      ),
+    data: { title: 'title.spiderEdit' },
   },
   {
     path: 'dataset-list',

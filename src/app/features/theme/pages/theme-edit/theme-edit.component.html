@@ -91,22 +91,22 @@
         </div>
       </div>
       <div class="d-flex gap-2 justify-content-end">
+        <button
+          type="submit"
+          class="btn btn-success"
+          (click)="update(false, 'save')"
+          [disabled]="!form.valid || isValidating()">
+          {{ isValidating() ? 'msg.saving' : ('g.save' | translate) }}
+        </button>
         @if (isEditMode()) {
           <button
             type="submit"
             class="btn btn-success"
-            (click)="update(false, 'save')"
+            (click)="update(true, 'commit')"
             [disabled]="!form.valid || isValidating()">
-            {{ isValidating() ? 'msg.saving' : ('g.save' | translate) }}
+            {{ isValidating() ? 'msg.submitting' : ('g.submit' | translate) }}
           </button>
         }
-        <button
-          type="submit"
-          class="btn btn-success"
-          (click)="update(true, 'commit')"
-          [disabled]="!form.valid || isValidating()">
-          {{ isValidating() ? 'msg.submitting' : ('g.submit' | translate) }}
-        </button>
       </div>
       @if (typeControl.value === eThemeHeaderType.imageList) {
         <app-theme-image

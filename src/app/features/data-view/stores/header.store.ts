@@ -14,10 +14,13 @@ import {
   ThemeTopCustom,
   ThemeCustom,
   DEFAULT_ROW_COLOR,
+  ThemeItem,
+  ThemeItemType,
 } from '../../theme/models';
 import { ShareTagService } from '../../theme/services/share-tag.service';
 import { ThemeService } from '../../theme/services/theme.service';
 import { LayoutStore } from '../../../core/stores/layout.store';
+import { ThemeItemService } from '../../theme/services';
 
 @Injectable()
 export class HeaderStore {
@@ -26,6 +29,7 @@ export class HeaderStore {
   readonly shareTagService = inject(ShareTagService);
   readonly translateService = inject(TranslateService);
   readonly layoutStore = inject(LayoutStore);
+  readonly themeItemService = inject(ThemeItemService);
 
   readonly RANDOM_KEY = '__random';
 
@@ -57,18 +61,37 @@ export class HeaderStore {
     defaultValue: {} as ThemeHeader,
   });
 
+  themeItems = rxResource({
+    params: () => this.headerId(),
+    stream: ({ params }) => this.themeItemService.getItemsByHeaderId(params),
+    defaultValue: [] as ThemeItem[],
+  });
+
   themeImage = computed(() => {
-    if (this.themeHeader.isLoading()) return undefined;
-    return this.themeHeader.value()?.themeImage;
+    if (
+      this.themeItems.isLoading() ||
+      this.themeHeaderType() !== ThemeHeaderType.imageList
+    ) {
+      return undefined;
+    }
+
+    return this.themeItems.value().find(x => x.type === ThemeItemType.IMAGE)
+      ?.json;
   });
 
   themeOtherSetting = computed<ThemeOtherSetting | undefined>(() => {
-    if (this.themeHeader.isLoading()) return undefined;
-    return this.themeHeader.value()?.themeOtherSetting;
+    if (this.themeItems.isLoading()) return undefined;
+    return this.themeItems
+      .value()
+      .find(x => x.type === ThemeItemType.OTHERSETTING)?.json;
   });
 
   visibleLabelList = computed<ThemeLabel[]>(() => {
-    const labelList = this.themeHeader.value()?.themeLabelList;
+    if (this.themeItems.isLoading()) return [];
+
+    const labelList = this.themeItems
+      .value()
+      .find(x => x.type === ThemeItemType.LABEL)?.json;
     return Array.isArray(labelList)
       ? labelList
           .slice()
@@ -94,8 +117,14 @@ export class HeaderStore {
   );
 
   themeDatasetList = computed<ThemeDataset[]>(() => {
-    if (this.themeHeader.isLoading()) return [];
-    return this.themeHeader.value().themeDatasetList.slice().sort(sortSeq);
+    if (this.themeItems.isLoading()) return [];
+    return (
+      this.themeItems
+        .value()
+        .find(x => x.type === ThemeItemType.DATASET)
+        ?.json?.slice()
+        .sort(sortSeq) ?? []
+    );
   });
   defaultDataset = computed(
     () =>
@@ -104,7 +133,11 @@ export class HeaderStore {
   );
 
   themeTagList = computed<ThemeTag[]>(() => {
-    return (this.themeHeader.value()?.themeTagList ?? [])
+    if (this.themeItems.isLoading()) return [];
+    return (
+      this.themeItems.value().find(x => x.type === ThemeItemType.TAG)?.json ??
+      []
+    )
       .map(x => ({ ...x, seq: parseInt(x.seq + '') }))
       .sort(sortSeq);
   });
@@ -117,19 +150,23 @@ export class HeaderStore {
 
   themeTopCustomList = computed<ThemeTopCustom[]>(
     () =>
-      this.themeHeader
+      this.themeItems
         .value()
-        ?.themeOtherSetting?.themeTopCustomList?.slice()
+        .find(x => x.type === ThemeItemType.TOPCUSTOM)
+        ?.json?.slice()
         .sort(sortSeq) ?? []
   );
 
   themeCustomList = computed<ThemeCustom[]>(
-    () => this.themeHeader.value()?.themeCustomList?.slice().sort(sortSeq) ?? []
+    () =>
+      this.themeItems
+        .value()
+        .find(x => x.type === ThemeItemType.CUSTOM)
+        ?.json?.slice()
+        .sort(sortSeq) ?? []
   );
 
   rowColor = computed<string[]>(() => {
-    return (
-      this.themeHeader.value()?.themeOtherSetting?.rowColor ?? DEFAULT_ROW_COLOR
-    );
+    return this.themeOtherSetting()?.rowColor ?? DEFAULT_ROW_COLOR;
   });
 }

@@ -1,0 +1,46 @@
+<div [formGroup]="form">
+  <div class="input-group my-2">
+    <label class="input-group-text">{{
+      'spider.spiderItemId' | translate
+    }}</label>
+    <input class="form-control" [formControl]="spiderItemId" />
+  </div>
+  <div class="input-group my-2">
+    <label class="input-group-text">{{
+      'spider.description' | translate
+    }}</label>
+    <input class="form-control" [formControl]="description" />
+  </div>
+  <div class="input-group my-2">
+    <label class="input-group-text">{{ 'spider.url' | translate }}</label>
+    <input class="form-control" [formControl]="url" />
+  </div>
+  <div class="input-group my-2">
+    <label class="input-group-text">{{
+      'spider.redirectUrlKey' | translate
+    }}</label>
+    <input class="form-control" [formControl]="redirectUrlKey" />
+  </div>
+  <div class="d-flex gap-2 my-2">
+    <!-- @if (!item().saved) {
+    <button type="button" class="btn btn-success" (click)="onSaveItem()">
+      {{ 'g.save' | translate }}
+    </button>
+  }
+  @if (item().saved) {
+    <button
+      type="button"
+      class="btn btn-outline-primary"
+      (click)="onToggleBind()">
+      {{ (item().binding ? 'g.unbind' : 'g.bind') | translate }}
+    </button>
+  }
+  <button
+    type="button"
+    class="btn btn-danger"
+    [disabled]="item().binding"
+    (click)="onDeleteItem()">
+    {{ 'g.delete' | translate }}
+  </button> -->
+  </div>
+</div>

@@ -18,8 +18,8 @@ import {
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import {
   ThemeItem,
+  ThemeItemMap,
   ThemeItemType,
-  ThemeMapTO,
   ThemeTableEditMode,
 } from '../../models';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
@@ -27,7 +27,7 @@ import { switchMap, EMPTY } from 'rxjs';
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import { isBlank, isNotBlank } from '../../../../shared/util/helper';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { ThemeItemService, ThemeMapService } from '../../services';
+import { ThemeItemService, ThemeItemMapService } from '../../services';
 import { MatDialog } from '@angular/material/dialog';
 import { CopyThemeItemComponent } from '../copy-theme-item/copy-theme-item.component';
 import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
@@ -42,7 +42,7 @@ export class ThemeItemManageComponent {
   readonly messageBoxService = inject(MessageBoxService);
   readonly selectTableService = inject(SelectTableService);
   readonly themeItemService = inject(ThemeItemService);
-  readonly themeMapService = inject(ThemeMapService);
+  readonly themeItemMapService = inject(ThemeItemMapService);
   readonly snackbarService = inject(SnackbarService);
   readonly fb = inject(FormBuilder);
   readonly dialog = inject(MatDialog);
@@ -55,6 +55,8 @@ export class ThemeItemManageComponent {
   readonly defaultBinding = input<boolean>(false);
   //outputs
   readonly jsonReset = output<ThemeItem>();
+  readonly bindingChange = output<boolean>();
+  readonly afterSave = output<ThemeItem>();
 
   // signals
   readonly mode = linkedSignal(() =>
@@ -158,6 +160,7 @@ export class ThemeItemManageComponent {
     };
 
     this.themeItemService.updateThemeItem(req).subscribe(() => {
+      this.afterSave.emit(req);
       this.mode.set(ThemeTableEditMode.EDIT);
       this.snackbarService.openI18N('msg.saveSuccess');
     });
@@ -188,17 +191,19 @@ export class ThemeItemManageComponent {
     const type = this.type();
 
     if (this.isBinding()) {
-      this.themeMapService
+      this.themeItemMapService
         .deleteItemMap(type, itemId, headerId)
         .subscribe(() => {
           this.isBinding.set(false);
           this.snackbarService.openI18N('msg.unbindSuccess');
+          this.bindingChange.emit(false);
         });
     } else {
-      const req: ThemeMapTO = { itemId, headerId, type };
-      this.themeMapService.updateItemMap(req).subscribe(() => {
+      const req: ThemeItemMap = { itemId, headerId, type };
+      this.themeItemMapService.updateItemMap(req).subscribe(() => {
         this.isBinding.set(true);
         this.snackbarService.openI18N('msg.bindSuccess');
+        this.bindingChange.emit(true);
       });
     }
   }
@@ -211,7 +216,7 @@ export class ThemeItemManageComponent {
     }
     const type = this.type();
 
-    this.themeMapService
+    this.themeItemMapService
       .itemMapInUse(type, itemId)
       .pipe(
         switchMap(inUse => {

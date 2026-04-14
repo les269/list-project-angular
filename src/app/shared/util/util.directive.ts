@@ -2,12 +2,13 @@ import {
   Directive,
   ElementRef,
   HostListener,
+  inject,
   Input,
   Renderer2,
 } from '@angular/core';
 import { SnackbarService } from '../../core/services/snackbar.service';
 import { isNotBlank } from './helper';
-import { NgControl } from '@angular/forms';
+import { NgControl, NgModel } from '@angular/forms';
 
 @Directive({ selector: '[ngCopy]', standalone: true })
 export class CopyDirective {
@@ -48,13 +49,35 @@ export class CopyDirective {
   standalone: true,
 })
 export class TrimOnBlurDirective {
-  constructor(private control: NgControl) {}
+  private readonly elementRef = inject(
+    ElementRef<HTMLInputElement | HTMLTextAreaElement>
+  );
+  private readonly control = inject(NgControl, { optional: true, self: true });
 
   @HostListener('blur')
   onBlur() {
-    const value = this.control.control?.value;
-    if (typeof value === 'string') {
-      this.control.control?.setValue(value.trim());
+    const value = this.elementRef.nativeElement.value;
+    if (typeof value !== 'string') {
+      return;
+    }
+
+    const trimmedValue = value.trim();
+    if (value === trimmedValue) {
+      return;
+    }
+
+    this.elementRef.nativeElement.value = trimmedValue;
+
+    if (this.control?.control) {
+      this.control.control.setValue(trimmedValue);
+
+      if (this.control instanceof NgModel) {
+        this.control.viewToModelUpdate(trimmedValue);
+      }
+    } else {
+      this.elementRef.nativeElement.dispatchEvent(
+        new Event('input', { bubbles: true })
+      );
     }
   }
 }

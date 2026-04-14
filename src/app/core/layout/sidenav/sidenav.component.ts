@@ -5,7 +5,6 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ThemeService } from '../../../features/theme/services/theme.service';
 import { ThemeHeader, ThemeHeaderType } from '../../../features/theme/models';
 import { routes } from '../../../app.routes';
-import { getQueryParamsByHeader } from '../../../shared/util/helper';
 import { LayoutStore } from '../../stores/layout.store';
 import { ThemeHiddenService } from '../../../features/theme/services';
 
@@ -28,7 +27,6 @@ export class SidenavComponent {
   readonly routes = routes
     .filter(x => x.data && x.data['sidenav'])
     .map(x => ({ path: x.path, title: x.data!['title'] }));
-  readonly getQueryParamsByHeader = getQueryParamsByHeader;
 
   close() {
     this.layoutStore.toggleSidenav();

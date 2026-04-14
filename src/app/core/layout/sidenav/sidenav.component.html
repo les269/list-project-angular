@@ -12,7 +12,7 @@
         <a
           class="menu-item"
           [routerLink]="navigateList(item)"
-          [queryParams]="getQueryParamsByHeader(item)"
+          [queryParams]="layoutStore.getQueryParamsByHeader(item)"
           (click)="close()"
           >{{ item.title | translate }}</a
         >
