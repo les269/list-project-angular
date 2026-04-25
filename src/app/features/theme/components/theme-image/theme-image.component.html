@@ -36,7 +36,8 @@
           <input
             class="form-control"
             formControlName="imageKey"
-            name="imageKey" />
+            name="imageKey"
+            trimOnBlur />
         </div>
       } @else if (type === eThemeImageType.url) {
         <div class="mb-3">
@@ -44,7 +45,8 @@
             class="form-control"
             name="imageUrl"
             [placeholder]="'themeImage.imageUrlPlaceholder' | translate"
-            formControlName="imageUrl" />
+            formControlName="imageUrl"
+            trimOnBlur />
         </div>
       }
       <app-form-alerts

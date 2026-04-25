@@ -29,15 +29,28 @@ export class SpiderMappingService {
     return this.http.post<void>(`${this.prefix}/update`, req);
   }
 
-  delete(spiderId: string, executionOrder: number): Observable<void> {
+  updateList(req: SpiderMapping[]): Observable<void> {
+    return this.http.post<void>(`${this.prefix}/update-list`, req);
+  }
+
+  delete(
+    spiderId: string,
+    executionOrder: number,
+    spiderItemId: string
+  ): Observable<void> {
     return this.http.delete<void>(
-      `${this.prefix}/delete?spiderId=${encodeURIComponent(spiderId)}&executionOrder=${executionOrder}`
+      `${this.prefix}/delete?spiderId=${encodeURIComponent(spiderId)}&executionOrder=${executionOrder}&spiderItemId=${encodeURIComponent(spiderItemId)}`
     );
   }
 
   deleteBySpiderId(spiderId: string): Observable<void> {
     return this.http.delete<void>(
       `${this.prefix}/delete-by-spider-id?spiderId=${encodeURIComponent(spiderId)}`
+    );
+  }
+  inUseBySpiderItemId(spiderItemId: string): Observable<boolean> {
+    return this.http.get<boolean>(
+      `${this.prefix}/in-use-by-spider-item-id?spiderItemId=${encodeURIComponent(spiderItemId)}`
     );
   }
 }

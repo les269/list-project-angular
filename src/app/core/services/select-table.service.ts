@@ -6,6 +6,7 @@ import {
   CookieListTO,
   ScrapyConfig,
   ScrapyPagination,
+  SpiderItem,
 } from '../../features/spider/model';
 import { formatDate } from '@angular/common';
 import {
@@ -244,7 +245,22 @@ export class SelectTableService {
     return this.openSelectDialog(data);
   }
 
-  dateTransform(value: any): string {
+  selectSingleSpiderItem(dataSource: SpiderItem[]) {
+    const data: BaseSelectTableData<SpiderItem> = {
+      displayedColumns: ['spiderItemId', 'description', 'updatedTime'],
+      labels: ['spider.spiderItemId', 'g.description', 'g.updatedTime'],
+      dataSource,
+      selectType: 'single',
+      columnFormats: {
+        updatedTime: this.dateTransform,
+      },
+      enableFilter: true,
+      title: this.translateService.instant('title.selectSpiderItem'),
+    };
+    return this.openSelectDialog(data);
+  }
+
+  private dateTransform(value: any): string {
     return formatDate(value, 'yyyy-MM-dd HH:mm:ss', 'en-US') || '';
   }
 

@@ -29,13 +29,21 @@ import { TranslateModule } from '@ngx-translate/core';
 import { EMPTY, filter, forkJoin, map, of, startWith, switchMap } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { isNotBlank, isNotJson } from '../../../../shared/util/helper';
-import { SpiderConfig, SpiderItem, SpiderMapping, UrlType } from '../../model';
+import {
+  ExtractionRuleMode,
+  SpiderConfig,
+  SpiderItem,
+  SpiderMapping,
+  UrlType,
+} from '../../model';
 import { SpiderConfigService } from '../../services/spider-config.service';
 import { SpiderMappingService } from '../../services/spider-mapping.service';
 import { SpiderItemComponent } from '../../components/spider-item/spider-item.component';
 import { CodeEditor } from '@acrodata/code-editor';
 import { languages } from '@codemirror/language-data';
 import { SpiderItemService } from '../../services/spider-item.service';
+import { MessageBoxService } from '../../../../core/services/message-box.service';
+import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 
 type SpiderEditMode = 'create' | 'edit';
 
@@ -55,17 +63,20 @@ type SpiderEditMode = 'create' | 'edit';
     TranslateModule,
     SpiderItemComponent,
     CodeEditor,
+    TrimOnBlurDirective,
   ],
 })
 export class SpiderEditComponent {
+  //inject
   readonly router = inject(Router);
   readonly route = inject(ActivatedRoute);
   readonly spiderConfigService = inject(SpiderConfigService);
   readonly spiderMappingService = inject(SpiderMappingService);
   readonly spiderItemService = inject(SpiderItemService);
   readonly snackbarService = inject(SnackbarService);
+  readonly messageBoxService = inject(MessageBoxService);
   readonly fb = inject(FormBuilder);
-
+  // constants
   readonly languages = languages;
 
   // signals
@@ -99,7 +110,12 @@ export class SpiderEditComponent {
     },
     defaultValue: [],
   });
-  readonly items = linkedSignal(() => this.itemsRx.value());
+  readonly spiderItems = linkedSignal(() => this.itemsRx.value());
+  readonly showDeleteItemButton = computed(() => {
+    const selectedIndex = this.selected();
+    return selectedIndex > 0 && selectedIndex <= this.spiderItems().length;
+  });
+
   readonly mappingsRx = rxResource({
     params: () => this.spiderId(),
     stream: ({ params }) => {
@@ -110,9 +126,15 @@ export class SpiderEditComponent {
     },
     defaultValue: [],
   });
-  readonly mappings = computed(() =>
-    this.mappingsRx.value().sort((a, b) => a.executionOrder - b.executionOrder)
+  readonly mappings = linkedSignal(() =>
+    [...this.mappingsRx.value()].sort(
+      (a, b) => a.executionOrder - b.executionOrder
+    )
   );
+  readonly getMappingItemId = (index: number) => {
+    const mapping = this.mappings().find(m => m.executionOrder === index);
+    return mapping ? mapping.spiderItemId : null;
+  };
 
   // form
   readonly form = this.fb.nonNullable.group({
@@ -144,7 +166,7 @@ export class SpiderEditComponent {
   }
 
   get canDragTabs(): boolean {
-    return this.mappings().length === this.items().length;
+    return this.mappings().length === this.spiderItems().length;
   }
 
   constructor() {
@@ -236,60 +258,79 @@ export class SpiderEditComponent {
       this.snackbarService.openI18N('msg.spiderSaveFirst');
       return;
     }
-    this.items.update(list => [
+    this.spiderItems.update(list => [
       ...list,
       {
         spiderItemId: '',
         description: '',
-        url: '',
-        urlType: UrlType.BY_REDIRECT,
-        testData: { html: '', json: '', resultJson: '' },
-        redirectUrlKey: '',
-        extractionRuleList: [],
+        itemSetting: {
+          url: '',
+          urlType: UrlType.BY_PRIME_KEY,
+          mode: ExtractionRuleMode.SELECT,
+          testData: { html: '', json: '', resultJson: '' },
+          extractionRuleList: [],
+          skipWhenUsingUrl: false,
+          useCookie: false,
+        },
       },
     ]);
-    this.selected.set(this.items().length - 1);
+    this.selected.set(this.spiderItems().length);
+  }
+
+  onDeleteItemTab() {
+    this.messageBoxService
+      .openI18N('msg.sureDeleteSpiderItem')
+      .subscribe(result => {
+        if (result) {
+          const selectedIndex = this.selected();
+          if (selectedIndex <= 0 || selectedIndex > this.spiderItems().length) {
+            return;
+          }
+
+          const targetIndex = selectedIndex - 1;
+          const tabs = [...this.spiderItems()];
+          tabs.splice(targetIndex, 1);
+          this.spiderItems.set(tabs);
+
+          if (selectedIndex >= tabs.length) {
+            this.selected.set(tabs.length);
+          }
+        }
+      });
   }
 
   dropTab(event: CdkDragDrop<SpiderItem[]>) {
-    if (!this.canDragTabs) {
-      return;
-    }
-    if (event.previousIndex === event.currentIndex) {
+    if (!this.canDragTabs && event.previousIndex === event.currentIndex) {
       return;
     }
 
-    const tabs = [...this.items()];
-    if (
-      event.previousIndex < 0 ||
-      event.currentIndex < 0 ||
-      event.previousIndex >= tabs.length ||
-      event.currentIndex >= tabs.length
-    ) {
-      return;
-    }
-
+    const tabs = [...this.spiderItems()];
     const selectedIndex = this.selected();
-    const testTabIndex = tabs.length;
+    const spiderId = this.spiderId();
+    if (!spiderId) {
+      return;
+    }
+
+    const reorderedMappings = this.buildReorderedMappings(
+      this.mappings(),
+      spiderId,
+      event.previousIndex,
+      event.currentIndex
+    );
+    const previousMappings = [...this.mappings()];
+    const previousTabs = [...tabs];
 
     moveItemInArray(tabs, event.previousIndex, event.currentIndex);
-    this.items.set(tabs);
+    this.spiderItems.set(tabs);
+    this.mappings.set(reorderedMappings);
 
-    if (selectedIndex === testTabIndex) {
-      this.selected.set(tabs.length);
-    } else if (selectedIndex === event.previousIndex) {
-      this.selected.set(event.currentIndex);
-    } else if (
-      event.previousIndex < selectedIndex &&
-      selectedIndex <= event.currentIndex
-    ) {
-      this.selected.set(selectedIndex - 1);
-    } else if (
-      event.currentIndex <= selectedIndex &&
-      selectedIndex < event.previousIndex
-    ) {
-      this.selected.set(selectedIndex + 1);
-    }
+    this.spiderMappingService.updateList(reorderedMappings).subscribe({
+      error: () => {
+        this.spiderItems.set(previousTabs);
+        this.mappings.set(previousMappings);
+        this.selected.set(selectedIndex);
+      },
+    });
   }
 
   update() {
@@ -328,5 +369,20 @@ export class SpiderEditComponent {
         }
         this.snackbarService.openI18N('msg.saveSuccess');
       });
+  }
+
+  private buildReorderedMappings(
+    mappings: SpiderMapping[],
+    spiderId: string,
+    previousIndex: number,
+    currentIndex: number
+  ): SpiderMapping[] {
+    const reorderedMappings = [...mappings];
+    moveItemInArray(reorderedMappings, previousIndex, currentIndex);
+    return reorderedMappings.map((mapping, index) => ({
+      ...mapping,
+      spiderId,
+      executionOrder: index,
+    }));
   }
 }

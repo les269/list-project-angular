@@ -78,7 +78,7 @@ export class CssSelectTableComponent {
     },
   ];
 
-  createGroup() {
+  readonly createGroup = () => {
     return this.fb.group({
       seq: [0],
       key: [''],
@@ -92,7 +92,7 @@ export class CssSelectTableComponent {
       replaceValueMapName: [''],
       splitText: [''],
     });
-  }
+  };
 
   selectReplaceValueMap(element: CssSelect) {
     this.selectTableService

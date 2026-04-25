@@ -106,7 +106,7 @@ export class GroupDatasetScrapyTableComponent {
     stream: () => this.scrapyService.getAllConfig(),
     defaultValue: [],
   });
-  createGroup() {
+  readonly createGroup = () => {
     return this.fb.group({
       seq: [0],
       name: ['', [Validators.required]],
@@ -115,5 +115,5 @@ export class GroupDatasetScrapyTableComponent {
       visibleJson: [false],
       visibleUrl: [false],
     });
-  }
+  };
 }

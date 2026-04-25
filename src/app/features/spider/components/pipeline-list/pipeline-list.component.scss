@@ -1,26 +1,16 @@
-.error-msg {
-  color: #ff4444;
-  font-size: 12px;
-  margin-top: 2px;
-}
-
-.drag-handle-wrap {
-  gap: 4px;
-}
-
 .drag-cursor {
   cursor: grab;
 }
 
 :host ::ng-deep .cdk-drag-preview {
   box-sizing: border-box;
-  background: #fff;
-  border-radius: 6px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  background: #f8f9fa;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
 }
 
 :host ::ng-deep .cdk-drag-placeholder {
-  opacity: 0.2;
+  opacity: 0.25;
 }
 
 :host ::ng-deep .cdk-drop-list-dragging .cdk-drag {

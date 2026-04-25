@@ -54,6 +54,7 @@ import { FormAlertsComponent } from '../../../../core/components/form-alerts/for
 import { FormAlert } from '../../../../core/model';
 import { ChipInputComponent } from '../../../../core/components/chip-input/chip-input.component';
 import { FormInvalidsComponent } from '../../../../core/components/form-invalids/form-invalids.component';
+import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 
 @Component({
   standalone: true,
@@ -72,6 +73,7 @@ import { FormInvalidsComponent } from '../../../../core/components/form-invalids
     FormAlertsComponent,
     ChipInputComponent,
     FormInvalidsComponent,
+    TrimOnBlurDirective,
   ],
   selector: 'app-theme-custom-table',
   templateUrl: 'theme-custom-table.component.html',
@@ -231,7 +233,7 @@ export class ThemeCustomTableComponent implements OnInit {
     arr.updateValueAndValidity({ emitEvent: false });
   }
 
-  createGroup() {
+  readonly createGroup = () => {
     const group = this.fb.group({
       seq: [0],
       type: [ThemeCustomType.openUrl],
@@ -254,7 +256,7 @@ export class ThemeCustomTableComponent implements OnInit {
     });
     this.initTypeWatcher(group);
     return group;
-  }
+  };
   initTypeWatcher(group: FormGroup) {
     group.get('type')!.valueChanges.subscribe(type => {
       this.updateValidatorsByType(group, type);
@@ -324,13 +326,10 @@ export class ThemeCustomTableComponent implements OnInit {
     group.updateValueAndValidity();
   }
 
-  selectApi() {
-    return this.selectTableService.selectSingleApi(this.apis.value());
-  }
+  readonly selectApi = () =>
+    this.selectTableService.selectSingleApi(this.apis.value());
 
-  getApiLabelName(itme: ApiConfig) {
-    return itme.apiName;
-  }
+  readonly getApiLabelName = (item: ApiConfig) => item.apiName;
 
   jsonReset(data: ThemeItem) {
     if (data.type !== ThemeItemType.CUSTOM) return;

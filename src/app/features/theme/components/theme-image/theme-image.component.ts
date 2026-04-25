@@ -27,6 +27,7 @@ import { isBlank } from '../../../../shared/util/helper';
 import { FormAlertsComponent } from '../../../../core/components/form-alerts/form-alerts.component';
 import { FormAlert } from '../../../../core/model';
 import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage.component';
+import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 
 @Component({
   selector: 'app-theme-image',
@@ -36,6 +37,7 @@ import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage
     ReactiveFormsModule,
     FormAlertsComponent,
     ThemeItemManageComponent,
+    TrimOnBlurDirective,
   ],
   templateUrl: './theme-image.component.html',
 })

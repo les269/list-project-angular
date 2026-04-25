@@ -18,7 +18,7 @@
         [class.table-invalid]="formArray.invalid"
         [initData]="initData()"
         [formArray]="formArray"
-        [createGroup]="createGroup.bind(this)"
+        [createGroup]="createGroup"
         [displayedColumns]="displayedColumns"
         [cols]="cols"
         [expandedTmpl]="expandedDetail">
@@ -26,7 +26,6 @@
     </div>
   </div>
 </div>
-
 <ng-template #expandedDetail let-element let-index="index">
   <div class="d-flex" [formGroup]="element">
     <div class="column p-1">

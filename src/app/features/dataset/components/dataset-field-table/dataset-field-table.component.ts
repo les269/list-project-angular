@@ -67,7 +67,7 @@ export class DatasetFieldTableComponent {
     this.typeColumn,
   ];
 
-  createGroup() {
+  readonly createGroup = () => {
     return this.fb.group({
       seq: [0],
       type: [DatasetFieldType.path],
@@ -77,5 +77,5 @@ export class DatasetFieldTableComponent {
       replaceRegular: [''],
       replaceRegularTo: [''],
     });
-  }
+  };
 }

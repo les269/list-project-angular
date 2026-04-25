@@ -27,12 +27,15 @@ import {
   ToFormArray,
 } from '../../../../core/model/generic-table';
 import { CookieListService } from '../../services/cookie-list.service';
+import { CookieListMapService } from '../../services/cookie-list-map.service';
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { EMPTY, switchMap } from 'rxjs';
 import { isBlank, isNotBlank } from '../../../../shared/util/helper';
 import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
+import { CookieMode } from '../../model/cookie.model';
+import { rxResource } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-cookie-table',
@@ -50,29 +53,55 @@ import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
   templateUrl: './cookie-table.component.html',
 })
 export class CookieTableComponent {
+  // inject
   readonly cookieListService = inject(CookieListService);
+  readonly cookieListMapService = inject(CookieListMapService);
   readonly selectTableService = inject(SelectTableService);
   readonly messageBoxService = inject(MessageBoxService);
   readonly snackbarService = inject(SnackbarService);
-  displayedColumns = ['name', 'value'];
+  readonly fb = inject(FormBuilder);
 
-  formArray = input.required<ToFormArray<Cookie>>();
-  initData = input<Cookie[]>();
-  refId = input<string>();
-  mapType = input<CookieListMapType>();
-  defaultBinding = input<boolean>(false);
+  readonly displayedColumns = ['name', 'value'];
 
+  // formArray = input<ToFormArray<Cookie>>();
+  // initData = input<Cookie[]>();
+  readonly refId = input<string>();
+  readonly mapType = input<CookieListMapType>();
   readonly bindingChange = output<boolean>();
   readonly afterSave = output<CookieListTO>();
 
-  cols: GenericTableColumn[] = [
+  readonly cols: GenericTableColumn[] = [
     { key: 'name', label: 'g.name', columnType: GenericColumnType.input },
     { key: 'value', label: 'g.value', columnType: GenericColumnType.input },
   ];
 
-  readonly mode = signal<'new' | 'edit'>('new');
-  readonly isEditMode = computed(() => this.mode() === 'edit');
-  readonly isBinding = linkedSignal<boolean>(() => this.defaultBinding());
+  // signal
+  readonly mode = signal<CookieMode>(CookieMode.create);
+  readonly isEditMode = computed(() => this.mode() === CookieMode.edit);
+  readonly initData = rxResource({
+    params: () => {
+      const refId = this.refId()?.trim() ?? '';
+      const mapType = this.mapType();
+      if (isBlank(refId) || !mapType) {
+        return null;
+      }
+      return { refId, mapType };
+    },
+    stream: ({ params }) => {
+      if (!params) {
+        return EMPTY;
+      }
+      return this.cookieListService.getByRefIdAndType(
+        params.refId,
+        params.mapType
+      );
+    },
+    defaultValue: undefined,
+  });
+  readonly list = linkedSignal(() => this.initData.value()?.list ?? []);
+  readonly isBinding = linkedSignal<boolean>(() => {
+    return this.initData.value() !== null;
+  });
   readonly showBindButton = computed(
     () =>
       this.isEditMode() && isNotBlank(this.refId() ?? '') && !!this.mapType()
@@ -81,18 +110,21 @@ export class CookieTableComponent {
     () => this.isEditMode() && !this.isBinding()
   );
 
-  readonly fb = inject(FormBuilder);
-  readonly manageForm = this.fb.nonNullable.group({
+  readonly form = this.fb.nonNullable.group({
     cookieId: ['', [Validators.required]],
     description: [''],
+    list: this.fb.array([]),
   });
 
   get cookieIdControl() {
-    return this.manageForm.controls.cookieId;
+    return this.form.controls.cookieId;
   }
 
   get descriptionControl() {
-    return this.manageForm.controls.description;
+    return this.form.controls.description;
+  }
+  get listControl() {
+    return this.form.get('list') as ToFormArray<Cookie>;
   }
 
   constructor() {
@@ -101,6 +133,18 @@ export class CookieTableComponent {
         this.cookieIdControl.disable({ emitEvent: false });
       } else {
         this.cookieIdControl.enable({ emitEvent: false });
+      }
+    });
+    effect(() => {
+      const data = this.initData.value();
+      if (data) {
+        this.form.patchValue(data, { emitEvent: false });
+        this.setCookieList(data.list ?? []);
+        this.mode.set(CookieMode.edit);
+      } else {
+        this.form.reset({ cookieId: '', description: '' });
+        this.setCookieList([]);
+        this.mode.set(CookieMode.create);
       }
     });
   }
@@ -113,18 +157,18 @@ export class CookieTableComponent {
         switchMap(item => this.cookieListService.getByCookieId(item.cookieId))
       )
       .subscribe(item => {
-        this.manageForm.patchValue({
+        this.form.patchValue({
           cookieId: item.cookieId,
           description: item.description ?? '',
         });
         this.setCookieList(item.list ?? []);
-        this.mode.set('edit');
+        this.mode.set(CookieMode.edit);
       });
   }
 
   addItem() {
     this.cookieIdControl.markAsTouched();
-    if (this.manageForm.invalid) {
+    if (this.form.invalid) {
       this.snackbarService.isBlankMessage('scrapy.cookieListId');
       return;
     }
@@ -144,17 +188,17 @@ export class CookieTableComponent {
 
   saveItem() {
     this.cookieIdControl.markAsTouched();
-    if (this.manageForm.invalid) {
+    if (this.form.invalid) {
       this.snackbarService.isBlankMessage('scrapy.cookieListId');
       return;
     }
     const req: CookieListTO = {
       cookieId: this.cookieIdControl.getRawValue().trim(),
       description: this.descriptionControl.getRawValue().trim(),
-      list: this.formArray().getRawValue() as Cookie[],
+      list: this.listControl.getRawValue() as Cookie[],
     };
     this.cookieListService.update(req).subscribe(() => {
-      this.mode.set('edit');
+      this.mode.set(CookieMode.edit);
       this.afterSave.emit(req);
       this.snackbarService.openI18N('msg.saveSuccess');
     });
@@ -163,8 +207,8 @@ export class CookieTableComponent {
   onClear() {
     this.messageBoxService.openI18N('msg.sureClear').subscribe(result => {
       if (!result) return;
-      this.mode.set('new');
-      this.manageForm.reset({ cookieId: '', description: '' });
+      this.mode.set(CookieMode.create);
+      this.form.reset({ cookieId: '', description: '' });
       this.setCookieList([]);
     });
   }
@@ -178,7 +222,7 @@ export class CookieTableComponent {
     }
 
     if (this.isBinding()) {
-      this.cookieListService.deleteMap(refId, mapType).subscribe(() => {
+      this.cookieListMapService.delete(refId, mapType).subscribe(() => {
         this.isBinding.set(false);
         this.bindingChange.emit(false);
         this.snackbarService.openI18N('msg.unbindSuccess');
@@ -186,8 +230,8 @@ export class CookieTableComponent {
       return;
     }
 
-    this.cookieListService
-      .updateMap({ refId, type: mapType, cookieId })
+    this.cookieListMapService
+      .update({ refId, type: mapType, cookieId })
       .subscribe(() => {
         this.isBinding.set(true);
         this.bindingChange.emit(true);
@@ -201,8 +245,8 @@ export class CookieTableComponent {
       this.snackbarService.isBlankMessage('scrapy.cookieListId');
       return;
     }
-    this.cookieListService
-      .isInUse(cookieId)
+    this.cookieListMapService
+      .cookieIsInUse(cookieId)
       .pipe(
         switchMap(inUse => {
           if (inUse) {
@@ -219,28 +263,24 @@ export class CookieTableComponent {
         })
       )
       .subscribe(() => {
-        this.mode.set('new');
-        this.manageForm.reset({ cookieId: '', description: '' });
+        this.mode.set(CookieMode.create);
+        this.form.reset({ cookieId: '', description: '' });
         this.setCookieList([]);
         this.snackbarService.openI18N('msg.deleteSuccess');
       });
   }
 
   private setCookieList(list: Cookie[]) {
-    const formArray = this.formArray();
+    const formArray = this.listControl;
     formArray.clear();
-    for (const item of list) {
-      const group = this.createGroup();
-      group.patchValue(item);
-      formArray.push(group);
-    }
+    this.list.set(list);
   }
 
-  createGroup() {
+  readonly createGroup = (item?: Cookie) => {
     return this.fb.nonNullable.group({
-      seq: [0],
-      name: ['', [Validators.required]],
-      value: ['', [Validators.required]],
+      seq: [item?.seq ?? 0],
+      name: [item?.name ?? '', [Validators.required]],
+      value: [item?.value ?? '', [Validators.required]],
     });
-  }
+  };
 }

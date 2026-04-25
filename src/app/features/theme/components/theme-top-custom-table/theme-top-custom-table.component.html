@@ -13,7 +13,7 @@
         [class.table-invalid]="formArray.invalid"
         [formArray]="formArray"
         [initData]="initData()"
-        [createGroup]="createGroup.bind(this)"
+        [createGroup]="createGroup"
         [displayedColumns]="displayedColumns"
         [cols]="cols"
         [expandedTmpl]="expandedTmpl">
@@ -31,7 +31,8 @@
           class="form-control mt-1"
           [placeholder]="'themeCustom.openUrlPH' | translate"
           formControlName="openUrl"
-          required="" />
+          required=""
+          trimOnBlur />
         <select
           formControlName="openWindowsTarget"
           class="form-control"
@@ -51,8 +52,8 @@
           <app-chip-select-button
             valueKey="apiName"
             [formControl]="element.get('apiName')"
-            [selectTable]="selectApi.bind(this)"
-            [options]="apis.value()"
+            [selectTable]="selectApi"
+            [options]="apis.value"
             [labelKey]="getApiLabelName"
             [required]="true"
             [requiredMsg]="

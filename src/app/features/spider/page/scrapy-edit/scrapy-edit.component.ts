@@ -33,9 +33,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ControlsOf } from '../../../../core/model/generic-table';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
-import { CookieTableComponent } from '../../components/cookie-table/cookie-table.component';
 import { CssSelectTableComponent } from '../../components/css-select-table/css-select-table.component';
 import { ToFormArray } from '../../../../core/model/generic-table';
+import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 
 type ScrapyDataFormControls = {
   name: FormControl<string>;
@@ -63,8 +63,8 @@ type ScrapyDataFormControls = {
     MatTabsModule,
     MatTooltipModule,
     MatCheckboxModule,
-    CookieTableComponent,
     CssSelectTableComponent,
+    TrimOnBlurDirective,
   ],
   selector: 'app-scrapy-edit',
   templateUrl: './scrapy-edit.component.html',

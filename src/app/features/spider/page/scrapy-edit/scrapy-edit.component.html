@@ -10,7 +10,7 @@
       </button>
       <div class="form-group mb-2">
         <label>{{ 'scrapy.name' | translate }}</label>
-        <input class="form-control" formControlName="name" />
+        <input class="form-control" formControlName="name" trimOnBlur />
       </div>
       <div class="form-group mb-2">
         <label>{{ 'scrapy.paramSize' | translate }}</label>
@@ -94,9 +94,9 @@
                 [placeholder]="'scrapy.urlPH' | translate" />
             </div>
             <label class="h6">{{ 'scrapy.cookie' | translate }}</label>
-            <app-cookie-table
+            <!-- <app-cookie-table
               [formArray]="dataGroup.controls.cookie"
-              [initData]="dataInit()[index]?.cookie"></app-cookie-table>
+              [initData]="dataInit()[index]?.cookie"></app-cookie-table> -->
             <div class="my-2">
               <label class="form-label" for="type">{{
                 'scrapy.scrapyPageType' | translate

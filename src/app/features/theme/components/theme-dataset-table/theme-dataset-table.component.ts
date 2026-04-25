@@ -171,14 +171,14 @@ export class ThemeDatasetTableComponent implements OnInit {
     ]);
     arr.updateValueAndValidity({ emitEvent: false });
   }
-  createGroup() {
+  readonly createGroup = () => {
     return this.fb.group({
       seq: [0],
       datasetList: [[], [Validators.required, Validators.minLength(1)]],
       label: ['', [Validators.required]],
       isDefault: [false],
     });
-  }
+  };
   //改變清單預設使用的資料來源
   changeDefaultKey(index: number) {
     const ctrls = this.formArray.controls;

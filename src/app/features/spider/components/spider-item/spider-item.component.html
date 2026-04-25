@@ -3,44 +3,232 @@
     <label class="input-group-text">{{
       'spider.spiderItemId' | translate
     }}</label>
-    <input class="form-control" [formControl]="spiderItemId" />
+    <input
+      class="form-control"
+      [formControl]="spiderItemId"
+      [class.is-invalid]="spiderItemId.invalid && spiderItemId.touched"
+      trimOnBlur />
+    @if (spiderItemId.invalid && spiderItemId.touched) {
+      <div class="invalid-feedback d-block">
+        @if (spiderItemId.hasError('required')) {
+          {{
+            'msg.blank'
+              | translate: { name: ('spider.spiderItemId' | translate) }
+          }}
+        }
+      </div>
+    }
+  </div>
+  <div class="input-group my-2">
+    <label class="input-group-text">{{ 'g.description' | translate }}</label>
+    <input class="form-control" [formControl]="description" trimOnBlur />
   </div>
   <div class="input-group my-2">
     <label class="input-group-text">{{
-      'spider.description' | translate
+      'spider.urlType.name' | translate
     }}</label>
-    <input class="form-control" [formControl]="description" />
+    <select class="form-control form-select" [formControl]="urlType">
+      @for (urlType of eUrlType | keyvalue; track urlType) {
+        <option [ngValue]="urlType.key">
+          {{ 'spider.urlType.' + urlType.key | translate }}
+        </option>
+      }
+    </select>
+  </div>
+  @if (modePrimeKey) {
+    <label class="form-text"
+      ><div [innerHTML]="'spider.primeKeyPH' | translate"></div
+    ></label>
+  }
+  @if (modeParams) {
+    <label class="form-text"
+      ><div [innerHTML]="'spider.paramsPH' | translate"></div
+    ></label>
+  }
+  <div class="d-flex">
+    <mat-checkbox [formControl]="skipWhenUsingUrl">{{
+      'spider.skipWhenUsingUrl' | translate
+    }}</mat-checkbox>
   </div>
   <div class="input-group my-2">
     <label class="input-group-text">{{ 'spider.url' | translate }}</label>
-    <input class="form-control" [formControl]="url" />
+    <input class="form-control" [formControl]="url" trimOnBlur />
   </div>
+
   <div class="input-group my-2">
     <label class="input-group-text">{{
-      'spider.redirectUrlKey' | translate
+      'spider.extractionRule' | translate
     }}</label>
-    <input class="form-control" [formControl]="redirectUrlKey" />
+    <select class="form-control form-select" [formControl]="extractionRuleMode">
+      @for (type of eExtractionRuleMode | keyvalue; track type) {
+        <option [ngValue]="type.key">
+          {{ 'spider.extractionRuleMode.' + type.key | translate }}
+        </option>
+      }
+    </select>
   </div>
-  <div class="d-flex gap-2 my-2">
-    <!-- @if (!item().saved) {
-    <button type="button" class="btn btn-success" (click)="onSaveItem()">
-      {{ 'g.save' | translate }}
-    </button>
+  @if (useJsonPath) {
+    <label class="form-text"
+      ><div [innerHTML]="'spider.jsonPathPH' | translate"></div
+    ></label>
   }
-  @if (item().saved) {
-    <button
-      type="button"
-      class="btn btn-outline-primary"
-      (click)="onToggleBind()">
-      {{ (item().binding ? 'g.unbind' : 'g.bind') | translate }}
-    </button>
+  @if (useSelector) {
+    <label class="form-text"
+      ><div [innerHTML]="'spider.selectorPH' | translate"></div
+    ></label>
   }
-  <button
-    type="button"
-    class="btn btn-danger"
-    [disabled]="item().binding"
-    (click)="onDeleteItem()">
-    {{ 'g.delete' | translate }}
-  </button> -->
+  <div class="d-flex">
+    <mat-checkbox [formControl]="useCookie">{{
+      'spider.useCookie' | translate
+    }}</mat-checkbox>
   </div>
+
+  <div class="d-flex my-2 gap-2">
+    @if (!isBinding()) {
+      <button
+        type="button"
+        class="btn btn-outline-primary"
+        (click)="onReadItems()">
+        {{ 'g.read' | translate }}
+      </button>
+    }
+    @if (isCreateMode()) {
+      <button
+        type="button"
+        class="btn btn-outline-primary"
+        (click)="onAddItem()">
+        {{ 'g.add' | translate }}
+      </button>
+    }
+    @if (isEditMode()) {
+      <button
+        type="button"
+        class="btn btn-outline-primary"
+        (click)="onSaveItem()">
+        {{ 'g.save' | translate }}
+      </button>
+    }
+
+    @if (isEditMode() && hasSpiderId()) {
+      <button
+        type="button"
+        class="btn btn-outline-primary"
+        (click)="toggleBind()">
+        {{ (isBinding() ? 'g.unbind' : 'g.bind') | translate }}
+      </button>
+    }
+    @if (!isBinding()) {
+      <button type="button" class="btn btn-danger" (click)="onClear()">
+        {{ 'g.clear' | translate }}
+      </button>
+    }
+    @if (isEditMode() && !isBinding()) {
+      <button
+        type="button"
+        class="btn btn-danger"
+        [disabled]="isBinding()"
+        (click)="onDeleteItem()">
+        {{ 'g.delete' | translate }}
+      </button>
+    }
+  </div>
+
+  @if (useCookie.value) {
+    <app-cookie-table
+      [refId]="cookieRefId()"
+      [mapType]="eCookieListMapType.SPIDER"></app-cookie-table>
+  }
+  <div class="card-body">
+    <div class="card mb-3">
+      <app-generic-table
+        [class.table-invalid]="extractionRuleList.invalid"
+        [formArray]="extractionRuleList"
+        [initData]="extractionRuleListData()"
+        [createGroup]="createExtractionRule"
+        [cols]="cols"
+        [displayedColumns]="
+          extractionRuleMode.value === eExtractionRuleMode.JSON_PATH
+            ? jsonPathDisplayedColumns
+            : selectorDisplayedColumns
+        "
+        [expandedTmpl]="expandedTmpl"></app-generic-table>
+    </div>
+  </div>
+  <div class="form-group mb-2">
+    @if (useSelector) {
+      <label>{{ 'scrapy.testHtml' | translate }}</label>
+      <code-editor
+        [style.height]="'300px'"
+        [formControl]="htmlData"
+        [language]="'html'"
+        [indentWithTab]="true"
+        [languages]="CodeEditorLanguages" />
+      <button type="button" class="btn btn-primary" (click)="onTestParseHtml()">
+        {{ 'scrapy.test' | translate }}
+      </button>
+    }
+    @if (useJsonPath) {
+      <label>{{ 'scrapy.testJson' | translate }}</label>
+      <code-editor
+        [style.height]="'300px'"
+        [formControl]="jsonData"
+        [language]="'json'"
+        [indentWithTab]="true"
+        [languages]="CodeEditorLanguages" />
+      <div class="d-flex gap-2 my-2">
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          (click)="onFormatJson()">
+          {{ 'g.format' | translate }}
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="onTestParseJson()">
+          {{ 'scrapy.test' | translate }}
+        </button>
+      </div>
+    }
+  </div>
+  <label>{{ 'scrapy.testResult' | translate }}</label>
+  <code-editor
+    class="mb-4"
+    [formControl]="resultJsonData"
+    [language]="'json'"
+    [indentWithTab]="true"
+    [languages]="CodeEditorLanguages" />
 </div>
+<ng-template #expandedTmpl let-element>
+  <div class="d-flex flex-column my-2" [formGroup]="element">
+    @let condition = element.get('condition')?.value;
+
+    @if (condition && condition !== eExtractionStepCondition.ALWAYS) {
+      <div class="d-flex input-group">
+        <label class="input-group-text">{{
+          'spider.conditionKey' | translate
+        }}</label>
+        <input
+          class="form-control"
+          formControlName="conditionKey"
+          [placeholder]="'spider.conditionKeyPH' | translate"
+          trimOnBlur />
+      </div>
+      @if (shouldShowValueInput(condition)) {
+        <div class="d-flex input-group">
+          <label class="input-group-text">
+            {{ 'spider.conditionValue' | translate }}
+          </label>
+          <input
+            class="form-control"
+            formControlName="conditionValue"
+            [placeholder]="'spider.conditionValuePH' | translate"
+            trimOnBlur />
+        </div>
+      }
+    }
+
+    <app-pipeline-list
+      [formArray]="element.get('pipelines')"></app-pipeline-list>
+  </div>
+</ng-template>

@@ -75,7 +75,6 @@ export class ShareTagListComponent {
   newTagId = signal('');
   isEdit = signal(false);
 
-  // @ViewChild('addTagDialog') addTagDialog!: TemplateRef<any>;
   addTagDialog = viewChild.required<TemplateRef<any>>('addTagDialog');
   sort = viewChild(MatSort);
 

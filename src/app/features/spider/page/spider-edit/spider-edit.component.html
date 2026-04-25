@@ -11,12 +11,12 @@
 
       <div class="form-group mb-2">
         <label>{{ 'spider.spiderId' | translate }}</label>
-        <input class="form-control" formControlName="spiderId" />
+        <input class="form-control" formControlName="spiderId" trimOnBlur />
       </div>
 
       <div class="form-group mb-2">
         <label>{{ 'g.description' | translate }}</label>
-        <input class="form-control" formControlName="description" />
+        <input class="form-control" formControlName="description" trimOnBlur />
       </div>
 
       <div class="form-group mb-2">
@@ -47,6 +47,14 @@
             {{ 'spider.createSpiderItem' | translate }}
           </button>
         }
+        @if (isEditMode && showDeleteItemButton()) {
+          <button
+            type="button"
+            class="btn btn-danger"
+            (click)="onDeleteItemTab()">
+            {{ 'spider.deleteSpiderItem' | translate }}
+          </button>
+        }
       </div>
 
       @if (isCreateMode) {
@@ -59,34 +67,11 @@
         cdkDropList
         cdkDropListOrientation="horizontal"
         [cdkDropListDisabled]="!canDragTabs"
-        [cdkDropListData]="items()"
+        [cdkDropListData]="spiderItems()"
         cdkDropListElementContainer=".mat-mdc-tab-labels"
         (cdkDropListDropped)="dropTab($event)"
         [selectedIndex]="selected()"
         (selectedIndexChange)="selected.set($event)">
-        @for (item of items(); track $index; let index = $index) {
-          <mat-tab>
-            <ng-template mat-tab-label>
-              <span
-                cdkDrag
-                cdkDragRootElement=".mat-mdc-tab"
-                [cdkDragDisabled]="!canDragTabs"
-                class="me-1">
-                {{
-                  item.spiderItemId
-                    ? item.spiderItemId
-                    : '(' + ('g.unnamed' | translate) + ')'
-                }}
-              </span>
-            </ng-template>
-
-            <app-spider-item
-              [item]="item"
-              [index]="index"
-              [mappingRef]="mappingsRx"></app-spider-item>
-          </mat-tab>
-        }
-
         <mat-tab [label]="'spider.testArea' | translate">
           <div formGroupName="testData">
             <div class="form-group mb-2">
@@ -100,15 +85,18 @@
                 'spider.testPkArrayDesc' | translate
               }}</label>
               <button type="button" class="btn btn-primary">
-                {{ 'scrapy.test' | translate }}
+                {{ 'spider.test' | translate }}
               </button>
             </div>
 
             <div class="form-group mb-2">
-              <div>{{ 'scrapy.testUrl' | translate }}</div>
-              <input class="form-control mb-2" formControlName="url" />
+              <div>{{ 'spider.testUrl' | translate }}</div>
+              <input
+                class="form-control mb-2"
+                formControlName="url"
+                trimOnBlur />
               <button type="button" class="btn btn-primary">
-                {{ 'scrapy.test' | translate }}
+                {{ 'spider.test' | translate }}
               </button>
             </div>
             <div class="form-group mb-2">
@@ -121,6 +109,26 @@
             </div>
           </div>
         </mat-tab>
+        @for (item of spiderItems(); track $index; let index = $index) {
+          @let spiderItemId = getMappingItemId(index);
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <span
+                cdkDrag
+                cdkDragRootElement=".mat-mdc-tab"
+                [cdkDragDisabled]="!canDragTabs"
+                class="me-1">
+                {{ spiderItemId ?? '(' + ('g.unnamed' | translate) + ')' }}
+              </span>
+            </ng-template>
+
+            <app-spider-item
+              [initData]="item"
+              [index]="index"
+              [mappingsRx]="mappingsRx"
+              [spiderId]="spiderId() ?? ''"></app-spider-item>
+          </mat-tab>
+        }
       </mat-tab-group>
     </form>
   </div>

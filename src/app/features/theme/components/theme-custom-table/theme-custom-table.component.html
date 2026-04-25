@@ -16,7 +16,7 @@
         [class.table-invalid]="formArray.invalid"
         [formArray]="formArray"
         [initData]="initData()"
-        [createGroup]="createGroup.bind(this)"
+        [createGroup]="createGroup"
         [cols]="cols"
         [displayedColumns]="displayedColumns"
         [expandedTmpl]="expandedTmpl"></app-generic-table>
@@ -64,7 +64,8 @@
             [class.is-invalid]="
               buttonIconTrue.invalid && buttonIconTrue.touched
             "
-            required />
+            required
+            trimOnBlur />
           <input
             type="text"
             class="form-control"
@@ -73,7 +74,8 @@
             [class.is-invalid]="
               buttonIconFalse.invalid && buttonIconFalse.touched
             "
-            required />
+            required
+            trimOnBlur />
         </div>
         <app-form-invalids
           [control]="buttonIconTrue"
@@ -114,7 +116,8 @@
             class="form-control mt-1"
             [placeholder]="'themeCustom.fillIcon' | translate"
             [formControl]="buttonIconFill"
-            required />
+            required
+            trimOnBlur />
           <input
             type="color"
             [placeholder]="'themeCustom.fillIconColor' | translate"
@@ -131,7 +134,8 @@
         <input
           class="form-control mt-1"
           [placeholder]="'themeCustom.copyValuePH' | translate"
-          [formControl]="copyValue" />
+          [formControl]="copyValue"
+          trimOnBlur />
       }
       <!-- 開啟自定義網址 -->
       @case (eThemeCustomType.openUrl) {
@@ -141,7 +145,8 @@
           class="form-control mt-1"
           [placeholder]="'themeCustom.openUrlPH' | translate"
           [formControl]="openUrl"
-          required="" />
+          required
+          trimOnBlur />
         <select
           [formControl]="openWindowsTarget"
           class="form-control"
@@ -162,8 +167,8 @@
           <app-chip-select-button
             valueKey="apiName"
             [formControl]="element.get('apiName')"
-            [selectTable]="selectApi.bind(this)"
-            [options]="apis.value()"
+            [selectTable]="selectApi"
+            [options]="apis.value"
             [labelKey]="getApiLabelName"
             [required]="true"
             [requiredMsg]="
@@ -177,7 +182,8 @@
         <input
           class="form-control mt-1"
           [placeholder]="'themeCustom.deleteFilePH' | translate"
-          [formControl]="deleteFile" />
+          [formControl]="deleteFile"
+          trimOnBlur />
         <app-form-invalids
           [control]="deleteFile"
           [formAlerts]="formAlertsObj().deleteFile"></app-form-invalids>
@@ -191,12 +197,14 @@
             class="form-control"
             [placeholder]="'themeCustom.filePathForMoveToPH' | translate"
             [formControl]="filePathForMoveTo"
-            required />
+            required
+            trimOnBlur />
           <input
             class="form-control"
             [placeholder]="'themeCustom.moveToPH' | translate"
             [formControl]="moveTo"
-            required />
+            required
+            trimOnBlur />
         </div>
         <app-form-invalids
           [control]="filePathForMoveTo"
@@ -211,7 +219,8 @@
         <input
           class="form-control mt-1"
           [placeholder]="'themeCustom.openFolderPH' | translate"
-          [formControl]="openFolder" />
+          [formControl]="openFolder"
+          trimOnBlur />
         <app-form-invalids
           [control]="openFolder"
           [formAlerts]="formAlertsObj().openFolder"></app-form-invalids>

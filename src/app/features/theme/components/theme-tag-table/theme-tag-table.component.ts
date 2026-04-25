@@ -141,12 +141,12 @@ export class ThemeTagTableComponent implements OnInit {
     arr.updateValueAndValidity({ emitEvent: false });
   }
 
-  createGroup() {
+  readonly createGroup = () => {
     return this.fb.group({
       seq: [0],
       shareTagId: ['', [Validators.required]],
     });
-  }
+  };
 
   shareTagIdEmptyValidator() {
     return (ctrl: AbstractControl): ValidationErrors | null => {

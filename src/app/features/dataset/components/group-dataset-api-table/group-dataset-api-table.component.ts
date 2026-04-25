@@ -95,13 +95,13 @@ export class GroupDatasetApiTableComponent {
       columnType: GenericColumnType.input,
     },
   ];
-  createGroup() {
+  readonly createGroup = () => {
     return this.fb.group({
       seq: [0],
       apiName: ['', [Validators.required]],
       label: ['', [Validators.required]],
     });
-  }
+  };
 
   selectApi(e: GroupDatasetApi) {
     this.selectTableService.selectSingleApi(this.apis.value()).subscribe(x => {

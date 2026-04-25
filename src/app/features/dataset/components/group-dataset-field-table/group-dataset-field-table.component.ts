@@ -75,7 +75,7 @@ export class GroupDatasetFieldTableComponent {
     } satisfies SelectColumn<{ key: string; value: string }>,
   ];
 
-  createGroup() {
+  readonly createGroup = () => {
     return this.fb.group({
       seq: [0],
       type: [GroupDatasetFieldType.string],
@@ -83,7 +83,7 @@ export class GroupDatasetFieldTableComponent {
       label: ['', [Validators.required]],
       replaceValueMapName: [''],
     });
-  }
+  };
 
   selectReplaceValueMap(element: GroupDatasetField) {
     this.selectTableService

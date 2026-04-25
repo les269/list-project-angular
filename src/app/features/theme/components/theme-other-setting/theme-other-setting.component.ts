@@ -31,6 +31,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { MatRadioModule } from '@angular/material/radio';
 import { QuickRefreshType } from '../../../dataset/model';
 import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage.component';
+import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 
 @Component({
   selector: 'app-theme-other-setting',
@@ -49,6 +50,7 @@ import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage
     ChipInputComponent,
     ThemeItemManageComponent,
     MatRadioModule,
+    TrimOnBlurDirective,
   ],
   templateUrl: './theme-other-setting.component.html',
 })

@@ -1,4 +1,4 @@
-import { Component, forwardRef, input, signal } from '@angular/core';
+import { Component, effect, forwardRef, input, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { MatChipsModule } from '@angular/material/chips';
@@ -30,6 +30,18 @@ export class ChipSelectMultipleButtonComponent implements ControlValueAccessor {
   readonly disabled = signal(false);
   readonly selectedData = signal<any[]>([]);
 
+  constructor() {
+    // options 是 async 載入，當 options 有資料時補找 selectedData
+    effect(() => {
+      const opts = this.options();
+      const vals = this.values();
+      if (opts.length === 0 || vals.length === 0) return;
+      if (this.selectedData().length > 0) return;
+      const found = opts.filter(opt => vals.includes(opt[this.valueKey()]));
+      if (found.length > 0) this.selectedData.set(found);
+    });
+  }
+
   removeChip(obj: any) {
     const key = this.valueKey();
     const value = obj[this.valueKey()];
@@ -59,11 +71,7 @@ export class ChipSelectMultipleButtonComponent implements ControlValueAccessor {
   onChange: any = () => {};
   onTouched: any = () => {};
   writeValue(val: any): void {
-    const options = this.options();
-    if (val && Array.isArray(val) && options.length > 0) {
-      const found = options.filter(opt => val.includes(opt[this.valueKey()]));
-      this.selectedData.set(found);
-    }
+    this.selectedData.set([]);
     this.values.set(val ?? []);
   }
 

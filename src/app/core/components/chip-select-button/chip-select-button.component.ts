@@ -1,4 +1,11 @@
-import { Component, forwardRef, input, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  forwardRef,
+  input,
+  signal,
+} from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
@@ -20,7 +27,8 @@ import { Observable } from 'rxjs';
 export class ChipSelectButtonComponent implements ControlValueAccessor {
   readonly valueKey = input.required<any>();
   readonly selectTable = input.required<() => Observable<any>>();
-  readonly options = input.required<any[]>();
+  /** 可傳入純陣列 `any[]` 或 Signal `() => any[]`，元件內部自動解析 */
+  readonly options = input.required<any[] | (() => any[])>();
   readonly labelKey = input.required<((item: any) => string) | string>();
   readonly required = input<boolean>(false);
   readonly requiredMsg = input<string>('');
@@ -28,6 +36,24 @@ export class ChipSelectButtonComponent implements ControlValueAccessor {
   readonly value = signal('');
   readonly disabled = signal(false);
   readonly selectedData = signal<any | null>(null);
+
+  private readonly resolvedOptions = computed<any[]>(() => {
+    const opts = this.options();
+    return typeof opts === 'function' ? opts() : opts;
+  });
+
+  constructor() {
+    // options 是 async 載入，當 options 有資料時補找 selectedData
+    effect(() => {
+      const opts = this.resolvedOptions();
+      const val = this.value();
+      if (opts.length === 0 || !val || this.selectedData()) return;
+      const found = opts.find(
+        opt => String(opt[this.valueKey()]) === String(val)
+      );
+      if (found) this.selectedData.set(found);
+    });
+  }
 
   removeChip() {
     this.value.set('');
@@ -59,14 +85,9 @@ export class ChipSelectButtonComponent implements ControlValueAccessor {
   onChange: any = () => {};
   onTouched: any = () => {};
   writeValue(val: any): void {
+    // 清除舊的 selectedData，讓 effect 重新查找（兼容 options 已載入或尚未載入兩種情況）
+    this.selectedData.set(null);
     this.value.set(val || '');
-    // 當外部傳入 ID 時，嘗試從 options 中找回完整的 Data 以便顯示 Label
-    if (val && this.options().length > 0) {
-      const found = this.options().find(
-        opt => String(opt[this.valueKey()]) === String(val)
-      );
-      if (found) this.selectedData.set(found);
-    }
   }
   registerOnChange(fn: any): void {
     this.onChange = fn;

@@ -1,0 +1,104 @@
+<div
+  cdkDropList
+  [cdkDropListData]="formArray().controls"
+  (cdkDropListDropped)="dropPipeline($event)">
+  @for (pipeline of formArray().controls; track $index) {
+    @let pipelineType = pipeline.get('type')?.value;
+    <div cdkDrag [formGroup]="pipeline" class="card mb-2 p-2 bg-light">
+      <div class="d-flex align-items-center gap-2">
+        <div class="d-flex">
+          <mat-icon cdkDragHandle class="drag-cursor">reorder</mat-icon>
+        </div>
+        <div class="mx-2">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            formControlName="enabled" />
+        </div>
+        <div class="d-flex gap-2">
+          <select formControlName="type" class="form-select">
+            @for (type of eValuePipelineType | keyvalue; track type.key) {
+              <option [value]="type.key">
+                {{ 'spider.pipeline.' + type.key | translate }}
+              </option>
+            }
+          </select>
+        </div>
+        @switch (pipelineType) {
+          @case (eValuePipelineType.EXTRACT_ATTR) {
+            <div class="d-flex input-group">
+              <input
+                class="form-control"
+                formControlName="attributeName"
+                [placeholder]="'spider.pipeline.attributeName' | translate"
+                trimOnBlur />
+            </div>
+          }
+          @case (eValuePipelineType.REPLACE_REGULAR) {
+            <div class="d-flex input-group">
+              <input
+                class="form-control"
+                formControlName="pattern"
+                [placeholder]="'spider.pipeline.pattern' | translate"
+                trimOnBlur />
+              <input
+                class="form-control"
+                formControlName="replacement"
+                [placeholder]="'spider.pipeline.replacement' | translate"
+                trimOnBlur />
+            </div>
+          }
+          @case (eValuePipelineType.SPLIT_TEXT) {
+            <div class="d-flex input-group">
+              <input
+                class="form-control"
+                formControlName="separator"
+                [placeholder]="'spider.pipeline.separator' | translate"
+                trimOnBlur />
+            </div>
+          }
+          @case (eValuePipelineType.COMBINE_TO_STRING) {
+            <div class="d-flex input-group">
+              <input
+                class="form-control"
+                formControlName="combineToString"
+                [placeholder]="'spider.pipeline.combineToStringPH' | translate"
+                trimOnBlur />
+            </div>
+          }
+          @case (eValuePipelineType.COMBINE_BY_KEY) {
+            <div class="d-flex input-group">
+              <input
+                class="form-control"
+                formControlName="combineByKey"
+                [placeholder]="'spider.pipeline.combineByKeyPH' | translate"
+                trimOnBlur />
+            </div>
+          }
+          @case (eValuePipelineType.USE_REPLACE_VALUE_MAP) {
+            <app-chip-select-button
+              valueKey="name"
+              formControlName="useReplaceValueMap"
+              [selectTable]="selectReplaceValueMap"
+              [options]="replaceValueMap.value()"
+              [labelKey]="getReplaceValueMapLabel"
+              [required]="true"
+              [requiredMsg]="
+                'msg.requiredSelectOne' | translate
+              "></app-chip-select-button>
+          }
+        }
+        <button mat-icon-button class="ms-auto" (click)="onDelete($index)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+  }
+</div>
+
+<button
+  type="button"
+  class="btn btn-outline-primary btn-sm mt-1"
+  (click)="onAdd()">
+  + {{ 'spider.addPipeline' | translate }}
+</button>

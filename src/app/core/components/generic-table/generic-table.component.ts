@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   Component,
   computed,
   effect,
@@ -18,7 +17,6 @@ import {
 } from '@angular/cdk/drag-drop';
 import {
   AbstractControl,
-  FormArray,
   FormBuilder,
   FormControl,
   FormGroup,
@@ -74,7 +72,7 @@ export class GenericTableComponent {
   readonly formArray = input.required<ToFormArray<any>>();
   readonly cols = input.required<GenericTableColumn[]>();
   readonly displayedColumns = input.required<string[]>();
-  readonly createGroup = input.required<() => FormGroup>();
+  readonly createGroup = input.required<(a?: any) => FormGroup>();
   readonly initData = input<any[]>();
   readonly customColTmpls = input<Record<string, TemplateRef<any>>>();
   readonly expandedTmpl = input<TemplateRef<any>>();
@@ -108,7 +106,7 @@ export class GenericTableComponent {
     const array = this.formArray();
     array.clear();
     for (const item of data.slice()) {
-      const group = this.createGroup()();
+      const group = this.createGroup()(item);
       group.patchValue(item);
       array.push(group);
     }

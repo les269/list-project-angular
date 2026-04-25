@@ -78,7 +78,11 @@
     "spiderPkArrayError": "測試主鍵資料格式錯誤，請輸入字串陣列 JSON",
     "spiderSaveFirst": "請先保存爬蟲設定，再建立爬蟲項目",
     "spiderItemRequired": "請輸入爬蟲項目 ID",
-    "spiderItemSaveFirst": "請先保存項目，再進行綁定"
+    "spiderItemSaveFirst": "請先保存項目，再進行綁定",
+    "spiderItemExist": "該爬蟲項目已經存在",
+    "spiderItemInUse": "該爬蟲項目正在使用中，無法刪除",
+    "sureDeleteSpiderItem": "是否要刪除該爬蟲項目?",
+    "invalidJson": "無效的 JSON 格式"
   },
   "g": {
     "edit": "編輯",
@@ -138,7 +142,9 @@
     "useThis": "使用這個",
     "optional": "可選",
     "bind": "綁定",
-    "unbind": "取消綁定"
+    "unbind": "取消綁定",
+    "format": "格式化",
+    "invalidJson": "無效的 JSON 格式"
   },
   "disk": {
     "disk": "硬碟代號",
@@ -214,7 +220,8 @@
     "databaseEdit": "資料庫設定",
     "disk": "硬碟",
     "select": "請選擇{{text}}",
-    "selectCookieList": "請選擇 Cookie 清單"
+    "selectCookieList": "請選擇 Cookie 清單",
+    "selectSpiderItem": "請選擇爬蟲項目"
   },
   "home": {
     "createTheme": "創建主題",
@@ -235,6 +242,7 @@
   "spider": {
     "createSpider": "新增爬蟲設定",
     "createSpiderItem": "建立爬蟲項目",
+    "deleteSpiderItem": "刪除爬蟲項目",
     "spiderId": "爬蟲ID",
     "spiderItemId": "爬蟲項目ID",
     "item": "項目",
@@ -246,7 +254,62 @@
     "testPkArray": "測試主鍵資料",
     "testPkArrayDesc": "請輸入字串陣列 JSON，例如 [\"a\", \"b\"]",
     "testUrl": "測試網址",
-    "testResultJson": "測試結果 JSON"
+    "testResultJson": "測試結果 JSON",
+    "extractionRule": "提取方法",
+    "extractionRuleMode": {
+      "SELECT": "CSS選擇器",
+      "JSON_PATH": "Json Path"
+    },
+    "urlType": {
+      "name": "網址使用方式",
+      "BY_PARAMS": "使用參數組合成網址",
+      "BY_PRIME_KEY": "使用主鍵組組成網址"
+    },
+    "url": "爬蟲網址",
+    "key": "鍵",
+    "selector": "選擇器",
+    "jsonPath": "Json Path",
+    "condition": {
+      "name": "提取條件",
+      "ALWAYS": "總是提取",
+      "IF_KEY_EMPTY": "當key值為空",
+      "IF_KEY_NOT_EMPTY": "當key值不為空",
+      "CONTAINS": "當結果包含特定值",
+      "NOT_CONTAINS": "當結果不包含特定值",
+      "EQUALS": "當結果等於特定值",
+      "NOT_EQUALS": "當結果不等於特定值",
+      "MATCHES": "當結果符合正則",
+      "NOT_MATCHES": "當結果不符合正則"
+    },
+    "paramsPH": "當使用參數合成網址時, 組成url寫法為http://example.com?key={{$.key}}, 其中key值為已獲取的資料的key值,使用方法為JsonPath, 例如$.data.list[0].id, 需要用{{}}來表示使用JsonPath, 可以參考官方文件: <a href='https://github.com/json-path/JsonPath' target='_blank'>參考文件</a>",
+    "primeKeyPH": "當使用主鍵組合成網址時, 組成url寫法為http://example.com?key={{$[0]}}, 其中$[0]為主鍵陣列的第一個值, 使用方法為JsonPath, 需要用{{}}來表示使用JsonPath, 可以參考官方文件: <a href='https://github.com/json-path/JsonPath' target='_blank'>參考文件</a>",
+    "jsonPathPH": "使用方法為JsonPath, 例如$.data.list[0].id, 可以參考官方文件: <a href='https://github.com/json-path/JsonPath' target='_blank'>參考文件</a>",
+    "selectorPH": "使用方法為Jsoup的select, 閱讀官方使用<a href='https://jsoup.org/apidocs/org/jsoup/select/Selector.html' target='_blank'>參考文件</a>",
+    "skipWhenUsingUrl": "當直接使用完整網址來進行爬蟲獲取資料時，是否跳過該項目，網址會留給下一項目使用。",
+    "test": "測試",
+    "useCookie": "使用Cookie",
+    "conditionKey": "當前結果的key值",
+    "conditionKeyPH": "當前結果的key值, 可字串或者使用JsonPath例如$.data.list[0].id",
+    "conditionValue": "當前結果的條件值",
+    "conditionValuePH": "當前結果的條件值, 例如要包含的字串或者正則表達式",
+    "addPipeline": "新增處理步驟",
+    "pipeline": {
+      "EXTRACT_ATTR": "提取屬性(Json Path不支援該功能)",
+      "EXTRACT_OWN_TEXT": "僅提取自身文本(Json Path不支援該功能)",
+      "REPLACE_REGULAR": "正則替換",
+      "SPLIT_TEXT": "分割字串",
+      "CONVERT_TO_ARRAY": "轉為陣列",
+      "FIRST_VALUE": "僅保留第一筆",
+      "attributeName": "屬性名稱 ex: href, src",
+      "pattern": "正則表達式",
+      "replacement": "替換字串",
+      "separator": "分割字串,當為陣列時會嘗試把第一筆進行分割,分割後會覆蓋原有的key值並轉為陣列",
+      "COMBINE_TO_STRING": "合併字串根據當前陣列資料",
+      "combineToStringPH": "合併用的字串, {{$[0]}}代表第一筆資料 ex: {{$[0]}}-{{$[1]}}",
+      "COMBINE_BY_KEY": "合併字串根據當前擁有的鍵值資料",
+      "combineByKeyPH": "合併用的字串, {{$.name}} ex: {{$.name}}-{{$.id}}",
+      "USE_REPLACE_VALUE_MAP": "使用替換值映射表"
+    }
   },
   "themeItem": {
     "sourceItemId": "來源Id",

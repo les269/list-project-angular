@@ -1,3 +1,5 @@
+import { Cookie } from './cookie.model';
+
 export enum ScrapyEditMode {
   create = 'create',
   edit = 'edit',
@@ -29,32 +31,6 @@ export enum ScrapyPageType {
   redirect = 'redirect',
   scrapyData = 'scrapyData',
 }
-
-export interface Cookie {
-  seq: number;
-  name: string;
-  value: string;
-}
-
-export interface CookieListTO {
-  cookieId: string;
-  list: Cookie[];
-  description?: string;
-  updatedTime?: Date;
-}
-
-export enum CookieListMapType {
-  SPIDER = 'SPIDER',
-  API = 'API',
-}
-
-export interface CookieListMapTO {
-  refId: string;
-  type: CookieListMapType;
-  cookieId: string;
-  updatedTime?: Date;
-}
-
 export interface CssSelect {
   seq: number;
   key: string;

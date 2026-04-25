@@ -158,7 +158,7 @@ export class ThemeLabelTableComponent implements OnInit {
     arr.updateValueAndValidity({ emitEvent: false });
   }
 
-  createGroup() {
+  readonly createGroup = () => {
     // add a group-level validator so a single theme label can enforce width rules
     return this.fb.group(
       {
@@ -184,13 +184,13 @@ export class ThemeLabelTableComponent implements OnInit {
       },
       {
         validators: [
-          this.widthValidator().bind(this),
-          this.maxWidthValidator().bind(this),
-          this.minWidthValidator().bind(this),
+          this.widthValidator(),
+          this.maxWidthValidator(),
+          this.minWidthValidator(),
         ],
       }
     );
-  }
+  };
   //改變資料欄位的預設欄位,只能有一筆或無
   changeDefaultKey(index: number) {
     const ctrls = this.formArray.controls;

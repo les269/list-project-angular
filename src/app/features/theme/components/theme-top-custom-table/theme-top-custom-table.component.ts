@@ -42,6 +42,7 @@ import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage
 import { FormInvalidsComponent } from '../../../../core/components/form-invalids/form-invalids.component';
 import { ChipSelectButtonComponent } from '../../../../core/components/chip-select-button/chip-select-button.component';
 import { ApiConfig } from '../../../api-config/model';
+import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 
 @Component({
   selector: 'app-theme-top-custom-table',
@@ -59,6 +60,7 @@ import { ApiConfig } from '../../../api-config/model';
     ThemeItemManageComponent,
     FormInvalidsComponent,
     ChipSelectButtonComponent,
+    TrimOnBlurDirective,
   ],
   templateUrl: './theme-top-custom-table.component.html',
 })
@@ -141,7 +143,7 @@ export class ThemeTopCustomTableComponent {
     });
   }
 
-  createGroup() {
+  readonly createGroup = () => {
     const group = this.fb.group({
       seq: [0],
       type: [ThemeTopCustomType.openUrl],
@@ -153,7 +155,7 @@ export class ThemeTopCustomTableComponent {
     });
     this.initTypeWatcher(group);
     return group;
-  }
+  };
   initTypeWatcher(group: FormGroup) {
     group.get('type')!.valueChanges.subscribe(type => {
       this.updateValidatorsByType(group, type);
@@ -191,9 +193,10 @@ export class ThemeTopCustomTableComponent {
     }
     group.updateValueAndValidity();
   }
-  selectApi() {
-    return this.selectTableService.selectSingleApi(this.apis.value());
-  }
+  readonly selectApi = () =>
+    this.selectTableService.selectSingleApi(this.apis.value());
+
+  readonly getApiLabelName = (item: ApiConfig) => item.apiName;
 
   removeApi(element: ThemeTopCustom) {
     element.apiConfig = undefined;
@@ -202,8 +205,5 @@ export class ThemeTopCustomTableComponent {
   jsonReset(data: ThemeItem) {
     if (data.type !== ThemeItemType.TOPCUSTOM) return;
     this.resetData.set(data.json);
-  }
-  getApiLabelName(itme: ApiConfig) {
-    return itme.apiName;
   }
 }
