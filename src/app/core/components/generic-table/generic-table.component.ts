@@ -83,7 +83,6 @@ export class GenericTableComponent {
     'other',
   ]);
 
-  readonly eThemeHeaderType = ThemeHeaderType;
   readonly eGenericColumnType = GenericColumnType;
 
   readonly dragDisabled = signal(true);
