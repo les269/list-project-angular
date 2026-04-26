@@ -23,7 +23,7 @@
    ```
 3. run
    ```bash
-   nx serve
+   ng serve
    ```
 
 ## 配置
