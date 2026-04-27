@@ -13,7 +13,6 @@ import { SelectTableService } from '../../../core/services/select-table.service'
 import { SnackbarService } from '../../../core/services/snackbar.service';
 import { getRandomInt } from '../../../shared/util/helper';
 import { EditGroupDatasetDataComponent } from '../../dataset/components/edit-group-dataset-data/edit-group-dataset-data.component';
-import { api } from '../../../../environments/environment';
 import {
   ThemeDataset,
   ThemeTag,
@@ -219,7 +218,6 @@ export class ListBaseViewStoreAdapter {
   // constants
   readonly RANDOM_KEY = '__random';
   readonly DATASET_NAME_KEY = '__datasetName';
-  readonly webApi = api;
 
   getTagValueLength(shareTagId: string) {
     const nameList = this.dataStore.useDataNameSet();

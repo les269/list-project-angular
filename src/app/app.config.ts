@@ -21,12 +21,15 @@ import { apiInterceptor } from './core/interceptors/api.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatNativeDateModule } from '@angular/material/core';
+import { api } from '../environments/environment';
+import { API_BASE_URL } from './core/tokens/api-base-url.token';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
 export const appConfig: ApplicationConfig = {
   providers: [
+    { provide: API_BASE_URL, useValue: api },
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(
       routes,
