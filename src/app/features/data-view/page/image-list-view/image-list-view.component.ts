@@ -6,6 +6,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { API_BASE_URL } from '../../../../core/tokens/api-base-url.token';
 import {
   isBlank,
   isNotBlank,
@@ -70,6 +71,7 @@ import {
 })
 export class ImageListViewComponent {
   readonly store = inject(ListBaseViewStoreAdapter);
+  private readonly apiBaseUrl = inject(API_BASE_URL);
 
   replaceImageUrl = replaceValue;
   ctrlPressed = signal<boolean>(false);
@@ -108,12 +110,11 @@ export class ImageListViewComponent {
     let url = '';
     switch (themeImage.type) {
       case 'key':
-        url =
-          this.store.webApi + '/proxy-image?url=' + data[themeImage.imageKey];
+        url = this.apiBaseUrl + '/proxy-image?url=' + data[themeImage.imageKey];
         break;
       case 'url':
         url =
-          this.store.webApi +
+          this.apiBaseUrl +
           '/proxy-image?url=' +
           this.replaceImageUrl(themeImage.imageUrl, data, true);
         break;
