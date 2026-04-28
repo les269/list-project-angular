@@ -81,7 +81,7 @@ export class SpiderEditComponent {
 
   // signals
   readonly status = signal<SpiderEditMode>('create');
-  readonly selected = signal(0);
+
   readonly spiderId = toSignal(
     this.route.paramMap.pipe(
       map(params => params.get('spiderId')),
@@ -136,6 +136,20 @@ export class SpiderEditComponent {
     return mapping ? mapping.spiderItemId : null;
   };
 
+  readonly initialTabIndex = computed(() => {
+    const raw = this.route.snapshot.queryParamMap.get('tab');
+    const parsed = Number(raw);
+    return Number.isInteger(parsed) && parsed >= 0 ? parsed : 0;
+  });
+  readonly selected = linkedSignal(() => {
+    if (this.itemsRx.isLoading()) {
+      return 0;
+    }
+    const maxTabIndex = this.spiderItems().length;
+    const initialTabIndex = this.initialTabIndex();
+    return initialTabIndex <= maxTabIndex ? initialTabIndex : 0;
+  });
+
   // form
   readonly form = this.fb.nonNullable.group({
     spiderId: ['', Validators.required],
@@ -143,7 +157,7 @@ export class SpiderEditComponent {
     primeKeySize: [1, [Validators.required, Validators.min(1)]],
     isUrlBased: [false],
     testData: this.fb.nonNullable.group({
-      pkArrayJson: ['[]'],
+      primeKeyListJson: ['[]'],
       url: [''],
       resultJson: [''],
     }),
@@ -206,8 +220,8 @@ export class SpiderEditComponent {
         primeKeySize: config.primeKeySize,
         isUrlBased: config.isUrlBased,
         testData: {
-          pkArrayJson: JSON.stringify(
-            config.testData?.pkArray ?? [],
+          primeKeyListJson: JSON.stringify(
+            config.testData?.primeKeyList ?? [],
             undefined,
             2
           ),
@@ -221,18 +235,18 @@ export class SpiderEditComponent {
 
   private buildPayload(): SpiderConfig | null {
     const formValue = this.form.getRawValue();
-    const pkArrayJson = formValue.testData.pkArrayJson.trim() || '[]';
-    if (isNotJson(pkArrayJson)) {
-      this.snackbarService.openI18N('msg.spiderPkArrayError');
+    const primeKeyListJson = formValue.testData.primeKeyListJson.trim() || '[]';
+    if (isNotJson(primeKeyListJson)) {
+      this.snackbarService.openI18N('msg.spiderPrimeKeyListError');
       return null;
     }
 
-    const pkArray = JSON.parse(pkArrayJson);
+    const primeKeyList = JSON.parse(primeKeyListJson);
     if (
-      !Array.isArray(pkArray) ||
-      pkArray.some(value => typeof value !== 'string')
+      !Array.isArray(primeKeyList) ||
+      primeKeyList.some(value => typeof value !== 'string')
     ) {
-      this.snackbarService.openI18N('msg.spiderPkArrayError');
+      this.snackbarService.openI18N('msg.spiderPrimeKeyListError');
       return null;
     }
 
@@ -242,7 +256,7 @@ export class SpiderEditComponent {
       primeKeySize: formValue.primeKeySize,
       isUrlBased: formValue.isUrlBased,
       testData: {
-        pkArray,
+        primeKeyList,
         url: formValue.testData.url,
         resultJson: formValue.testData.resultJson,
       },
@@ -297,6 +311,15 @@ export class SpiderEditComponent {
           }
         }
       });
+  }
+
+  onTabChange(index: number) {
+    this.selected.set(index);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { tab: index },
+      queryParamsHandling: 'merge',
+    });
   }
 
   dropTab(event: CdkDragDrop<SpiderItem[]>) {

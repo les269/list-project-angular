@@ -71,18 +71,18 @@
         cdkDropListElementContainer=".mat-mdc-tab-labels"
         (cdkDropListDropped)="dropTab($event)"
         [selectedIndex]="selected()"
-        (selectedIndexChange)="selected.set($event)">
+        (selectedIndexChange)="onTabChange($event)">
         <mat-tab [label]="'spider.testArea' | translate">
           <div formGroupName="testData">
             <div class="form-group mb-2">
-              <label>{{ 'spider.testPkArray' | translate }}</label>
+              <label>{{ 'spider.testPrimeKeyList' | translate }}</label>
               <code-editor
-                formControlName="pkArrayJson"
+                formControlName="primeKeyListJson"
                 [language]="'json'"
                 [indentWithTab]="true"
                 [languages]="languages" />
               <label class="form-text w-100">{{
-                'spider.testPkArrayDesc' | translate
+                'spider.testPrimeKeyListDesc' | translate
               }}</label>
               <button type="button" class="btn btn-primary">
                 {{ 'spider.test' | translate }}
