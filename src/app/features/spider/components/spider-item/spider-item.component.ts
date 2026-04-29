@@ -27,6 +27,7 @@ import {
   ExtractionStepCondition,
   SpiderItem,
   SpiderItemMode,
+  SpiderItemSetting,
   SpiderMapping,
   UrlType,
   ValuePipeline,
@@ -60,6 +61,7 @@ import { CodeEditor } from '@acrodata/code-editor';
 import { languages } from '@codemirror/language-data';
 import { CdkAriaLive } from '../../../../../../node_modules/@angular/cdk/types/_a11y-module-chunk';
 import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
+import { SpiderService } from '../../services/spider.service';
 
 @Component({
   selector: 'app-spider-item',
@@ -88,6 +90,7 @@ export class SpiderItemComponent {
   readonly selectTableService = inject(SelectTableService);
   readonly messageBoxService = inject(MessageBoxService);
   readonly cookieListService = inject(CookieListService);
+  readonly spiderService = inject(SpiderService);
   // input
   readonly initData = input<SpiderItem>();
   readonly index = input<number>();
@@ -408,7 +411,24 @@ export class SpiderItemComponent {
     }
   }
 
-  onTestParseHtml() {}
+  onTestParseHtml() {
+    this.resultJsonData.setValue(JSON.stringify('{}', null, 2));
+    this.spiderService
+      .previewExtraction(
+        this.form.controls.itemSetting.value as SpiderItemSetting
+      )
+      .subscribe({
+        next: result => {
+          this.resultJsonData.setValue(JSON.stringify(result, null, 2));
+          this.snackbarService.openI18N('msg.extractSuccess');
+        },
+        error: err => {
+          this.snackbarService.openI18N('msg.extractFailed', {
+            message: err.message || '',
+          });
+        },
+      });
+  }
   onTestParseJson() {}
 
   private setExtractionRuleList(list: ExtractionRule[]) {

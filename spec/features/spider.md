@@ -18,13 +18,13 @@
 
 ### SpiderConfig
 
-| 欄位         | 型別                                                   | 說明              |
-| ------------ | ------------------------------------------------------ | ----------------- |
-| spiderId     | string                                                 | 主鍵              |
-| description  | string                                                 | 描述              |
-| primeKeySize | number                                                 | 主鍵數量          |
-| isUrlBased   | boolean                                                | 是否直接 URL 驅動 |
-| testData     | { pkArray: string[]; url: string; resultJson: string } | 測試資料          |
+| 欄位         | 型別                                                        | 說明              |
+| ------------ | ----------------------------------------------------------- | ----------------- |
+| spiderId     | string                                                      | 主鍵              |
+| description  | string                                                      | 描述              |
+| primeKeySize | number                                                      | 主鍵數量          |
+| isUrlBased   | boolean                                                     | 是否直接 URL 驅動 |
+| testData     | { primeKeyList: string[]; url: string; resultJson: string } | 測試資料          |
 
 ### SpiderMapping
 
@@ -124,7 +124,7 @@
 3. isUrlBased 會影響 primeKeySize 驗證：
    - URL-based 可為 0
    - 非 URL-based 至少 1
-4. testData.pkArrayJson 必須是合法 JSON 且為 string[]。
+4. testData.primeKeyListJson 必須是合法 JSON 且為 string[]。
 5. 新增 item tab 前，需先儲存 spider 主體。
 6. mapping tab 支援拖曳排序，拖曳後重算 executionOrder 並呼叫 update-list。
 7. 刪除 spider item 前會檢查是否 in-use，使用中不可刪。

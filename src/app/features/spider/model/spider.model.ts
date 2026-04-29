@@ -2,11 +2,27 @@ export interface SpiderConfig {
   spiderId: string; //pk
   description: string;
   primeKeySize: number;
-  testData: { pkArray: string[]; url: string; resultJson: string }; //測試區使用的資料
+  testData: SpiderConfigTestData; //測試區使用的資料
   isUrlBased: boolean; //僅只有URL的爬蟲，沒有使用primeKey爬蟲
   updatedTime?: Date;
 }
 
+export interface SpiderConfigTestData {
+  primeKeyList: string[];
+  url: string;
+  resultJson: string;
+}
+
+export interface SpiderReq {
+  spiderId: string;
+  url?: string;
+  primeKeyList?: string[];
+}
+
+export interface SpiderTestReq {
+  spiderConfig: SpiderConfig;
+  spiderItems: SpiderItem[];
+}
 export interface SpiderMapping {
   spiderId: string; //pk
   executionOrder: number; //pk 代表執行順序
@@ -24,11 +40,17 @@ export interface SpiderItem {
 export interface SpiderItemSetting {
   url: string;
   urlType: UrlType;
-  testData: { html: string; json: string; resultJson: string };
+  testData: SpiderItemSettingTestData;
   mode: ExtractionRuleMode; //select 多筆陣列 selectFirst 單一值 jsonPath 使用jsonPath語法
   extractionRuleList: ExtractionRule[];
   skipWhenUsingUrl: boolean;
   useCookie: boolean;
+}
+
+export interface SpiderItemSettingTestData {
+  html: string; // jsoup用的測試區使用的html
+  json: string; // jsonPath用的測試區使用的json
+  resultJson: string;
 }
 
 export enum SpiderItemMode {
@@ -75,8 +97,8 @@ export enum ValuePipelineType {
   SPLIT_TEXT = 'SPLIT_TEXT', // 分割字串
   CONVERT_TO_ARRAY = 'CONVERT_TO_ARRAY', // 轉為陣列
   FIRST_VALUE = 'FIRST_VALUE', // 僅保留第一筆資料
-  COMBINE_TO_STRING = 'COMBINE_TO_STRING', // 陣列合併為字串
-  COMBINE_BY_KEY = 'COMBINE_BY_KEY', // 陣列合併為字串
+  COMBINE_TO_STRING = 'COMBINE_TO_STRING', // 合併字串根據當前陣列資料
+  COMBINE_BY_KEY = 'COMBINE_BY_KEY', // 合併字串根據當前擁有的鍵值資料
   USE_REPLACE_VALUE_MAP = 'USE_REPLACE_VALUE_MAP', // 使用替換對照表
 }
 export interface ValuePipeline {

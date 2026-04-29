@@ -16,10 +16,10 @@ import {
 } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
-import moment from 'moment';
 import { isBlank, isNotBlank, isNumber } from '../../../../shared/util/helper';
 import { debounceTime, EMPTY, filter, switchMap } from 'rxjs';
 import { ScrapyPaginationService } from '../../services/scrapy-pagination.service';
+import dayjs from 'dayjs';
 
 @Component({
   selector: 'app-scrapy-pagination-edit',
@@ -54,7 +54,7 @@ export class ScrapyPaginationEditComponent implements OnInit {
       springExpressionLangList: [],
       updateIntervalType: UpdateIntervalType.year,
       updateInterval: 0,
-      lastUpdateDate: moment().startOf('day').toDate(),
+      lastUpdateDate: dayjs().startOf('day').toDate(),
     },
   };
   testHtml: string = '';

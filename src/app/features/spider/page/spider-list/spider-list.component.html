@@ -1,7 +1,9 @@
 <div class="col-md-10 offset-md-1 col-xs-12 mt-3">
-  <button type="button" class="btn btn-primary" (click)="onAdd()">
-    {{ 'spider.createSpider' | translate }}
-  </button>
+  <div class="d-flex mb-3">
+    <button type="button" class="btn btn-primary" (click)="onAdd()">
+      {{ 'spider.createSpider' | translate }}
+    </button>
+  </div>
   <div class="card">
     <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort>
       <ng-container matColumnDef="spiderId">
