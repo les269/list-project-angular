@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, KeyValue } from '@angular/common';
 import { Component, inject, input } from '@angular/core';
 import {
   FormArray,
@@ -7,7 +7,18 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
-import { ValuePipeline, ValuePipelineType } from '../../model';
+import {
+  ChineseConvertType,
+  ConvertToCaseType,
+  CopySpecifiedValueToConfig,
+  DeleteConfig,
+  InsertConfig,
+  MoveCharConfig,
+  PositionType,
+  Timezones,
+  ValuePipeline,
+  ValuePipelineType,
+} from '../../model';
 import {
   CdkDragDrop,
   DragDropModule,
@@ -22,6 +33,13 @@ import { switchMap } from 'rxjs';
 import { ChipSelectButtonComponent } from '../../../../core/components/chip-select-button/chip-select-button.component';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { ReplaceValueMap } from '../../../replace-value-map/model';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { EnumKeysPipe } from '../../../../shared/util/util.pipe';
+import { ChipInputComponent } from '../../../../core/components/chip-input/chip-input.component';
+import { SpiderFormService } from '../../services/spider-form.service';
+import { CodeEditor } from '@acrodata/code-editor';
+import { languages } from '@codemirror/language-data';
+import { CdkFooterRowDef } from '@angular/cdk/table';
 
 @Component({
   selector: 'app-pipeline-list',
@@ -35,28 +53,31 @@ import { ReplaceValueMap } from '../../../replace-value-map/model';
     TrimOnBlurDirective,
     MatButtonModule,
     ChipSelectButtonComponent,
+    MatTooltipModule,
+    EnumKeysPipe,
+    ChipInputComponent,
+    CodeEditor,
   ],
   templateUrl: './pipeline-list.component.html',
   styleUrls: ['./pipeline-list.component.scss'],
 })
 export class PipelineListComponent {
-  readonly fb = inject(FormBuilder);
   readonly selectTableService = inject(SelectTableService);
   readonly replaceValueMapService = inject(ReplaceValueMapService);
+  readonly spiderFormService = inject(SpiderFormService);
 
   readonly formArray = input.required<FormArray<FormGroup>>();
+  readonly replaceValueMapList = input<ReplaceValueMap[]>([]);
 
   readonly eValuePipelineType = ValuePipelineType;
-
-  readonly replaceValueMap = rxResource({
-    stream: () => this.replaceValueMapService.getNameList(),
-    defaultValue: [],
-  });
+  readonly eConvertToCaseType = ConvertToCaseType;
+  readonly eTimezones = Timezones;
+  readonly CodeEditorLanguages = languages;
 
   onAdd() {
     const arr = this.formArray();
     const nextSeq = arr.length;
-    arr.push(this.createPipelineGroup({ seq: nextSeq }));
+    arr.push(this.spiderFormService.createPipelineGroup({ seq: nextSeq }));
   }
 
   onDelete(index: number) {
@@ -77,25 +98,14 @@ export class PipelineListComponent {
     arr.updateValueAndValidity();
   }
 
-  createPipelineGroup(data?: Partial<ValuePipeline>) {
-    return this.fb.nonNullable.group({
-      seq: [data?.seq ?? 0],
-      type: [data?.type ?? ValuePipelineType.SPLIT_TEXT],
-      enabled: [data?.enabled ?? true],
-      attributeName: [data?.attributeName ?? ''],
-      pattern: [data?.pattern ?? ''],
-      replacement: [data?.replacement ?? ''],
-      separator: [data?.separator ?? ''],
-      combineToString: [data?.combineToString ?? ''],
-      combineByKey: [data?.combineByKey ?? ''],
-      useReplaceValueMap: [data?.useReplaceValueMap ?? ''],
-    });
-  }
-
-  readonly selectReplaceValueMap = () =>
-    this.selectTableService.selectSingleReplaceValueMap(
-      this.replaceValueMap.value()
-    );
+  selectReplaceValueMap = () =>
+    this.replaceValueMapService
+      .getNameList()
+      .pipe(
+        switchMap(list =>
+          this.selectTableService.selectSingleReplaceValueMap(list)
+        )
+      );
 
   getReplaceValueMapLabel(item: ReplaceValueMap) {
     return item.name;

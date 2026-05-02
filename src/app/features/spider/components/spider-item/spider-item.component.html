@@ -201,31 +201,40 @@
 </div>
 <ng-template #expandedTmpl let-element>
   <div class="d-flex flex-column my-2" [formGroup]="element">
-    @let condition = element.get('condition')?.value;
+    @let conditionType = element.get('conditionType')?.value;
 
-    @if (condition && condition !== eExtractionStepCondition.ALWAYS) {
-      <div class="d-flex input-group">
-        <label class="input-group-text">{{
+    @if (conditionType && conditionType !== eExtractionStepCondition.ALWAYS) {
+      <div
+        class="d-flex input-group input-group-sm mb-2"
+        formGroupName="conditionValue">
+        @if (shouldShowIgnoreCase(conditionType)) {
+          <div class="input-group-text">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              formControlName="ignoreCase"
+              [matTooltip]="'spider.ignoreCaseTip' | translate" />
+          </div>
+        }
+        <span class="input-group-text">{{
           'spider.conditionKey' | translate
-        }}</label>
+        }}</span>
         <input
           class="form-control"
-          formControlName="conditionKey"
+          formControlName="key"
           [placeholder]="'spider.conditionKeyPH' | translate"
           trimOnBlur />
-      </div>
-      @if (shouldShowValueInput(condition)) {
-        <div class="d-flex input-group">
-          <label class="input-group-text">
-            {{ 'spider.conditionValue' | translate }}
-          </label>
+        @if (shouldShowValueInput(conditionType)) {
+          <span class="input-group-text">
+            {{ 'spider.conditionValue' | translate }}</span
+          >
           <input
             class="form-control"
-            formControlName="conditionValue"
+            formControlName="value"
             [placeholder]="'spider.conditionValuePH' | translate"
             trimOnBlur />
-        </div>
-      }
+        }
+      </div>
     }
 
     <app-pipeline-list

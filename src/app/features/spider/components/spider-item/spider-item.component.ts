@@ -40,7 +40,6 @@ import {
   SelectColumn,
   ToFormArray,
 } from '../../../../core/model';
-import { C, G } from '@angular/cdk/keycodes';
 import { CookieTableComponent } from '../cookie-table/cookie-table.component';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 import { PipelineListComponent } from '../pipeline-list/pipeline-list.component';
@@ -59,9 +58,10 @@ import { MessageBoxService } from '../../../../core/services/message-box.service
 import { CookieListService } from '../../services/cookie-list.service';
 import { CodeEditor } from '@acrodata/code-editor';
 import { languages } from '@codemirror/language-data';
-import { CdkAriaLive } from '../../../../../../node_modules/@angular/cdk/types/_a11y-module-chunk';
 import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 import { SpiderService } from '../../services/spider.service';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { SpiderFormService } from '../../services/spider-form.service';
 
 @Component({
   selector: 'app-spider-item',
@@ -77,6 +77,7 @@ import { SpiderService } from '../../services/spider.service';
     CodeEditor,
     PipelineListComponent,
     TrimOnBlurDirective,
+    MatTooltipModule,
   ],
   templateUrl: './spider-item.component.html',
 })
@@ -91,6 +92,7 @@ export class SpiderItemComponent {
   readonly messageBoxService = inject(MessageBoxService);
   readonly cookieListService = inject(CookieListService);
   readonly spiderService = inject(SpiderService);
+  readonly spiderFormService = inject(SpiderFormService);
   // input
   readonly initData = input<SpiderItem>();
   readonly index = input<number>();
@@ -147,10 +149,10 @@ export class SpiderItemComponent {
   readonly eExtractionRuleMode = ExtractionRuleMode;
   readonly eExtractionStepCondition = ExtractionStepCondition;
   readonly eCookieListMapType = CookieListMapType;
-  readonly selectorDisplayedColumns = ['key', 'selector', 'condition'];
-  readonly jsonPathDisplayedColumns = ['key', 'jsonPath', 'condition'];
+  readonly selectorDisplayedColumns = ['key', 'selector', 'conditionType'];
+  readonly jsonPathDisplayedColumns = ['key', 'jsonPath', 'conditionType'];
   readonly conditionColumn = {
-    key: 'condition',
+    key: 'conditionType',
     label: 'spider.condition.name',
     columnType: GenericColumnType.select,
     data: toKeyValueArray(this.eExtractionStepCondition),
@@ -227,6 +229,10 @@ export class SpiderItemComponent {
   }
   get useSelector() {
     return this.extractionRuleMode.value === ExtractionRuleMode.SELECT;
+  }
+
+  get createExtractionRule() {
+    return this.spiderFormService.createExtractionRule;
   }
 
   constructor() {
@@ -337,7 +343,7 @@ export class SpiderItemComponent {
     this.extractionRuleList.clear();
     this.extractionRuleListData.set([]);
   }
-
+  //TODO: 如果有綁定就不能刪除，除非先解除綁定
   onDeleteItem() {
     const spiderItemId = this.spiderItemId.value;
     this.spiderMappingService
@@ -361,40 +367,6 @@ export class SpiderItemComponent {
         this.snackbarService.openI18N('msg.deleteSuccess');
         this.clearItem();
       });
-  }
-
-  readonly createExtractionRule = (data?: Partial<ExtractionRule>) => {
-    return this.fb.nonNullable.group({
-      seq: [data?.seq ?? 0],
-      key: [data?.key ?? ''],
-      selector: [data?.selector ?? ''],
-      jsonPath: [data?.jsonPath ?? ''],
-      pipelines: this.fb.nonNullable.array<
-        FormGroup<ControlsOf<ValuePipeline>>
-      >(
-        (data?.pipelines ?? []).map(pipeline =>
-          this.createValuePipelineGroup(pipeline)
-        )
-      ),
-      condition: [data?.condition ?? ExtractionStepCondition.ALWAYS],
-      conditionKey: [data?.conditionKey ?? ''],
-      conditionValue: [data?.conditionValue ?? ''],
-    }) as FormGroup<ControlsOf<ExtractionRule>>;
-  };
-
-  private createValuePipelineGroup(data?: Partial<ValuePipeline>) {
-    return this.fb.nonNullable.group({
-      seq: [data?.seq ?? 0],
-      type: [data?.type ?? ValuePipelineType.SPLIT_TEXT],
-      enabled: [data?.enabled ?? true],
-      attributeName: [data?.attributeName ?? ''],
-      pattern: [data?.pattern ?? ''],
-      replacement: [data?.replacement ?? ''],
-      separator: [data?.separator ?? ''],
-      combineToString: [data?.combineToString ?? ''],
-      combineByKey: [data?.combineByKey ?? ''],
-      useReplaceValueMap: [data?.useReplaceValueMap ?? ''],
-    }) as FormGroup<ControlsOf<ValuePipeline>>;
   }
 
   onFormatJson() {
@@ -435,7 +407,7 @@ export class SpiderItemComponent {
     const items = this.extractionRuleList;
     items.clear();
     for (const item of list) {
-      const group = this.createExtractionRule(item);
+      const group = this.spiderFormService.createExtractionRule(item);
       group.patchValue(item);
       items.push(group);
     }
@@ -450,5 +422,14 @@ export class SpiderItemComponent {
       ExtractionStepCondition.NOT_MATCHES,
     ];
     return valueConditions.includes(condition);
+  }
+  shouldShowIgnoreCase(condition: ExtractionStepCondition): boolean {
+    const patternConditions = [
+      ExtractionStepCondition.CONTAINS,
+      ExtractionStepCondition.NOT_CONTAINS,
+      ExtractionStepCondition.EQUALS,
+      ExtractionStepCondition.NOT_EQUALS,
+    ];
+    return patternConditions.includes(condition);
   }
 }

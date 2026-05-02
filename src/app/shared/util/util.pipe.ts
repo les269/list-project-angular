@@ -33,3 +33,13 @@ export class ReplaceValuePipe implements PipeTransform {
     });
   }
 }
+
+@Pipe({
+  name: 'enumKeys',
+  standalone: true,
+})
+export class EnumKeysPipe implements PipeTransform {
+  transform(value: object): string[] {
+    return Object.keys(value);
+  }
+}

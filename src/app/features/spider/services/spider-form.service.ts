@@ -1,0 +1,143 @@
+import { computed, inject, Injectable } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import {
+  ValuePipeline,
+  ValuePipelineType,
+  InsertConfig,
+  CopySpecifiedValueToConfig,
+  DeleteConfig,
+  MoveCharConfig,
+  ChineseConvertType,
+  ConvertToCaseType,
+  PositionType,
+  ExtractionRule,
+  ExtractionStepCondition,
+  CurrentTimeFormatOption,
+  Timezones,
+} from '../model';
+import { ControlsOf } from '../../../core/model';
+import dayjs from 'dayjs';
+
+@Injectable({ providedIn: 'root' })
+export class SpiderFormService {
+  readonly fb = inject(FormBuilder);
+  readonly eValuePipelineType = ValuePipelineType;
+  readonly eConvertToCaseType = ConvertToCaseType;
+  readonly eChineseConvertType = ChineseConvertType;
+  readonly ePositionType = PositionType;
+
+  readonly currentTimezones = computed(() => {
+    // 取得偏移分鐘數，例如台北是 480
+    const offsetMinutes = dayjs().utcOffset();
+    const hours = offsetMinutes / 60;
+
+    const prefix = hours >= 0 ? 'P' : 'M';
+    // 格式化數字，確保是兩位數 (如 08, 05)
+    const absHours = Math.abs(hours).toString().padStart(2, '0');
+
+    const key = `GMT_${prefix}${absHours}` as keyof typeof Timezones;
+
+    // 回傳對應的 Enum 值，如果找不到則預設 GMT_P00
+    return Timezones[key] ?? Timezones.GMT_P00;
+  });
+
+  readonly createExtractionRule = (data?: Partial<ExtractionRule>) => {
+    return this.fb.nonNullable.group({
+      seq: [data?.seq ?? 0],
+      key: [data?.key ?? ''],
+      selector: [data?.selector ?? ''],
+      jsonPath: [data?.jsonPath ?? ''],
+      pipelines: this.fb.nonNullable.array<
+        FormGroup<ControlsOf<ValuePipeline>>
+      >(
+        (data?.pipelines ?? []).map(pipeline =>
+          this.createPipelineGroup(pipeline)
+        )
+      ),
+      conditionType: [data?.conditionType ?? ExtractionStepCondition.ALWAYS],
+      conditionValue: this.fb.nonNullable.group({
+        key: [data?.conditionValue?.key ?? ''],
+        value: [data?.conditionValue?.value ?? ''],
+        ignoreCase: [data?.conditionValue?.ignoreCase ?? false],
+      }),
+    }) as FormGroup<ControlsOf<ExtractionRule>>;
+  };
+
+  createPipelineGroup(
+    data?: Partial<ValuePipeline>
+  ): FormGroup<ControlsOf<ValuePipeline>> {
+    return this.fb.nonNullable.group({
+      seq: [data?.seq ?? 0],
+      type: [data?.type ?? ValuePipelineType.FIXED_VALUE],
+      enabled: [data?.enabled ?? true],
+      fixedValue: [data?.fixedValue ?? ''],
+      fixedJsonValue: [data?.fixedJsonValue ?? ''],
+      attributeName: [data?.attributeName ?? ''],
+      pattern: [data?.pattern ?? ''],
+      replacement: [data?.replacement ?? ''],
+      separator: [data?.separator ?? ''],
+      combineToString: [data?.combineToString ?? ''],
+      combineByKey: [data?.combineByKey ?? ''],
+      useReplaceValueMap: [data?.useReplaceValueMap ?? ''],
+      mergeMultiObjKeys: [data?.mergeMultiObjKeys ?? []],
+      mergeMultiArrayKeys: [data?.mergeMultiArrayKeys ?? []],
+      convertToCaseType: [data?.convertToCaseType ?? ConvertToCaseType.UPPER],
+      currentTimeFormatOption: this.createCurrentTimeFormatOptionGroup(
+        data?.currentTimeFormatOption
+      ),
+      chineseConvertType: [
+        data?.chineseConvertType ??
+          ChineseConvertType.TRADITIONAL_TO_SIMPLIFIED,
+      ],
+      insertConfig: this.createInsertConfigGroup(data?.insertConfig),
+      copySpecifiedValueToConfig: this.createCopySpecifiedValueToConfigGroup(
+        data?.copySpecifiedValueToConfig
+      ),
+      deleteConfig: this.createDeleteConfigGroup(data?.deleteConfig),
+      deletePaths: [data?.deletePaths ?? []],
+      moveCharConfig: this.createMoveCharConfigGroup(data?.moveCharConfig),
+      joinArraySeparator: [data?.joinArraySeparator ?? ''],
+    }) as FormGroup<ControlsOf<ValuePipeline>>;
+  }
+
+  createInsertConfigGroup(data?: Partial<InsertConfig>) {
+    return this.fb.nonNullable.group({
+      position: [data?.position ?? PositionType.START],
+      key: [data?.key ?? ''],
+      text: [data?.text ?? ''],
+      index: [data?.index ?? 0],
+    }) as FormGroup<ControlsOf<InsertConfig>>;
+  }
+
+  createCopySpecifiedValueToConfigGroup(
+    data?: Partial<CopySpecifiedValueToConfig>
+  ) {
+    return this.fb.nonNullable.group({
+      copyKey: [data?.copyKey ?? ''],
+      insertKey: [data?.insertKey ?? ''],
+    }) as FormGroup<ControlsOf<CopySpecifiedValueToConfig>>;
+  }
+
+  createDeleteConfigGroup(data?: Partial<DeleteConfig>) {
+    return this.fb.nonNullable.group({
+      position: [data?.position ?? PositionType.START],
+      key: [data?.key ?? ''],
+      length: [data?.length ?? 0],
+      index: [data?.index ?? 0],
+    }) as FormGroup<ControlsOf<DeleteConfig>>;
+  }
+
+  createMoveCharConfigGroup(data?: Partial<MoveCharConfig>) {
+    return this.fb.nonNullable.group({
+      fromIndex: [data?.fromIndex ?? 0],
+      toIndex: [data?.toIndex ?? 0],
+    }) as FormGroup<ControlsOf<MoveCharConfig>>;
+  }
+
+  createCurrentTimeFormatOptionGroup(data?: Partial<CurrentTimeFormatOption>) {
+    return this.fb.nonNullable.group({
+      format: [data?.format ?? 'YYYY-MM-dd HH:mm:ss'],
+      timezones: [data?.timezones ?? this.currentTimezones()],
+    }) as FormGroup<ControlsOf<CurrentTimeFormatOption>>;
+  }
+}
