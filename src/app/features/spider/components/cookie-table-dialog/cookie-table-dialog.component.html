@@ -1,0 +1,12 @@
+<div class="d-flex justify-content-between align-items-center">
+  <h2 mat-dialog-title>{{ 'spider.settingCookies' | translate }}</h2>
+  <button class="d-flex mx-2" mat-icon-button (click)="onClose()">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content>
+  <app-cookie-table
+    [refId]="data.refId"
+    [mapType]="data.mapType"></app-cookie-table>
+</mat-dialog-content>

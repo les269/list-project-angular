@@ -55,8 +55,10 @@ export class SpiderFormService {
           this.createPipelineGroup(pipeline)
         )
       ),
-      conditionType: [data?.conditionType ?? ExtractionStepCondition.ALWAYS],
       conditionValue: this.fb.nonNullable.group({
+        conditionType: [
+          data?.conditionValue?.conditionType ?? ExtractionStepCondition.ALWAYS,
+        ],
         key: [data?.conditionValue?.key ?? ''],
         value: [data?.conditionValue?.value ?? ''],
         ignoreCase: [data?.conditionValue?.ignoreCase ?? false],

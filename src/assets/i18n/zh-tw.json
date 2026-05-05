@@ -360,7 +360,8 @@
       "fromIndex": "選定字元位置(從1開始)",
       "toIndex": "移動到的位置(從1開始)"
     },
-    "ignoreCaseTip": "是否忽略大小寫"
+    "ignoreCaseTip": "是否忽略大小寫",
+    "settingCookies": "設定Cookies"
   },
   "themeItem": {
     "sourceItemId": "來源Id",

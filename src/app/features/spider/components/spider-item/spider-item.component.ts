@@ -40,7 +40,6 @@ import {
   SelectColumn,
   ToFormArray,
 } from '../../../../core/model';
-import { CookieTableComponent } from '../cookie-table/cookie-table.component';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 import { PipelineListComponent } from '../pipeline-list/pipeline-list.component';
 import {
@@ -62,6 +61,11 @@ import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 import { SpiderService } from '../../services/spider.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { SpiderFormService } from '../../services/spider-form.service';
+import { MatDialog, MatDialogClose } from '@angular/material/dialog';
+import {
+  CookieTableDialogComponent,
+  CookieTableDialogData,
+} from '../cookie-table-dialog/cookie-table-dialog.component';
 
 @Component({
   selector: 'app-spider-item',
@@ -73,7 +77,6 @@ import { SpiderFormService } from '../../services/spider-form.service';
     ReactiveFormsModule,
     GenericTableComponent,
     MatCheckbox,
-    CookieTableComponent,
     CodeEditor,
     PipelineListComponent,
     TrimOnBlurDirective,
@@ -93,6 +96,7 @@ export class SpiderItemComponent {
   readonly cookieListService = inject(CookieListService);
   readonly spiderService = inject(SpiderService);
   readonly spiderFormService = inject(SpiderFormService);
+  readonly matDialog = inject(MatDialog);
   // input
   readonly initData = input<SpiderItem>();
   readonly index = input<number>();
@@ -140,7 +144,6 @@ export class SpiderItemComponent {
         FormGroup<ControlsOf<ExtractionRule>>
       >([]),
       skipWhenUsingUrl: [false],
-      useCookie: [false],
     }),
   });
   // constants
@@ -149,35 +152,26 @@ export class SpiderItemComponent {
   readonly eExtractionRuleMode = ExtractionRuleMode;
   readonly eExtractionStepCondition = ExtractionStepCondition;
   readonly eCookieListMapType = CookieListMapType;
-  readonly selectorDisplayedColumns = ['key', 'selector', 'conditionType'];
-  readonly jsonPathDisplayedColumns = ['key', 'jsonPath', 'conditionType'];
-  readonly conditionColumn = {
-    key: 'conditionType',
-    label: 'spider.condition.name',
-    columnType: GenericColumnType.select,
-    data: toKeyValueArray(this.eExtractionStepCondition),
-    dataValue: 'key',
-    dataLabel: item => `spider.condition.${item.key}`,
-    width: '20%',
-  } satisfies SelectColumn<{ key: string; value: string }>;
+  readonly selectorDisplayedColumns = ['key', 'selector'];
+  readonly jsonPathDisplayedColumns = ['key', 'jsonPath'];
   readonly cols: GenericTableColumn[] = [
     {
       key: 'key',
       label: 'spider.key',
       columnType: GenericColumnType.input,
-      width: '20%',
     },
     {
       key: 'selector',
       label: 'spider.selector',
       columnType: GenericColumnType.textarea,
+      width: '70%',
     },
     {
       key: 'jsonPath',
       label: 'spider.jsonPath',
       columnType: GenericColumnType.textarea,
+      width: '70%',
     },
-    this.conditionColumn,
   ];
 
   get spiderItemId() {
@@ -214,9 +208,6 @@ export class SpiderItemComponent {
   }
   get skipWhenUsingUrl() {
     return this.form.controls.itemSetting.controls.skipWhenUsingUrl;
-  }
-  get useCookie() {
-    return this.form.controls.itemSetting.controls.useCookie;
   }
   get modeParams() {
     return this.urlType.value === UrlType.BY_PARAMS;
@@ -402,6 +393,18 @@ export class SpiderItemComponent {
       });
   }
   onTestParseJson() {}
+
+  onCookiesDialog() {
+    const data: CookieTableDialogData = {
+      refId: this.spiderItemId.getRawValue() ?? '',
+      mapType: CookieListMapType.SPIDER,
+    };
+    this.matDialog.open(CookieTableDialogComponent, {
+      data,
+      minWidth: '60vw',
+      autoFocus: false,
+    });
+  }
 
   private setExtractionRuleList(list: ExtractionRule[]) {
     const items = this.extractionRuleList;

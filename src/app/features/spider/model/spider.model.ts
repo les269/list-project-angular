@@ -44,7 +44,6 @@ export interface SpiderItemSetting {
   mode: ExtractionRuleMode; //select 多筆陣列 selectFirst 單一值 jsonPath 使用jsonPath語法
   extractionRuleList: ExtractionRule[];
   skipWhenUsingUrl: boolean;
-  useCookie: boolean;
 }
 
 export interface SpiderItemSettingTestData {
@@ -69,11 +68,11 @@ export interface ExtractionRule {
   selector: string; // jsoup selector
   jsonPath: string; // 用於 jsonPath 的路徑
   pipelines: ValuePipeline[];
-  conditionType: ExtractionStepCondition; // 執行條件類型
   conditionValue: ExtractionCondition;
 }
 
 export interface ExtractionCondition {
+  conditionType: ExtractionStepCondition; // 執行條件類型
   key: string;
   value: string;
   ignoreCase: boolean;

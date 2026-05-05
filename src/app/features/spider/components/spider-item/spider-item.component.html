@@ -78,9 +78,9 @@
     ></label>
   }
   <div class="d-flex">
-    <mat-checkbox [formControl]="useCookie">{{
-      'spider.useCookie' | translate
-    }}</mat-checkbox>
+    <button type="button" class="btn btn-primary" (click)="onCookiesDialog()">
+      {{ 'spider.settingCookies' | translate }}
+    </button>
   </div>
 
   <div class="d-flex my-2 gap-2">
@@ -132,12 +132,6 @@
       </button>
     }
   </div>
-
-  @if (useCookie.value) {
-    <app-cookie-table
-      [refId]="cookieRefId()"
-      [mapType]="eCookieListMapType.SPIDER"></app-cookie-table>
-  }
   <div class="card-body">
     <div class="card mb-3">
       <app-generic-table
@@ -201,12 +195,20 @@
 </div>
 <ng-template #expandedTmpl let-element>
   <div class="d-flex flex-column my-2" [formGroup]="element">
-    @let conditionType = element.get('conditionType')?.value;
-
-    @if (conditionType && conditionType !== eExtractionStepCondition.ALWAYS) {
-      <div
-        class="d-flex input-group input-group-sm mb-2"
-        formGroupName="conditionValue">
+    <div
+      class="d-flex input-group input-group-sm mb-2"
+      formGroupName="conditionValue">
+      <select
+        class="form-select"
+        [formControl]="element.get('conditionValue.conditionType')">
+        @for (type of eExtractionStepCondition | keyvalue; track type) {
+          <option [ngValue]="type.key">
+            {{ 'spider.condition.' + type.key | translate }}
+          </option>
+        }
+      </select>
+      @let conditionType = element.get('conditionValue.conditionType').value;
+      @if (conditionType && conditionType !== eExtractionStepCondition.ALWAYS) {
         @if (shouldShowIgnoreCase(conditionType)) {
           <div class="input-group-text">
             <input
@@ -223,6 +225,7 @@
           class="form-control"
           formControlName="key"
           [placeholder]="'spider.conditionKeyPH' | translate"
+          [matTooltip]="'spider.conditionKeyPH' | translate"
           trimOnBlur />
         @if (shouldShowValueInput(conditionType)) {
           <span class="input-group-text">
@@ -232,10 +235,11 @@
             class="form-control"
             formControlName="value"
             [placeholder]="'spider.conditionValuePH' | translate"
+            [matTooltip]="'spider.conditionValuePH' | translate"
             trimOnBlur />
         }
-      </div>
-    }
+      }
+    </div>
 
     <app-pipeline-list
       [formArray]="element.get('pipelines')"></app-pipeline-list>

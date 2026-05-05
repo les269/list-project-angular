@@ -48,6 +48,7 @@
           @case (eGenericColumnType.textarea) {
             <textarea
               class="form-control"
+              style="field-sizing: content"
               [formControlName]="col.key"
               [class.is-invalid]="
                 colKey?.invalid && colKey?.touched
