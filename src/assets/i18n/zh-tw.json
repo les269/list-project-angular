@@ -299,10 +299,14 @@
     "pipeline": {
       "FIXED_VALUE": "固定值",
       "FIXED_JSON_VALUE": "固定JSON值",
+      "CURRENT_DATA_KEY": "使用當前資料鍵值資料",
+      "currentDataKeyPH": "指定要使用的當前資料鍵值, 例如 name 或者 $.data.name",
       "EXTRACT_ATTR": "提取屬性(Json Path不支援該功能)",
       "EXTRACT_OWN_TEXT": "僅提取自身文本(Json Path不支援該功能)",
       "REPLACE_REGULAR": "正則替換",
       "SPLIT_TEXT": "分割字串",
+      "JOIN_ARRAY_TO_STRING": "將字串陣列合併為字串",
+      "joinSeparator": "合併分隔符",
       "CONVERT_TO_ARRAY": "轉為陣列",
       "FIRST_VALUE": "僅保留第一筆",
       "LAST_VALUE": "僅保留最後一筆",
@@ -333,7 +337,28 @@
         "LOWER": "將大寫字母轉成小寫",
         "FIRST_UPPER": "將首字母轉成大寫",
         "FIND_FIRST_UPPER": "將第一個出現的字母轉成大寫"
-      }
+      },
+      "chineseConvertType": {
+        "SIMPLIFIED_TO_TRADITIONAL": "簡體轉繁體",
+        "TRADITIONAL_TO_SIMPLIFIED": "繁體轉簡體"
+      },
+      "zhConverterUtilType": {
+        "ZH_CONVERTER_UTIL": "基礎的繁簡體轉換",
+        "ZH_TW_CONVERTER_UTIL": "台灣與大陸的繁簡體轉換",
+        "ZH_HK_CONVERTER_UTIL": "香港與大陸的繁簡體轉換",
+        "ZH_JP_CONVERTER_UTIL": "日文新字與大陸的繁簡體轉換"
+      },
+      "indexNTH": "第N位(從1開始)",
+      "insertText": "要插入的字串",
+      "positionType": {
+        "START": "開始",
+        "END": "結束",
+        "NTH": "第N位"
+      },
+      "deleteLength": "要刪除的長度",
+      "deletePathsPH": "請輸入要刪除的鍵值",
+      "fromIndex": "選定字元位置(從1開始)",
+      "toIndex": "移動到的位置(從1開始)"
     },
     "ignoreCaseTip": "是否忽略大小寫"
   },

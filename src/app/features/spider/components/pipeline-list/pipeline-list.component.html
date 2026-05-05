@@ -27,6 +27,7 @@
           </select>
         </div>
         @switch (pipelineType) {
+          <!-- 固定值 -->
           @case (eValuePipelineType.FIXED_VALUE) {
             <div class="d-flex input-group">
               <input
@@ -35,6 +36,7 @@
                 trimOnBlur />
             </div>
           }
+          <!-- 固定JSON值 -->
           @case (eValuePipelineType.FIXED_JSON_VALUE) {
             <div class="d-flex input-group">
               <code-editor
@@ -45,6 +47,17 @@
                 [languages]="CodeEditorLanguages" />
             </div>
           }
+          <!-- 當前資料鍵值 -->
+          @case (eValuePipelineType.CURRENT_DATA_KEY) {
+            <div class="d-flex input-group">
+              <input
+                class="form-control"
+                formControlName="currentDataKey"
+                [placeholder]="'spider.pipeline.currentDataKeyPH' | translate"
+                trimOnBlur />
+            </div>
+          }
+          <!-- 提取属性 jsoup專用 -->
           @case (eValuePipelineType.EXTRACT_ATTR) {
             <div class="d-flex input-group">
               <input
@@ -54,6 +67,9 @@
                 trimOnBlur />
             </div>
           }
+          <!-- 提取自身文本 jsoup專用 無需要的componet -->
+          @case (eValuePipelineType.EXTRACT_OWN_TEXT) {}
+          <!-- 正則替換 -->
           @case (eValuePipelineType.REPLACE_REGULAR) {
             <div class="d-flex input-group">
               <input
@@ -68,6 +84,7 @@
                 trimOnBlur />
             </div>
           }
+          <!-- 分割文本 -->
           @case (eValuePipelineType.SPLIT_TEXT) {
             <div class="d-flex input-group">
               <input
@@ -77,6 +94,16 @@
                 trimOnBlur />
             </div>
           }
+          <!-- 將字串陣列合併為字串 -->
+          @case (eValuePipelineType.JOIN_ARRAY_TO_STRING) {
+            <div class="d-flex input-group">
+              <input
+                class="form-control"
+                formControlName="joinSeparator"
+                [placeholder]="'spider.pipeline.joinSeparator' | translate" />
+            </div>
+          }
+          <!-- 將多個值合併為字串 -->
           @case (eValuePipelineType.COMBINE_TO_STRING) {
             <div class="d-flex input-group">
               <input
@@ -86,6 +113,7 @@
                 trimOnBlur />
             </div>
           }
+          <!-- 根據當前擁有的鍵值資料合併成字串 -->
           @case (eValuePipelineType.COMBINE_BY_KEY) {
             <div class="d-flex input-group">
               <input
@@ -141,7 +169,7 @@
           @case (eValuePipelineType.CURRENT_TIME) {
             <div
               class="d-flex input-group"
-              [formGroupName]="'currentTimeFormatOption'">
+              formGroupName="currentTimeFormatOption">
               <select formControlName="timezones" class="form-select">
                 @for (type of eTimezones | keyvalue; track type.key) {
                   <option [value]="type.key">
@@ -158,13 +186,106 @@
               <mat-icon>help</mat-icon>
             </a>
           }
-          @case (eValuePipelineType.CHINESE_CONVERT) {}
-          @case (eValuePipelineType.INSERT) {}
-          @case (eValuePipelineType.COPY_SPECIFIED_VALUE_TO) {}
-          @case (eValuePipelineType.DELETE) {}
-          @case (eValuePipelineType.DELETE_PATHS) {}
-          @case (eValuePipelineType.MOVE_CHAR) {}
-          @case (eValuePipelineType.JOIN_ARRAY) {}
+          @case (eValuePipelineType.CHINESE_CONVERT) {
+            <div class="d-flex input-group" formGroupName="chineseConvert">
+              <select formControlName="zhConverterUtilType" class="form-select">
+                @for (type of eZhConverterUtilType | enumKeys; track type) {
+                  <option [value]="type">
+                    {{
+                      'spider.pipeline.zhConverterUtilType.' + type | translate
+                    }}
+                  </option>
+                }
+              </select>
+              <select formControlName="chineseConvertType" class="form-select">
+                @for (type of eChineseConvertType | enumKeys; track type) {
+                  <option [value]="type">
+                    {{
+                      'spider.pipeline.chineseConvertType.' + type | translate
+                    }}
+                  </option>
+                }
+              </select>
+            </div>
+          }
+          @case (eValuePipelineType.INSERT) {
+            <div class="d-flex input-group" formGroupName="insertConfig">
+              <select formControlName="position" class="form-select">
+                @for (type of ePositionType | enumKeys; track type) {
+                  <option [value]="type">
+                    {{ 'spider.pipeline.positionType.' + type | translate }}
+                  </option>
+                }
+              </select>
+              @if (
+                pipeline.get('insertConfig.position')?.value ===
+                ePositionType.NTH
+              ) {
+                <input
+                  type="number"
+                  class="form-control"
+                  formControlName="index"
+                  [matTooltip]="'spider.pipeline.indexNTH' | translate"
+                  trimOnBlur />
+              }
+              <input
+                class="form-control"
+                formControlName="text"
+                [placeholder]="'spider.pipeline.insertText' | translate"
+                trimOnBlur />
+            </div>
+          }
+          @case (eValuePipelineType.DELETE) {
+            <div class="d-flex input-group" formGroupName="deleteConfig">
+              <select formControlName="position" class="form-select">
+                @for (type of ePositionType | enumKeys; track type) {
+                  <option [value]="type">
+                    {{ 'spider.pipeline.positionType.' + type | translate }}
+                  </option>
+                }
+              </select>
+              @if (
+                pipeline.get('deleteConfig.position')?.value ===
+                ePositionType.NTH
+              ) {
+                <input
+                  class="form-control"
+                  type="number"
+                  formControlName="index"
+                  [matTooltip]="'spider.pipeline.indexNTH' | translate" />
+              }
+              <input
+                class="form-control"
+                type="number"
+                formControlName="length"
+                [matTooltip]="'spider.pipeline.deleteLength' | translate"
+                trimOnBlur />
+            </div>
+          }
+          @case (eValuePipelineType.DELETE_PATHS) {
+            <div class="d-flex input-group">
+              <app-chip-input
+                class="form-control"
+                formControlName="deletePaths"
+                [matTooltip]="
+                  'spider.pipeline.deletePathsPH' | translate
+                "></app-chip-input>
+            </div>
+          }
+          @case (eValuePipelineType.MOVE_CHAR) {
+            <div class="d-flex input-group" formGroupName="moveCharConfig">
+              <input
+                class="form-control"
+                type="number"
+                formControlName="fromIndex"
+                [matTooltip]="'spider.pipeline.fromIndex' | translate" />
+              <input
+                class="form-control"
+                type="number"
+                formControlName="toIndex"
+                [matTooltip]="'spider.pipeline.toIndex' | translate" />
+            </div>
+          }
         }
 
         <button mat-icon-button class="ms-auto" (click)="onDelete($index)">

@@ -4,7 +4,6 @@ import {
   ValuePipeline,
   ValuePipelineType,
   InsertConfig,
-  CopySpecifiedValueToConfig,
   DeleteConfig,
   MoveCharConfig,
   ChineseConvertType,
@@ -14,6 +13,8 @@ import {
   ExtractionStepCondition,
   CurrentTimeFormatOption,
   Timezones,
+  ChineseConvert,
+  ZhConverterUtilType,
 } from '../model';
 import { ControlsOf } from '../../../core/model';
 import dayjs from 'dayjs';
@@ -72,10 +73,12 @@ export class SpiderFormService {
       enabled: [data?.enabled ?? true],
       fixedValue: [data?.fixedValue ?? ''],
       fixedJsonValue: [data?.fixedJsonValue ?? ''],
+      currentDataKey: [data?.currentDataKey ?? ''],
       attributeName: [data?.attributeName ?? ''],
       pattern: [data?.pattern ?? ''],
       replacement: [data?.replacement ?? ''],
       separator: [data?.separator ?? ''],
+      joinSeparator: [data?.joinSeparator ?? ','],
       combineToString: [data?.combineToString ?? ''],
       combineByKey: [data?.combineByKey ?? ''],
       useReplaceValueMap: [data?.useReplaceValueMap ?? ''],
@@ -85,14 +88,8 @@ export class SpiderFormService {
       currentTimeFormatOption: this.createCurrentTimeFormatOptionGroup(
         data?.currentTimeFormatOption
       ),
-      chineseConvertType: [
-        data?.chineseConvertType ??
-          ChineseConvertType.TRADITIONAL_TO_SIMPLIFIED,
-      ],
+      chineseConvert: this.createChineseConvertGroup(data?.chineseConvert),
       insertConfig: this.createInsertConfigGroup(data?.insertConfig),
-      copySpecifiedValueToConfig: this.createCopySpecifiedValueToConfigGroup(
-        data?.copySpecifiedValueToConfig
-      ),
       deleteConfig: this.createDeleteConfigGroup(data?.deleteConfig),
       deletePaths: [data?.deletePaths ?? []],
       moveCharConfig: this.createMoveCharConfigGroup(data?.moveCharConfig),
@@ -103,34 +100,23 @@ export class SpiderFormService {
   createInsertConfigGroup(data?: Partial<InsertConfig>) {
     return this.fb.nonNullable.group({
       position: [data?.position ?? PositionType.START],
-      key: [data?.key ?? ''],
       text: [data?.text ?? ''],
-      index: [data?.index ?? 0],
+      index: [data?.index ?? 1],
     }) as FormGroup<ControlsOf<InsertConfig>>;
-  }
-
-  createCopySpecifiedValueToConfigGroup(
-    data?: Partial<CopySpecifiedValueToConfig>
-  ) {
-    return this.fb.nonNullable.group({
-      copyKey: [data?.copyKey ?? ''],
-      insertKey: [data?.insertKey ?? ''],
-    }) as FormGroup<ControlsOf<CopySpecifiedValueToConfig>>;
   }
 
   createDeleteConfigGroup(data?: Partial<DeleteConfig>) {
     return this.fb.nonNullable.group({
       position: [data?.position ?? PositionType.START],
-      key: [data?.key ?? ''],
-      length: [data?.length ?? 0],
-      index: [data?.index ?? 0],
+      length: [data?.length ?? 1],
+      index: [data?.index ?? 1],
     }) as FormGroup<ControlsOf<DeleteConfig>>;
   }
 
   createMoveCharConfigGroup(data?: Partial<MoveCharConfig>) {
     return this.fb.nonNullable.group({
-      fromIndex: [data?.fromIndex ?? 0],
-      toIndex: [data?.toIndex ?? 0],
+      fromIndex: [data?.fromIndex ?? 1],
+      toIndex: [data?.toIndex ?? 1],
     }) as FormGroup<ControlsOf<MoveCharConfig>>;
   }
 
@@ -139,5 +125,17 @@ export class SpiderFormService {
       format: [data?.format ?? 'YYYY-MM-dd HH:mm:ss'],
       timezones: [data?.timezones ?? this.currentTimezones()],
     }) as FormGroup<ControlsOf<CurrentTimeFormatOption>>;
+  }
+
+  createChineseConvertGroup(data?: Partial<ChineseConvert>) {
+    return this.fb.nonNullable.group({
+      chineseConvertType: [
+        data?.chineseConvertType ??
+          ChineseConvertType.SIMPLIFIED_TO_TRADITIONAL,
+      ],
+      zhConverterUtilType: [
+        data?.zhConverterUtilType ?? ZhConverterUtilType.ZH_CONVERTER_UTIL,
+      ],
+    }) as FormGroup<ControlsOf<ChineseConvert>>;
   }
 }

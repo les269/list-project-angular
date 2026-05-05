@@ -9,11 +9,8 @@ import {
 import { TranslateModule } from '@ngx-translate/core';
 import {
   ChineseConvertType,
+  ZhConverterUtilType,
   ConvertToCaseType,
-  CopySpecifiedValueToConfig,
-  DeleteConfig,
-  InsertConfig,
-  MoveCharConfig,
   PositionType,
   Timezones,
   ValuePipeline,
@@ -40,6 +37,7 @@ import { SpiderFormService } from '../../services/spider-form.service';
 import { CodeEditor } from '@acrodata/code-editor';
 import { languages } from '@codemirror/language-data';
 import { CdkFooterRowDef } from '@angular/cdk/table';
+import { MatPrefix } from '../../../../../../node_modules/@angular/material/types/_form-field-chunk';
 
 @Component({
   selector: 'app-pipeline-list',
@@ -57,6 +55,7 @@ import { CdkFooterRowDef } from '@angular/cdk/table';
     EnumKeysPipe,
     ChipInputComponent,
     CodeEditor,
+    MatTooltipModule,
   ],
   templateUrl: './pipeline-list.component.html',
   styleUrls: ['./pipeline-list.component.scss'],
@@ -69,10 +68,13 @@ export class PipelineListComponent {
   readonly formArray = input.required<FormArray<FormGroup>>();
   readonly replaceValueMapList = input<ReplaceValueMap[]>([]);
 
+  readonly CodeEditorLanguages = languages;
   readonly eValuePipelineType = ValuePipelineType;
   readonly eConvertToCaseType = ConvertToCaseType;
   readonly eTimezones = Timezones;
-  readonly CodeEditorLanguages = languages;
+  readonly eChineseConvertType = ChineseConvertType;
+  readonly eZhConverterUtilType = ZhConverterUtilType;
+  readonly ePositionType = PositionType;
 
   onAdd() {
     const arr = this.formArray();
