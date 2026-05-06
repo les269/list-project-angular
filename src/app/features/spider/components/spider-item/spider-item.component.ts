@@ -30,8 +30,6 @@ import {
   SpiderItemSetting,
   SpiderMapping,
   UrlType,
-  ValuePipeline,
-  ValuePipelineType,
 } from '../../model';
 import {
   ControlsOf,

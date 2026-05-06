@@ -11,7 +11,7 @@ import {
   PositionType,
   ExtractionRule,
   ExtractionStepCondition,
-  CurrentTimeFormatOption,
+  TimeFormatOption,
   Timezones,
   ChineseConvert,
   ZhConverterUtilType,
@@ -87,15 +87,15 @@ export class SpiderFormService {
       mergeMultiObjKeys: [data?.mergeMultiObjKeys ?? []],
       mergeMultiArrayKeys: [data?.mergeMultiArrayKeys ?? []],
       convertToCaseType: [data?.convertToCaseType ?? ConvertToCaseType.UPPER],
-      currentTimeFormatOption: this.createCurrentTimeFormatOptionGroup(
+      currentTimeFormatOption: this.createTimeFormatOptionGroup(
         data?.currentTimeFormatOption
       ),
+      timeFormat: this.createTimeFormatOptionGroup(data?.timeFormat),
       chineseConvert: this.createChineseConvertGroup(data?.chineseConvert),
       insertConfig: this.createInsertConfigGroup(data?.insertConfig),
       deleteConfig: this.createDeleteConfigGroup(data?.deleteConfig),
       deletePaths: [data?.deletePaths ?? []],
       moveCharConfig: this.createMoveCharConfigGroup(data?.moveCharConfig),
-      joinArraySeparator: [data?.joinArraySeparator ?? ''],
     }) as FormGroup<ControlsOf<ValuePipeline>>;
   }
 
@@ -122,11 +122,13 @@ export class SpiderFormService {
     }) as FormGroup<ControlsOf<MoveCharConfig>>;
   }
 
-  createCurrentTimeFormatOptionGroup(data?: Partial<CurrentTimeFormatOption>) {
+  createTimeFormatOptionGroup(data?: Partial<TimeFormatOption>) {
     return this.fb.nonNullable.group({
       format: [data?.format ?? 'YYYY-MM-dd HH:mm:ss'],
       timezones: [data?.timezones ?? this.currentTimezones()],
-    }) as FormGroup<ControlsOf<CurrentTimeFormatOption>>;
+      skipTimezoneConversion: [data?.skipTimezoneConversion ?? false],
+      formatParsed: [data?.formatParsed ?? 'YYYY-MM-dd HH:mm:ss'],
+    }) as FormGroup<ControlsOf<TimeFormatOption>>;
   }
 
   createChineseConvertGroup(data?: Partial<ChineseConvert>) {

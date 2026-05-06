@@ -129,6 +129,7 @@
                 trimOnBlur />
             </div>
           }
+          <!-- 使用替換值映射表 -->
           @case (eValuePipelineType.USE_REPLACE_VALUE_MAP) {
             <app-chip-select-button
               valueKey="name"
@@ -141,6 +142,7 @@
                 'msg.requiredSelectOne' | translate
               "></app-chip-select-button>
           }
+          <!-- 合併多個物件到陣列 -->
           @case (eValuePipelineType.MERGE_MULTI_OBJ_TO_ARRAY) {
             <div class="d-flex input-group">
               <app-chip-input
@@ -151,6 +153,7 @@
                 "></app-chip-input>
             </div>
           }
+          <!-- 合併多個陣列成單一陣列 -->
           @case (eValuePipelineType.MERGE_MULTI_ARRAY_TO_ARRAY) {
             <div class="d-flex input-group">
               <app-chip-input
@@ -161,6 +164,7 @@
                 "></app-chip-input>
             </div>
           }
+          <!-- 轉換大小寫 -->
           @case (eValuePipelineType.CONVERT_TO_CASE) {
             <div class="d-flex input-group">
               <select formControlName="convertToCaseType" class="form-select">
@@ -172,6 +176,7 @@
               </select>
             </div>
           }
+          <!-- 獲取當前時間 -->
           @case (eValuePipelineType.CURRENT_TIME) {
             <div
               class="d-flex input-group"
@@ -192,6 +197,46 @@
               <mat-icon>help</mat-icon>
             </a>
           }
+          <!-- 時間格式化 -->
+          @case (eValuePipelineType.TIME_FORMAT) {
+            <div class="d-flex input-group" formGroupName="timeFormat">
+              <div class="input-group-text">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  formControlName="skipTimezoneConversion"
+                  [matTooltip]="
+                    'spider.pipeline.skipTimezoneConversion' | translate
+                  " />
+              </div>
+              @if (!pipeline.get('timeFormat.skipTimezoneConversion')?.value) {
+                <select formControlName="timezones" class="form-select">
+                  @for (type of eTimezones | keyvalue; track type.key) {
+                    <option [value]="type.key">
+                      {{ 'timezones.' + type.key | translate }}
+                    </option>
+                  }
+                </select>
+              }
+              <input
+                class="form-control"
+                formControlName="formatParsed"
+                [matTooltip]="'spider.pipeline.formatParsed' | translate"
+                trimOnBlur />
+              <input
+                class="form-control"
+                formControlName="format"
+                [matTooltip]="'spider.pipeline.formatTo' | translate"
+                trimOnBlur />
+            </div>
+            <a
+              mat-icon-button
+              href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/time/format/DateTimeFormatter.html"
+              target="_blank">
+              <mat-icon>help</mat-icon>
+            </a>
+          }
+          <!-- 繁簡轉換 -->
           @case (eValuePipelineType.CHINESE_CONVERT) {
             <div class="d-flex input-group" formGroupName="chineseConvert">
               <select formControlName="zhConverterUtilType" class="form-select">
@@ -214,6 +259,7 @@
               </select>
             </div>
           }
+          <!-- 插入值到指定位置到字串或陣列 -->
           @case (eValuePipelineType.INSERT) {
             <div class="d-flex input-group" formGroupName="insertConfig">
               <select formControlName="position" class="form-select">
@@ -241,6 +287,7 @@
                 trimOnBlur />
             </div>
           }
+          <!-- 刪除字串指定位置 -->
           @case (eValuePipelineType.DELETE) {
             <div class="d-flex input-group" formGroupName="deleteConfig">
               <select formControlName="position" class="form-select">
@@ -268,6 +315,7 @@
                 trimOnBlur />
             </div>
           }
+          <!-- 刪除鍵值 -->
           @case (eValuePipelineType.DELETE_PATHS) {
             <div class="d-flex input-group">
               <app-chip-input
@@ -278,6 +326,7 @@
                 "></app-chip-input>
             </div>
           }
+          <!-- 移動字元 -->
           @case (eValuePipelineType.MOVE_CHAR) {
             <div class="d-flex input-group" formGroupName="moveCharConfig">
               <input

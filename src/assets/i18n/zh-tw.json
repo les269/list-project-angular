@@ -358,7 +358,11 @@
       "deleteLength": "要刪除的長度",
       "deletePathsPH": "請輸入要刪除的鍵值",
       "fromIndex": "選定字元位置(從1開始)",
-      "toIndex": "移動到的位置(從1開始)"
+      "toIndex": "移動到的位置(從1開始)",
+      "skipTimezoneConversion": "不使用時區轉換",
+      "TIME_FORMAT": "時間格式化",
+      "formatTo": "轉換成的時間格式樣式",
+      "formatParsed": "解析當前時間格式未符合會無法轉換"
     },
     "ignoreCaseTip": "是否忽略大小寫",
     "settingCookies": "設定Cookies"
