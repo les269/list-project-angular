@@ -6,50 +6,21 @@
     <mat-label>{{ label() }}</mat-label>
   }
   <mat-chip-grid #chipGrid>
-    @if (type() === 'color') {
-      <div class="d-flex align-items-center flex-wrap">
-        @for (value of chipList(); track value; let i = $index) {
-          <mat-chip-row
-            (removed)="removeChip(i)"
-            [editable]="true"
-            (edited)="editChip(i, $event.value)">
-            <div
-              [ngStyle]="{
-                'background-color': getLuminance(value) < 0.5 ? '' : '#525252',
-                color: value,
-              }">
-              {{ value }}
-            </div>
-            <button matChipRemove>
-              <mat-icon>cancel</mat-icon>
-            </button>
-          </mat-chip-row>
-        }
-        <input
-          class="form-control form-control-color"
-          style="max-width: 30px"
-          [type]="type()"
-          [matChipInputFor]="chipGrid"
-          [matChipInputAddOnBlur]="true"
-          (matChipInputTokenEnd)="addChip($event)" />
-      </div>
-    } @else {
-      @for (value of chipList(); track value; let i = $index) {
-        <mat-chip-row
-          (removed)="removeChip(i)"
-          [editable]="true"
-          (edited)="editChip(i, $event.value)">
-          {{ value }}
-          <button matChipRemove>
-            <mat-icon>cancel</mat-icon>
-          </button>
-        </mat-chip-row>
-      }
-      <input
-        [type]="type()"
-        [matChipInputFor]="chipGrid"
-        [matChipInputAddOnBlur]="true"
-        (matChipInputTokenEnd)="addChip($event)" />
+    @for (value of chipList(); track value; let i = $index) {
+      <mat-chip-row
+        (removed)="removeChip(i)"
+        [editable]="true"
+        (edited)="editChip(i, $event.value)">
+        {{ value }}
+        <button matChipRemove>
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </mat-chip-row>
     }
+    <input
+      type="text"
+      [matChipInputFor]="chipGrid"
+      [matChipInputAddOnBlur]="true"
+      (matChipInputTokenEnd)="addChip($event)" />
   </mat-chip-grid>
 </mat-form-field>

@@ -24,7 +24,7 @@ import { MatTableModule } from '@angular/material/table';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatChipsModule } from '@angular/material/chips';
-import { ChipInputComponent } from '../../../../core/components/chip-input/chip-input.component';
+import { ChipInputColorComponent } from '../../../../core/components/chip-input-color/chip-input-color.component';
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import { ScrapyService } from '../../../spider/services/scrapy.service';
 import { rxResource } from '@angular/core/rxjs-interop';
@@ -47,7 +47,7 @@ import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
     TranslateModule,
     MatFormFieldModule,
     MatChipsModule,
-    ChipInputComponent,
+    ChipInputColorComponent,
     ThemeItemManageComponent,
     MatRadioModule,
     TrimOnBlurDirective,

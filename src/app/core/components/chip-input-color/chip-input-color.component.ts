@@ -1,4 +1,4 @@
-import { Component, forwardRef, input, model } from '@angular/core';
+import { Component, computed, forwardRef, input, model } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatChipInputEvent, MatChipsModule } from '@angular/material/chips';
@@ -6,29 +6,33 @@ import { MatIconModule } from '@angular/material/icon';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
-  selector: 'app-chip-input',
+  selector: 'app-chip-input-color',
   standalone: true,
   imports: [CommonModule, MatFormFieldModule, MatChipsModule, MatIconModule],
-  templateUrl: './chip-input.component.html',
+  templateUrl: './chip-input-color.component.html',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => ChipInputComponent),
+      useExisting: forwardRef(() => ChipInputColorComponent),
       multi: true,
     },
   ],
 })
-export class ChipInputComponent {
+export class ChipInputColorComponent {
   readonly chipList = model<string[]>([]);
   readonly label = input<string>('');
   readonly allowDuplicates = input<boolean>(false);
   readonly canUpdate = input<(value: string, index?: number) => boolean>(
     () => true
   );
+  readonly pickerValue = computed(() => {
+    const lastColor = this.chipList().at(-1);
+    return this.normalizeColorForPicker(lastColor);
+  });
 
   addChip(event: MatChipInputEvent): void {
     const trimmedValue = event.value.trim();
-    const currentList = this.chipList(); // 取得目前的 Signal 值
+    const currentList = this.chipList();
 
     if (this.canUpdate() && !this.canUpdate()(trimmedValue)) return;
 
@@ -37,8 +41,7 @@ export class ChipInputComponent {
         event.chipInput.clear();
         return;
       }
-      // 更新 Signal：使用 set/update 觸發通知
-      this.chipList.update(list => [...list!, trimmedValue]);
+      this.chipList.update(list => [...list, trimmedValue]);
     }
     event.chipInput.clear();
     this.onChange(this.chipList());
@@ -55,50 +58,78 @@ export class ChipInputComponent {
 
   editChip(index: number, newValue: string): void {
     const trimmedValue = newValue.trim();
-    // 1. 檢查 canUpdate (注意 canUpdate 是 input signal)
     if (this.canUpdate() && !this.canUpdate()(trimmedValue)) {
       return;
     }
 
     if (trimmedValue) {
-      const currentList = this.chipList(); // 取得當前值
-
-      // 2. 檢查重複
+      const currentList = this.chipList();
       const isDuplicate =
         !this.allowDuplicates() &&
         currentList.includes(trimmedValue) &&
         currentList[index] !== trimmedValue;
       if (!isDuplicate) {
-        // 3. 關鍵：使用 update 並透過展開運算符 [...] 產生新陣列
         this.chipList.update(list => {
-          const newList = [...list]; // 複製一份
-          newList[index] = trimmedValue; // 修改新陣列
-          return newList; // 回傳新陣列觸發通知
+          const newList = [...list];
+          newList[index] = trimmedValue;
+          return newList;
         });
         this.onChange(this.chipList());
       }
     }
   }
 
-  // ControlValueAccessor 必須實作的四個方法
+  getLuminance(hex: string): number {
+    hex = hex.replace('#', '');
+    if (hex.length === 3) {
+      hex = hex
+        .split('')
+        .map(x => x + x)
+        .join('');
+    }
+    const r = parseInt(hex.substring(0, 2), 16) / 255;
+    const g = parseInt(hex.substring(2, 4), 16) / 255;
+    const b = parseInt(hex.substring(4, 6), 16) / 255;
+    const a = [r, g, b].map(function (v) {
+      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
+  }
+
+  private normalizeColorForPicker(color?: string): string {
+    if (!color) return '#000000';
+
+    const hex = color.trim().replace('#', '');
+    if (/^[A-Fa-f0-9]{6}$/.test(hex)) return `#${hex}`;
+    if (/^[A-Fa-f0-9]{3}$/.test(hex)) {
+      const expanded = hex
+        .split('')
+        .map(x => x + x)
+        .join('');
+      return `#${expanded}`;
+    }
+    if (/^[A-Fa-f0-9]{8}$/.test(hex)) return `#${hex.substring(0, 6)}`;
+
+    return '#000000';
+  }
+
   onChange: any = () => {};
   onTouched: any = () => {};
 
   writeValue(value: string[]): void {
-    this.chipList.set(value || []); // 同步到你原本的變數
+    this.chipList.set(value || []);
     this.onChange(this.chipList());
   }
 
   registerOnChange(fn: any): void {
     this.onChange = fn;
   }
+
   registerOnTouched(fn: any): void {
     this.onTouched = fn;
   }
-  setDisabledState?(isDisabled: boolean): void {
-    /* 處理禁用狀態 */
-  }
 
-  // 在你原本的 addChip / removeChip 最後呼叫：
-  // this.onChange(this.chipList);
+  setDisabledState?(isDisabled: boolean): void {
+    // handle disabled state if needed
+  }
 }

@@ -9,11 +9,10 @@
     </app-theme-item-manage>
     <form [formGroup]="group()" class="theme-other-setting">
       @if (themeHeaderType() === eThemeHeaderType.table) {
-        <app-chip-input
-          [type]="'color'"
+        <app-chip-input-color
           [(chipList)]="rowColor.value"
           [label]="'otherSetting.rowColor' | translate"
-          [canUpdate]="checkColor"></app-chip-input>
+          [canUpdate]="checkColor"></app-chip-input-color>
         <button class="btn btn-primary" (click)="setDefaultColor()">
           {{ 'otherSetting.defaultColor' | translate }}
         </button>
