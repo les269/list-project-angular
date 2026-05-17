@@ -82,7 +82,71 @@
       {{ 'spider.settingCookies' | translate }}
     </button>
   </div>
+  <ng-container [ngTemplateOutlet]="buttonTmpl"></ng-container>
+  <div class="card-body">
+    <div class="card mb-3">
+      <app-generic-table
+        [class.table-invalid]="extractionRuleList.invalid"
+        [formArray]="extractionRuleList"
+        [initData]="extractionRuleListData()"
+        [createGroup]="createExtractionRule"
+        [cols]="cols"
+        [displayedColumns]="
+          extractionRuleMode.value === eExtractionRuleMode.JSON_PATH
+            ? jsonPathDisplayedColumns
+            : selectorDisplayedColumns
+        "
+        [expandedTmpl]="expandedTmpl"></app-generic-table>
+    </div>
+  </div>
+  <ng-container [ngTemplateOutlet]="buttonTmpl"></ng-container>
+  <div class="form-group mb-2">
+    @if (useSelector) {
+      <label>{{ 'scrapy.testHtml' | translate }}</label>
+      <code-editor
+        [style.height]="'300px'"
+        [formControl]="htmlData"
+        [language]="'html'"
+        [indentWithTab]="true"
+        [languages]="CodeEditorLanguages" />
+      <button type="button" class="btn btn-primary" (click)="onTestParseHtml()">
+        {{ 'scrapy.test' | translate }}
+      </button>
+    }
+    @if (useJsonPath) {
+      <label>{{ 'scrapy.testJson' | translate }}</label>
+      <code-editor
+        [style.height]="'300px'"
+        [formControl]="jsonData"
+        [language]="'json'"
+        [indentWithTab]="true"
+        [languages]="CodeEditorLanguages" />
+      <div class="d-flex gap-2 my-2">
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          (click)="onFormatJson()">
+          {{ 'g.format' | translate }}
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="onTestParseJson()">
+          {{ 'scrapy.test' | translate }}
+        </button>
+      </div>
+    }
+  </div>
+  <label>{{ 'scrapy.testResult' | translate }}</label>
+  <code-editor
+    class="mb-4"
+    [formControl]="resultJsonData"
+    [language]="'json'"
+    [indentWithTab]="true"
+    [languages]="CodeEditorLanguages" />
+</div>
 
+<ng-template #buttonTmpl>
   <div class="d-flex my-2 gap-2">
     @if (!isBinding()) {
       <button
@@ -132,67 +196,7 @@
       </button>
     }
   </div>
-  <div class="card-body">
-    <div class="card mb-3">
-      <app-generic-table
-        [class.table-invalid]="extractionRuleList.invalid"
-        [formArray]="extractionRuleList"
-        [initData]="extractionRuleListData()"
-        [createGroup]="createExtractionRule"
-        [cols]="cols"
-        [displayedColumns]="
-          extractionRuleMode.value === eExtractionRuleMode.JSON_PATH
-            ? jsonPathDisplayedColumns
-            : selectorDisplayedColumns
-        "
-        [expandedTmpl]="expandedTmpl"></app-generic-table>
-    </div>
-  </div>
-  <div class="form-group mb-2">
-    @if (useSelector) {
-      <label>{{ 'scrapy.testHtml' | translate }}</label>
-      <code-editor
-        [style.height]="'300px'"
-        [formControl]="htmlData"
-        [language]="'html'"
-        [indentWithTab]="true"
-        [languages]="CodeEditorLanguages" />
-      <button type="button" class="btn btn-primary" (click)="onTestParseHtml()">
-        {{ 'scrapy.test' | translate }}
-      </button>
-    }
-    @if (useJsonPath) {
-      <label>{{ 'scrapy.testJson' | translate }}</label>
-      <code-editor
-        [style.height]="'300px'"
-        [formControl]="jsonData"
-        [language]="'json'"
-        [indentWithTab]="true"
-        [languages]="CodeEditorLanguages" />
-      <div class="d-flex gap-2 my-2">
-        <button
-          type="button"
-          class="btn btn-outline-secondary"
-          (click)="onFormatJson()">
-          {{ 'g.format' | translate }}
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary"
-          (click)="onTestParseJson()">
-          {{ 'scrapy.test' | translate }}
-        </button>
-      </div>
-    }
-  </div>
-  <label>{{ 'scrapy.testResult' | translate }}</label>
-  <code-editor
-    class="mb-4"
-    [formControl]="resultJsonData"
-    [language]="'json'"
-    [indentWithTab]="true"
-    [languages]="CodeEditorLanguages" />
-</div>
+</ng-template>
 <ng-template #expandedTmpl let-element>
   <div class="d-flex flex-column my-2" [formGroup]="element">
     <div

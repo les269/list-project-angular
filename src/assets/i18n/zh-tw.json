@@ -84,7 +84,9 @@
     "sureDeleteSpiderItem": "是否要刪除該爬蟲項目?",
     "invalidJson": "無效的 JSON 格式",
     "extractSuccess": "提取成功",
-    "extractFailed": "提取失敗: {{message}}"
+    "extractFailed": "提取失敗: {{message}}",
+    "keyAndValueRequired": "鍵和值都為必填項",
+    "keyAlreadyExists": "鍵已經存在"
   },
   "g": {
     "edit": "編輯",
@@ -296,6 +298,8 @@
     "conditionValue": "當前結果的條件值",
     "conditionValuePH": "當前結果的條件值, 例如要包含的字串或者正則表達式",
     "addPipeline": "新增處理步驟",
+    "ignoreCaseTip": "是否忽略大小寫",
+    "settingCookies": "設定Cookies",
     "pipeline": {
       "FIXED_VALUE": "固定值",
       "FIXED_JSON_VALUE": "固定JSON值",
@@ -362,10 +366,12 @@
       "skipTimezoneConversion": "不使用時區轉換",
       "TIME_FORMAT": "時間格式化",
       "formatTo": "轉換成的時間格式樣式",
-      "formatParsed": "解析當前時間格式未符合會無法轉換"
-    },
-    "ignoreCaseTip": "是否忽略大小寫",
-    "settingCookies": "設定Cookies"
+      "formatParsed": "解析當前時間格式未符合會無法轉換",
+      "CALCULATE": "計算",
+      "variablePathsPH": "請輸入要計算的暫存鍵值以待在表達式中使用，值會以當前資料去獲取使用方法為json path，例如 $.price or $.data.list[0].price",
+      "expressionPH": "請輸入計算表達式, 使用的是SpEL, 使用的",
+      "defaultValuePH": "計算失敗時的預設值可以輸入隨意或是json path"
+    }
   },
   "themeItem": {
     "sourceItemId": "來源Id",

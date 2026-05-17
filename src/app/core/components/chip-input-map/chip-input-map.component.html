@@ -1,0 +1,80 @@
+<mat-form-field
+  appearance="outline"
+  style="width: 100%"
+  subscriptSizing="dynamic">
+  <mat-chip-grid #chipGrid>
+    @for (item of chipList(); track item; let i = $index) {
+      <mat-chip-row
+        (removed)="removeChip(i)"
+        (click)="editChip(item, chipOrigin)"
+        cdkOverlayOrigin
+        #chipOrigin="cdkOverlayOrigin">
+        {{ item.key }}: {{ item.value }}
+        <button matChipRemove>
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </mat-chip-row>
+    }
+    <input
+      type="text"
+      readonly
+      [matChipInputFor]="chipGrid"
+      [matChipInputAddOnBlur]="true"
+      (blur)="onTouched()" />
+  </mat-chip-grid>
+
+  <button
+    mat-icon-button
+    matSuffix
+    cdkOverlayOrigin
+    #addOrigin="cdkOverlayOrigin"
+    type="button"
+    (click)="addChip(addOrigin)">
+    <mat-icon>add</mat-icon>
+  </button>
+</mat-form-field>
+
+<mat-chip-set class="d-flex flex-wrap gap-1 mb-2"> </mat-chip-set>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOpen]="overlayOpen() && !!activeOrigin()"
+  [cdkConnectedOverlayOrigin]="activeOrigin()!"
+  [cdkConnectedOverlayHasBackdrop]="true"
+  [cdkConnectedOverlayBackdropClass]="'cdk-overlay-transparent-backdrop'"
+  [cdkConnectedOverlayOffsetY]="8"
+  (backdropClick)="closeOverlay()"
+  (detach)="closeOverlay()">
+  <div class="card shadow-sm p-3" style="min-width: 280px">
+    <div class="mb-2">
+      <label class="form-label mb-1">{{ 'g.key' | translate }}</label>
+      <input
+        class="form-control"
+        [(ngModel)]="draftKey"
+        [disabled]="type() === 'edit'" />
+    </div>
+    <div class="mb-2">
+      <label class="form-label mb-1">{{ 'g.value' | translate }}</label>
+      <input class="form-control" [(ngModel)]="draftValue" />
+    </div>
+
+    @if (errorMessage()) {
+      <div class="text-danger small mb-2">{{ errorMessage() }}</div>
+    }
+
+    <div class="d-flex justify-content-end gap-2">
+      <button
+        class="btn btn-outline-secondary"
+        type="button"
+        (click)="closeOverlay()">
+        {{ 'g.cancel' | translate }}
+      </button>
+      <button
+        class="btn btn-primary"
+        type="button"
+        (click)="type() === 'add' ? onAdd() : onUpdate()">
+        {{ 'g.confirm' | translate }}
+      </button>
+    </div>
+  </div>
+</ng-template>

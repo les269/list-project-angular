@@ -4,11 +4,27 @@ import { Observable } from 'rxjs';
 // export type ControlsOf<T extends Record<string, any>> = {
 //   [K in keyof T]: FormControl<T[K]>;
 // };
+
+/**
+ * 判斷物件是否為「純 primitive 值」的 flat 物件（所有屬性均非 object/array）。
+ * flat 物件陣列（如 ChipsMapValue[]）應對應 FormControl 而非 FormArray<FormGroup>。
+ */
+type IsFlatObject<T> = T extends Record<string, any>
+  ? {
+      [K in keyof T]-?: NonNullable<T[K]> extends object | any[] ? false : true;
+    }[keyof T] extends true
+    ? true
+    : false
+  : false;
+
 type MapToFormArray<T> = T extends (infer U)[]
   ? U extends Record<string, any>
-    ? FormArray<FormGroup<ControlsOf<U>>>
-    : FormControl<T>
+    ? IsFlatObject<U> extends true
+      ? FormControl<T> // flat 物件陣列 → FormControl（如 ChipsMapValue[]）
+      : FormArray<FormGroup<ControlsOf<U>>> // 深層物件陣列 → FormArray
+    : FormControl<T> // primitive 陣列 → FormControl（如 string[]）
   : never;
+
 export type ControlsOf<T> = {
   [K in keyof T]: NonNullable<T[K]> extends any[]
     ? MapToFormArray<NonNullable<T[K]>> // 處理陣列（含可選陣列）

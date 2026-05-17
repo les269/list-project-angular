@@ -1,3 +1,5 @@
+import { ChipsMapValue } from '../../../core/model';
+
 export enum ValuePipelineType {
   FIXED_VALUE = 'FIXED_VALUE', // 固定值
   FIXED_JSON_VALUE = 'FIXED_JSON_VALUE', // 固定JSON值
@@ -23,8 +25,9 @@ export enum ValuePipelineType {
   DELETE = 'DELETE', // 刪除字串或是移除陣列元素
   DELETE_PATHS = 'DELETE_PATHS', // 刪除JSON中的特定路徑
   MOVE_CHAR = 'MOVE_CHAR', // 移動字元位置
-  // TODO 其他類型：數字運算、條件判斷等
-  // TODO 可以拿cookie 跟header 資料來使用
+  CALCULATE = 'CALCULATE', // 計算，根據當前資料進行加減乘除運算
+  FETCH_COOKIE = 'FETCH_COOKIE', // 取得cookie資料
+  FETCH_HEADER = 'FETCH_HEADER', // 取得header資料
 }
 export interface ValuePipeline {
   seq: number;
@@ -51,6 +54,7 @@ export interface ValuePipeline {
   deleteConfig: DeleteConfig; // 當 type 是 DELETE_TEXT 時使用，指定要刪除的字串
   deletePaths: string[]; // 當 type 是 DELETE_PATHS 時使用，指定要刪除的JSON路徑列表
   moveCharConfig: MoveCharConfig; // 當 type 是 MOVE_CHAR 時使用，指定要移動的字元位置
+  calculateConfig: CalculateConfig; // 當 type 是 CALCULATE 時使用，指定計算配置
 }
 
 export interface TimeFormatOption {
@@ -80,6 +84,12 @@ export interface MoveCharConfig {
 export interface ChineseConvert {
   chineseConvertType: ChineseConvertType;
   zhConverterUtilType: ZhConverterUtilType;
+}
+
+export interface CalculateConfig {
+  variablePaths: ChipsMapValue[]; // json path 表達式對應的變量映射，例如 { a: '$.price', b: '$.quantity' }
+  expression: string; // 計算表達式，SPEL格式，使用 #{variable} 來引用 tempMap 中的變量，例如 #{a} + #{b}
+  defaultValue: string; // 當計算失敗時的預設值
 }
 
 export enum PositionType {

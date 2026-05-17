@@ -15,8 +15,9 @@ import {
   Timezones,
   ChineseConvert,
   ZhConverterUtilType,
+  CalculateConfig,
 } from '../model';
-import { ControlsOf } from '../../../core/model';
+import { ChipsMapValue, ControlsOf } from '../../../core/model';
 import dayjs from 'dayjs';
 
 @Injectable({ providedIn: 'root' })
@@ -96,6 +97,7 @@ export class SpiderFormService {
       deleteConfig: this.createDeleteConfigGroup(data?.deleteConfig),
       deletePaths: [data?.deletePaths ?? []],
       moveCharConfig: this.createMoveCharConfigGroup(data?.moveCharConfig),
+      calculateConfig: this.createCalculateConfigGroup(data?.calculateConfig),
     }) as FormGroup<ControlsOf<ValuePipeline>>;
   }
 
@@ -141,5 +143,12 @@ export class SpiderFormService {
         data?.zhConverterUtilType ?? ZhConverterUtilType.ZH_CONVERTER_UTIL,
       ],
     }) as FormGroup<ControlsOf<ChineseConvert>>;
+  }
+  createCalculateConfigGroup(data?: Partial<CalculateConfig>) {
+    return this.fb.nonNullable.group({
+      variablePaths: [data?.variablePaths ?? ([] as ChipsMapValue[])],
+      expression: [data?.expression ?? ''],
+      defaultValue: [data?.defaultValue ?? ''],
+    }) as FormGroup<ControlsOf<CalculateConfig>>;
   }
 }

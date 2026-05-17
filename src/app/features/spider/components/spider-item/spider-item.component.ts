@@ -64,6 +64,7 @@ import {
   CookieTableDialogComponent,
   CookieTableDialogData,
 } from '../cookie-table-dialog/cookie-table-dialog.component';
+import { CdkDragPlaceholder } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-spider-item',

@@ -1,4 +1,4 @@
-import { ValuePipeline } from './value-pipeline';
+import { ValuePipeline } from './value-pipeline.model';
 
 export interface SpiderConfig {
   spiderId: string; //pk
