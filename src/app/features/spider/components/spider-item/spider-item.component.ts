@@ -30,6 +30,7 @@ import {
   SpiderItemSetting,
   SpiderMapping,
   UrlType,
+  ValuePipeline,
 } from '../../model';
 import {
   ControlsOf,
@@ -58,13 +59,13 @@ import { languages } from '@codemirror/language-data';
 import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 import { SpiderService } from '../../services/spider.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { SpiderFormService } from '../../services/spider-form.service';
 import { MatDialog, MatDialogClose } from '@angular/material/dialog';
 import {
   CookieTableDialogComponent,
   CookieTableDialogData,
 } from '../cookie-table-dialog/cookie-table-dialog.component';
 import { CdkDragPlaceholder } from '@angular/cdk/drag-drop';
+import { ValuePipelineFormService } from '../../services/value-pipeline-form.service';
 
 @Component({
   selector: 'app-spider-item',
@@ -94,7 +95,7 @@ export class SpiderItemComponent {
   readonly messageBoxService = inject(MessageBoxService);
   readonly cookieListService = inject(CookieListService);
   readonly spiderService = inject(SpiderService);
-  readonly spiderFormService = inject(SpiderFormService);
+  readonly valuePipelineFormService = inject(ValuePipelineFormService);
   readonly matDialog = inject(MatDialog);
   // input
   readonly initData = input<SpiderItem>();
@@ -219,10 +220,6 @@ export class SpiderItemComponent {
   }
   get useSelector() {
     return this.extractionRuleMode.value === ExtractionRuleMode.SELECT;
-  }
-
-  get createExtractionRule() {
-    return this.spiderFormService.createExtractionRule;
   }
 
   constructor() {
@@ -376,9 +373,7 @@ export class SpiderItemComponent {
   onTestParseHtml() {
     this.resultJsonData.setValue(JSON.stringify('{}', null, 2));
     this.spiderService
-      .previewExtraction(
-        this.form.controls.itemSetting.value as SpiderItemSetting
-      )
+      .previewExtraction(this.form.value as SpiderItem)
       .subscribe({
         next: result => {
           this.resultJsonData.setValue(JSON.stringify(result, null, 2));
@@ -409,7 +404,7 @@ export class SpiderItemComponent {
     const items = this.extractionRuleList;
     items.clear();
     for (const item of list) {
-      const group = this.spiderFormService.createExtractionRule(item);
+      const group = this.createExtractionRule(item);
       group.patchValue(item);
       items.push(group);
     }
@@ -434,4 +429,28 @@ export class SpiderItemComponent {
     ];
     return patternConditions.includes(condition);
   }
+
+  readonly createExtractionRule = (data?: Partial<ExtractionRule>) => {
+    return this.fb.nonNullable.group({
+      seq: [data?.seq ?? 0],
+      key: [data?.key ?? ''],
+      selector: [data?.selector ?? ''],
+      jsonPath: [data?.jsonPath ?? ''],
+      pipelines: this.fb.nonNullable.array<
+        FormGroup<ControlsOf<ValuePipeline>>
+      >(
+        (data?.pipelines ?? []).map(pipeline =>
+          this.valuePipelineFormService.createValuePipelineGroup(pipeline)
+        )
+      ),
+      conditionValue: this.fb.nonNullable.group({
+        conditionType: [
+          data?.conditionValue?.conditionType ?? ExtractionStepCondition.ALWAYS,
+        ],
+        key: [data?.conditionValue?.key ?? ''],
+        value: [data?.conditionValue?.value ?? ''],
+        ignoreCase: [data?.conditionValue?.ignoreCase ?? false],
+      }),
+    }) as FormGroup<ControlsOf<ExtractionRule>>;
+  };
 }

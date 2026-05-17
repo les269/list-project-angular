@@ -1,7 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { SpiderItemSetting, SpiderReq, SpiderTestReq } from '../model';
+import {
+  SpiderItem,
+  SpiderItemSetting,
+  SpiderReq,
+  SpiderTestReq,
+} from '../model';
 
 @Injectable({ providedIn: 'root' })
 export class SpiderService {
@@ -17,7 +22,7 @@ export class SpiderService {
     return this.http.post<string>(`${this.prefix}/use-prime-key`, req);
   }
 
-  previewExtraction(setting: SpiderItemSetting): Observable<any> {
+  previewExtraction(setting: SpiderItem): Observable<any> {
     return this.http.post<string>(`${this.prefix}/preview-extraction`, setting);
   }
 

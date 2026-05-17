@@ -26,11 +26,11 @@ import { ReplaceValueMap } from '../../../replace-value-map/model';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { EnumKeysPipe } from '../../../../shared/util/util.pipe';
 import { ChipInputComponent } from '../../../../core/components/chip-input/chip-input.component';
-import { SpiderFormService } from '../../services/spider-form.service';
 import { CodeEditor } from '@acrodata/code-editor';
 import { languages } from '@codemirror/language-data';
 import { ChipInputMapComponent } from '../../../../core/components';
 import { form, FormField, required } from '@angular/forms/signals';
+import { ValuePipelineFormService } from '../../services';
 
 @Component({
   selector: 'app-pipeline-list',
@@ -43,7 +43,6 @@ import { form, FormField, required } from '@angular/forms/signals';
     MatIconModule,
     TrimOnBlurDirective,
     MatButtonModule,
-    ChipSelectButtonComponent,
     MatTooltipModule,
     EnumKeysPipe,
     ChipInputComponent,
@@ -57,7 +56,7 @@ import { form, FormField, required } from '@angular/forms/signals';
 export class PipelineListComponent {
   readonly selectTableService = inject(SelectTableService);
   readonly replaceValueMapService = inject(ReplaceValueMapService);
-  readonly spiderFormService = inject(SpiderFormService);
+  readonly valuePipelineFormService = inject(ValuePipelineFormService);
 
   readonly formArray = input.required<FormArray<FormGroup>>();
   readonly replaceValueMapList = input<ReplaceValueMap[]>([]);
@@ -72,7 +71,9 @@ export class PipelineListComponent {
   onAdd() {
     const arr = this.formArray();
     const nextSeq = arr.length;
-    arr.push(this.spiderFormService.createPipelineGroup({ seq: nextSeq }));
+    arr.push(
+      this.valuePipelineFormService.createValuePipelineGroup({ seq: nextSeq })
+    );
   }
 
   onDelete(index: number) {

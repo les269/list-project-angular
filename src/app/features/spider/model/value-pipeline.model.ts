@@ -14,7 +14,6 @@ export enum ValuePipelineType {
   LAST_VALUE = 'LAST_VALUE', // 僅保留最後一筆資料
   COMBINE_TO_STRING = 'COMBINE_TO_STRING', // 合併字串根據當前陣列資料
   COMBINE_BY_KEY = 'COMBINE_BY_KEY', // 合併字串根據當前擁有的鍵值資料
-  USE_REPLACE_VALUE_MAP = 'USE_REPLACE_VALUE_MAP', // 使用替換對照表
   MERGE_MULTI_OBJ_TO_ARRAY = 'MERGE_MULTI_OBJ_TO_ARRAY', // 合併多筆物件成陣列
   MERGE_MULTI_ARRAY_TO_ARRAY = 'MERGE_MULTI_ARRAY_TO_ARRAY', // 合併多筆陣列成陣列
   CONVERT_TO_CASE = 'CONVERT_TO_CASE', // 轉為大小寫字串
@@ -43,7 +42,6 @@ export interface ValuePipeline {
   joinSeparator: string; // 當 type 是 JOIN_ARRAY_TO_STRING 時使用，指定合併字串的分隔符
   combineToString: string; // 當 type 是 COMBINE_TO_STRING 時使用
   combineByKey: string; // 當 type 是 COMBINE_BY_KEY 時使用
-  useReplaceValueMap: string; // 當 type 是 USE_REPLACE_VALUE_MAP 時使用，對應到後端的替換對照表名稱
   mergeMultiObjKeys: string[]; // 當 type 是 MERGE_MULTI_OBJ_TO_ARRAY 時使用，指定用於合併的物件鍵值
   mergeMultiArrayKeys: string[]; // 當 type 是 MERGE_MULTI_ARRAY_TO_ARRAY 時使用，指定用於合併的陣列鍵值
   convertToCaseType: ConvertToCaseType; // 當 type 是 CONVERT_TO_CASE 時使用，指定轉換類型

@@ -1,3 +1,5 @@
+import { ValuePipeline } from './value-pipeline.model';
+
 export enum CookieMode {
   create = 'create',
   edit = 'edit',
@@ -7,6 +9,7 @@ export interface Cookie {
   seq: number;
   name: string;
   value: string;
+  valuePipelines: ValuePipeline[];
 }
 
 export interface CookieListTO {

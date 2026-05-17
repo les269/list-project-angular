@@ -16,12 +16,19 @@ import {
   FormsModule,
   FormBuilder,
   Validators,
+  FormGroup,
 } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { Cookie, CookieListMapType, CookieListTO } from '../../model';
+import {
+  Cookie,
+  CookieListMapType,
+  CookieListTO,
+  ValuePipeline,
+} from '../../model';
 import { MatButtonModule } from '@angular/material/button';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 import {
+  ControlsOf,
   GenericColumnType,
   GenericTableColumn,
   ToFormArray,
@@ -36,6 +43,8 @@ import { isBlank, isNotBlank } from '../../../../shared/util/helper';
 import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 import { CookieMode } from '../../model/cookie.model';
 import { rxResource } from '@angular/core/rxjs-interop';
+import { PipelineListComponent } from '../pipeline-list/pipeline-list.component';
+import { ValuePipelineFormService } from '../../services/value-pipeline-form.service';
 
 @Component({
   selector: 'app-cookie-table',
@@ -49,6 +58,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
     MatButtonModule,
     GenericTableComponent,
     TrimOnBlurDirective,
+    PipelineListComponent,
   ],
   templateUrl: './cookie-table.component.html',
 })
@@ -59,6 +69,7 @@ export class CookieTableComponent {
   readonly selectTableService = inject(SelectTableService);
   readonly messageBoxService = inject(MessageBoxService);
   readonly snackbarService = inject(SnackbarService);
+  readonly valuePipelineFormService = inject(ValuePipelineFormService);
   readonly fb = inject(FormBuilder);
 
   readonly displayedColumns = ['name', 'value'];
@@ -276,11 +287,18 @@ export class CookieTableComponent {
     this.list.set(list);
   }
 
-  readonly createGroup = (item?: Cookie) => {
+  readonly createCookieGroup = (item?: Partial<Cookie>) => {
     return this.fb.nonNullable.group({
       seq: [item?.seq ?? 0],
       name: [item?.name ?? '', [Validators.required]],
       value: [item?.value ?? '', [Validators.required]],
-    });
+      valuePipelines: this.fb.nonNullable.array<
+        FormGroup<ControlsOf<ValuePipeline>>
+      >(
+        (item?.valuePipelines ?? []).map(pipeline =>
+          this.valuePipelineFormService.createValuePipelineGroup(pipeline)
+        )
+      ),
+    }) as FormGroup<ControlsOf<Cookie>>;
   };
 }

@@ -83,9 +83,14 @@
       <app-generic-table
         [formArray]="listControl"
         [initData]="list()"
-        [createGroup]="createGroup"
+        [createGroup]="createCookieGroup"
         [cols]="cols"
-        [displayedColumns]="displayedColumns"></app-generic-table>
+        [displayedColumns]="displayedColumns"
+        [expandedTmpl]="expandedTmpl"></app-generic-table>
     </div>
   </div>
 </div>
+
+<ng-template #expandedTmpl let-element>
+  <app-pipeline-list [formArray]="element.get('pipelines')"></app-pipeline-list>
+</ng-template>

@@ -130,19 +130,6 @@
                 trimOnBlur />
             </div>
           }
-          <!-- 使用替換值映射表 -->
-          @case (eValuePipelineType.USE_REPLACE_VALUE_MAP) {
-            <app-chip-select-button
-              valueKey="name"
-              formControlName="useReplaceValueMap"
-              [selectTable]="selectReplaceValueMap"
-              [options]="replaceValueMapList()"
-              [labelKey]="getReplaceValueMapLabel"
-              [required]="true"
-              [requiredMsg]="
-                'msg.requiredSelectOne' | translate
-              "></app-chip-select-button>
-          }
           <!-- 合併多個物件到陣列 -->
           @case (eValuePipelineType.MERGE_MULTI_OBJ_TO_ARRAY) {
             <div class="d-flex input-group">

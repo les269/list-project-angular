@@ -1,27 +1,25 @@
 import { computed, inject, Injectable } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import dayjs from 'dayjs';
+import { ControlsOf, ChipsMapValue } from '../../../core/model';
 import {
-  ValuePipeline,
   ValuePipelineType,
+  ConvertToCaseType,
+  ChineseConvertType,
+  PositionType,
+  Timezones,
+  ValuePipeline,
   InsertConfig,
   DeleteConfig,
   MoveCharConfig,
-  ChineseConvertType,
-  ConvertToCaseType,
-  PositionType,
-  ExtractionRule,
-  ExtractionStepCondition,
   TimeFormatOption,
-  Timezones,
   ChineseConvert,
   ZhConverterUtilType,
   CalculateConfig,
 } from '../model';
-import { ChipsMapValue, ControlsOf } from '../../../core/model';
-import dayjs from 'dayjs';
 
 @Injectable({ providedIn: 'root' })
-export class SpiderFormService {
+export class ValuePipelineFormService {
   readonly fb = inject(FormBuilder);
   readonly eValuePipelineType = ValuePipelineType;
   readonly eConvertToCaseType = ConvertToCaseType;
@@ -43,31 +41,7 @@ export class SpiderFormService {
     return Timezones[key] ?? Timezones.GMT_P00;
   });
 
-  readonly createExtractionRule = (data?: Partial<ExtractionRule>) => {
-    return this.fb.nonNullable.group({
-      seq: [data?.seq ?? 0],
-      key: [data?.key ?? ''],
-      selector: [data?.selector ?? ''],
-      jsonPath: [data?.jsonPath ?? ''],
-      pipelines: this.fb.nonNullable.array<
-        FormGroup<ControlsOf<ValuePipeline>>
-      >(
-        (data?.pipelines ?? []).map(pipeline =>
-          this.createPipelineGroup(pipeline)
-        )
-      ),
-      conditionValue: this.fb.nonNullable.group({
-        conditionType: [
-          data?.conditionValue?.conditionType ?? ExtractionStepCondition.ALWAYS,
-        ],
-        key: [data?.conditionValue?.key ?? ''],
-        value: [data?.conditionValue?.value ?? ''],
-        ignoreCase: [data?.conditionValue?.ignoreCase ?? false],
-      }),
-    }) as FormGroup<ControlsOf<ExtractionRule>>;
-  };
-
-  createPipelineGroup(
+  createValuePipelineGroup(
     data?: Partial<ValuePipeline>
   ): FormGroup<ControlsOf<ValuePipeline>> {
     return this.fb.nonNullable.group({
@@ -84,7 +58,6 @@ export class SpiderFormService {
       joinSeparator: [data?.joinSeparator ?? ','],
       combineToString: [data?.combineToString ?? ''],
       combineByKey: [data?.combineByKey ?? ''],
-      useReplaceValueMap: [data?.useReplaceValueMap ?? ''],
       mergeMultiObjKeys: [data?.mergeMultiObjKeys ?? []],
       mergeMultiArrayKeys: [data?.mergeMultiArrayKeys ?? []],
       convertToCaseType: [data?.convertToCaseType ?? ConvertToCaseType.UPPER],
