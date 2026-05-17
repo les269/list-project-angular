@@ -53,6 +53,8 @@ export interface ValuePipeline {
   deletePaths: string[]; // 當 type 是 DELETE_PATHS 時使用，指定要刪除的JSON路徑列表
   moveCharConfig: MoveCharConfig; // 當 type 是 MOVE_CHAR 時使用，指定要移動的字元位置
   calculateConfig: CalculateConfig; // 當 type 是 CALCULATE 時使用，指定計算配置
+  fetchCookieName: string; // 當 type 是 FETCH_COOKIE 時使用，指定要取得的cookie名稱
+  fetchHeaderName: string; // 當 type 是 FETCH_HEADER 時使用，指定要取得的header名稱
 }
 
 export interface TimeFormatOption {

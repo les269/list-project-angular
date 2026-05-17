@@ -71,6 +71,8 @@ export class ValuePipelineFormService {
       deletePaths: [data?.deletePaths ?? []],
       moveCharConfig: this.createMoveCharConfigGroup(data?.moveCharConfig),
       calculateConfig: this.createCalculateConfigGroup(data?.calculateConfig),
+      fetchCookieName: [data?.fetchCookieName ?? ''],
+      fetchHeaderName: [data?.fetchHeaderName ?? ''],
     }) as FormGroup<ControlsOf<ValuePipeline>>;
   }
 

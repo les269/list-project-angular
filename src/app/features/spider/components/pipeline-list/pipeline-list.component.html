@@ -2,7 +2,7 @@
   type="button"
   class="btn btn-outline-primary btn-sm mb-2"
   (click)="onAdd()">
-  + {{ 'spider.addPipeline' | translate }}
+  + {{ 'pipeline.addPipeline' | translate }}
 </button>
 <div
   cdkDropList
@@ -27,7 +27,7 @@
           <select formControlName="type" class="form-select">
             @for (type of eValuePipelineType | enumKeys; track type) {
               <option [value]="type">
-                {{ 'spider.pipeline.' + type | translate }}
+                {{ 'pipeline.' + type | translate }}
               </option>
             }
           </select>
@@ -60,7 +60,7 @@
               <input
                 class="form-control"
                 formControlName="currentDataKey"
-                [placeholder]="'spider.pipeline.currentDataKeyPH' | translate"
+                [placeholder]="'pipeline.currentDataKeyPH' | translate"
                 trimOnBlur />
             </div>
           }
@@ -70,7 +70,7 @@
               <input
                 class="form-control"
                 formControlName="attributeName"
-                [placeholder]="'spider.pipeline.attributeName' | translate"
+                [placeholder]="'pipeline.attributeName' | translate"
                 trimOnBlur />
             </div>
           }
@@ -82,12 +82,12 @@
               <input
                 class="form-control"
                 formControlName="pattern"
-                [placeholder]="'spider.pipeline.pattern' | translate"
+                [placeholder]="'pipeline.pattern' | translate"
                 trimOnBlur />
               <input
                 class="form-control"
                 formControlName="replacement"
-                [placeholder]="'spider.pipeline.replacement' | translate"
+                [placeholder]="'pipeline.replacement' | translate"
                 trimOnBlur />
             </div>
           }
@@ -97,7 +97,7 @@
               <input
                 class="form-control"
                 formControlName="separator"
-                [placeholder]="'spider.pipeline.separator' | translate"
+                [placeholder]="'pipeline.separator' | translate"
                 trimOnBlur />
             </div>
           }
@@ -107,7 +107,7 @@
               <input
                 class="form-control"
                 formControlName="joinSeparator"
-                [placeholder]="'spider.pipeline.joinSeparator' | translate" />
+                [placeholder]="'pipeline.joinSeparator' | translate" />
             </div>
           }
           <!-- 將多個值合併為字串 -->
@@ -116,7 +116,7 @@
               <input
                 class="form-control"
                 formControlName="combineToString"
-                [placeholder]="'spider.pipeline.combineToStringPH' | translate"
+                [placeholder]="'pipeline.combineToStringPH' | translate"
                 trimOnBlur />
             </div>
           }
@@ -126,7 +126,7 @@
               <input
                 class="form-control"
                 formControlName="combineByKey"
-                [placeholder]="'spider.pipeline.combineByKeyPH' | translate"
+                [placeholder]="'pipeline.combineByKeyPH' | translate"
                 trimOnBlur />
             </div>
           }
@@ -137,7 +137,7 @@
                 class="form-control"
                 formControlName="mergeMultiObjKeys"
                 [matTooltip]="
-                  'spider.pipeline.MERGE_MULTI_OBJ_TO_ARRAY_PH' | translate
+                  'pipeline.MERGE_MULTI_OBJ_TO_ARRAY_PH' | translate
                 "></app-chip-input>
             </div>
           }
@@ -148,7 +148,7 @@
                 class="form-control"
                 formControlName="mergeMultiArrayKeys"
                 [matTooltip]="
-                  'spider.pipeline.MERGE_MULTI_ARRAY_TO_ARRAY_PH' | translate
+                  'pipeline.MERGE_MULTI_ARRAY_TO_ARRAY_PH' | translate
                 "></app-chip-input>
             </div>
           }
@@ -158,7 +158,7 @@
               <select formControlName="convertToCaseType" class="form-select">
                 @for (type of eConvertToCaseType | enumKeys; track type) {
                   <option [value]="type">
-                    {{ 'spider.pipeline.convertToCase.' + type | translate }}
+                    {{ 'pipeline.convertToCase.' + type | translate }}
                   </option>
                 }
               </select>
@@ -194,7 +194,7 @@
                   class="form-check-input"
                   formControlName="skipTimezoneConversion"
                   [matTooltip]="
-                    'spider.pipeline.skipTimezoneConversion' | translate
+                    'pipeline.skipTimezoneConversion' | translate
                   " />
               </div>
               @if (!pipeline.get('timeFormat.skipTimezoneConversion')?.value) {
@@ -209,12 +209,12 @@
               <input
                 class="form-control"
                 formControlName="formatParsed"
-                [matTooltip]="'spider.pipeline.formatParsed' | translate"
+                [matTooltip]="'pipeline.formatParsed' | translate"
                 trimOnBlur />
               <input
                 class="form-control"
                 formControlName="format"
-                [matTooltip]="'spider.pipeline.formatTo' | translate"
+                [matTooltip]="'pipeline.formatTo' | translate"
                 trimOnBlur />
             </div>
             <a
@@ -230,18 +230,14 @@
               <select formControlName="zhConverterUtilType" class="form-select">
                 @for (type of eZhConverterUtilType | enumKeys; track type) {
                   <option [value]="type">
-                    {{
-                      'spider.pipeline.zhConverterUtilType.' + type | translate
-                    }}
+                    {{ 'pipeline.zhConverterUtilType.' + type | translate }}
                   </option>
                 }
               </select>
               <select formControlName="chineseConvertType" class="form-select">
                 @for (type of eChineseConvertType | enumKeys; track type) {
                   <option [value]="type">
-                    {{
-                      'spider.pipeline.chineseConvertType.' + type | translate
-                    }}
+                    {{ 'pipeline.chineseConvertType.' + type | translate }}
                   </option>
                 }
               </select>
@@ -253,7 +249,7 @@
               <select formControlName="position" class="form-select">
                 @for (type of ePositionType | enumKeys; track type) {
                   <option [value]="type">
-                    {{ 'spider.pipeline.positionType.' + type | translate }}
+                    {{ 'pipeline.positionType.' + type | translate }}
                   </option>
                 }
               </select>
@@ -265,13 +261,13 @@
                   type="number"
                   class="form-control"
                   formControlName="index"
-                  [matTooltip]="'spider.pipeline.indexNTH' | translate"
+                  [matTooltip]="'pipeline.indexNTH' | translate"
                   trimOnBlur />
               }
               <input
                 class="form-control"
                 formControlName="text"
-                [placeholder]="'spider.pipeline.insertText' | translate"
+                [placeholder]="'pipeline.insertText' | translate"
                 trimOnBlur />
             </div>
           }
@@ -281,7 +277,7 @@
               <select formControlName="position" class="form-select">
                 @for (type of ePositionType | enumKeys; track type) {
                   <option [value]="type">
-                    {{ 'spider.pipeline.positionType.' + type | translate }}
+                    {{ 'pipeline.positionType.' + type | translate }}
                   </option>
                 }
               </select>
@@ -293,13 +289,13 @@
                   class="form-control"
                   type="number"
                   formControlName="index"
-                  [matTooltip]="'spider.pipeline.indexNTH' | translate" />
+                  [matTooltip]="'pipeline.indexNTH' | translate" />
               }
               <input
                 class="form-control"
                 type="number"
                 formControlName="length"
-                [matTooltip]="'spider.pipeline.deleteLength' | translate"
+                [matTooltip]="'pipeline.deleteLength' | translate"
                 trimOnBlur />
             </div>
           }
@@ -310,7 +306,7 @@
                 class="form-control"
                 formControlName="deletePaths"
                 [matTooltip]="
-                  'spider.pipeline.deletePathsPH' | translate
+                  'pipeline.deletePathsPH' | translate
                 "></app-chip-input>
             </div>
           }
@@ -321,12 +317,12 @@
                 class="form-control"
                 type="number"
                 formControlName="fromIndex"
-                [matTooltip]="'spider.pipeline.fromIndex' | translate" />
+                [matTooltip]="'pipeline.fromIndex' | translate" />
               <input
                 class="form-control"
                 type="number"
                 formControlName="toIndex"
-                [matTooltip]="'spider.pipeline.toIndex' | translate" />
+                [matTooltip]="'pipeline.toIndex' | translate" />
             </div>
           }
           <!-- 計算表達式 -->
@@ -339,19 +335,19 @@
                   class="form-control"
                   formControlName="variablePaths"
                   [matTooltip]="
-                    'spider.pipeline.variablePathsPH' | translate
+                    'pipeline.variablePathsPH' | translate
                   "></app-chip-input-map>
               </div>
               <div class="d-flex input-group">
                 <input
                   class="form-control"
                   formControlName="expression"
-                  [matTooltip]="'spider.pipeline.expressionPH' | translate"
+                  [matTooltip]="'pipeline.expressionPH' | translate"
                   trimOnBlur />
                 <input
                   class="form-control"
                   formControlName="defaultValue"
-                  [matTooltip]="'spider.pipeline.defaultValuePH' | translate"
+                  [matTooltip]="'pipeline.defaultValuePH' | translate"
                   trimOnBlur />
                 <a
                   mat-icon-button
@@ -360,6 +356,26 @@
                   <mat-icon>help</mat-icon>
                 </a>
               </div>
+            </div>
+          }
+          <!-- 獲取Cookie -->
+          @case (eValuePipelineType.FETCH_COOKIE) {
+            <div class="d-flex input-group">
+              <input
+                class="form-control"
+                formControlName="fetchCookieName"
+                [matTooltip]="'pipeline.fetchCookieTip' | translate"
+                trimOnBlur />
+            </div>
+          }
+          <!-- 獲取Header -->
+          @case (eValuePipelineType.FETCH_HEADER) {
+            <div class="d-flex input-group">
+              <input
+                class="form-control"
+                formControlName="fetchHeaderName"
+                [matTooltip]="'pipeline.fetchHeaderTip' | translate"
+                trimOnBlur />
             </div>
           }
         }

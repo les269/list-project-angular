@@ -330,7 +330,7 @@ export class SpiderItemComponent {
     this.extractionRuleList.clear();
     this.extractionRuleListData.set([]);
   }
-  //TODO: 如果有綁定就不能刪除，除非先解除綁定
+
   onDeleteItem() {
     const spiderItemId = this.spiderItemId.value;
     this.spiderMappingService
@@ -373,7 +373,7 @@ export class SpiderItemComponent {
   onTestParseHtml() {
     this.resultJsonData.setValue(JSON.stringify('{}', null, 2));
     this.spiderService
-      .previewExtraction(this.form.value as SpiderItem)
+      .previewExtraction(this.form.getRawValue() as SpiderItem)
       .subscribe({
         next: result => {
           this.resultJsonData.setValue(JSON.stringify(result, null, 2));

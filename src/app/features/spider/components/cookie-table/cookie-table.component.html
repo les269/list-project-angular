@@ -92,5 +92,8 @@
 </div>
 
 <ng-template #expandedTmpl let-element>
-  <app-pipeline-list [formArray]="element.get('pipelines')"></app-pipeline-list>
+  <div [formGroup]="element">
+    <app-pipeline-list
+      [formArray]="element.get('valuePipelines')"></app-pipeline-list>
+  </div>
 </ng-template>

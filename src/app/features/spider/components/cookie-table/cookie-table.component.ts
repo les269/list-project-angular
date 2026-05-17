@@ -45,6 +45,7 @@ import { CookieMode } from '../../model/cookie.model';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { PipelineListComponent } from '../pipeline-list/pipeline-list.component';
 import { ValuePipelineFormService } from '../../services/value-pipeline-form.service';
+import { FormField } from '@angular/forms/signals';
 
 @Component({
   selector: 'app-cookie-table',
