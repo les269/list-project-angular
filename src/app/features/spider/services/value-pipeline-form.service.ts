@@ -73,6 +73,7 @@ export class ValuePipelineFormService {
       calculateConfig: this.createCalculateConfigGroup(data?.calculateConfig),
       fetchCookieName: [data?.fetchCookieName ?? ''],
       fetchHeaderName: [data?.fetchHeaderName ?? ''],
+      fetchCurrentDataKey: [data?.fetchCurrentDataKey ?? ''],
     }) as FormGroup<ControlsOf<ValuePipeline>>;
   }
 

@@ -34,6 +34,8 @@ import {
   SpiderConfig,
   SpiderItem,
   SpiderMapping,
+  SpiderReq,
+  SpiderTestReq,
   UrlType,
 } from '../../model';
 import { SpiderConfigService } from '../../services/spider-config.service';
@@ -44,6 +46,7 @@ import { languages } from '@codemirror/language-data';
 import { SpiderItemService } from '../../services/spider-item.service';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
+import { SpiderService } from '../../services';
 
 type SpiderEditMode = 'create' | 'edit';
 
@@ -73,6 +76,7 @@ export class SpiderEditComponent {
   readonly spiderConfigService = inject(SpiderConfigService);
   readonly spiderMappingService = inject(SpiderMappingService);
   readonly spiderItemService = inject(SpiderItemService);
+  readonly spiderService = inject(SpiderService);
   readonly snackbarService = inject(SnackbarService);
   readonly messageBoxService = inject(MessageBoxService);
   readonly fb = inject(FormBuilder);
@@ -181,6 +185,21 @@ export class SpiderEditComponent {
 
   get canDragTabs(): boolean {
     return this.mappings().length === this.spiderItems().length;
+  }
+
+  get testDataUrl(): string {
+    const url = this.form.controls.testData.controls.url.value;
+    return url ? url : '';
+  }
+
+  get resultJson(): FormControl<string> {
+    return this.form.controls.testData.controls.resultJson;
+  }
+
+  get testDataPrimeKeyListJson(): string {
+    const primeKeyListJson =
+      this.form.controls.testData.controls.primeKeyListJson.value;
+    return primeKeyListJson ? primeKeyListJson : '';
   }
 
   constructor() {
@@ -392,6 +411,28 @@ export class SpiderEditComponent {
         }
         this.snackbarService.openI18N('msg.saveSuccess');
       });
+  }
+
+  onPreviewByPrimeKeyList() {
+    this.resultJson.setValue('{}');
+    const data: SpiderReq = {
+      spiderId: this.spiderIdControl.value,
+      primeKeyList: JSON.parse(this.testDataPrimeKeyListJson) as string[],
+    };
+    this.spiderService.executeByPrimeKeyList(data).subscribe(x => {
+      this.resultJson.setValue(JSON.stringify(x, undefined, 2));
+    });
+  }
+
+  onPreviewByUrl() {
+    this.resultJson.setValue('{}');
+    const data: SpiderReq = {
+      spiderId: this.spiderIdControl.value,
+      url: this.testDataUrl,
+    };
+    this.spiderService.executeByUrl(data).subscribe(x => {
+      this.resultJson.setValue(JSON.stringify(x, undefined, 2));
+    });
   }
 
   private buildReorderedMappings(

@@ -27,6 +27,7 @@ export enum ValuePipelineType {
   CALCULATE = 'CALCULATE', // 計算，根據當前資料進行加減乘除運算
   FETCH_COOKIE = 'FETCH_COOKIE', // 取得cookie資料
   FETCH_HEADER = 'FETCH_HEADER', // 取得header資料
+  FETCH_CURRENT_DATA = 'FETCH_CURRENT_DATA', // 取得當前資料給予cookie或header使用
 }
 export interface ValuePipeline {
   seq: number;
@@ -55,6 +56,7 @@ export interface ValuePipeline {
   calculateConfig: CalculateConfig; // 當 type 是 CALCULATE 時使用，指定計算配置
   fetchCookieName: string; // 當 type 是 FETCH_COOKIE 時使用，指定要取得的cookie名稱
   fetchHeaderName: string; // 當 type 是 FETCH_HEADER 時使用，指定要取得的header名稱
+  fetchCurrentDataKey: string; // 當 type 是 FETCH_CURRENT_DATA 時使用，指定要取得的當前資料鍵值
 }
 
 export interface TimeFormatOption {

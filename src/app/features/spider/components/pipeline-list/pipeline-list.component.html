@@ -378,6 +378,16 @@
                 trimOnBlur />
             </div>
           }
+          <!-- 獲取當前資料給予cookie或header使用 -->
+          @case (eValuePipelineType.FETCH_CURRENT_DATA) {
+            <div class="d-flex input-group">
+              <input
+                class="form-control"
+                formControlName="fetchCurrentDataKey"
+                [matTooltip]="'pipeline.fetchCurrentDataKeyTip' | translate"
+                trimOnBlur />
+            </div>
+          }
         }
 
         <button mat-icon-button class="ms-auto" (click)="onDelete($index)">

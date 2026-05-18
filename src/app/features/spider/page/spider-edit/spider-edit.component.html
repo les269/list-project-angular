@@ -85,7 +85,10 @@
               <label class="form-text w-100">{{
                 'spider.testPrimeKeyListDesc' | translate
               }}</label>
-              <button type="button" class="btn btn-primary">
+              <button
+                type="button"
+                class="btn btn-primary"
+                (click)="onPreviewByPrimeKeyList()">
                 {{ 'spider.test' | translate }}
               </button>
             </div>
@@ -96,7 +99,10 @@
                 class="form-control mb-2"
                 formControlName="url"
                 trimOnBlur />
-              <button type="button" class="btn btn-primary">
+              <button
+                type="button"
+                class="btn btn-primary"
+                (click)="onPreviewByUrl()">
                 {{ 'spider.test' | translate }}
               </button>
             </div>

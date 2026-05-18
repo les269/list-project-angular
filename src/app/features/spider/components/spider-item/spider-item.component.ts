@@ -371,7 +371,7 @@ export class SpiderItemComponent {
   }
 
   onTestParseHtml() {
-    this.resultJsonData.setValue(JSON.stringify('{}', null, 2));
+    this.resultJsonData.setValue('{}');
     this.spiderService
       .previewExtraction(this.form.getRawValue() as SpiderItem)
       .subscribe({

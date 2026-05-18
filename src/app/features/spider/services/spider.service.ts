@@ -25,12 +25,4 @@ export class SpiderService {
   previewExtraction(setting: SpiderItem): Observable<any> {
     return this.http.post<string>(`${this.prefix}/preview-extraction`, setting);
   }
-
-  previewByUrl(req: SpiderTestReq): Observable<any> {
-    return this.http.post<string>(`${this.prefix}/preview/use-url`, req);
-  }
-
-  previewByPrimeKey(req: SpiderTestReq): Observable<any> {
-    return this.http.post<string>(`${this.prefix}/preview/use-prime-key`, req);
-  }
 }
