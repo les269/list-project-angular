@@ -1,5 +1,7 @@
 export * from './cookie-list-map.service';
 export * from './cookie-list.service';
+export * from './headers-map.service';
+export * from './headers.service';
 export * from './scrapy-pagination.service';
 export * from './scrapy.service';
 export * from './spider-config.service';

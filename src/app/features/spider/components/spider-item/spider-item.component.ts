@@ -25,6 +25,7 @@ import {
   ExtractionRule,
   ExtractionRuleMode,
   ExtractionStepCondition,
+  HeadersMapType,
   SpiderItem,
   SpiderItemMode,
   SpiderItemSetting,
@@ -64,6 +65,10 @@ import {
   CookieTableDialogComponent,
   CookieTableDialogData,
 } from '../cookie-table-dialog/cookie-table-dialog.component';
+import {
+  HeadersTableDialogComponent,
+  HeadersTableDialogData,
+} from '../headers-table-dialog/headers-table-dialog.component';
 import { CdkDragPlaceholder } from '@angular/cdk/drag-drop';
 import { ValuePipelineFormService } from '../../services/value-pipeline-form.service';
 
@@ -152,6 +157,7 @@ export class SpiderItemComponent {
   readonly eExtractionRuleMode = ExtractionRuleMode;
   readonly eExtractionStepCondition = ExtractionStepCondition;
   readonly eCookieListMapType = CookieListMapType;
+  readonly eHeadersMapType = HeadersMapType;
   readonly selectorDisplayedColumns = ['key', 'selector'];
   readonly jsonPathDisplayedColumns = ['key', 'jsonPath'];
   readonly cols: GenericTableColumn[] = [
@@ -394,6 +400,18 @@ export class SpiderItemComponent {
       mapType: CookieListMapType.SPIDER,
     };
     this.matDialog.open(CookieTableDialogComponent, {
+      data,
+      minWidth: '60vw',
+      autoFocus: false,
+    });
+  }
+
+  onHeadersDialog() {
+    const data: HeadersTableDialogData = {
+      refId: this.spiderItemId.getRawValue() ?? '',
+      mapType: HeadersMapType.SPIDER,
+    };
+    this.matDialog.open(HeadersTableDialogComponent, {
       data,
       minWidth: '60vw',
       autoFocus: false,

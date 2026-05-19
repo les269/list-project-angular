@@ -75,6 +75,8 @@
     "bindSuccess": "綁定成功",
     "itemIdExist": "該{{text}}已經存在",
     "cookieListInUse": "目前該 Cookie 清單使用中，需先解除綁定後才可刪除",
+    "sureDeleteHeadersList": "是否要刪除該 Header 清單?",
+    "headersListInUse": "目前該 Header 清單使用中，需先解除綁定後才可刪除",
     "spiderPrimeKeyListError": "測試主鍵資料格式錯誤，請輸入字串陣列 JSON",
     "spiderSaveFirst": "請先保存爬蟲設定，再建立爬蟲項目",
     "spiderItemRequired": "請輸入爬蟲項目 ID",
@@ -226,6 +228,7 @@
     "disk": "硬碟",
     "select": "請選擇{{text}}",
     "selectCookieList": "請選擇 Cookie 清單",
+    "selectHeadersList": "請選擇 Header 清單",
     "selectSpiderItem": "請選擇爬蟲項目"
   },
   "home": {
@@ -298,7 +301,8 @@
     "conditionValue": "當前結果的條件值",
     "conditionValuePH": "當前結果的條件值, 例如要包含的字串或者正則表達式",
     "ignoreCaseTip": "是否忽略大小寫",
-    "settingCookies": "設定Cookies"
+    "settingCookies": "設定Cookies",
+    "settingHeaders": "設定Headers"
   },
   "pipeline": {
     "addPipeline": "新增處理步驟",
@@ -531,6 +535,8 @@
   "scrapy": {
     "name": "名稱",
     "cookieListId": "Cookie 清單 ID",
+    "headersId": "Header 清單 ID",
+    "headers": "Headers",
     "paramSize": "參數數量",
     "paramSizeDesc": "設定編輯資料使用爬蟲所需要的輸入欄位數量, 最少為1。",
     "tabName": "Tab名稱",

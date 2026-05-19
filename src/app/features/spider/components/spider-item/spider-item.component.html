@@ -77,7 +77,10 @@
       ><div [innerHTML]="'spider.selectorPH' | translate"></div
     ></label>
   }
-  <div class="d-flex">
+  <div class="d-flex gap-2">
+    <button type="button" class="btn btn-primary" (click)="onHeadersDialog()">
+      {{ 'spider.settingHeaders' | translate }}
+    </button>
     <button type="button" class="btn btn-primary" (click)="onCookiesDialog()">
       {{ 'spider.settingCookies' | translate }}
     </button>

@@ -4,6 +4,7 @@ import { ApiConfig } from '../../features/api-config/model';
 import { SelectTableDialog } from '../components/select-table/select-table.dialog';
 import {
   CookieListTO,
+  HeadersTO,
   ScrapyConfig,
   ScrapyPagination,
   SpiderItem,
@@ -241,6 +242,21 @@ export class SelectTableService {
       },
       enableFilter: true,
       title: this.translateService.instant('title.selectCookieList'),
+    };
+    return this.openSelectDialog(data);
+  }
+
+  selectSingleHeadersList(dataSource: HeadersTO[]) {
+    const data: BaseSelectTableData<HeadersTO> = {
+      displayedColumns: ['headersId', 'description', 'updatedTime'],
+      labels: ['scrapy.headersId', 'g.description', 'g.updatedTime'],
+      dataSource,
+      selectType: 'single',
+      columnFormats: {
+        updatedTime: this.dateTransform,
+      },
+      enableFilter: true,
+      title: this.translateService.instant('title.selectHeadersList'),
     };
     return this.openSelectDialog(data);
   }
