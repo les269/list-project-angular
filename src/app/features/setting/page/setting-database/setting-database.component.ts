@@ -11,7 +11,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { SettingService } from '../../services/setting.service';
 import { CommonModule } from '@angular/common';
 import { MatAnchor, MatButtonModule } from '@angular/material/button';
-import { DatabaseConfig, Setting } from '../../model';
+import { DatabaseConfig, DatabaseType, Setting } from '../../model';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -70,6 +70,7 @@ export class SettingDatabaseComponent implements OnInit, AfterViewInit {
   ];
   DEFAULT_DYNAMIC_DB_KEY = DEFAULT_DYNAMIC_DB_KEY;
   sort = viewChild(MatSort);
+  eDatabaseType = DatabaseType;
 
   ngOnInit(): void {
     this.getCurrentConfig();
@@ -154,7 +155,7 @@ export class SettingDatabaseComponent implements OnInit, AfterViewInit {
 
   onTestConnection(element: DatabaseConfig) {
     var req = element;
-    if (element.databaseType === 'sqlite') {
+    if (element.databaseType === DatabaseType.SQLITE) {
       req.sqliteFilePath = req.jdbcUrl
         .replace(/^jdbc:sqlite:/, '')
         .trim()
@@ -174,7 +175,7 @@ export class SettingDatabaseComponent implements OnInit, AfterViewInit {
 
   changeCurrent(element: DatabaseConfig) {
     var req = element;
-    if (element.databaseType === 'sqlite') {
+    if (element.databaseType === DatabaseType.SQLITE) {
       req.sqliteFilePath = req.jdbcUrl
         .replace(/^jdbc:sqlite:/, '')
         .trim()
@@ -204,6 +205,14 @@ export class SettingDatabaseComponent implements OnInit, AfterViewInit {
         this.layoutStore.loadThemeList();
         this.getCurrentConfig();
         this.snackbarService.openI18N('msg.changeDatabaseSuccess');
+      });
+  }
+
+  onOpenLocalFolder(element: DatabaseConfig) {
+    this.databaseConfigService
+      .openLocalFolder(element.configId)
+      .subscribe(result => {
+        this.snackbarService.openI18N('msg.openLocalFolderSuccess');
       });
   }
 }

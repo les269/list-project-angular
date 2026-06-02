@@ -88,7 +88,8 @@
     "extractSuccess": "提取成功",
     "extractFailed": "提取失敗: {{message}}",
     "keyAndValueRequired": "鍵和值都為必填項",
-    "keyAlreadyExists": "鍵已經存在"
+    "keyAlreadyExists": "鍵已經存在",
+    "openLocalFolderSuccess": "開啟本地資料夾成功"
   },
   "g": {
     "edit": "編輯",
@@ -310,8 +311,8 @@
     "FIXED_JSON_VALUE": "固定JSON值",
     "CURRENT_DATA_KEY": "使用當前資料鍵值資料",
     "currentDataKeyPH": "指定要使用的當前資料鍵值, 例如 name 或者 $.data.name",
-    "EXTRACT_ATTR": "提取屬性(Json Path不支援該功能)",
-    "EXTRACT_OWN_TEXT": "僅提取自身文本(Json Path不支援該功能)",
+    "EXTRACT_ATTR": "提取屬性(僅限使用CSS選擇器的提取方法)",
+    "EXTRACT_OWN_TEXT": "僅提取自身文本(僅限使用CSS選擇器的提取方法)",
     "REPLACE_REGULAR": "正則替換",
     "SPLIT_TEXT": "分割字串",
     "JOIN_ARRAY_TO_STRING": "將字串陣列合併為字串",
@@ -380,7 +381,7 @@
     "fetchCookieTip": "輸入當前使用的Cookie的鍵值名稱, 會從request的cookies中取得對應的值",
     "FETCH_HEADER": "獲取Header",
     "fetchHeaderTip": "輸入當前使用的Header的鍵值名稱, 會從request的headers中取得對應的值",
-    "FETCH_CURRENT_DATA": "獲取當前資料給予cookies或是headers中使用",
+    "FETCH_CURRENT_DATA": "獲取當前資料(僅限Cookies或Headers中使用)",
     "fetchCurrentDataKeyTip": "輸入當前已取得的資料鍵值名稱, 可使用json path例如 $.name, 會從當前資料中取得對應的值給予cookies或是headers中使用"
   },
   "themeItem": {
@@ -681,7 +682,8 @@
     "databaseName": "資料庫名稱",
     "testConnection": "測試連線",
     "connectionSuccess": "連線成功",
-    "connectionFailed": "連線失敗"
+    "connectionFailed": "連線失敗",
+    "openLocalFolder": "開啟本地資料夾"
   },
   "timezones": {
     "GMT_M12": "國際日期變換線西 (UTC-12)",

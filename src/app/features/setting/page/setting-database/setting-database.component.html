@@ -48,7 +48,7 @@
             {{ 'database.databaseType' | translate }}
           </th>
           <td mat-cell *matCellDef="let element">
-            {{ element.databaseType }}
+            {{ element.databaseType | lowercase }}
           </td>
         </ng-container>
         <ng-container matColumnDef="description">
@@ -108,6 +108,16 @@
                   [matTooltip]="'g.delete' | translate"
                   (click)="onDelete(element)">
                   <mat-icon>delete</mat-icon>
+                </button>
+              }
+              @if (element.databaseType === eDatabaseType.SQLITE) {
+                <button
+                  mat-icon-button
+                  [matTooltip]="'database.openLocalFolder' | translate"
+                  (click)="onOpenLocalFolder(element)">
+                  <mat-icon fontSet="material-symbols-outlined"
+                    >folder_open</mat-icon
+                  >
                 </button>
               }
             </div>

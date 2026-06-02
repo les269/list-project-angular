@@ -54,11 +54,11 @@
             <span class="required">*</span></label
           >
           <select id="databaseType" formControlName="databaseType">
-            @for (item of databaseTypes; track $index) {
+            @for (item of databaseType | keyvalue; track $index) {
               <option
-                [value]="item"
-                [selected]="item === form.get('databaseType')?.value">
-                {{ item }}
+                [value]="item.value"
+                [selected]="item.value === form.get('databaseType')?.value">
+                {{ item.value | lowercase }}
               </option>
             }
           </select>

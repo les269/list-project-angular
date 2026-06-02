@@ -25,4 +25,9 @@ export class DatabaseConfigService {
       params: { configId },
     });
   }
+  openLocalFolder(configId: string): Observable<void> {
+    return this.http.get<void>(
+      `${this.prefix}/open-local-folder?configId=${configId}`
+    );
+  }
 }

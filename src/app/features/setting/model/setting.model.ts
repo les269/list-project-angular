@@ -9,7 +9,7 @@ export interface Setting {
 export interface DatabaseConfig {
   configId: string;
   configName: string;
-  databaseType: string;
+  databaseType: DatabaseType;
   jdbcUrl: string;
   driverClassName: string;
   host: string;
@@ -24,6 +24,11 @@ export interface DatabaseConfig {
   createdTime: string;
   updatedTime: string;
   sqliteFilePath: string;
+}
+
+export enum DatabaseType {
+  SQLITE = 'SQLITE',
+  POSTGRESQL = 'POSTGRESQL',
 }
 
 export interface TestConnectionResult {

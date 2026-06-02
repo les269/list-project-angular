@@ -8,7 +8,11 @@ import {
   Validators,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { DatabaseConfig, TestConnectionResult } from '../../model';
+import {
+  DatabaseConfig,
+  DatabaseType,
+  TestConnectionResult,
+} from '../../model';
 import { TranslateModule } from '@ngx-translate/core';
 import {
   MAT_DIALOG_DATA,
@@ -48,7 +52,7 @@ export class DatabaseEditComponent implements OnInit {
     {
       configId: ['', [Validators.required]],
       configName: ['', [Validators.required]],
-      databaseType: ['sqlite', [Validators.required]],
+      databaseType: [DatabaseType.SQLITE, [Validators.required]],
       sqliteFilePath: [''],
       host: [''],
       port: [''],
@@ -65,7 +69,7 @@ export class DatabaseEditComponent implements OnInit {
     }
   );
 
-  databaseTypes = ['sqlite', 'postgresql'];
+  databaseType = DatabaseType;
 
   testSuccess = signal<{ success: boolean; data: DatabaseConfig }>({
     success: false,
@@ -77,7 +81,7 @@ export class DatabaseEditComponent implements OnInit {
 
     if (!this.data.isAdd) {
       this.form.get('configId')?.disable();
-      if (this.data.databaseConfig.databaseType === 'sqlite') {
+      if (this.data.databaseConfig.databaseType === DatabaseType.SQLITE) {
         this.form
           .get('sqliteFilePath')
           ?.setValue(
