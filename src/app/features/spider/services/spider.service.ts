@@ -25,4 +25,16 @@ export class SpiderService {
   previewExtraction(setting: SpiderItem): Observable<any> {
     return this.http.post<string>(`${this.prefix}/preview-extraction`, setting);
   }
+  previewExtractionWithFile(setting: SpiderItem, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    const settingBlob = new Blob([JSON.stringify(setting)], {
+      type: 'application/json',
+    });
+    formData.append('setting', settingBlob);
+    return this.http.post<any>(
+      `${this.prefix}/preview-extraction-with-file`,
+      formData
+    );
+  }
 }

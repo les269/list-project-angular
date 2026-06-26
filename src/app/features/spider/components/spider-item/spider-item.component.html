@@ -105,42 +105,97 @@
   <ng-container [ngTemplateOutlet]="buttonTmpl"></ng-container>
   <div class="form-group mb-2">
     @if (useSelector) {
-      <label>{{ 'scrapy.testHtml' | translate }}</label>
+      <label>{{ 'spider.testHtml' | translate }}</label>
       <code-editor
         [style.height]="'300px'"
         [formControl]="htmlData"
         [language]="'html'"
         [indentWithTab]="true"
         [languages]="CodeEditorLanguages" />
-      <button type="button" class="btn btn-primary" (click)="onTestParseHtml()">
-        {{ 'scrapy.test' | translate }}
+      <button type="button" class="btn btn-primary" (click)="onTestParse()">
+        {{ 'spider.test' | translate }}
       </button>
+      <div class="my-2">
+        <div class="btn-group">
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
+            (click)="htmlFile.click()">
+            {{ 'spider.uploadHtml' | translate }}
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="onTestParseWithFile(selectedHtmlFile())"
+            [disabled]="!selectedHtmlFile()">
+            {{ 'spider.test' | translate }}
+          </button>
+        </div>
+        <input
+          #htmlFile
+          class="d-none"
+          type="file"
+          (change)="onUploadHtml($event)"
+          accept=".html,.htm" />
+
+        @if (selectedHtmlFile() !== null) {
+          <div class="text-success small mt-1">
+            已選擇檔案: <strong>{{ selectedHtmlFile()!.name }}</strong>
+          </div>
+        }
+      </div>
     }
     @if (useJsonPath) {
-      <label>{{ 'scrapy.testJson' | translate }}</label>
+      <label>{{ 'spider.testJson' | translate }}</label>
       <code-editor
         [style.height]="'300px'"
         [formControl]="jsonData"
         [language]="'json'"
         [indentWithTab]="true"
         [languages]="CodeEditorLanguages" />
-      <div class="d-flex gap-2 my-2">
+      <div class="my-2 btn-group">
         <button
           type="button"
           class="btn btn-outline-secondary"
           (click)="onFormatJson()">
           {{ 'g.format' | translate }}
         </button>
-        <button
-          type="button"
-          class="btn btn-primary"
-          (click)="onTestParseJson()">
-          {{ 'scrapy.test' | translate }}
+        <button type="button" class="btn btn-primary" (click)="onTestParse()">
+          {{ 'spider.test' | translate }}
         </button>
+      </div>
+      <div class="my-2">
+        <div class="btn-group">
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
+            (click)="jsonFile.click()">
+            {{ 'spider.uploadJson' | translate }}
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="onTestParseWithFile(selectedJsonFile())"
+            [disabled]="!selectedJsonFile()">
+            {{ 'spider.test' | translate }}
+          </button>
+        </div>
+        <input
+          #jsonFile
+          class="d-none"
+          type="file"
+          (change)="onUploadJson($event)"
+          accept=".json" />
+
+        @if (selectedJsonFile() !== null) {
+          <div class="text-success small mt-1">
+            已選擇檔案: <strong>{{ selectedJsonFile()!.name }}</strong>
+          </div>
+        }
       </div>
     }
   </div>
-  <label>{{ 'scrapy.testResult' | translate }}</label>
+  <label>{{ 'spider.testResult' | translate }}</label>
   <code-editor
     class="mb-4"
     [formControl]="resultJsonData"

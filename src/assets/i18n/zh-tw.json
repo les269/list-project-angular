@@ -303,7 +303,12 @@
     "conditionValuePH": "當前結果的條件值, 例如要包含的字串或者正則表達式",
     "ignoreCaseTip": "是否忽略大小寫",
     "settingCookies": "設定Cookies",
-    "settingHeaders": "設定Headers"
+    "settingHeaders": "設定Headers",
+    "uploadHtml": "上傳HTML檔案測試",
+    "testResult": "測試結果",
+    "testHtml": "測試HTML",
+    "testJson": "測試JSON",
+    "uploadJson": "上傳JSON檔案測試"
   },
   "pipeline": {
     "addPipeline": "新增處理步驟",

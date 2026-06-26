@@ -71,6 +71,7 @@ import {
 } from '../headers-table-dialog/headers-table-dialog.component';
 import { CdkDragPlaceholder } from '@angular/cdk/drag-drop';
 import { ValuePipelineFormService } from '../../services/value-pipeline-form.service';
+import { CdkAriaLive } from '../../../../../../node_modules/@angular/cdk/types/_a11y-module-chunk';
 
 @Component({
   selector: 'app-spider-item',
@@ -105,7 +106,6 @@ export class SpiderItemComponent {
   // input
   readonly initData = input<SpiderItem>();
   readonly index = input<number>();
-
   readonly mappingsRx = input<ResourceRef<SpiderMapping[]>>();
   readonly spiderId = input<string>();
   //signal
@@ -131,6 +131,8 @@ export class SpiderItemComponent {
     }
     return '';
   });
+  readonly selectedHtmlFile = signal<File | null>(null);
+  readonly selectedJsonFile = signal<File | null>(null);
 
   // form
   readonly form = this.fb.nonNullable.group({
@@ -376,7 +378,14 @@ export class SpiderItemComponent {
     }
   }
 
-  onTestParseHtml() {
+  onUploadHtml(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedHtmlFile.set(input.files[0]);
+    }
+  }
+
+  onTestParse() {
     this.resultJsonData.setValue('{}');
     this.spiderService
       .previewExtraction(this.form.getRawValue() as SpiderItem)
@@ -392,7 +401,33 @@ export class SpiderItemComponent {
         },
       });
   }
-  onTestParseJson() {}
+
+  onTestParseWithFile(file: File | null) {
+    if (!file) {
+      return;
+    }
+    this.resultJsonData.setValue('{}');
+    this.spiderService
+      .previewExtractionWithFile(this.form.getRawValue() as SpiderItem, file)
+      .subscribe({
+        next: result => {
+          this.resultJsonData.setValue(JSON.stringify(result, null, 2));
+          this.snackbarService.openI18N('msg.extractSuccess');
+        },
+        error: err => {
+          this.snackbarService.openI18N('msg.extractFailed', {
+            message: err.message || '',
+          });
+        },
+      });
+  }
+
+  onUploadJson(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedJsonFile.set(input.files[0]);
+    }
+  }
 
   onCookiesDialog() {
     const data: CookieTableDialogData = {
