@@ -135,7 +135,7 @@
           #htmlFile
           class="d-none"
           type="file"
-          (change)="onUploadHtml($event)"
+          (change)="onUpload($event, selectedHtmlFile)"
           accept=".html,.htm" />
 
         @if (selectedHtmlFile() !== null) {
@@ -184,7 +184,7 @@
           #jsonFile
           class="d-none"
           type="file"
-          (change)="onUploadJson($event)"
+          (change)="onUpload($event, selectedJsonFile)"
           accept=".json" />
 
         @if (selectedJsonFile() !== null) {

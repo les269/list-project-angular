@@ -11,6 +11,7 @@ import {
   Output,
   ResourceRef,
   signal,
+  WritableSignal,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -378,13 +379,6 @@ export class SpiderItemComponent {
     }
   }
 
-  onUploadHtml(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      this.selectedHtmlFile.set(input.files[0]);
-    }
-  }
-
   onTestParse() {
     this.resultJsonData.setValue('{}');
     this.spiderService
@@ -422,10 +416,10 @@ export class SpiderItemComponent {
       });
   }
 
-  onUploadJson(event: Event) {
+  onUpload(event: Event, selectedFileSignal: WritableSignal<File | null>) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      this.selectedJsonFile.set(input.files[0]);
+      selectedFileSignal.set(input.files[0]);
     }
   }
 
