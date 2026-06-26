@@ -1,13 +1,12 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { SpiderMapping } from '../model';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class SpiderMappingService {
   readonly prefix = '/spider-mapping';
-
-  constructor(private readonly http: HttpClient) {}
+  readonly http = inject(HttpClient);
 
   getAll(): Observable<SpiderMapping[]> {
     return this.http.get<SpiderMapping[]>(`${this.prefix}/all`);

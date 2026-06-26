@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable, of, shareReplay } from 'rxjs';
 import {
   Dataset,
@@ -7,9 +7,9 @@ import {
   DatasetQuickRefreshTO,
 } from '../model/dataset.model';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class DatasetService {
-  constructor(private readonly http: HttpClient) {}
+  readonly http = inject(HttpClient);
 
   findDataset(name: string): Observable<Dataset> {
     return this.http.get<Dataset>(`/dataset/get?name=${name}`);

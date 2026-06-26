@@ -1,16 +1,15 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { ApiConfig } from '../model';
 import { concatMap, EMPTY, from, Observable } from 'rxjs';
 import { SnackbarService } from '../../../core/services/snackbar.service';
-import { isBlank, isNull, replaceValue } from '../../../shared/util/helper';
+import { isNull, replaceValue } from '../../../shared/util/helper';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class ApiConfigService {
-  constructor(
-    private readonly http: HttpClient,
-    private snackbarService: SnackbarService
-  ) {}
+  http = inject(HttpClient);
+  snackbarService = inject(SnackbarService);
+
   getAll(): Observable<ApiConfig[]> {
     return this.http.get<ApiConfig[]>('/api-config/all');
   }

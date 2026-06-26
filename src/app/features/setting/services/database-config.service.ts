@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { DatabaseConfig, TestConnectionResult } from '../model';
 import { Observable } from 'rxjs';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class DatabaseConfigService {
   prefix = '/database-config';
-  constructor(private readonly http: HttpClient) {}
+  readonly http = inject(HttpClient);
 
   getAll(): Observable<DatabaseConfig[]> {
     return this.http.get<DatabaseConfig[]>(`${this.prefix}/all`);

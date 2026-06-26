@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ScrapyConfig, ScrapyReq, ScrapyTestReq } from '../model';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class ScrapyService {
   prefix = '/scrapy';
-  constructor(private readonly http: HttpClient) {}
+  readonly http = inject(HttpClient);
 
   findConfig(name: string): Observable<ScrapyConfig> {
     return this.http.get<ScrapyConfig>(`${this.prefix}/get?name=${name}`);

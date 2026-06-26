@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ReplaceValueMap } from '../model';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class ReplaceValueMapService {
-  constructor(private readonly http: HttpClient) {}
+  readonly http = inject(HttpClient);
 
   getNameList(): Observable<ReplaceValueMap[]> {
     return this.http.get<ReplaceValueMap[]>('/replace-value-map/name-list');

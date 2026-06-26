@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Setting } from '../model';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class SettingService {
   prefix = '/setting';
-  constructor(private readonly http: HttpClient) {}
+  readonly http = inject(HttpClient);
 
   getAll(): Observable<Setting[]> {
     return this.http.get<Setting[]>(`${this.prefix}/all`);

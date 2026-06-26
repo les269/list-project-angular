@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { GroupDatasetData } from '../model';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class GroupDatasetDataService {
   prefix = '/group-dataset-data';
-  constructor(private readonly http: HttpClient) {}
+  readonly http = inject(HttpClient);
 
   getGroupDatasetData(
     groupName: string,

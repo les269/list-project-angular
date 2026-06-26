@@ -1,12 +1,12 @@
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ScrapyPagination, ScrapyPaginationTest } from '../model';
 import { Observable } from 'rxjs';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class ScrapyPaginationService {
   prefix = '/scrapy-pagination';
-  constructor(private http: HttpClient) {}
+  readonly http = inject(HttpClient);
 
   find(name: string): Observable<ScrapyPagination> {
     return this.http.get<ScrapyPagination>(`${this.prefix}/get?name=${name}`);

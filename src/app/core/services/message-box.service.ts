@@ -1,14 +1,12 @@
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageBoxComponent } from '../components/message-box/message-box.component';
 import { TranslateService } from '@ngx-translate/core';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class MessageBoxService {
-  constructor(
-    private matDialog: MatDialog,
-    private translateService: TranslateService
-  ) {}
+  matDialog = inject(MatDialog);
+  translateService = inject(TranslateService);
 
   openI18N(
     msg: string,

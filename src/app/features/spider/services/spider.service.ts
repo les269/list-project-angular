@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
   SpiderItem,
@@ -8,11 +8,10 @@ import {
   SpiderTestReq,
 } from '../model';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class SpiderService {
   readonly prefix = '/spider';
-
-  constructor(private readonly http: HttpClient) {}
+  readonly http = inject(HttpClient);
 
   executeByUrl(req: SpiderReq): Observable<any> {
     return this.http.post<string>(`${this.prefix}/use-url`, req);

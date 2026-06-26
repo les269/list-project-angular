@@ -1,13 +1,12 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { SpiderItem } from '../model';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class SpiderItemService {
   readonly prefix = '/spider-item';
-
-  constructor(private readonly http: HttpClient) {}
+  readonly http = inject(HttpClient);
 
   getAll(): Observable<SpiderItem[]> {
     return this.http.get<SpiderItem[]>(`${this.prefix}/all`);

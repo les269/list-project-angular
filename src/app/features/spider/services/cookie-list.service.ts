@@ -1,13 +1,12 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { CookieListMapType, CookieListTO } from '../model';
 import { Observable } from 'rxjs';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class CookieListService {
   readonly prefix = '/cookie-list';
-
-  constructor(private readonly http: HttpClient) {}
+  readonly http = inject(HttpClient);
 
   getByRefIdAndType(
     refId: string,

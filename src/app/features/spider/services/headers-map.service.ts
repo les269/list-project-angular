@@ -1,13 +1,12 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { HeadersMapTO, HeadersMapType } from '../model';
 import { Observable } from 'rxjs';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class HeadersMapService {
   readonly prefix = '/headers/map';
-
-  constructor(private readonly http: HttpClient) {}
+  readonly http = inject(HttpClient);
 
   isInUse(headersId: string, type: HeadersMapType): Observable<boolean> {
     return this.http.get<boolean>(

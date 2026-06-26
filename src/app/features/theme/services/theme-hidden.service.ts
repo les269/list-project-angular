@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ThemeHiddenTO } from '../models';
 import { LayoutStore } from '../../../core/stores/layout.store';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class ThemeHiddenService {
   private readonly http = inject(HttpClient);
 

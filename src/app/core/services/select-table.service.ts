@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ApiConfig } from '../../features/api-config/model';
 import { SelectTableDialog } from '../components/select-table/select-table.dialog';
@@ -15,18 +15,14 @@ import {
   GroupDataset,
   GroupDatasetData,
 } from '../../features/dataset/model';
-import {
-  ShareTag,
-  ThemeItem,
-  ThemeItemSummary,
-} from '../../features/theme/models';
+import { ShareTag, ThemeItemSummary } from '../../features/theme/models';
 import { ReplaceValueMap } from '../../features/replace-value-map/model';
 import { TranslateService } from '@ngx-translate/core';
 import { isNotBlank } from '../../shared/util/helper';
 import { filter } from 'rxjs';
 import { BaseSelectTableData } from '../model';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class SelectTableService {
   matDialog = inject(MatDialog);
   translateService = inject(TranslateService);

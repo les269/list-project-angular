@@ -1,13 +1,12 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Disk, DiskAddRequest } from '../model/disk.model';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class DiskService {
   private readonly prefix = '/disk';
-
-  constructor(private readonly http: HttpClient) {}
+  readonly http = inject(HttpClient);
 
   getAll(): Observable<Disk[]> {
     return this.http.get<Disk[]>(`${this.prefix}/all`);

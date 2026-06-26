@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { FileExistRequest, FileRequest } from '../model/file.model';
 import { Observable, of } from 'rxjs';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class FileService {
-  constructor(private readonly http: HttpClient) {}
+  http = inject(HttpClient);
 
   delete(req: FileRequest): Observable<boolean> {
     return this.http.post<boolean>('/file/delete', req);

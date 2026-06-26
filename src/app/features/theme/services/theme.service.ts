@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, Service } from '@angular/core';
 import { map, Observable, of } from 'rxjs';
 import {
   CopyThemeRequest,
@@ -12,7 +12,7 @@ import {
   ThemeTopCustomValueResponse,
 } from '../models';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class ThemeService {
   readonly http = inject(HttpClient);
 
