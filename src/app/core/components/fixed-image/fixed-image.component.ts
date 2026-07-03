@@ -12,7 +12,7 @@ import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-fixed-image',
-  standalone: true,
+
   imports: [CommonModule, MatIconModule, TranslateModule],
   templateUrl: './fixed-image.component.html',
   styleUrl: './fixed-image.component.scss',

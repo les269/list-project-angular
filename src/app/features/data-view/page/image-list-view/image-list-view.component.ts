@@ -38,7 +38,6 @@ import {
 } from '../../stores/index.store';
 
 @Component({
-  standalone: true,
   imports: [
     MatIconModule,
     TranslateModule,

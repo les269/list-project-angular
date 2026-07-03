@@ -33,7 +33,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-share-tag-value-list',
-  standalone: true,
+
   imports: [
     CommonModule,
     MatDialogModule,

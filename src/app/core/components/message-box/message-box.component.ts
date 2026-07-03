@@ -18,7 +18,6 @@ export interface MessageBoxData {
 }
 
 @Component({
-  standalone: true,
   imports: [
     MatButtonModule,
     MatDialogActions,

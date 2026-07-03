@@ -24,7 +24,7 @@ import { GroupDatasetData } from '../../model';
 
 @Component({
   selector: 'app-group-dataset-import-export',
-  standalone: true,
+
   imports: [
     TranslateModule,
     MatDialogClose,

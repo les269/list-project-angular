@@ -46,7 +46,7 @@ import {
 
 @Component({
   selector: 'app-table-view',
-  standalone: true,
+
   imports: [
     CommonModule,
     FormsModule,

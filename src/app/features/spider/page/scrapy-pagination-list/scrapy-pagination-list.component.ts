@@ -19,7 +19,7 @@ import { MessageBoxService } from '../../../../core/services/message-box.service
 
 @Component({
   selector: 'app-scrapy-pagination-list',
-  standalone: true,
+
   imports: [
     TranslateModule,
     CommonModule,

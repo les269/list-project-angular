@@ -29,7 +29,7 @@ import { MessageBoxService } from '../../../../core/services/message-box.service
 
 @Component({
   selector: 'app-replace-value-map',
-  standalone: true,
+
   imports: [
     FormsModule,
     ReactiveFormsModule,

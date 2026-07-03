@@ -41,7 +41,7 @@ import {
 
 @Component({
   selector: 'app-dataset-edit',
-  standalone: true,
+
   imports: [
     MatTableModule,
     ReactiveFormsModule,

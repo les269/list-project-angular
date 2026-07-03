@@ -9,7 +9,6 @@ import { LayoutStore } from '../../stores/layout.store';
 import { ThemeHiddenService } from '../../../features/theme/services';
 
 @Component({
-  standalone: true,
   imports: [CommonModule, RouterModule, TranslateModule],
   selector: 'app-sidenav',
   templateUrl: 'sidenav.component.html',

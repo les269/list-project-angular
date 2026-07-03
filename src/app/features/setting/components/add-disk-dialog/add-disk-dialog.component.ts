@@ -8,7 +8,7 @@ import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-add-disk-dialog',
-  standalone: true,
+
   imports: [
     CommonModule,
     MatDialogModule,

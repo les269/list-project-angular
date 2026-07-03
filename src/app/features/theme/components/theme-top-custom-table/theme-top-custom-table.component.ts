@@ -46,7 +46,7 @@ import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 
 @Component({
   selector: 'app-theme-top-custom-table',
-  standalone: true,
+
   imports: [
     TranslateModule,
     FormsModule,

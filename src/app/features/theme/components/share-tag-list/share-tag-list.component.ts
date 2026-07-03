@@ -40,7 +40,7 @@ import { toSignal, rxResource } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-share-tag-list',
-  standalone: true,
+
   imports: [
     ReactiveFormsModule,
     FormsModule,

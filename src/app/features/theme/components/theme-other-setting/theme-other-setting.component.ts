@@ -35,7 +35,7 @@ import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 
 @Component({
   selector: 'app-theme-other-setting',
-  standalone: true,
+
   imports: [
     ReactiveFormsModule,
     MatTableModule,

@@ -33,7 +33,7 @@ import { ScrapyConfig } from '../../../spider/model';
 
 @Component({
   selector: 'app-group-dataset-scrapy-table',
-  standalone: true,
+
   imports: [
     MatTableModule,
     ReactiveFormsModule,

@@ -230,7 +230,8 @@
     "select": "請選擇{{text}}",
     "selectCookieList": "請選擇 Cookie 清單",
     "selectHeadersList": "請選擇 Header 清單",
-    "selectSpiderItem": "請選擇爬蟲項目"
+    "selectSpiderItem": "請選擇爬蟲項目",
+    "spiderPaginationList": "爬蟲處理分頁清單"
   },
   "home": {
     "createTheme": "創建主題",
@@ -267,7 +268,9 @@
     "extractionRule": "提取方法",
     "extractionRuleMode": {
       "SELECT": "CSS選擇器",
-      "JSON_PATH": "Json Path"
+      "JSON_PATH": "Json Path",
+      "CSV": "CSV",
+      "EXCEL": "Excel"
     },
     "urlType": {
       "name": "網址使用方式",
@@ -309,6 +312,11 @@
     "testHtml": "測試HTML",
     "testJson": "測試JSON",
     "uploadJson": "上傳JSON檔案測試"
+  },
+  "spiderPagination": {
+    "createSpiderPagination": "新增爬蟲處理分頁",
+    "spiderPaginationId": "爬蟲處理分頁ID",
+    "spiderPaginationName": "爬蟲處理分頁名稱"
   },
   "pipeline": {
     "addPipeline": "新增處理步驟",

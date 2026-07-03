@@ -51,7 +51,6 @@ import { SpiderService } from '../../services';
 type SpiderEditMode = 'create' | 'edit';
 
 @Component({
-  standalone: true,
   selector: 'app-spider-edit',
   templateUrl: './spider-edit.component.html',
   imports: [

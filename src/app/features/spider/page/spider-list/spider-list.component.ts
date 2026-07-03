@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import {
   AfterViewInit,
   Component,
+  computed,
   inject,
   OnInit,
   viewChild,
@@ -17,9 +18,9 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { isNotBlank } from '../../../../shared/util/helper';
 import { SpiderConfig } from '../../model';
 import { SpiderConfigService } from '../../services/spider-config.service';
+import { rxResource } from '@angular/core/rxjs-interop';
 
 @Component({
-  standalone: true,
   selector: 'app-spider-list',
   templateUrl: './spider-list.component.html',
   imports: [
@@ -31,7 +32,7 @@ import { SpiderConfigService } from '../../services/spider-config.service';
     MatSortModule,
   ],
 })
-export class SpiderListComponent implements OnInit, AfterViewInit {
+export class SpiderListComponent {
   displayedColumns = [
     'spiderId',
     'description',
@@ -39,7 +40,7 @@ export class SpiderListComponent implements OnInit, AfterViewInit {
     'updatedTime',
     'other',
   ];
-  dataSource = new MatTableDataSource<SpiderConfig>([]);
+  // dataSource = new MatTableDataSource<SpiderConfig>([]);
 
   readonly router = inject(Router);
   readonly spiderConfigService = inject(SpiderConfigService);
@@ -48,19 +49,20 @@ export class SpiderListComponent implements OnInit, AfterViewInit {
 
   readonly sort = viewChild(MatSort);
 
-  ngOnInit() {
-    this.getList();
-  }
+  readonly list = rxResource({
+    stream: () => this.spiderConfigService.getAll(),
+    defaultValue: [] as SpiderConfig[],
+  });
 
-  ngAfterViewInit() {
-    this.dataSource.sort = this.sort()!;
-  }
-
-  getList() {
-    this.spiderConfigService.getAll().subscribe(res => {
-      this.dataSource.data = res;
-    });
-  }
+  readonly dataSource = computed(() => {
+    const data = this.list.value() ?? [];
+    const sort = this.sort();
+    const dataSource = new MatTableDataSource<SpiderConfig>(data);
+    if (sort) {
+      dataSource.sort = sort;
+    }
+    return dataSource;
+  });
 
   onAdd() {
     this.router.navigate(['spider-edit']);
@@ -77,7 +79,7 @@ export class SpiderListComponent implements OnInit, AfterViewInit {
         if (isNotBlank(result)) {
           this.spiderConfigService.delete(e.spiderId).subscribe(() => {
             this.snackbarService.openI18N('msg.deleteSuccess');
-            this.getList();
+            this.list.reload();
           });
         }
       });

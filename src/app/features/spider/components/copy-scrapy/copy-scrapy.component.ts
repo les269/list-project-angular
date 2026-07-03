@@ -20,7 +20,7 @@ import { EMPTY, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-copy-scrapy',
-  standalone: true,
+
   imports: [
     ReactiveFormsModule,
     FormsModule,

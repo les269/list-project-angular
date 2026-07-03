@@ -44,7 +44,7 @@ import {
 
 @Component({
   selector: 'app-group-dataset-api-table',
-  standalone: true,
+
   imports: [
     MatTableModule,
     ReactiveFormsModule,

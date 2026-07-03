@@ -23,7 +23,6 @@ import { LayoutStore } from './core/stores/layout.store';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterOutlet, HeaderComponent, SidenavComponent, CommonModule],
   templateUrl: './app.component.html',

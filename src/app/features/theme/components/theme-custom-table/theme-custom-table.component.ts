@@ -57,7 +57,6 @@ import { FormInvalidsComponent } from '../../../../core/components/form-invalids
 import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 
 @Component({
-  standalone: true,
   imports: [
     TranslateModule,
     FormsModule,

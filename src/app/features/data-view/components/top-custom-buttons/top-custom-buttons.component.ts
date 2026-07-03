@@ -16,7 +16,7 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
 
 @Component({
   selector: 'app-top-custom-buttons',
-  standalone: true,
+
   imports: [MatIconModule],
   templateUrl: './top-custom-buttons.component.html',
   styleUrl: './top-custom-buttons.component.scss',

@@ -1,5 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, inject, OnInit, viewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  inject,
+  OnInit,
+  viewChild,
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -15,7 +21,6 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 
 @Component({
-  standalone: true,
   imports: [
     TranslateModule,
     CommonModule,

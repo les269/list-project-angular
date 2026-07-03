@@ -43,7 +43,7 @@ import {
 
 @Component({
   selector: 'app-css-select-table',
-  standalone: true,
+
   imports: [
     MatTableModule,
     ReactiveFormsModule,

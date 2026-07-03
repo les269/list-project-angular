@@ -14,7 +14,6 @@ import { CopyThemeComponent } from '../../components/copy-theme/copy-theme.compo
 import { LayoutStore } from '../../../../core/stores/layout.store';
 
 @Component({
-  standalone: true,
   imports: [CommonModule, TranslateModule],
   selector: 'app-theme-list',
   templateUrl: 'theme-list.component.html',

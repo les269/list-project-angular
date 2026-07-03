@@ -18,7 +18,7 @@ export interface HeadersTableDialogData {
 
 @Component({
   selector: 'app-headers-table-dialog',
-  standalone: true,
+
   imports: [
     TranslateModule,
     MatButtonModule,

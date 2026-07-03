@@ -27,7 +27,7 @@ import { filter, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-disk-management',
-  standalone: true,
+
   imports: [
     CommonModule,
     MatTableModule,

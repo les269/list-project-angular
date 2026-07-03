@@ -53,7 +53,6 @@ import { ThemeItemService } from '../../services';
 import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 import { LayoutStore } from '../../../../core/stores/layout.store';
 @Component({
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,

@@ -8,7 +8,6 @@ import { LayoutStore } from '../../stores/layout.store';
   templateUrl: './header.component.html',
   styleUrls: ['header.component.scss'],
   imports: [MatIconModule, MatButtonModule],
-  standalone: true,
 })
 export class HeaderComponent {
   store = inject(LayoutStore);

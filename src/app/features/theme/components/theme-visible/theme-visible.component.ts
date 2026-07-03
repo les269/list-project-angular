@@ -22,7 +22,7 @@ import { LayoutStore } from '../../../../core/stores/layout.store';
 
 @Component({
   selector: 'app-theme-visible',
-  standalone: true,
+
   imports: [
     CommonModule,
     MatListModule,

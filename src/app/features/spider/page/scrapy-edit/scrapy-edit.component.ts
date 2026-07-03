@@ -50,7 +50,6 @@ type ScrapyDataFormControls = {
 };
 
 @Component({
-  standalone: true,
   imports: [
     MatTableModule,
     ReactiveFormsModule,

@@ -1,0 +1,77 @@
+<div class="col-md-10 offset-md-1 col-xs-12 mt-3">
+  <div class="mb-3 d-flex">
+    <button type="button" class="btn btn-primary" (click)="onAdd()">
+      {{ 'spiderPagination.createSpiderPagination' | translate }}
+    </button>
+    <div
+      class="mx-2"
+      style="flex: 1; max-width: 420px; display: flex; gap: 8px">
+      <input
+        class="form-control"
+        [placeholder]="'g.filter' | translate"
+        [value]="searchSignal()"
+        (input)="applyFilter($event)" />
+    </div>
+    <button
+      type="button"
+      class="btn btn-primary"
+      [disabled]="!searchSignal()"
+      (click)="clearFilter()">
+      {{ 'g.clear' | translate }}
+    </button>
+  </div>
+  <div class="card overflow-auto" [ngStyle]="{ 'max-height': '85vh' }">
+    <table
+      mat-table
+      [dataSource]="dataSource()"
+      multiTemplateDataRows
+      matSort
+      (matSortChange)="onSortChange($event)">
+      <ng-container matColumnDef="spiderPaginationId">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ 'spiderPagination.spiderPaginationId' | translate }}
+        </th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.spiderPaginationId }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="createdTime">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ 'g.createdTime' | translate }}
+        </th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.createdTime | date: 'yyyy-MM-dd HH:mm' }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="updatedTime">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ 'g.updatedTime' | translate }}
+        </th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.updatedTime | date: 'yyyy-MM-dd HH:mm' }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="other">
+        <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
+        <td mat-cell *matCellDef="let element; let i = dataIndex">
+          <div class="row flex-nowrap">
+            <button mat-icon-button (click)="onEdit(element)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button (click)="onRedirectData(element)">
+              <mat-icon>reorder</mat-icon>
+            </button>
+            <button mat-icon-button (click)="onCopy(element)">
+              <mat-icon>file_copy</mat-icon>
+            </button>
+            <button mat-icon-button (click)="onDelete(element)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+</div>

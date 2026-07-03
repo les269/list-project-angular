@@ -43,7 +43,7 @@ import { ValuePipelineFormService } from '../../services/value-pipeline-form.ser
 
 @Component({
   selector: 'app-headers-table',
-  standalone: true,
+
   imports: [
     MatTableModule,
     ReactiveFormsModule,

@@ -30,7 +30,7 @@ import { ButtonInputUrlComponent } from '../button-input-url/button-input-url.co
 
 @Component({
   selector: 'app-custom-buttons',
-  standalone: true,
+
   imports: [MatIconModule, CopyDirective],
   templateUrl: './custom-buttons.component.html',
   styleUrl: './custom-buttons.component.scss',

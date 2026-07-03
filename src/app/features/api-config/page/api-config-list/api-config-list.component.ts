@@ -17,7 +17,6 @@ import { CommonModule } from '@angular/common';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 
 @Component({
-  standalone: true,
   selector: 'app-api-config-list',
   templateUrl: 'api-config-list.component.html',
   styleUrl: 'api-config-list.component.scss',

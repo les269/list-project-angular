@@ -16,7 +16,7 @@ import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
 
 @Component({
   selector: 'app-theme-note',
-  standalone: true,
+
   imports: [
     ReactiveFormsModule,
     FormsModule,

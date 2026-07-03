@@ -2,7 +2,6 @@ import { Component, HostListener } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  standalone: true,
   imports: [MatIconModule],
   selector: 'app-scrollTop',
   templateUrl: 'scroll-top.component.html',

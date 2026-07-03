@@ -91,6 +91,14 @@ export const routes: Routes = [
     data: { title: 'title.spiderEdit' },
   },
   {
+    path: 'spider-pagination-list',
+    loadComponent: () =>
+      import('./features/spider/page/spider-pagination-list/spider-pagination-list.component').then(
+        mod => mod.SpiderPaginationListComponent
+      ),
+    data: { title: 'title.spiderPaginationList', sidenav: true },
+  },
+  {
     path: 'spider-edit/:spiderId',
     loadComponent: () =>
       import('./features/spider/page/spider-edit/spider-edit.component').then(

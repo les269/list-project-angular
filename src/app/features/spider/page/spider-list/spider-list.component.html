@@ -5,7 +5,7 @@
     </button>
   </div>
   <div class="card">
-    <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort>
+    <table mat-table [dataSource]="dataSource()" multiTemplateDataRows matSort>
       <ng-container matColumnDef="spiderId">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'spider.spiderId' | translate }}

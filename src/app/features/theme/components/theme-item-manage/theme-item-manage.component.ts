@@ -34,7 +34,7 @@ import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 
 @Component({
   selector: 'app-theme-item-manage',
-  standalone: true,
+
   imports: [ReactiveFormsModule, TranslateModule, TrimOnBlurDirective],
   templateUrl: './theme-item-manage.component.html',
 })

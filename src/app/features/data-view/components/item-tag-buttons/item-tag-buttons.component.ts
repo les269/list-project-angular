@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-item-tag-buttons',
-  standalone: true,
+
   imports: [MatIconModule],
   templateUrl: './item-tag-buttons.component.html',
   styleUrl: './item-tag-buttons.component.scss',

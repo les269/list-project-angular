@@ -18,7 +18,7 @@ export interface CookieTableDialogData {
 
 @Component({
   selector: 'app-cookie-table-dialog',
-  standalone: true,
+
   imports: [
     TranslateModule,
     MatButtonModule,

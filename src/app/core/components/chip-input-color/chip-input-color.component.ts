@@ -7,7 +7,7 @@ import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
   selector: 'app-chip-input-color',
-  standalone: true,
+
   imports: [CommonModule, MatFormFieldModule, MatChipsModule, MatIconModule],
   templateUrl: './chip-input-color.component.html',
   providers: [

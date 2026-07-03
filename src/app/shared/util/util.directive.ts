@@ -46,7 +46,6 @@ export class CopyDirective {
 
 @Directive({
   selector: '[trimOnBlur]',
-  standalone: true,
 })
 export class TrimOnBlurDirective {
   private readonly elementRef = inject(

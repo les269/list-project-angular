@@ -23,7 +23,7 @@ import { toKeyValueArray } from '../../../../shared/util/helper';
 
 @Component({
   selector: 'app-dataset-field-table',
-  standalone: true,
+
   imports: [
     MatTableModule,
     ReactiveFormsModule,

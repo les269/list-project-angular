@@ -49,7 +49,6 @@ import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage
 import { LayoutStore } from '../../../../core/stores/layout.store';
 
 @Component({
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     MatTableModule,

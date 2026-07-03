@@ -6,7 +6,7 @@ import { CopyDirective } from '../../../../shared/util/util.directive';
 
 @Component({
   selector: 'app-array-text',
-  standalone: true,
+
   imports: [MatIconModule, CopyDirective],
   templateUrl: './array-text.component.html',
   styleUrl: './array-text.component.scss',

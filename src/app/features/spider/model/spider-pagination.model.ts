@@ -1,0 +1,80 @@
+import { ExtractionRule, ExtractionRuleMode } from './extraction.model';
+
+export interface SpiderPagination {
+  spiderPaginationId: string;
+  paginationConfig: SpiderPaginationConfig;
+  createdTime?: Date;
+  updatedTime?: Date;
+}
+
+export interface SpiderPaginationData {
+  spiderPaginationId: string;
+  dataId: string;
+  // 後端資料內容欄位依 TO 為準，先保留延展欄位避免型別阻塞
+  data: Record<string, any>;
+  createdTime?: Date;
+  updatedTime?: Date;
+}
+
+export interface SpiderPaginationConfig {
+  perStartParams: ParamSetting[];
+  startUrl: string;
+  nextPageUrlKey: string; // 當資料為空時即終止
+  mode: ExtractionRuleMode;
+  extractionRuleList: ExtractionRule[];
+}
+
+export interface ParamSetting {
+  paramKey: string; // 置換的標記，如 {code}, {time}
+  type: ParamType; // STATIC_LIST, NUMBER_RANGE, TIME_RANGE
+
+  // --- 1. 固定字串列表 ---
+  staticList?: string[];
+
+  // --- 2. 數字推進 (全字串化，支援間隔與補零) ---
+  startNumStr?: string; // 例如 "001" 或 "0"
+  endNumStr?: string; // 例如 "999" 或 "100"
+  numStep?: number; // 步長間隔，例如 1 或 10
+  padZeros?: boolean; // 是否保持與 startNumStr 同樣的長度補零
+
+  // --- 3. 時間推進 (自由定義起點、終點與間隔單位) ---
+  startTimeStr?: string; // 例如 "2026-07-01 00:00:00"
+  timeFormat?: string; // 時間格式，例如 "yyyy-MM-dd HH:mm:ss"
+  timeInterval?: number; // 間隔數量，例如 1、2、7
+  timeUnit?: TimeStepUnit; // YEAR, WEEK, DAY, HOUR, MINUTE, SECOND
+  endTimeConfig?: EndTimeConfig; // 終止時間設定
+}
+
+export interface EndTimeConfig {
+  endTimeType: EndTimeType; // FIXED, CURRENT_DATE, END_CURRENT_YEAR, RELATIVE_OFFSET
+  timeFormat?: string;
+
+  // 當 endTimeType == FIXED 時使用
+  endTimeStr?: string;
+
+  // 當 endTimeType == RELATIVE_OFFSET 時使用
+  offsetInterval?: number; // 可以是負數或正數，例如 -7
+  offsetUnit?: TimeStepUnit; // DAY, WEEK, MONTH...
+}
+
+export enum ParamType {
+  STATIC_LIST = 'STATIC_LIST',
+  NUMBER_RANGE = 'NUMBER_RANGE',
+  TIME_RANGE = 'TIME_RANGE',
+}
+
+export enum TimeStepUnit {
+  YEAR = 'YEAR',
+  WEEK = 'WEEK',
+  DAY = 'DAY',
+  HOUR = 'HOUR',
+  MINUTE = 'MINUTE',
+  SECOND = 'SECOND',
+}
+
+export enum EndTimeType {
+  FIXED = 'FIXED', // 固定時間
+  CURRENT_DATE = 'CURRENT_DATE', // 執行當天的此刻
+  END_CURRENT_YEAR = 'END_CURRENT_YEAR', // 當年的最後一刻
+  RELATIVE_OFFSET = 'RELATIVE_OFFSET', // 相對偏移
+}

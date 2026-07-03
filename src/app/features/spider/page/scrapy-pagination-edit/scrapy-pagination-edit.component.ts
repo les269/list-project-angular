@@ -23,7 +23,7 @@ import dayjs from 'dayjs';
 
 @Component({
   selector: 'app-scrapy-pagination-edit',
-  standalone: true,
+
   providers: [
     provideNativeDateAdapter(),
     { provide: MAT_DATE_LOCALE, useValue: 'zh-tw' },

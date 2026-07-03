@@ -12,7 +12,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-chip-input-map',
-  standalone: true,
+
   imports: [
     CommonModule,
     OverlayModule,

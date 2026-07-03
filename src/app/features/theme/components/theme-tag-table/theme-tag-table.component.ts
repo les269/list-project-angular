@@ -41,7 +41,7 @@ import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage
 
 @Component({
   selector: 'app-theme-tag-table',
-  standalone: true,
+
   imports: [
     ReactiveFormsModule,
     MatTableModule,

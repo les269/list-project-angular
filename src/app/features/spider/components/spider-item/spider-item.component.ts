@@ -76,7 +76,7 @@ import { CdkAriaLive } from '../../../../../../node_modules/@angular/cdk/types/_
 
 @Component({
   selector: 'app-spider-item',
-  standalone: true,
+
   imports: [
     CommonModule,
     FormsModule,

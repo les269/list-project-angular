@@ -19,7 +19,7 @@ import { GroupDatasetService } from '../../service/group-dataset.service';
 
 @Component({
   selector: 'app-copy-group-dataset',
-  standalone: true,
+
   imports: [
     ReactiveFormsModule,
     FormsModule,

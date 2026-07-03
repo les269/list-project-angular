@@ -34,7 +34,7 @@ import { GroupDatasetApiTableComponent } from '../../components/group-dataset-ap
 
 @Component({
   selector: 'app-group-dataset-edit',
-  standalone: true,
+
   imports: [
     MatTableModule,
     ReactiveFormsModule,

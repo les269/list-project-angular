@@ -9,7 +9,7 @@ import { isBlank, isNotBlank } from '../../../../shared/util/helper';
 
 @Component({
   selector: 'app-list-item-value',
-  standalone: true,
+
   imports: [
     CopyDirective,
     CommonModule,

@@ -25,7 +25,7 @@ import { ScrapyPaginationService } from '../../services/scrapy-pagination.servic
 
 @Component({
   selector: 'app-copy-scrapy-pagination',
-  standalone: true,
+
   imports: [
     ReactiveFormsModule,
     FormsModule,

@@ -28,7 +28,7 @@ import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-dataset-list',
-  standalone: true,
+
   imports: [
     TranslateModule,
     CommonModule,

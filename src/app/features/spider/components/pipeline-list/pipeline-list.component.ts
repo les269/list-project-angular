@@ -34,7 +34,7 @@ import { ValuePipelineFormService } from '../../services';
 
 @Component({
   selector: 'app-pipeline-list',
-  standalone: true,
+
   imports: [
     CommonModule,
     ReactiveFormsModule,

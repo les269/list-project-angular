@@ -18,7 +18,7 @@ import { MatListModule } from '@angular/material/list';
 
 @Component({
   selector: 'app-redirect-data',
-  standalone: true,
+
   imports: [
     ReactiveFormsModule,
     FormsModule,

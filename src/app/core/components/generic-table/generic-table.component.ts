@@ -43,7 +43,7 @@ import { TrimOnBlurDirective } from '../../../shared/util/util.directive';
 
 @Component({
   selector: 'app-generic-table',
-  standalone: true,
+
   imports: [
     TranslateModule,
     CommonModule,

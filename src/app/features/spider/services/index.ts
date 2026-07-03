@@ -7,5 +7,7 @@ export * from './scrapy.service';
 export * from './spider-config.service';
 export * from './spider-item.service';
 export * from './spider-mapping.service';
+export * from './spider-pagination-data.service';
+export * from './spider-pagination.service';
 export * from './spider.service';
 export * from './value-pipeline-form.service';

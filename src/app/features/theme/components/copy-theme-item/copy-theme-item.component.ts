@@ -19,7 +19,7 @@ import { EMPTY, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-copy-theme-item',
-  standalone: true,
+
   imports: [
     ReactiveFormsModule,
     FormsModule,

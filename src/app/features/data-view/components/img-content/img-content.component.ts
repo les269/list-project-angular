@@ -3,7 +3,7 @@ import { CommonModule, NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'app-img-content',
-  standalone: true,
+
   imports: [CommonModule, NgOptimizedImage],
   templateUrl: './img-content.component.html',
   styleUrl: './img-content.component.scss',

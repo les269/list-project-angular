@@ -19,7 +19,7 @@ import { DatasetService } from '../../service/dataset.service';
 
 @Component({
   selector: 'app-copy-dataset',
-  standalone: true,
+
   imports: [
     ReactiveFormsModule,
     FormsModule,

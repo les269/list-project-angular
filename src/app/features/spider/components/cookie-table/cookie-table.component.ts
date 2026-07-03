@@ -49,7 +49,7 @@ import { FormField } from '@angular/forms/signals';
 
 @Component({
   selector: 'app-cookie-table',
-  standalone: true,
+
   imports: [
     MatTableModule,
     ReactiveFormsModule,

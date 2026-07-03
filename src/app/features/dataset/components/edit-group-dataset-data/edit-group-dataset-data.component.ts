@@ -39,7 +39,7 @@ export interface EditGroupDatasetDataType {
 }
 @Component({
   selector: 'app-edit-group-dataset-data',
-  standalone: true,
+
   imports: [
     ReactiveFormsModule,
     FormsModule,

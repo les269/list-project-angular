@@ -31,7 +31,6 @@ import { CustomMatPaginatorIntl } from '../custom-mat-paginatorIntl/custom-mat-p
 import { BaseSelectTableData } from '../../model';
 
 @Component({
-  standalone: true,
   imports: [
     CommonModule,
     MatTableModule,

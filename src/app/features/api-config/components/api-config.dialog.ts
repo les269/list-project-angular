@@ -24,7 +24,6 @@ export interface ApiConfigDialogData {
   type: 'add' | 'edit';
 }
 @Component({
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     FormsModule,

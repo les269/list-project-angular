@@ -2,7 +2,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   name: 'fileSize',
-  standalone: true,
 })
 export class FileSizePipe implements PipeTransform {
   transform(value: number): string {
@@ -19,7 +18,6 @@ export class FileSizePipe implements PipeTransform {
 
 @Pipe({
   name: 'replaceValue',
-  standalone: true,
 })
 export class ReplaceValuePipe implements PipeTransform {
   transform(value: string, obj: any): string {
@@ -36,7 +34,6 @@ export class ReplaceValuePipe implements PipeTransform {
 
 @Pipe({
   name: 'enumKeys',
-  standalone: true,
 })
 export class EnumKeysPipe implements PipeTransform {
   transform(value: object): string[] {
