@@ -21,6 +21,7 @@ export interface HeadersTO {
 
 export enum HeadersMapType {
   SPIDER = 'SPIDER',
+  SPIDER_PAGINATION = 'SPIDER_PAGINATION',
   API = 'API',
 }
 

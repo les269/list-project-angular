@@ -21,6 +21,7 @@ export interface CookieListTO {
 
 export enum CookieListMapType {
   SPIDER = 'SPIDER',
+  SPIDER_PAGINATION = 'SPIDER_PAGINATION',
   API = 'API',
 }
 

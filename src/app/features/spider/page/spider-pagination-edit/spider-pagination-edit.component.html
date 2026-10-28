@@ -1,0 +1,60 @@
+<div class="container d-flex">
+  <div class="col-md-10 offset-md-1 col-xs-12 mt-2">
+    <button
+      mat-icon-button
+      class="d-flex align-content-center"
+      (click)="onBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="form-group mb-2">
+      <label>{{ 'spiderPagination.spiderPaginationId' | translate }}</label>
+      <input
+        class="form-control"
+        [formField]="form.spiderPaginationId"
+        trimOnBlur />
+      @if (
+        form.spiderPaginationId().touched() &&
+        form.spiderPaginationId().invalid()
+      ) {
+        <div class="text-danger small mt-1">
+          {{
+            'spiderPagination.validation.spiderPaginationIdRequired' | translate
+          }}
+        </div>
+      }
+    </div>
+    <div class="form-group mb-2">
+      <label>{{ 'spiderPagination.startUrl' | translate }}</label>
+      <input
+        class="form-control"
+        [formField]="form.paginationConfig.startUrl"
+        trimOnBlur />
+    </div>
+    <div class="form-group mb-2">
+      <label>{{ 'spiderPagination.nextPageUrlKey' | translate }}</label>
+      <input
+        class="form-control"
+        [formField]="form.paginationConfig.nextPageUrlKey"
+        trimOnBlur />
+    </div>
+    <button type="button" class="btn btn-success" (click)="update()">
+      {{ (isEditMode ? 'g.update' : 'g.save') | translate }}
+    </button>
+    <div class="d-flex gap-2 mt-2">
+      <button
+        type="button"
+        class="btn btn-primary"
+        [disabled]="isCreateMode"
+        (click)="onHeadersDialog()">
+        {{ 'spider.settingHeaders' | translate }}
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        [disabled]="isCreateMode"
+        (click)="onCookiesDialog()">
+        {{ 'spider.settingCookies' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -46,6 +46,7 @@ export class CopyDirective {
 
 @Directive({
   selector: '[trimOnBlur]',
+  standalone: true,
 })
 export class TrimOnBlurDirective {
   private readonly elementRef = inject(
@@ -55,7 +56,8 @@ export class TrimOnBlurDirective {
 
   @HostListener('blur')
   onBlur() {
-    const value = this.elementRef.nativeElement.value;
+    const input = this.elementRef.nativeElement;
+    const value = input.value;
     if (typeof value !== 'string') {
       return;
     }
@@ -65,18 +67,17 @@ export class TrimOnBlurDirective {
       return;
     }
 
-    this.elementRef.nativeElement.value = trimmedValue;
+    input.value = trimmedValue;
 
-    if (this.control?.control) {
-      this.control.control.setValue(trimmedValue);
+    const control = this.control?.control;
+    if (control && typeof control.setValue === 'function') {
+      control.setValue(trimmedValue);
 
       if (this.control instanceof NgModel) {
         this.control.viewToModelUpdate(trimmedValue);
       }
     } else {
-      this.elementRef.nativeElement.dispatchEvent(
-        new Event('input', { bubbles: true })
-      );
+      input.dispatchEvent(new Event('input', { bubbles: true }));
     }
   }
 }

@@ -35,7 +35,6 @@ import {
   SpiderItem,
   SpiderMapping,
   SpiderReq,
-  SpiderTestReq,
   UrlType,
 } from '../../model';
 import { SpiderConfigService } from '../../services/spider-config.service';
@@ -47,6 +46,7 @@ import { SpiderItemService } from '../../services/spider-item.service';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 import { SpiderService } from '../../services';
+import { EditMode } from '../../../../core/model';
 
 type SpiderEditMode = 'create' | 'edit';
 
@@ -81,9 +81,10 @@ export class SpiderEditComponent {
   readonly fb = inject(FormBuilder);
   // constants
   readonly languages = languages;
+  readonly editMode = EditMode;
 
   // signals
-  readonly status = signal<SpiderEditMode>('create');
+  readonly status = signal<EditMode>(EditMode.CREATE);
 
   readonly spiderId = toSignal(
     this.route.paramMap.pipe(
@@ -167,11 +168,11 @@ export class SpiderEditComponent {
   });
 
   get isCreateMode() {
-    return this.status() === 'create';
+    return this.status() === this.editMode.CREATE;
   }
 
   get isEditMode() {
-    return this.status() === 'edit';
+    return this.status() === this.editMode.EDIT;
   }
 
   get spiderIdControl(): FormControl<string> {
@@ -225,7 +226,7 @@ export class SpiderEditComponent {
         return;
       }
       this.patchForm(spider);
-      this.status.set('edit');
+      this.status.set(this.editMode.EDIT);
       this.form.controls.spiderId.disable({ emitEvent: false });
     });
   }
@@ -402,7 +403,7 @@ export class SpiderEditComponent {
       )
       .subscribe(() => {
         if (this.isCreateMode) {
-          this.status.set('edit');
+          this.status.set(this.editMode.EDIT);
           this.form.controls.spiderId.disable({ emitEvent: false });
           this.router.navigate(['spider-edit', data.spiderId], {
             replaceUrl: true,

@@ -152,7 +152,8 @@
     "bind": "綁定",
     "unbind": "取消綁定",
     "format": "格式化",
-    "invalidJson": "無效的 JSON 格式"
+    "invalidJson": "無效的 JSON 格式",
+    "selectedFile": "已選擇檔案"
   },
   "disk": {
     "disk": "硬碟代號",
@@ -231,7 +232,8 @@
     "selectCookieList": "請選擇 Cookie 清單",
     "selectHeadersList": "請選擇 Header 清單",
     "selectSpiderItem": "請選擇爬蟲項目",
-    "spiderPaginationList": "爬蟲處理分頁清單"
+    "spiderPaginationList": "爬蟲處理分頁清單",
+    "spiderPaginationEdit": "編輯爬蟲處理分頁"
   },
   "home": {
     "createTheme": "創建主題",
@@ -316,7 +318,10 @@
   "spiderPagination": {
     "createSpiderPagination": "新增爬蟲處理分頁",
     "spiderPaginationId": "爬蟲處理分頁ID",
-    "spiderPaginationName": "爬蟲處理分頁名稱"
+    "spiderPaginationName": "爬蟲處理分頁名稱",
+    "startUrl": "起始網址",
+    "nextPageUrlKey": "下一頁網址鍵",
+    "extractionRuleMode": "提取方法模式"
   },
   "pipeline": {
     "addPipeline": "新增處理步驟",

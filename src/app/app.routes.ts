@@ -91,6 +91,14 @@ export const routes: Routes = [
     data: { title: 'title.spiderEdit' },
   },
   {
+    path: 'spider-edit/:spiderId',
+    loadComponent: () =>
+      import('./features/spider/page/spider-edit/spider-edit.component').then(
+        mod => mod.SpiderEditComponent
+      ),
+    data: { title: 'title.spiderEdit' },
+  },
+  {
     path: 'spider-pagination-list',
     loadComponent: () =>
       import('./features/spider/page/spider-pagination-list/spider-pagination-list.component').then(
@@ -99,12 +107,20 @@ export const routes: Routes = [
     data: { title: 'title.spiderPaginationList', sidenav: true },
   },
   {
-    path: 'spider-edit/:spiderId',
+    path: 'spider-pagination-edit',
     loadComponent: () =>
-      import('./features/spider/page/spider-edit/spider-edit.component').then(
-        mod => mod.SpiderEditComponent
+      import('./features/spider/page/spider-pagination-edit/spider-pagination-edit.component').then(
+        mod => mod.SpiderPaginationEditComponent
       ),
-    data: { title: 'title.spiderEdit' },
+    data: { title: 'title.spiderPaginationEdit' },
+  },
+  {
+    path: 'spider-pagination-edit/:spiderPaginationId',
+    loadComponent: () =>
+      import('./features/spider/page/spider-pagination-edit/spider-pagination-edit.component').then(
+        mod => mod.SpiderPaginationEditComponent
+      ),
+    data: { title: 'title.spiderPaginationEdit' },
   },
   {
     path: 'dataset-list',

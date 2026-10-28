@@ -140,7 +140,8 @@
 
         @if (selectedHtmlFile() !== null) {
           <div class="text-success small mt-1">
-            已選擇檔案: <strong>{{ selectedHtmlFile()!.name }}</strong>
+            {{ 'g.selectedFile' | translate }}:
+            <strong>{{ selectedHtmlFile()!.name }}</strong>
           </div>
         }
       </div>

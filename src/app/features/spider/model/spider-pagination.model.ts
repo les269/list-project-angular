@@ -10,7 +10,6 @@ export interface SpiderPagination {
 export interface SpiderPaginationData {
   spiderPaginationId: string;
   dataId: string;
-  // 後端資料內容欄位依 TO 為準，先保留延展欄位避免型別阻塞
   data: Record<string, any>;
   createdTime?: Date;
   updatedTime?: Date;
@@ -20,7 +19,7 @@ export interface SpiderPaginationConfig {
   perStartParams: ParamSetting[];
   startUrl: string;
   nextPageUrlKey: string; // 當資料為空時即終止
-  mode: ExtractionRuleMode;
+  extractionRuleMode: ExtractionRuleMode;
   extractionRuleList: ExtractionRule[];
 }
 
