@@ -2,15 +2,15 @@
   appearance="outline"
   style="width: 100%"
   subscriptSizing="dynamic">
-  <mat-chip-grid #chipGrid>
-    @for (item of chipList(); track item; let i = $index) {
+  <mat-chip-grid #chipGrid [disabled]="disabled()">
+    @for (item of value(); track item; let i = $index) {
       <mat-chip-row
         (removed)="removeChip(i)"
         (click)="editChip(item, chipOrigin)"
         cdkOverlayOrigin
         #chipOrigin="cdkOverlayOrigin">
         {{ item.key }}: {{ item.value }}
-        <button matChipRemove>
+        <button type="button" [disabled]="disabled()" matChipRemove>
           <mat-icon>cancel</mat-icon>
         </button>
       </mat-chip-row>
@@ -20,7 +20,7 @@
       readonly
       [matChipInputFor]="chipGrid"
       [matChipInputAddOnBlur]="true"
-      (blur)="onTouched()" />
+      (blur)="touch.emit()" />
   </mat-chip-grid>
 
   <button
@@ -48,14 +48,11 @@
   <div class="card shadow-sm p-3" style="min-width: 280px">
     <div class="mb-2">
       <label class="form-label mb-1">{{ 'g.key' | translate }}</label>
-      <input
-        class="form-control"
-        [(ngModel)]="draftKey"
-        [disabled]="type() === 'edit'" />
+      <input class="form-control" [formField]="draftKeyForm" />
     </div>
     <div class="mb-2">
       <label class="form-label mb-1">{{ 'g.value' | translate }}</label>
-      <input class="form-control" [(ngModel)]="draftValue" />
+      <input class="form-control" [formField]="draftValueForm" />
     </div>
 
     @if (errorMessage()) {

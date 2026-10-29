@@ -1,19 +1,26 @@
-import { Component, forwardRef, inject, model, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CdkOverlayOrigin, OverlayModule } from '@angular/cdk/overlay';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatIconModule } from '@angular/material/icon';
+import { CommonModule } from '@angular/common';
+import { Component, inject, input, model, output, signal } from '@angular/core';
+import {
+  FormField,
+  FormValueControl,
+  disabled,
+  form,
+} from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { ChipsMapValue } from '../../model';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ChipsMapValue } from '../../model';
 
 @Component({
   selector: 'app-chip-input-map',
+  host: { '(focusout)': 'touch.emit()' },
 
   imports: [
+    FormField,
     CommonModule,
     OverlayModule,
     MatFormFieldModule,
@@ -22,20 +29,16 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     MatButtonModule,
     MatInputModule,
     TranslateModule,
-    FormsModule,
   ],
   templateUrl: './chip-input-map.component.html',
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => ChipInputMapComponent),
-      multi: true,
-    },
-  ],
 })
-export class ChipInputMapComponent {
+export class ChipInputMapComponent implements FormValueControl<
+  ChipsMapValue[]
+> {
   readonly translateService = inject(TranslateService);
-  readonly chipList = model<ChipsMapValue[]>([]);
+  readonly value = model<ChipsMapValue[]>([]);
+  readonly disabled = input(false);
+  readonly touch = output<void>();
 
   readonly type = signal<'add' | 'edit'>('add');
   readonly overlayOpen = signal(false);
@@ -44,13 +47,21 @@ export class ChipInputMapComponent {
   readonly errorMessage = signal('');
   readonly activeOrigin = signal<CdkOverlayOrigin | undefined>(undefined);
 
+  readonly draftKeyForm = form(this.draftKey, p => {
+    disabled(p, { when: () => this.type() === 'edit' });
+  });
+
+  readonly draftValueForm = form(this.draftValue);
+
   addChip(origin: CdkOverlayOrigin): void {
+    if (this.disabled()) return;
     this.type.set('add');
     this.activeOrigin.set(origin);
     this.overlayOpen.set(true);
   }
 
   editChip(item: ChipsMapValue, origin: CdkOverlayOrigin): void {
+    if (this.disabled()) return;
     this.type.set('edit');
     this.draftKey.set(item.key);
     this.draftValue.set(item.value);
@@ -65,6 +76,7 @@ export class ChipInputMapComponent {
   }
 
   onAdd(): void {
+    if (this.disabled()) return;
     const key = this.draftKey().trim();
     const value = this.draftValue().trim();
 
@@ -82,12 +94,13 @@ export class ChipInputMapComponent {
       return;
     }
 
-    this.chipList.update(list => [...list, { key, value }]);
-    this.onChange(this.chipList());
+    this.touch.emit();
+    this.value.update(list => [...list, { key, value }]);
     this.closeOverlay();
   }
 
   onUpdate(): void {
+    if (this.disabled()) return;
     const key = this.draftKey().trim();
     const value = this.draftValue().trim();
     if (!key || !value) {
@@ -96,49 +109,36 @@ export class ChipInputMapComponent {
       );
       return;
     }
-    this.chipList.update(list => [
-      ...list.map(item => (item.key === key ? { key, value } : item)),
-    ]);
-    this.onChange(this.chipList());
+    const current = this.value().find(item => item.key === key);
+    if (!current || current.value === value) {
+      this.touch.emit();
+      this.closeOverlay();
+      return;
+    }
+    this.touch.emit();
+    this.value.update(list =>
+      list.map(item => (item.key === key ? { key, value } : item))
+    );
     this.closeOverlay();
   }
 
   removeChip(index: number): void {
-    this.chipList.update(list => {
+    if (this.disabled()) return;
+    this.touch.emit();
+    this.value.update(list => {
       const next = [...list];
       next.splice(index, 1);
       return next;
     });
-    this.onChange(this.chipList());
   }
 
   private hasKey(key: string): boolean {
-    return this.chipList().some(item => item.key === key);
+    return this.value().some(item => item.key === key);
   }
 
   private resetDraft(): void {
     this.draftKey.set('');
     this.draftValue.set('');
     this.errorMessage.set('');
-  }
-
-  onChange: any = () => {};
-  onTouched: any = () => {};
-
-  writeValue(value: ChipsMapValue[] | null): void {
-    this.chipList.set(value || []);
-    this.onChange(this.chipList());
-  }
-
-  registerOnChange(fn: any): void {
-    this.onChange = fn;
-  }
-
-  registerOnTouched(fn: any): void {
-    this.onTouched = fn;
-  }
-
-  setDisabledState?(isDisabled: boolean): void {
-    // handle disabled state if needed
   }
 }

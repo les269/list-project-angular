@@ -5,14 +5,14 @@
   @if (label()) {
     <mat-label>{{ label() }}</mat-label>
   }
-  <mat-chip-grid #chipGrid>
-    @for (value of chipList(); track value; let i = $index) {
+  <mat-chip-grid #chipGrid [disabled]="disabled()">
+    @for (item of value(); track $index; let i = $index) {
       <mat-chip-row
         (removed)="removeChip(i)"
-        [editable]="true"
+        [editable]="!disabled()"
         (edited)="editChip(i, $event.value)">
-        {{ value }}
-        <button matChipRemove>
+        {{ item }}
+        <button type="button" [disabled]="disabled()" matChipRemove>
           <mat-icon>cancel</mat-icon>
         </button>
       </mat-chip-row>

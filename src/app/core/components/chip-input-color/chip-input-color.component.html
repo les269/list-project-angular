@@ -5,21 +5,21 @@
   @if (label()) {
     <mat-label>{{ label() }}</mat-label>
   }
-  <mat-chip-grid #chipGrid>
+  <mat-chip-grid #chipGrid [disabled]="disabled()">
     <div class="d-flex align-items-center flex-wrap">
-      @for (value of chipList(); track value; let i = $index) {
+      @for (item of value(); track $index; let i = $index) {
         <mat-chip-row
           (removed)="removeChip(i)"
-          [editable]="true"
+          [editable]="!disabled()"
           (edited)="editChip(i, $event.value)">
           <div
             [ngStyle]="{
-              'background-color': getLuminance(value) < 0.5 ? '' : '#525252',
-              color: value,
+              'background-color': getLuminance(item) < 0.5 ? '' : '#525252',
+              color: item,
             }">
-            {{ value }}
+            {{ item }}
           </div>
-          <button matChipRemove>
+          <button type="button" [disabled]="disabled()" matChipRemove>
             <mat-icon>cancel</mat-icon>
           </button>
         </mat-chip-row>

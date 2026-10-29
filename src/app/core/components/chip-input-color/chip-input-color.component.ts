@@ -1,82 +1,75 @@
-import { Component, computed, forwardRef, input, model } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { Component, computed, input, model, output } from '@angular/core';
+import { FormValueControl } from '@angular/forms/signals';
 import { MatChipInputEvent, MatChipsModule } from '@angular/material/chips';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
   selector: 'app-chip-input-color',
+  host: { '(focusout)': 'touch.emit()' },
 
   imports: [CommonModule, MatFormFieldModule, MatChipsModule, MatIconModule],
   templateUrl: './chip-input-color.component.html',
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => ChipInputColorComponent),
-      multi: true,
-    },
-  ],
 })
-export class ChipInputColorComponent {
-  readonly chipList = model<string[]>([]);
+export class ChipInputColorComponent implements FormValueControl<string[]> {
+  readonly value = model<string[]>([]);
+  readonly disabled = input(false);
+  readonly touch = output<void>();
   readonly label = input<string>('');
   readonly allowDuplicates = input<boolean>(false);
   readonly canUpdate = input<(value: string, index?: number) => boolean>(
     () => true
   );
   readonly pickerValue = computed(() => {
-    const lastColor = this.chipList().at(-1);
+    const lastColor = this.value().at(-1);
     return this.normalizeColorForPicker(lastColor);
   });
 
   addChip(event: MatChipInputEvent): void {
+    if (this.disabled()) return;
     const trimmedValue = event.value.trim();
-    const currentList = this.chipList();
+    const currentList = this.value();
 
-    if (this.canUpdate() && !this.canUpdate()(trimmedValue)) return;
+    if (!this.canUpdate()(trimmedValue)) return;
 
     if (trimmedValue) {
       if (!this.allowDuplicates() && currentList.includes(trimmedValue)) {
         event.chipInput.clear();
         return;
       }
-      this.chipList.update(list => [...list, trimmedValue]);
+      this.touch.emit();
+      this.value.update(list => [...list, trimmedValue]);
     }
     event.chipInput.clear();
-    this.onChange(this.chipList());
   }
 
   removeChip(index: number): void {
-    this.chipList.update(list => {
+    if (this.disabled()) return;
+    this.touch.emit();
+    this.value.update(list => {
       const newList = [...list];
       newList.splice(index, 1);
       return newList;
     });
-    this.onChange(this.chipList());
   }
 
   editChip(index: number, newValue: string): void {
+    if (this.disabled()) return;
     const trimmedValue = newValue.trim();
-    if (this.canUpdate() && !this.canUpdate()(trimmedValue)) {
+    const currentList = this.value();
+    if (index < 0 || index >= currentList.length || !trimmedValue) return;
+    if (currentList[index] === trimmedValue) {
+      this.touch.emit();
       return;
     }
+    if (!this.canUpdate()(trimmedValue, index)) return;
+    if (!this.allowDuplicates() && currentList.includes(trimmedValue)) return;
 
-    if (trimmedValue) {
-      const currentList = this.chipList();
-      const isDuplicate =
-        !this.allowDuplicates() &&
-        currentList.includes(trimmedValue) &&
-        currentList[index] !== trimmedValue;
-      if (!isDuplicate) {
-        this.chipList.update(list => {
-          const newList = [...list];
-          newList[index] = trimmedValue;
-          return newList;
-        });
-        this.onChange(this.chipList());
-      }
-    }
+    this.touch.emit();
+    this.value.update(list =>
+      list.map((item, itemIndex) => (itemIndex === index ? trimmedValue : item))
+    );
   }
 
   getLuminance(hex: string): number {
@@ -111,25 +104,5 @@ export class ChipInputColorComponent {
     if (/^[A-Fa-f0-9]{8}$/.test(hex)) return `#${hex.substring(0, 6)}`;
 
     return '#000000';
-  }
-
-  onChange: any = () => {};
-  onTouched: any = () => {};
-
-  writeValue(value: string[]): void {
-    this.chipList.set(value || []);
-    this.onChange(this.chipList());
-  }
-
-  registerOnChange(fn: any): void {
-    this.onChange = fn;
-  }
-
-  registerOnTouched(fn: any): void {
-    this.onTouched = fn;
-  }
-
-  setDisabledState?(isDisabled: boolean): void {
-    // handle disabled state if needed
   }
 }
