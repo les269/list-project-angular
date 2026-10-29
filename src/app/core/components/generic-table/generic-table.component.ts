@@ -1,58 +1,53 @@
 import {
+  CdkDrag,
+  CdkDragDrop,
+  CdkDragHandle,
+  CdkDropList,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop';
+import { CommonModule } from '@angular/common';
+import {
   Component,
   computed,
   effect,
   inject,
   input,
-  signal,
   TemplateRef,
   untracked,
-  viewChild,
 } from '@angular/core';
-import {
-  CdkDrag,
-  CdkDragDrop,
-  CdkDropList,
-  moveItemInArray,
-} from '@angular/cdk/drag-drop';
-import {
-  AbstractControl,
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-} from '@angular/forms';
-import { MatIcon } from '@angular/material/icon';
-import { CommonModule } from '@angular/common';
-import { MatTable, MatTableModule } from '@angular/material/table';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import {
-  ControlsOf,
-  GenericColumnType,
-  GenericTableColumn,
-  ToFormArray,
-} from '../../model/generic-table';
+import { FormField, ValidationError } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatIcon } from '@angular/material/icon';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatTableModule } from '@angular/material/table';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { getWidth } from '../../../shared/util/helper';
+import { TrimOnBlurDirective } from '../../../shared/util/util.directive';
+import {
+  GenericColumnType,
+  GenericTableCellContext,
+  GenericTableColumn,
+  GenericTableFields,
+  GenericTableRow,
+  GenericTableRowContext,
+  GenericTableRowFactory,
+  GenericTableRowField,
+} from '../../model/generic-table';
 import { ChipSelectButtonComponent } from '../chip-select-button/chip-select-button.component';
 import { ChipSelectMultipleButtonComponent } from '../chip-select-multiple-button/chip-select-multiple-button.component';
-import { MatRadioModule } from '@angular/material/radio';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { getWidth, trimControl } from '../../../shared/util/helper';
-import { TrimOnBlurDirective } from '../../../shared/util/util.directive';
 
 @Component({
   selector: 'app-generic-table',
-
   imports: [
     TranslateModule,
     CommonModule,
     MatTableModule,
     CdkDropList,
     CdkDrag,
+    CdkDragHandle,
     MatIcon,
-    FormsModule,
-    ReactiveFormsModule,
+    FormField,
     MatButtonModule,
     ChipSelectButtonComponent,
     ChipSelectMultipleButtonComponent,
@@ -65,17 +60,32 @@ import { TrimOnBlurDirective } from '../../../shared/util/util.directive';
 })
 export class GenericTableComponent {
   // inject
-  readonly fb = inject(FormBuilder);
   readonly translate = inject(TranslateService);
-  // input
-  readonly formArray = input.required<ToFormArray<any>>();
+  // inputs
+  readonly fields = input.required<GenericTableFields>();
   readonly cols = input.required<GenericTableColumn[]>();
   readonly displayedColumns = input.required<string[]>();
-  readonly createGroup = input.required<(a?: any) => FormGroup>();
-  readonly initData = input<any[]>();
-  readonly customColTmpls = input<Record<string, TemplateRef<any>>>();
-  readonly expandedTmpl = input<TemplateRef<any>>();
-
+  readonly createRow = input.required<GenericTableRowFactory>();
+  readonly initData = input<readonly object[]>();
+  readonly customColTmpls =
+    input<Record<string, TemplateRef<GenericTableCellContext>>>();
+  readonly expandedTmpl = input<TemplateRef<GenericTableRowContext>>();
+  // signals
+  readonly rows = computed(() => Array.from(this.fields()));
+  readonly selectOptions = computed(
+    () =>
+      new Map(
+        this.cols()
+          .filter(col => col.columnType === GenericColumnType.select)
+          .map(col => [
+            col.key,
+            col.data.map(option => ({
+              value: option[col.dataValue],
+              label: col.dataLabel(option),
+            })),
+          ])
+      )
+  );
   readonly displayedColumnsWith = computed(() => [
     'seq',
     ...this.displayedColumns(),
@@ -83,106 +93,96 @@ export class GenericTableComponent {
   ]);
 
   readonly eGenericColumnType = GenericColumnType;
-
-  readonly dragDisabled = signal(true);
-
-  readonly table = viewChild(MatTable);
   readonly getWidth = getWidth;
-  readonly trimControl = trimControl;
 
   constructor() {
     effect(() => {
       const data = this.initData();
       if (!data) return;
       untracked(() => {
-        this.setFormArrayData(data);
+        this.setData(data);
       });
     });
   }
 
-  setFormArrayData(data: any[]) {
-    const array = this.formArray();
-    array.clear();
-    for (const item of data.slice()) {
-      const group = this.createGroup()(item);
-      group.patchValue(item);
-      array.push(group);
-    }
-    this.table()?.renderRows();
+  setData(data: readonly object[]) {
+    this.fields()().reset(data.map(item => this.createRow()(item)));
   }
 
-  private updateSequenceFromFormArray() {
-    this.formArray().controls.forEach((ctrl, index) => {
-      const seqControl = ctrl.get('seq') as FormControl<number> | null;
-      if (seqControl) {
-        // 現在 TS 知道這是一個接收 number 的 FormControl 了
-        seqControl.patchValue(index + 1, { emitEvent: false });
-      }
-    });
-    this.table()?.renderRows();
+  private updateRows(update: (rows: GenericTableRow[]) => GenericTableRow[]) {
+    const state = this.fields()();
+    if (state.disabled()) return;
+    state.value.update(rows =>
+      update(rows).map((row, index) =>
+        row.seq === index + 1 ? row : { ...row, seq: index + 1 }
+      )
+    );
+    state.markAsDirty();
   }
 
   onAdd() {
-    // 取得目前的 FormArray 實例
-    const arr = this.formArray();
-    // 1. 建立 Non-nullable 的 Control
-    const group = this.createGroup()!();
-    // 2. 標記狀態
-    group.markAsDirty();
-    // 3. 直接對該實例進行 push (物件參考不變，所以不違反 Signal 唯讀原則)
-    arr.push(group);
-    // 4. 更新排序與發出事件
-    this.updateSequenceFromFormArray();
+    this.updateRows(rows => [...rows, this.createRow()()]);
   }
 
   onDelete(index: number) {
-    this.formArray().removeAt(index);
-    this.updateSequenceFromFormArray();
+    this.updateRows(rows => rows.filter((_, i) => i !== index));
   }
 
-  drop(event: CdkDragDrop<FormGroup<ControlsOf<any>>[]>) {
+  drop(event: CdkDragDrop<GenericTableRowField[]>) {
     if (event.previousIndex === event.currentIndex) return;
-
-    moveItemInArray(
-      event.container.data,
-      event.previousIndex,
-      event.currentIndex
-    );
-
-    this.updateSequenceFromFormArray();
-    this.formArray().updateValueAndValidity();
+    this.updateRows(rows => {
+      const reordered = [...rows];
+      moveItemInArray(reordered, event.previousIndex, event.currentIndex);
+      return reordered;
+    });
   }
 
   onRadioChange(rowIndex: number, key: string) {
-    const arr = this.formArray();
+    if (this.fields()().disabled()) return;
+    const values: GenericTableRow[] = this.fields()().value();
+    if (values.some(row => typeof row[key] !== 'boolean')) return;
+    const rows = this.rows();
+    const selectedField = rows[rowIndex]?.[key];
+    if (!selectedField || selectedField().disabled()) return;
+    const states = rows.map(row => row[key]());
+    // 保留停用欄位的值，並維持跨列單選互斥。
+    if (
+      states.some(
+        (state, index) =>
+          state.disabled() && state.value() !== (index === rowIndex)
+      )
+    )
+      return;
 
-    arr.controls.forEach((group, i) => {
-      const control = group.get(key);
-      if (!control) return;
-      const newValue = i === rowIndex;
-      if (control.value !== newValue) {
-        (control as FormControl).setValue(newValue, { emitEvent: false });
-        control.markAsDirty();
+    selectedField().markAsTouched();
+    for (const [index, state] of states.entries()) {
+      const selected = index === rowIndex;
+      if (state.value() !== selected) {
+        state.value.set(selected);
+        state.markAsDirty();
       }
-    });
-    arr.updateValueAndValidity();
-  }
-  print(element: FormControl, ctrl: any) {
-    console.log(element, element.get('seq'));
-    console.log(ctrl);
-  }
-  requireError(col: GenericTableColumn, ctrl: AbstractControl | null) {
-    if (!ctrl) return '';
-    const name = this.translate.instant(col.label);
-    if (ctrl.hasError('required')) {
-      return this.translate.instant('msg.blank', { name });
     }
-    if (ctrl.hasError('minlength')) {
-      const error = ctrl.getError('minlength');
-      return this.translate.instant('msg.formMinLengthError', {
-        name,
-        length: error.requiredLength,
-      });
+  }
+
+  requireError(col: GenericTableColumn, errors: readonly ValidationError[]) {
+    const name = this.translate.instant(col.label);
+    for (const error of errors) {
+      if (error.message) return error.message;
+      if (error.kind === 'required') {
+        return this.translate.instant('msg.blank', { name });
+      }
+      if (
+        error.kind === 'minLength' &&
+        'minLength' in error &&
+        typeof error.minLength === 'number'
+      ) {
+        return this.translate.instant('msg.formMinLengthError', {
+          name,
+          length: error.minLength,
+        });
+      }
+      const custom = col.error?.find(item => item.name === error.kind);
+      if (custom) return this.translate.instant(custom.msg);
     }
     return '';
   }

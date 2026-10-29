@@ -1,21 +1,18 @@
 <table
   mat-table
-  [dataSource]="formArray().controls"
+  [dataSource]="rows()"
   multiTemplateDataRows
   cdkDropList
   (cdkDropListDropped)="drop($event)"
-  [cdkDropListData]="formArray().controls">
+  [cdkDropListData]="rows()">
   <ng-container matColumnDef="seq">
     <th mat-header-cell *matHeaderCellDef>
       {{ 'g.order' | translate }}
     </th>
     <td mat-cell *matCellDef="let element">
-      <div
-        class="d-flex align-items-center user-select-none"
-        (mouseout)="dragDisabled.set(true)"
-        (mouseover)="dragDisabled.set(false)">
-        <mat-icon class="drag-cursor">reorder</mat-icon>
-        <span>{{ element.get('seq')?.value }}</span>
+      <div class="d-flex align-items-center user-select-none">
+        <mat-icon cdkDragHandle class="drag-cursor">reorder</mat-icon>
+        <span>{{ element.seq().value() }}</span>
       </div>
     </td>
   </ng-container>
@@ -25,107 +22,110 @@
       <th
         mat-header-cell
         *matHeaderCellDef
-        [ngStyle]="{
-          width: getWidth(col['width']),
-          'max-width': getWidth(col['maxWidth']),
-          'min-width': getWidth(col['minWidth']),
-        }">
+        [style.width]="getWidth(col.width)"
+        [style.max-width]="getWidth(col.maxWidth)"
+        [style.min-width]="getWidth(col.minWidth)">
         {{ col.label | translate }}
       </th>
-      <td
-        mat-cell
-        *matCellDef="let element; let index = dataIndex"
-        [formGroup]="element">
-        @let colKey = element.get(col.key);
+      <td mat-cell *matCellDef="let element; let index = dataIndex">
+        @let field = element[col.key];
+        @let showError =
+          col.columnType !== eGenericColumnType.custom &&
+          field().invalid() &&
+          field().touched();
+        @let fieldLabel =
+          (col.label | translate) +
+          ' ' +
+          ('g.order' | translate) +
+          ' ' +
+          (index + 1);
         @switch (col.columnType) {
           @case (eGenericColumnType.input) {
             <input
               class="form-control"
-              [formControlName]="col.key"
+              [formField]="field"
+              [attr.aria-label]="fieldLabel"
               trimOnBlur
-              [class.is-invalid]="colKey?.invalid && colKey?.touched" />
+              [class.is-invalid]="showError" />
           }
           @case (eGenericColumnType.textarea) {
             <textarea
               class="form-control"
-              style="field-sizing: content"
-              [formControlName]="col.key"
-              [class.is-invalid]="
-                colKey?.invalid && colKey?.touched
-              "></textarea>
+              [formField]="field"
+              [attr.aria-label]="fieldLabel"
+              [class.is-invalid]="showError"></textarea>
           }
           @case (eGenericColumnType.select) {
             <select
-              [formControlName]="col.key"
+              [formField]="field"
+              [attr.aria-label]="fieldLabel"
               class="form-control"
-              [class.is-invalid]="colKey?.invalid && colKey?.touched">
-              @for (option of col.data; track option) {
-                <option [value]="option[col.dataValue]">
-                  {{ col.dataLabel(option) | translate }}
+              [class.is-invalid]="showError">
+              @for (
+                option of selectOptions().get(col.key);
+                track option.value
+              ) {
+                <option [value]="option.value">
+                  {{ option.label | translate }}
                 </option>
               }
             </select>
           }
           @case (eGenericColumnType.checkbox) {
-            <mat-checkbox [formControlName]="col.key"></mat-checkbox>
+            <mat-checkbox
+              [formField]="field"
+              [aria-label]="fieldLabel"></mat-checkbox>
           }
           @case (eGenericColumnType.radio) {
             <mat-radio-button
-              [checked]="formArray().at(index).get(col.key)?.value === true"
+              [aria-label]="fieldLabel"
+              [checked]="field().value() === true"
+              [disabled]="field().disabled()"
+              (focusout)="field().markAsTouched()"
               (change)="onRadioChange(index, col.key)">
             </mat-radio-button>
           }
           @case (eGenericColumnType.chipSelect) {
             <app-chip-select-button
               class="d-block pt-2"
-              [formControlName]="col.key"
+              [formField]="field"
               [options]="col.data"
               [valueKey]="col.dataValue"
               [labelKey]="col.dataLabel"
               [selectTable]="col.openDialog"
-              [required]="!!col.required"
               [requiredMsg]="
-                (col.requiredMsg ? col.requiredMsg : 'msg.requiredSelectOne')
-                  | translate
+                col.requiredMsg || 'msg.requiredSelectOne' | translate
               ">
             </app-chip-select-button>
           }
           @case (eGenericColumnType.chipSelectMultiple) {
             <app-chip-select-multiple-button
               class="d-block pt-2"
-              [formControlName]="col.key"
+              [formField]="field"
               [options]="col.data"
               [valueKey]="col.dataValue"
               [labelKey]="col.dataLabel"
               [selectTable]="col.openDialog"
-              [required]="!!col.required"
               [requiredMsg]="
-                (col.requiredMsg ? col.requiredMsg : 'msg.requiredSelectOne')
-                  | translate
+                col.requiredMsg || 'msg.requiredSelectOne' | translate
               "></app-chip-select-multiple-button>
           }
           @case (eGenericColumnType.custom) {
-            @if (customColTmpls()) {
+            @if (customColTmpls()?.[col.key]; as template) {
               <ng-container
-                *ngTemplateOutlet="
-                  customColTmpls()![col.key];
-                  context: { $implicit: element, index, col }
-                ">
-              </ng-container>
+                [ngTemplateOutlet]="template"
+                [ngTemplateOutletContext]="{
+                  $implicit: element,
+                  index,
+                  col,
+                }" />
             }
           }
         }
-        @if (col.columnType !== eGenericColumnType.custom) {
-          @let ctrl = element.get(col.key);
-          @if (ctrl?.invalid && ctrl?.touched) {
-            <span class="error-msg">{{ requireError(col, ctrl) }}</span>
-          } @else if (ctrl.error) {
-            @for (item of ctrl.error; track $index) {
-              @if (element.hasError(item.name) && ctrl?.touched) {
-                <span class="error-msg">{{ item.msg | translate }}</span>
-              }
-            }
-          }
+        @if (showError) {
+          <span class="error-msg">{{
+            requireError(col, field().errors())
+          }}</span>
         }
       </td>
     </ng-container>
@@ -134,7 +134,18 @@
     <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
     <td mat-cell *matCellDef="let element; let i = dataIndex">
       <div class="row flex-nowrap">
-        <button mat-icon-button (click)="onDelete(i)">
+        <button
+          type="button"
+          mat-icon-button
+          [disabled]="fields()().disabled()"
+          [attr.aria-label]="
+            ('g.delete' | translate) +
+            ' ' +
+            ('g.order' | translate) +
+            ' ' +
+            (i + 1)
+          "
+          (click)="onDelete(i)">
           <mat-icon>delete</mat-icon>
         </button>
       </div>
@@ -146,7 +157,13 @@
       *matFooterCellDef
       [attr.colspan]="displayedColumnsWith().length">
       <div class="row justify-content-center">
-        <button mat-button class="rounded" (click)="onAdd()">
+        <button
+          type="button"
+          mat-button
+          class="rounded"
+          [disabled]="fields()().disabled()"
+          [attr.aria-label]="'g.add' | translate"
+          (click)="onAdd()">
           <mat-icon>add</mat-icon>
         </button>
       </div>
@@ -175,8 +192,7 @@
     class="expand-row"
     cdkDrag
     [cdkDragData]="row"
-    [cdkDragDisabled]="dragDisabled()"
-    (cdkDragReleased)="dragDisabled.set(true)"></tr>
+    [cdkDragDisabled]="fields()().disabled()"></tr>
   @if (expandedTmpl()) {
     <tr
       mat-row

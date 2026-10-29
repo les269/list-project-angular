@@ -1,40 +1,26 @@
-import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
+import { FieldTree } from '@angular/forms/signals';
 
-// export type ControlsOf<T extends Record<string, any>> = {
-//   [K in keyof T]: FormControl<T[K]>;
-// };
+/** 表格列操作共用的結構，業務欄位保留動態型別。 */
+export interface GenericTableRow {
+  seq: number;
+  [key: string]: unknown;
+}
 
-/**
- * 判斷物件是否為「純 primitive 值」的 flat 物件（所有屬性均非 object/array）。
- * flat 物件陣列（如 ChipsMapValue[]）應對應 FormControl 而非 FormArray<FormGroup>。
- */
-type IsFlatObject<T> = T extends Record<string, any>
-  ? {
-      [K in keyof T]-?: NonNullable<T[K]> extends object | any[] ? false : true;
-    }[keyof T] extends true
-    ? true
-    : false
-  : false;
+// 將動態 Signal Forms 的型別交界集中於此，讓呼叫端沿用各自的 schema。
+export type GenericTableFields = FieldTree<any[]>;
+export type GenericTableRowField = GenericTableFields[number];
+export type GenericTableRowFactory = (data?: any) => GenericTableRow;
 
-type MapToFormArray<T> = T extends (infer U)[]
-  ? U extends Record<string, any>
-    ? IsFlatObject<U> extends true
-      ? FormControl<T> // flat 物件陣列 → FormControl（如 ChipsMapValue[]）
-      : FormArray<FormGroup<ControlsOf<U>>> // 深層物件陣列 → FormArray
-    : FormControl<T> // primitive 陣列 → FormControl（如 string[]）
-  : never;
+export interface GenericTableRowContext {
+  $implicit: GenericTableRowField;
+  index: number;
+}
 
-export type ControlsOf<T> = {
-  [K in keyof T]: NonNullable<T[K]> extends any[]
-    ? MapToFormArray<NonNullable<T[K]>> // 處理陣列（含可選陣列）
-    : NonNullable<T[K]> extends Record<string, any>
-      ? FormGroup<ControlsOf<NonNullable<T[K]>>> // 處理巢狀物件（含可選物件）
-      : FormControl<T[K]>; // 處理基本型別
-};
-export type ToFormArray<T extends Record<string, any>> = FormArray<
-  FormGroup<ControlsOf<T>>
->;
+export interface GenericTableCellContext extends GenericTableRowContext {
+  col: GenericTableColumn;
+}
+
 type BaseColumn = {
   key: string;
   label: string;
