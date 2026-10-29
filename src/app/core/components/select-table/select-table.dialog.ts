@@ -68,7 +68,6 @@ export class SelectTableDialog<O, T extends BaseSelectTableData<O>>
   paginator = viewChild(MatPaginator);
 
   ngOnInit(): void {
-    this.dataSource.paginator = this.paginator();
     if (this.selectType === 'multiple') {
       this.multipleDisplayedColumns = ['select', ...this.displayedColumns];
       if (this.selected && Array.isArray(this.selected)) {
@@ -84,6 +83,7 @@ export class SelectTableDialog<O, T extends BaseSelectTableData<O>>
   }
 
   ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator();
     this.dataSource.sort = this.sort();
   }
 
