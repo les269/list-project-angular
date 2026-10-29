@@ -1,25 +1,46 @@
+import { CommonModule } from '@angular/common';
 import {
-  Component,
   ChangeDetectionStrategy,
+  Component,
+  computed,
   inject,
   signal,
-  computed,
-  effect,
 } from '@angular/core';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatTableModule } from '@angular/material/table';
-import { MatIconModule } from '@angular/material/icon';
+  disabled,
+  form,
+  FormField,
+  min,
+  required,
+  validate,
+} from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
+import { MatTableModule } from '@angular/material/table';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { EMPTY, filter, finalize, map, switchMap, tap } from 'rxjs';
+import { FormInvalidsComponent } from '../../../../core/components/form-invalids/form-invalids.component';
+import { FormAlert } from '../../../../core/model';
+import { SnackbarService } from '../../../../core/services/snackbar.service';
+import { LayoutStore } from '../../../../core/stores/layout.store';
+import {
+  getHeaderId,
+  isNotBlank,
+} from '../../../../shared/util/helper';
+import { patchField } from '../../../../shared/util/signal-form';
+import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
+import { QuickRefreshType } from '../../../dataset/model';
+import { ThemeCustomTableComponent } from '../../components/theme-custom-table/theme-custom-table.component';
+import { ThemeDatasetTableComponent } from '../../components/theme-dataset-table/theme-dataset-table.component';
+import { ThemeImageComponent } from '../../components/theme-image/theme-image.component';
+import { ThemeLabelTableComponent } from '../../components/theme-label-table/theme-label-table.component';
+import { ThemeOtherSettingComponent } from '../../components/theme-other-setting/theme-other-setting.component';
+import { ThemeTagTableComponent } from '../../components/theme-tag-table/theme-tag-table.component';
+import { ThemeTopCustomTableComponent } from '../../components/theme-top-custom-table/theme-top-custom-table.component';
 import {
   ThemeEditMode,
   ThemeHeader,
@@ -28,36 +49,12 @@ import {
   ThemeItemType,
   ThemeOtherSetting,
 } from '../../models';
-import { ThemeService } from '../../services/theme.service';
-import { SnackbarService } from '../../../../core/services/snackbar.service';
-import {
-  isBlank,
-  getHeaderId,
-  isNotBlank,
-  isNull,
-} from '../../../../shared/util/helper';
-import { ActivatedRoute, Router } from '@angular/router';
-import { EMPTY, filter, map, switchMap, tap } from 'rxjs';
-import { ThemeCustomTableComponent } from '../../components/theme-custom-table/theme-custom-table.component';
-import { ThemeLabelTableComponent } from '../../components/theme-label-table/theme-label-table.component';
-import { ThemeDatasetTableComponent } from '../../components/theme-dataset-table/theme-dataset-table.component';
-import { ThemeTagTableComponent } from '../../components/theme-tag-table/theme-tag-table.component';
-import { ThemeOtherSettingComponent } from '../../components/theme-other-setting/theme-other-setting.component';
-import { ThemeTopCustomTableComponent } from '../../components/theme-top-custom-table/theme-top-custom-table.component';
-import { QuickRefreshType } from '../../../dataset/model';
-import { rxResource, toSignal } from '@angular/core/rxjs-interop';
-import { ThemeImageComponent } from '../../components/theme-image/theme-image.component';
-import { FormInvalidsComponent } from '../../../../core/components/form-invalids/form-invalids.component';
-import { FormAlert } from '../../../../core/model';
 import { ThemeItemService } from '../../services';
-import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
-import { LayoutStore } from '../../../../core/stores/layout.store';
+import { ThemeService } from '../../services/theme.service';
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    ReactiveFormsModule,
     MatTableModule,
-    FormsModule,
     MatIconModule,
     MatButtonModule,
     MatCheckboxModule,
@@ -73,29 +70,29 @@ import { LayoutStore } from '../../../../core/stores/layout.store';
     ThemeImageComponent,
     FormInvalidsComponent,
     TrimOnBlurDirective,
+    FormField,
   ],
   selector: 'app-theme-edit',
   templateUrl: 'theme-edit.component.html',
   styleUrls: ['theme-edit.component.scss'],
 })
 export class ThemeEditComponent {
-  //inject
+  // 注入服務
   readonly router = inject(Router);
   readonly route = inject(ActivatedRoute);
   readonly themeService = inject(ThemeService);
   readonly snackbarService = inject(SnackbarService);
   readonly translateService = inject(TranslateService);
-  readonly fb = inject(FormBuilder);
   readonly themeItemService = inject(ThemeItemService);
   readonly layoutStore = inject(LayoutStore);
 
-  // enums
+  // 列舉
   readonly eThemeEditMode = ThemeEditMode;
   readonly eThemeHeaderType = ThemeHeaderType;
   readonly eThemeImageType = ThemeImageType;
 
-  //signals
-  readonly isValidating = signal(false);
+  // 頁面狀態
+  readonly isSaving = signal(false);
   readonly status = signal(ThemeEditMode.create);
   readonly isEditMode = computed(() => this.status() === ThemeEditMode.edit);
   readonly currentHeaderId = computed(() => {
@@ -106,7 +103,7 @@ export class ThemeEditComponent {
     return getHeaderId(req.name, req.version, req.type);
   });
   readonly themeItems = rxResource({
-    params: () => this.currentHeaderId(),
+    params: () => this.currentHeaderId() || undefined,
     stream: ({ params }) => this.themeItemService.getItemsByHeaderId(params),
   });
 
@@ -189,25 +186,28 @@ export class ThemeEditComponent {
     );
   });
 
-  // form
-  readonly form: FormGroup = this.fb.group({
-    name: [{ value: '', disabled: this.isEditMode() }, [Validators.required]],
-    version: [
-      { value: '', disabled: this.isEditMode() },
-      [Validators.required],
-    ],
-    title: [{ value: '', disabled: this.isEditMode() }, [Validators.required]],
-    type: [ThemeHeaderType.imageList, [Validators.required]],
-    seq: [
-      0,
-      [Validators.required, Validators.min(0), Validators.pattern('^[0-9]+$')],
-    ],
+  // 表單
+  readonly formModel = signal<ThemeHeader>({
+    name: '',
+    version: '',
+    title: '',
+    type: ThemeHeaderType.imageList,
+    seq: 0,
   });
-  readonly nameControl = this.form.get('name') as FormControl;
-  readonly versionControl = this.form.get('version') as FormControl;
-  readonly typeControl = this.form.get('type') as FormControl;
-  readonly titleControl = this.form.get('title') as FormControl;
-  readonly seqControl = this.form.get('seq') as FormControl;
+  readonly form = form(this.formModel, p => {
+    disabled(p.name, { when: () => this.isEditMode() });
+    disabled(p.version, { when: () => this.isEditMode() });
+    disabled(p.type, { when: () => this.isEditMode() });
+    required(p.name);
+    required(p.version);
+    required(p.title);
+    required(p.type);
+    required(p.seq);
+    min(p.seq, 0);
+    validate(p.seq, ({ value }) =>
+      Number.isInteger(value()) ? undefined : { kind: 'pattern' }
+    );
+  });
 
   readonly themeReq = toSignal(
     this.route.queryParams.pipe(
@@ -233,16 +233,31 @@ export class ThemeEditComponent {
           if (theme === null) {
             this.onBack();
           } else {
-            this.form.patchValue(theme);
+            patchField(this.form, theme);
           }
         })
       );
     },
   });
+  private readonly validationMessages = toSignal(
+    this.translateService.stream([
+      'msg.required',
+      'msg.integer',
+      'msg.nonNegative',
+    ]),
+    {
+      initialValue: this.translateService.instant([
+        'msg.required',
+        'msg.integer',
+        'msg.nonNegative',
+      ]),
+    }
+  );
   readonly formAlertsObj = computed(() => {
+    const messages = this.validationMessages();
     const required = {
       errorId: 'required',
-      msg: this.translateService.instant('msg.required'),
+      msg: messages['msg.required'],
     };
     return {
       name: [required],
@@ -252,67 +267,30 @@ export class ThemeEditComponent {
         required,
         {
           errorId: 'pattern',
-          msg: this.translateService.instant('msg.integer'),
+          msg: messages['msg.integer'],
         },
         {
           errorId: 'min',
-          msg: this.translateService.instant('msg.nonNegative'),
+          msg: messages['msg.nonNegative'],
         },
       ],
     } satisfies Record<string, FormAlert[]>;
   });
 
-  get themeHeaderType() {
-    return this.form.get('type')?.value as ThemeHeaderType;
-  }
-
-  constructor() {
-    effect(() => {
-      if (this.isEditMode()) {
-        this.form.get('name')?.disable();
-        this.form.get('version')?.disable();
-        this.form.get('type')?.disable();
-      } else {
-        this.form.get('name')?.enable();
-        this.form.get('version')?.enable();
-        this.form.get('type')?.enable();
-      }
-    });
-  }
-
   onBack() {
     this.router.navigate(['']);
   }
 
-  // Read full model from the form + list controls
-  private getModelFromForm() {
-    const base = { ...this.form.value } as ThemeHeader;
-    base.themeLabelList = this.form.get('themeLabelList')?.value || [];
-    base.themeDatasetList = this.form.get('themeDatasetList')?.value || [];
-    base.themeCustomList = this.form.get('themeCustomList')?.value || [];
-    base.themeTagList = this.form.get('themeTagList')?.value || [];
-    base.themeOtherSetting =
-      this.form.get('themeOtherSetting')?.value || base.themeOtherSetting;
-    // ensure nested objects exist
-    if (!base.themeImage)
-      base.themeImage = {
-        type: this.eThemeImageType.key,
-        imageKey: '',
-        imageUrl: '',
-      };
-    return base;
-  }
-
   update(back: boolean, type: 'save' | 'commit') {
-    if (!this.form.valid) {
+    if (this.isSaving()) return;
+    if (!this.form().valid()) {
       this.snackbarService.openI18N('msg.formInvalid');
       return;
     }
 
-    // Build model from form
-    const currentModel = this.form.value as ThemeHeader;
+    const currentModel = this.form().value();
 
-    this.isValidating.set(true);
+    this.isSaving.set(true);
     this.themeService
       .existTheme(currentModel)
       .pipe(
@@ -326,7 +304,8 @@ export class ThemeEditComponent {
             return EMPTY;
           }
           return this.themeService.updateTheme(currentModel);
-        })
+        }),
+        finalize(() => this.isSaving.set(false))
       )
       .subscribe({
         next: () => {
@@ -337,37 +316,8 @@ export class ThemeEditComponent {
             type === 'commit' ? 'msg.commitSuccess' : 'msg.saveSuccess'
           );
           this.layoutStore.loadThemeList();
-          this.isValidating.set(false);
         },
-        error: () => {
-          this.isValidating.set(false);
-        },
+        error: () => {},
       });
-  }
-
-  validationOther(header: ThemeHeader) {
-    let model = { ...header };
-    if (
-      model.type === 'imageList' &&
-      model.themeOtherSetting.listPageSize <= 0
-    ) {
-      this.snackbarService.openI18N('otherSetting.listPageSizeMoreZero');
-      return false;
-    }
-    if (model.themeOtherSetting.useQuickRefresh) {
-      if (isBlank(model.themeOtherSetting.useSpider)) {
-        this.snackbarService.openI18N('msg.quickRefreshSpiderEmpty');
-        return false;
-      }
-      if (isBlank(model.themeOtherSetting.quickRefreshType)) {
-        this.snackbarService.openI18N('otherSetting.quickRefreshTypeRequired');
-        return false;
-      }
-      if (isBlank(model.themeOtherSetting.quickRefresh)) {
-        this.snackbarService.isBlankMessage('otherSetting.quickRefresh');
-        return false;
-      }
-    }
-    return true;
   }
 }
