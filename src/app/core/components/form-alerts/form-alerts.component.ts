@@ -1,7 +1,8 @@
 import { Component, input } from '@angular/core';
-import { FormAlert } from '../../model';
+import { FieldState } from '@angular/forms/signals';
 import { MatIconModule } from '@angular/material/icon';
-import { AbstractControl } from '@angular/forms';
+import { hasFieldError } from '../../../shared/util/signal-form';
+import { FormAlert } from '../../model';
 
 @Component({
   selector: 'app-form-alerts',
@@ -9,6 +10,7 @@ import { AbstractControl } from '@angular/forms';
   templateUrl: './form-alerts.component.html',
 })
 export class FormAlertsComponent {
-  readonly form = input.required<AbstractControl>();
+  readonly hasError = hasFieldError;
+  readonly form = input.required<() => FieldState<any>>();
   readonly formAlerts = input.required<FormAlert[]>();
 }

@@ -7,17 +7,15 @@ import {
   inject,
   OnInit,
   viewChild,
-  ViewChild,
 } from '@angular/core';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import {
+  MAT_DIALOG_DATA,
   MatDialogActions,
-  MatDialogTitle,
   MatDialogContent,
   MatDialogRef,
-  MAT_DIALOG_DATA,
+  MatDialogTitle,
 } from '@angular/material/dialog';
 import {
   MatPaginator,
@@ -27,15 +25,13 @@ import {
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { TranslateModule } from '@ngx-translate/core';
-import { CustomMatPaginatorIntl } from '../custom-mat-paginatorIntl/custom-mat-paginatorIntl';
 import { BaseSelectTableData } from '../../model';
+import { CustomMatPaginatorIntl } from '../custom-mat-paginatorIntl/custom-mat-paginatorIntl';
 
 @Component({
   imports: [
     CommonModule,
     MatTableModule,
-    ReactiveFormsModule,
-    FormsModule,
     MatButtonModule,
     MatDialogActions,
     MatDialogContent,
