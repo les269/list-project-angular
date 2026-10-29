@@ -8,7 +8,6 @@ import {
 } from '@angular/core';
 import { SnackbarService } from '../../core/services/snackbar.service';
 import { isNotBlank } from './helper';
-import { NgControl, NgModel } from '@angular/forms';
 
 @Directive({ selector: '[ngCopy]', standalone: true })
 export class CopyDirective {
@@ -52,7 +51,6 @@ export class TrimOnBlurDirective {
   private readonly elementRef = inject(
     ElementRef<HTMLInputElement | HTMLTextAreaElement>
   );
-  private readonly control = inject(NgControl, { optional: true, self: true });
 
   @HostListener('blur')
   onBlur() {
@@ -69,15 +67,6 @@ export class TrimOnBlurDirective {
 
     input.value = trimmedValue;
 
-    const control = this.control?.control;
-    if (control && typeof control.setValue === 'function') {
-      control.setValue(trimmedValue);
-
-      if (this.control instanceof NgModel) {
-        this.control.viewToModelUpdate(trimmedValue);
-      }
-    } else {
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-    }
+    input.dispatchEvent(new Event('input', { bubbles: true }));
   }
 }
