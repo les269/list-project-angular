@@ -1,13 +1,17 @@
 <div class="d-flex align-items-center gap-2 flex-wrap">
-  @for (value of selectedData(); track $index) {
+  @for (item of selectedData(); track $index) {
     <mat-chip
-      >{{ displayLabel(value) }}
-      <button matChipRemove (click)="removeChip(value)">
+      >{{ displayLabel(item) }}
+      <button
+        type="button"
+        [disabled]="disabled()"
+        matChipRemove
+        (click)="removeChip(item)">
         <mat-icon>cancel</mat-icon>
       </button>
     </mat-chip>
   }
-  @if (required() && requiredMsg().length > 0 && selectedData().length === 0) {
+  @if (required() && requiredMsg().length > 0 && value().length === 0) {
     <div>
       {{ requiredMsg() }}
     </div>

@@ -1,101 +1,85 @@
 import {
   Component,
   computed,
-  effect,
-  forwardRef,
   input,
+  model,
+  output,
   signal,
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { FormValueControl } from '@angular/forms/signals';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-chip-select-button',
+  host: { '(focusout)': 'touch.emit()' },
   imports: [MatChipsModule, MatIconModule],
   templateUrl: './chip-select-button.component.html',
   styleUrl: './chip-select-button.component.scss',
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => ChipSelectButtonComponent),
-      multi: true,
-    },
-  ],
 })
-export class ChipSelectButtonComponent implements ControlValueAccessor {
-  readonly valueKey = input.required<any>();
+export class ChipSelectButtonComponent implements FormValueControl<string> {
+  /** 選項中用來識別資料的欄位，例如 'id'；表單儲存這個欄位的值。 */
+  readonly valueKey = input.required<PropertyKey>();
+  /** 開啟單選對話框，回傳使用者選中的完整物件；取消時不應發出值。 */
   readonly selectTable = input.required<() => Observable<any>>();
-  /** 可傳入純陣列 `any[]` 或 Signal `() => any[]`，元件內部自動解析 */
+  /** 用於將已儲存的 ID 查回顯示資料，可傳入陣列或回傳陣列的 Signal／函式。 */
   readonly options = input.required<any[] | (() => any[])>();
+  /** 顯示文字的欄位名稱，例如 'name'，或接收完整物件並回傳文字的函式。 */
   readonly labelKey = input.required<((item: any) => string) | string>();
+  /** 由上層 Signal Forms 傳入必填狀態，本身不會建立驗證規則。 */
   readonly required = input<boolean>(false);
+  /** 必填且尚未選取時顯示的文字。 */
   readonly requiredMsg = input<string>('');
 
-  readonly value = signal('');
-  readonly disabled = signal(false);
-  readonly selectedData = signal<any | null>(null);
+  /** 正式表單值只儲存 ID 字串，不儲存整個選項物件。 */
+  readonly value = model('');
+  readonly touch = output<void>();
+  readonly disabled = input(false);
 
   private readonly resolvedOptions = computed<any[]>(() => {
     const opts = this.options();
     return typeof opts === 'function' ? opts() : opts;
   });
 
-  constructor() {
-    // options 是 async 載入，當 options 有資料時補找 selectedData
-    effect(() => {
-      const opts = this.resolvedOptions();
-      const val = this.value();
-      if (opts.length === 0 || !val || this.selectedData()) return;
-      const found = opts.find(
-        opt => String(opt[this.valueKey()]) === String(val)
-      );
-      if (found) this.selectedData.set(found);
-    });
-  }
+  // 暫存對話框選回的物件，補足 options 尚未載入或不包含該項目的情況。
+  private readonly dialogSelection = signal<any>(undefined);
+
+  /** 根據正式表單的 ID 取得顯示資料；優先使用 options。 */
+  readonly selectedData = computed(() => {
+    const id = this.value();
+    if (id === '') return undefined;
+    const key = this.valueKey();
+    const option = this.resolvedOptions().find(
+      item => String(item[key]) === id
+    );
+    if (option) return option;
+    const selected = this.dialogSelection();
+    return selected && String(selected[key]) === id ? selected : undefined;
+  });
 
   removeChip() {
+    if (this.disabled()) return;
     this.value.set('');
-    this.selectedData.set(null);
-    this.onChange('');
+    this.touch.emit();
   }
 
-  displayLabel() {
+  displayLabel(): string {
     const item = this.selectedData();
-    if (!item) return this.value(); // 如果找不到物件，保底顯示 ID
-
+    if (!item) return this.value();
     const key = this.labelKey();
-    if (typeof key === 'function') return key(item);
-    if (key) return item[key];
-
-    return this.value();
+    const label = typeof key === 'function' ? key(item) : item[key];
+    return String(label ?? this.value());
   }
 
   openSelectTable() {
+    if (this.disabled()) return;
     this.selectTable()().subscribe(res => {
+      if (this.disabled()) return;
+      this.dialogSelection.set(res);
       const id = String(res[this.valueKey()]);
       this.value.set(id);
-      this.selectedData.set(res);
-      this.onChange(id);
+      this.touch.emit();
     });
-  }
-
-  // ControlValueAccessor 介面實作
-  onChange: any = () => {};
-  onTouched: any = () => {};
-  writeValue(val: any): void {
-    // 清除舊的 selectedData，讓 effect 重新查找（兼容 options 已載入或尚未載入兩種情況）
-    this.selectedData.set(null);
-    this.value.set(val || '');
-  }
-  registerOnChange(fn: any): void {
-    this.onChange = fn;
-  }
-  registerOnTouched(fn: any): void {
-    this.onTouched = fn;
-  }
-  setDisabledState?(isDisabled: boolean): void {
-    this.disabled.set(isDisabled);
   }
 }

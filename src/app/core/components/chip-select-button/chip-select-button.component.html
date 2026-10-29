@@ -2,7 +2,7 @@
   @if (value()) {
     <mat-chip-row (removed)="removeChip()">
       {{ displayLabel() }}
-      <button matChipRemove>
+      <button type="button" [disabled]="disabled()" matChipRemove>
         <mat-icon>cancel</mat-icon>
       </button>
     </mat-chip-row>
