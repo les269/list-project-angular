@@ -1,22 +1,22 @@
 <div class="d-flex justify-content-between align-items-center">
   <h2 mat-dialog-title>
-    {{ (disabled ? 'g.read' : 'g.edit') | translate }}{{ data.title }}
+    {{ (disabledModel() ? 'g.read' : 'g.edit') | translate }}{{ data.title }}
   </h2>
   <button class="d-flex mx-2" mat-icon-button (click)="onNoClick()">
     <mat-icon>close</mat-icon>
   </button>
 </div>
-@if (disabled) {
+@if (disabledModel()) {
   <mat-dialog-content class="scrollbar-primary">
     <div cdkFocusInitial>
       <ngx-editor
-        [ngClass]="{ disabled: disabled }"
+        [ngClass]="{ disabled: disabledModel() }"
         [editor]="editor"
         [formField]="valueForm"></ngx-editor>
     </div>
   </mat-dialog-content>
   <mat-dialog-actions>
-    <button mat-button (click)="disabled = false">
+    <button mat-button (click)="disabledModel.set(false)">
       {{ 'g.edit' | translate }}
     </button>
   </mat-dialog-actions>
@@ -29,7 +29,7 @@
     </div>
   </mat-dialog-content>
   <mat-dialog-actions>
-    <button mat-button (click)="disabled = true">
+    <button mat-button (click)="disabledModel.set(true)">
       {{ 'g.read' | translate }}
     </button>
     <button mat-button (click)="onNoClick()">

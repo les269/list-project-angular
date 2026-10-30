@@ -39,23 +39,10 @@ export class ThemeNoteComponent implements OnInit, OnDestroy {
     save: (text: string) => void;
   }>(MAT_DIALOG_DATA);
   readonly valueModel = signal(this.data.value);
+  readonly disabledModel = signal(this.data.disabled);
   readonly valueForm = form(this.valueModel, p => {
     disabled(p, { when: () => this.disabledModel() });
   });
-  get value() {
-    return this.valueModel();
-  }
-  set value(value) {
-    this.valueModel.set(value);
-  }
-  readonly disabledModel = signal(this.data.disabled);
-  readonly disabledForm = form(this.disabledModel);
-  get disabled() {
-    return this.disabledModel();
-  }
-  set disabled(value) {
-    this.disabledModel.set(value);
-  }
   editor: Editor = new Editor({ history: true });
   toolbar: Toolbar = [
     ['bold', 'italic'],
@@ -68,16 +55,15 @@ export class ThemeNoteComponent implements OnInit, OnDestroy {
     ['align_left', 'align_center', 'align_right', 'align_justify'],
   ];
   ngOnInit(): void {
-    this.editor.setContent(this.value);
-  }
-  onChange(html: string) {
-    this.value = html;
+    this.editor.setContent(this.valueModel());
   }
   onOK() {
-    this.dialogRef.close(this.value === '<p></p>' ? '' : this.value);
+    const value = this.valueModel();
+    this.dialogRef.close(value === '<p></p>' ? '' : value);
   }
   onSave() {
-    this.data.save(this.value === '<p></p>' ? '' : this.value);
+    const value = this.valueModel();
+    this.data.save(value === '<p></p>' ? '' : value);
   }
   onNoClick(): void {
     this.dialogRef.close();
