@@ -85,7 +85,10 @@
                 <button mat-icon-button (click)="onReorderTag(tag)">
                   <mat-icon>reorder</mat-icon>
                 </button>
-                <button mat-icon-button (click)="deleteTag(tag.shareTagId)">
+                <button
+                  mat-icon-button
+                  [disabled]="isDeleting() || isSaving()"
+                  (click)="deleteTag(tag.shareTagId)">
                   <mat-icon>delete</mat-icon>
                 </button>
               </div>
@@ -116,9 +119,7 @@
       <input
         type="text"
         class="form-control"
-        [ngModel]="newTagId()"
-        (ngModelChange)="newTagId.set($event)"
-        [disabled]="isEdit()" />
+        [formField]="tagForm.shareTagId" />
     </div>
 
     <div class="mb-3">
@@ -128,15 +129,22 @@
       <input
         type="text"
         class="form-control"
-        [ngModel]="newTagName()"
-        (ngModelChange)="newTagName.set($event)" />
+        [formField]="tagForm.shareTagName" />
     </div>
   </mat-dialog-content>
   <mat-dialog-actions>
-    <button type="button" class="btn btn-secondary" (click)="closeAddDialog()">
+    <button
+      type="button"
+      class="btn btn-secondary"
+      [disabled]="isSaving()"
+      (click)="closeAddDialog()">
       {{ 'g.no' | translate }}
     </button>
-    <button type="button" class="btn btn-primary" (click)="confirmAddTag()">
+    <button
+      type="button"
+      class="btn btn-primary"
+      [disabled]="isSaving()"
+      (click)="confirmAddTag()">
       {{ 'g.ok' | translate }}
     </button>
   </mat-dialog-actions>

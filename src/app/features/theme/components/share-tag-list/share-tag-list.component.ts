@@ -1,49 +1,47 @@
+import { CommonModule } from '@angular/common';
 import {
   Component,
-  inject,
-  OnInit,
-  OnDestroy,
-  ViewChild,
-  TemplateRef,
-  ViewChildren,
-  QueryList,
-  signal,
   effect,
-  WritableSignal,
+  inject,
+  signal,
+  TemplateRef,
+  untracked,
   viewChild,
-  linkedSignal,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { MatListModule } from '@angular/material/list';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { MatIconModule } from '@angular/material/icon';
+import { rxResource } from '@angular/core/rxjs-interop';
+import {
+  disabled,
+  form,
+  FormField,
+  readonly,
+  required,
+} from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import {
-  MatDialogTitle,
-  MatDialogContent,
-  MatDialogRef,
   MatDialog,
+  MatDialogContent,
   MatDialogModule,
+  MatDialogRef,
+  MatDialogTitle,
 } from '@angular/material/dialog';
-import { ShareTagService } from '../../services/share-tag.service';
-import { ShareTag } from '../../models';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import { MatTableModule } from '@angular/material/table';
-import { EMPTY, switchMap, Subject, take, takeUntil, filter, map } from 'rxjs';
-import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { isBlank, parseHeaderId } from '../../../../shared/util/helper';
-import { ShareTagValueListComponent } from '../share-tag-value-list/share-tag-value-list.component';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { TranslateModule } from '@ngx-translate/core';
+import { EMPTY, filter, finalize, map, switchMap, take } from 'rxjs';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
-import { toSignal, rxResource } from '@angular/core/rxjs-interop';
+import { SnackbarService } from '../../../../core/services/snackbar.service';
+import { isBlank } from '../../../../shared/util/helper';
+import { ShareTag } from '../../models';
+import { ShareTagService } from '../../services/share-tag.service';
+import { ShareTagValueListComponent } from '../share-tag-value-list/share-tag-value-list.component';
 
 @Component({
   selector: 'app-share-tag-list',
 
   imports: [
-    ReactiveFormsModule,
-    FormsModule,
+    FormField,
     CommonModule,
     MatListModule,
     TranslateModule,
@@ -71,8 +69,11 @@ export class ShareTagListComponent {
     'updatedTime',
     'action',
   ];
-  newTagName = signal('');
-  newTagId = signal('');
+  readonly tagModel = signal({ shareTagId: '', shareTagName: '' });
+  readonly initialTagValue = structuredClone(this.tagModel());
+  readonly isSaving = signal(false);
+  readonly isDeleting = signal(false);
+  readonly filterValue = signal('');
   isEdit = signal(false);
 
   addTagDialog = viewChild.required<TemplateRef<any>>('addTagDialog');
@@ -80,43 +81,66 @@ export class ShareTagListComponent {
 
   private addDialogRef?: MatDialogRef<any>;
 
-  readonly tagsResource = rxResource({
-    stream: () => this.shareTagService.getAllTag(),
-    defaultValue: [] as ShareTag[],
-  });
   dataSource = rxResource({
     stream: () =>
-      this.shareTagService.getAllTag().pipe(
-        map(data => {
-          const ds = new MatTableDataSource<ShareTag>(data);
-          ds.sort = this.sort();
-          return ds;
-        })
-      ),
+      this.shareTagService
+        .getAllTag()
+        .pipe(map(data => new MatTableDataSource<ShareTag>(data))),
     defaultValue: new MatTableDataSource<ShareTag>([]),
   });
 
+  readonly tagForm = form(this.tagModel, p => {
+    required(p.shareTagId);
+    required(p.shareTagName);
+    disabled(p.shareTagId, { when: () => this.isEdit() });
+    readonly(p, { when: () => this.isSaving() });
+  });
+
+  constructor() {
+    effect(() => {
+      const dataSource = this.dataSource.value();
+      const sort = this.sort();
+      untracked(() => {
+        dataSource.sort = sort ?? null;
+      });
+    });
+    effect(() => {
+      const dataSource = this.dataSource.value();
+      const filter = this.filterValue();
+      untracked(() => {
+        dataSource.filter = filter;
+      });
+    });
+  }
+
   deleteTag(shareTagId: string): void {
+    if (this.isSaving() || this.isDeleting()) return;
+    this.isDeleting.set(true);
     this.shareTagService
       .inUse(shareTagId)
       .pipe(
         switchMap(inUse => {
           if (inUse.length > 0) {
-            // show message that the tag is currently bound/used
-            this.messageBoxService.openI18N('shareTag.inUse', {
-              params: { values: inUse.join('\n') },
-              onlyOk: true,
-            });
-            return EMPTY;
+            return this.messageBoxService
+              .openI18N('shareTag.inUse', {
+                params: { values: inUse.join('\n') },
+                onlyOk: true,
+              })
+              .pipe(switchMap(() => EMPTY));
           }
           return this.messageBoxService.openI18N('msg.sureDeleteTag');
         }),
-        filter(result => !!result), // only proceed if user confirmed
-        switchMap(result => this.shareTagService.deleteTag(shareTagId))
+        take(1),
+        filter(result => !!result),
+        switchMap(() => this.shareTagService.deleteTag(shareTagId)),
+        finalize(() => this.isDeleting.set(false))
       )
-      .subscribe(x => {
-        this.tagsResource.reload();
-        this.snackbarService.openI18N('msg.deleteSuccess');
+      .subscribe({
+        next: () => {
+          this.dataSource.reload();
+          this.snackbarService.openI18N('msg.deleteSuccess');
+        },
+        error: () => {},
       });
   }
 
@@ -125,31 +149,40 @@ export class ShareTagListComponent {
   }
 
   applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.value().filter = filterValue.trim().toLowerCase();
+    const value = (event.target as HTMLInputElement).value;
+    this.filterValue.set(value.trim().toLowerCase());
   }
 
   onEditTag(tag: ShareTag) {
-    this.newTagId.set(tag.shareTagId);
-    this.newTagName.set(tag.shareTagName);
+    if (this.isSaving() || this.isDeleting()) return;
+    this.tagForm().reset({
+      shareTagId: tag.shareTagId,
+      shareTagName: tag.shareTagName,
+    });
     this.isEdit.set(true);
     this.addDialogRef = this.matDialog.open(this.addTagDialog());
     this.addDialogRef
       .afterClosed()
       .pipe(take(1))
       .subscribe(() => {
-        this.newTagId.set('');
-        this.newTagName.set('');
+        this.tagForm().reset(structuredClone(this.initialTagValue));
         this.isEdit.set(false);
       });
   }
 
   confirmAddTag() {
-    if (isBlank(this.newTagId())) {
+    if (this.isSaving() || this.isDeleting()) return;
+    this.tagForm().markAsTouched();
+    const raw = this.tagModel();
+    const payload = {
+      shareTagId: raw.shareTagId.trim(),
+      shareTagName: raw.shareTagName.trim(),
+    };
+    if (isBlank(payload.shareTagId)) {
       this.snackbarService.isBlankMessage('shareTag.tagId');
       return;
     }
-    if (isBlank(this.newTagName())) {
+    if (isBlank(payload.shareTagName)) {
       this.snackbarService.isBlankMessage('shareTag.tagName');
       return;
     }
@@ -157,46 +190,50 @@ export class ShareTagListComponent {
       !this.isEdit() &&
       this.dataSource
         .value()
-        .data.find(x => x.shareTagId === this.newTagId().trim())
+        .data.some(x => x.shareTagId === payload.shareTagId)
     ) {
       this.snackbarService.openI18N('shareTag.tagDuplicate');
       return;
     }
 
-    const payload = {
-      shareTagId: this.newTagId().trim(),
-      shareTagName: this.newTagName().trim(),
-    } as ShareTag;
-
-    this.shareTagService.addTag(payload).subscribe(tags => {
-      this.tagsResource.reload();
-      this.isEdit.set(false);
-      if (this.addDialogRef) {
-        this.addDialogRef.close();
-      }
-      this.snackbarService.openI18N('msg.addSuccess');
-    });
+    this.isSaving.set(true);
+    const dialogRef = this.addDialogRef;
+    if (dialogRef) dialogRef.disableClose = true;
+    this.shareTagService
+      .addTag(payload)
+      .pipe(
+        finalize(() => {
+          this.isSaving.set(false);
+          if (dialogRef) dialogRef.disableClose = false;
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.dataSource.reload();
+          this.isEdit.set(false);
+          dialogRef?.close();
+          this.snackbarService.openI18N('msg.addSuccess');
+        },
+        error: () => {},
+      });
   }
 
   openAddDialog() {
+    if (this.isSaving() || this.isDeleting()) return;
+    this.isEdit.set(false);
+    this.tagForm().reset(structuredClone(this.initialTagValue));
     this.addDialogRef = this.matDialog.open(this.addTagDialog());
     this.addDialogRef
       .afterClosed()
       .pipe(take(1))
       .subscribe(() => {
-        this.newTagId.set('');
-        this.newTagName.set('');
+        this.tagForm().reset(structuredClone(this.initialTagValue));
         this.isEdit.set(false);
       });
-    // attach sort after view initialised
-    setTimeout(() => {
-      if (this.sort) {
-        this.dataSource.value().sort = this.sort();
-      }
-    });
   }
 
   closeAddDialog() {
+    if (this.isSaving()) return;
     if (this.addDialogRef) {
       this.addDialogRef.close();
     }

@@ -1,6 +1,22 @@
-/* Styles for the share-tag-value-list component */
+.tag-value-content {
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.pagination-footer {
+  display: block;
+  padding: 0 16px 8px;
+}
+
 .share-tag-vlaue-list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+
   .toolbar {
+    flex-shrink: 0;
     display: flex;
     justify-content: flex-end;
     margin-bottom: 12px;
@@ -19,12 +35,16 @@
   }
 
   .dialog {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
     background: #fff;
     border-radius: 6px;
     padding: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 
     .table-container {
+      min-height: 0;
       max-height: 420px;
       overflow: auto;
     }

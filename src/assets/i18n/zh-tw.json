@@ -681,7 +681,11 @@
     "tagValue": "標籤值",
     "tagValueList": "標籤值清單",
     "inUse": "目前該標籤使用中如需刪除需要清除使用該標籤的所有清單才可進行刪除 {{values}}",
-    "addTagValue": "新增標籤值"
+    "addTagValue": "新增標籤值",
+    "valueCount": "共 {{count}} 筆",
+    "filteredValueCount": "篩選結果 {{count}} 筆",
+    "selectedValueCount": "已選取 {{count}} 筆",
+    "selectCurrentPage": "選取本頁全部標籤值"
   },
   "database": {
     "currentDatabaseId": "當前所使用的資料庫ID",
