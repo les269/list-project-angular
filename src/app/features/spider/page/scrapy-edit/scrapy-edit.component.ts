@@ -1,59 +1,41 @@
+import { CodeEditor } from '@acrodata/code-editor';
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import {
-  ReactiveFormsModule,
-  FormsModule,
-  FormArray,
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+  disabled,
+  form,
+  FormField,
+  min,
+  required,
+} from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTableModule } from '@angular/material/table';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { ActivatedRoute, Router } from '@angular/router';
+import { languages } from '@codemirror/language-data';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { EMPTY, filter, map, switchMap } from 'rxjs';
+import { SnackbarService } from '../../../../core/services/snackbar.service';
+import { isNotBlank, isNotJson } from '../../../../shared/util/helper';
+import { patchField } from '../../../../shared/util/signal-form';
+import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
+import { CssSelectTableComponent } from '../../components/css-select-table/css-select-table.component';
 import {
-  Cookie,
-  CssSelect,
   ScrapyConfig,
   ScrapyData,
   ScrapyEditMode,
   ScrapyPageType,
 } from '../../model';
 import { ScrapyService } from '../../services/scrapy.service';
-import { MatTableModule } from '@angular/material/table';
-import { MatIconModule } from '@angular/material/icon';
-import { languages } from '@codemirror/language-data';
-import { CodeEditor } from '@acrodata/code-editor';
-import { Router, ActivatedRoute } from '@angular/router';
-import { EMPTY, filter, map, switchMap } from 'rxjs';
-import { isNotBlank, isNotJson } from '../../../../shared/util/helper';
-import { MatTabsModule } from '@angular/material/tabs';
-import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { ControlsOf } from '../../../../core/model/generic-table';
-import { rxResource, toSignal } from '@angular/core/rxjs-interop';
-import { CssSelectTableComponent } from '../../components/css-select-table/css-select-table.component';
-import { ToFormArray } from '../../../../core/model/generic-table';
-import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
-
-type ScrapyDataFormControls = {
-  name: FormControl<string>;
-  url: FormControl<string>;
-  cookie: ToFormArray<Cookie>;
-  scrapyPageType: FormControl<ScrapyPageType>;
-  cssSelectList: ToFormArray<CssSelect>;
-  script: FormControl<string>;
-  html: FormControl<string>;
-  replaceRegular: FormControl<string>;
-  replaceRegularTo: FormControl<string>;
-};
 
 @Component({
   imports: [
     MatTableModule,
-    ReactiveFormsModule,
-    FormsModule,
+    FormField,
     MatButtonModule,
     TranslateModule,
     CommonModule,
@@ -75,7 +57,6 @@ export class ScrapyEditComponent {
   readonly scrapyService = inject(ScrapyService);
   readonly translateService = inject(TranslateService);
   readonly snackbarService = inject(SnackbarService);
-  readonly fb = inject(FormBuilder);
   // enum and constant
   readonly eScrapyPageType = ScrapyPageType;
   readonly languages = languages;
@@ -104,12 +85,19 @@ export class ScrapyEditComponent {
   readonly dataInit = computed(() => this.scrapy.value()?.data ?? []);
 
   // form
-  readonly form = this.fb.nonNullable.group({
-    name: ['', Validators.required],
-    paramSize: [1, [Validators.required, Validators.min(1)]],
-    testJson: [''],
-    testUrl: [''],
-    data: this.fb.array<FormGroup<ScrapyDataFormControls>>([]),
+  readonly formModel = signal({
+    name: '',
+    paramSize: 1,
+    testJson: '',
+    testUrl: '',
+    data: [] as any[],
+  });
+  readonly form = form(this.formModel, p => {
+    disabled(p.name, { when: () => this.isEditMode });
+
+    required(p.name);
+    required(p.paramSize);
+    min(p.paramSize, 1);
   });
 
   get isCreateMode() {
@@ -120,12 +108,12 @@ export class ScrapyEditComponent {
     return this.status() === ScrapyEditMode.edit;
   }
 
-  get nameControl(): FormControl<string> {
-    return this.form.controls.name;
+  get nameControl() {
+    return this.form.name;
   }
 
   get dataControl() {
-    return this.form.controls.data;
+    return this.form.data;
   }
 
   constructor() {
@@ -139,41 +127,40 @@ export class ScrapyEditComponent {
       }
       this.patchForm(scrapy);
       this.status.set(ScrapyEditMode.edit);
-      this.form.controls.name.disable({ emitEvent: false });
     });
   }
 
   private patchForm(config: ScrapyConfig) {
     const { data, ...rest } = config;
-    this.form.patchValue(rest, { emitEvent: false });
-    this.dataControl.clear();
+    patchField(this.form, rest);
+    this.dataControl().value.set([]);
     for (const d of data) {
-      this.dataControl.push(this.createDataGroup(d));
+      this.dataControl().value.update(rows => [...rows, this.createData(d)]);
     }
   }
 
-  createDataGroup(
-    data?: Partial<ScrapyData>
-  ): FormGroup<ScrapyDataFormControls> {
-    return this.fb.nonNullable.group({
-      name: [data?.name ?? ''],
-      url: [data?.url ?? ''],
-      cookie: this.fb.array<FormGroup<ControlsOf<Cookie>>>([]),
-      scrapyPageType: [data?.scrapyPageType ?? ScrapyPageType.scrapyData],
-      cssSelectList: this.fb.array<FormGroup<ControlsOf<CssSelect>>>([]),
-      script: [data?.script ?? this.defaultJS],
-      html: [data?.html ?? ''],
-      replaceRegular: [data?.replaceRegular ?? ''],
-      replaceRegularTo: [data?.replaceRegularTo ?? ''],
-    });
+  createData(data?: Partial<ScrapyData>): any {
+    return {
+      name: data?.name ?? '',
+      url: data?.url ?? '',
+      cookie: data?.cookie ?? [],
+      scrapyPageType: data?.scrapyPageType ?? ScrapyPageType.scrapyData,
+      cssSelectList: data?.cssSelectList ?? [],
+      script: data?.script ?? this.defaultJS,
+      html: data?.html ?? '',
+      replaceRegular: data?.replaceRegular ?? '',
+      replaceRegularTo: data?.replaceRegularTo ?? '',
+    };
   }
 
   onAddData() {
-    this.dataControl.push(this.createDataGroup());
+    this.dataControl().value.update(rows => [...rows, this.createData()]);
   }
 
   onDeleteData(i: number) {
-    this.dataControl.removeAt(i);
+    this.dataControl().value.update(rows =>
+      rows.filter((_, index) => index !== i)
+    );
   }
 
   onBack() {
@@ -181,7 +168,7 @@ export class ScrapyEditComponent {
   }
 
   onTestParseHtml(index: number) {
-    const data = this.dataControl.at(index).getRawValue() as ScrapyData;
+    const data = this.dataControl[index]().value() as ScrapyData;
     this.scrapyService
       .testScrapyHtml({ scrapyData: data })
       .subscribe(result => {
@@ -190,7 +177,7 @@ export class ScrapyEditComponent {
   }
 
   onTestJson() {
-    const testJson = this.form.controls.testJson.value;
+    const testJson = this.form.testJson().value();
     if (isNotJson(testJson) || !Array.isArray(JSON.parse(testJson))) {
       this.snackbarService.openI18N('msg.testJsonError');
       return;
@@ -198,7 +185,7 @@ export class ScrapyEditComponent {
     this.testResult.set('');
     this.scrapyService
       .testScrapyJson({
-        scrapyDataList: this.dataControl.getRawValue() as ScrapyData[],
+        scrapyDataList: this.dataControl().value() as ScrapyData[],
         json: JSON.parse(testJson),
       })
       .subscribe(result => {
@@ -209,8 +196,8 @@ export class ScrapyEditComponent {
   onTestUrl() {
     this.scrapyService
       .testScrapyUrl({
-        scrapyDataList: this.dataControl.getRawValue() as ScrapyData[],
-        url: this.form.controls.testUrl.value,
+        scrapyDataList: this.dataControl().value() as ScrapyData[],
+        url: this.form.testUrl().value(),
       })
       .subscribe(result => {
         this.testResult.set(JSON.stringify(result, undefined, 2));
@@ -218,11 +205,11 @@ export class ScrapyEditComponent {
   }
 
   update(back: boolean, type: 'save' | 'commit') {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
+    if (this.form().invalid()) {
+      this.form().markAsTouched();
       return;
     }
-    const data = this.form.getRawValue() as unknown as ScrapyConfig;
+    const data = this.form().value() as unknown as ScrapyConfig;
     this.scrapyService
       .existConfig(data.name)
       .pipe(
@@ -250,10 +237,13 @@ export class ScrapyEditComponent {
 
   moveTab(index: number, type: 'left' | 'right') {
     const targetIndex = index + (type === 'left' ? -1 : 1);
-    const a = this.dataControl.at(index);
-    const b = this.dataControl.at(targetIndex);
-    this.dataControl.setControl(index, b);
-    this.dataControl.setControl(targetIndex, a);
+    this.dataControl().value.update(rows => {
+      if (targetIndex < 0 || targetIndex >= rows.length) return rows;
+      const next = [...rows];
+      [next[index], next[targetIndex]] = [next[targetIndex], next[index]];
+      return next;
+    });
+    this.dataControl().markAsDirty();
     this.selected.set(targetIndex);
   }
 }

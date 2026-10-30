@@ -16,6 +16,10 @@ import { ShareTagValueListComponent } from './share-tag-value-list/share-tag-val
 describe('Share tag forms', () => {
   async function setup() {
     const pending = new Subject<void>();
+    const confirmation = new Subject<string>();
+    const messages = {
+      openI18N: vi.fn((): Observable<string> => confirmation),
+    };
     const closed = new Subject<void>();
     const addDialog = {
       disableClose: false,
@@ -27,6 +31,10 @@ describe('Share tag forms', () => {
       getShareTagValue: vi.fn((): Observable<ShareTagValue[]> => of([])),
       addTag: vi.fn((): Observable<void> => pending),
       addTagValue: vi.fn((): Observable<void> => pending),
+      inUse: vi.fn((): Observable<string[]> => of([])),
+      deleteTag: vi.fn((): Observable<void> => pending),
+      deleteTagValue: vi.fn((): Observable<void> => pending),
+      deleteShareTagValueList: vi.fn((): Observable<void> => pending),
     };
     const snackbar = { openI18N: vi.fn(), isBlankMessage: vi.fn() };
     await TestBed.configureTestingModule({
@@ -38,7 +46,7 @@ describe('Share tag forms', () => {
       providers: [
         { provide: ShareTagService, useValue: service },
         { provide: SnackbarService, useValue: snackbar },
-        { provide: MessageBoxService, useValue: {} },
+        { provide: MessageBoxService, useValue: messages },
         { provide: MatDialog, useValue: { open: () => addDialog } },
         { provide: MatDialogRef, useValue: { close: vi.fn() } },
         {
@@ -49,8 +57,98 @@ describe('Share tag forms', () => {
     })
       .overrideProvider(MatDialog, { useValue: { open: () => addDialog } })
       .compileComponents();
-    return { service, pending, addDialog, snackbar };
+    return { service, pending, addDialog, snackbar, messages, confirmation };
   }
+
+  it('Tag 刪除從確認視窗到請求結束皆阻擋重複操作，取消與失敗後解鎖', async () => {
+    const { service, pending, messages, confirmation } = await setup();
+    const fixture = TestBed.createComponent(ShareTagListComponent);
+    await fixture.whenStable();
+    const component = fixture.componentInstance;
+    component.deleteTag('tag');
+    component.deleteTag('tag');
+    expect(service.inUse).toHaveBeenCalledTimes(1);
+    expect(messages.openI18N).toHaveBeenCalledTimes(1);
+    expect(component.isDeleting()).toBe(true);
+    confirmation.next('yes');
+    expect(service.deleteTag).toHaveBeenCalledTimes(1);
+    component.deleteTag('tag');
+    expect(service.inUse).toHaveBeenCalledTimes(1);
+    pending.error(new Error('Delete failed'));
+    expect(component.isDeleting()).toBe(false);
+    messages.openI18N.mockReturnValue(of(''));
+    component.deleteTag('tag');
+    expect(component.isDeleting()).toBe(false);
+    expect(service.deleteTag).toHaveBeenCalledTimes(1);
+    messages.openI18N.mockReturnValue(of('yes'));
+    service.deleteTag.mockReturnValue(of(undefined));
+    component.deleteTag('tag');
+    await fixture.whenStable();
+    expect(component.isDeleting()).toBe(false);
+    expect(service.getAllTag).toHaveBeenCalledTimes(2);
+  });
+
+  it.each(['single', 'bulk'])(
+    'Tag value %s 刪除共用操作鎖並直接使用翻譯 key',
+    async mode => {
+      const { service, pending, messages, confirmation } = await setup();
+      service.getShareTagValue.mockReturnValue(
+        of([{ shareTagId: 'tag', value: 'value' }])
+      );
+      const fixture = TestBed.createComponent(ShareTagValueListComponent);
+      await fixture.whenStable();
+      const component = fixture.componentInstance;
+      component.selection.select(component.dataSource.value().data[0]);
+      const submit = () =>
+        mode === 'single'
+          ? component.deleteTag('value')
+          : component.onDeleteSelect();
+      submit();
+      component.deleteTag('value');
+      component.onDeleteSelect();
+      expect(messages.openI18N).toHaveBeenCalledExactlyOnceWith(
+        'msg.sureDeleteTagValue'
+      );
+      expect(component.isDeleting()).toBe(true);
+      confirmation.next('yes');
+      const request =
+        mode === 'single'
+          ? service.deleteTagValue
+          : service.deleteShareTagValueList;
+      expect(request).toHaveBeenCalledTimes(1);
+      pending.error(new Error('Delete failed'));
+      expect(component.isDeleting()).toBe(false);
+      messages.openI18N.mockReturnValue(of(''));
+      submit();
+      expect(component.isDeleting()).toBe(false);
+      expect(request).toHaveBeenCalledTimes(1);
+      messages.openI18N.mockReturnValue(of('yes'));
+      request.mockReturnValue(of(undefined));
+      submit();
+      await fixture.whenStable();
+      expect(component.isDeleting()).toBe(false);
+      expect(service.getShareTagValue).toHaveBeenCalledTimes(2);
+      expect(component.selection.isEmpty()).toBe(true);
+    }
+  );
+
+  it('修改 filter 不會重新綁定排序器與分頁器', async () => {
+    await setup();
+    const fixture = TestBed.createComponent(ShareTagValueListComponent);
+    await fixture.whenStable();
+    const component = fixture.componentInstance;
+    const dataSource = component.dataSource.value();
+    const sortSetter = vi.spyOn(dataSource, 'sort', 'set');
+    const paginatorSetter = vi.spyOn(dataSource, 'paginator', 'set');
+    const input: HTMLInputElement =
+      fixture.nativeElement.querySelector('input');
+    input.value = 'filter';
+    input.dispatchEvent(new Event('input'));
+    await fixture.whenStable();
+    expect(dataSource.filter).toBe('filter');
+    expect(sortSetter).not.toHaveBeenCalled();
+    expect(paginatorSetter).not.toHaveBeenCalled();
+  });
 
   it('Tag 表單阻擋重複送出，失敗後可重試並重新載入列表', async () => {
     const { service, pending, addDialog } = await setup();

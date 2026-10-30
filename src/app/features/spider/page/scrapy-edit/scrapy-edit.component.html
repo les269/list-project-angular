@@ -1,6 +1,6 @@
 <div class="container d-flex">
   <div class="col-md-10 offset-md-1 col-xs-12 mt-2">
-    <form [formGroup]="form">
+    <form (submit)="$event.preventDefault()">
       <button
         type="button"
         mat-icon-button
@@ -10,11 +10,14 @@
       </button>
       <div class="form-group mb-2">
         <label>{{ 'scrapy.name' | translate }}</label>
-        <input class="form-control" formControlName="name" trimOnBlur />
+        <input class="form-control" [formField]="form.name" trimOnBlur />
       </div>
       <div class="form-group mb-2">
         <label>{{ 'scrapy.paramSize' | translate }}</label>
-        <input class="form-control" type="number" formControlName="paramSize" />
+        <input
+          class="form-control"
+          type="number"
+          [formField]="form.paramSize" />
         <label class="form-text">{{
           'scrapy.paramSizeDesc' | translate
         }}</label>
@@ -25,11 +28,7 @@
       <mat-tab-group
         [selectedIndex]="selected()"
         (selectedIndexChange)="selected.set($event)">
-        @for (
-          dataGroup of dataControl.controls;
-          track $index;
-          let index = $index
-        ) {
+        @for (dataGroup of dataControl; track $index; let index = $index) {
           <mat-tab>
             <ng-template mat-tab-label>
               @if (dataControl.length !== 1 && index !== 0) {
@@ -40,8 +39,8 @@
                 </button>
               }
               {{
-                dataGroup.controls.name.value
-                  ? dataGroup.controls.name.value
+                dataGroup.name().value()
+                  ? dataGroup.name().value()
                   : '(' + ('g.unnamed' | translate) + ')'
               }}
               @if (
@@ -65,9 +64,7 @@
               <label class="input-group-text">{{
                 'scrapy.tabName' | translate
               }}</label>
-              <input
-                class="form-control"
-                [formControl]="dataGroup.controls.name" />
+              <input class="form-control" [formField]="dataGroup.name" />
             </div>
             <div class="input-group my-2">
               <label class="input-group-text">{{
@@ -77,12 +74,12 @@
                 class="form-control"
                 [matTooltip]="'scrapy.replaceRegular' | translate"
                 [placeholder]="'scrapy.replaceRegular' | translate"
-                [formControl]="dataGroup.controls.replaceRegular" />
+                [formField]="dataGroup.replaceRegular" />
               <input
                 class="form-control"
                 [matTooltip]="'scrapy.replaceRegularTo' | translate"
                 [placeholder]="'scrapy.replaceRegularTo' | translate"
-                [formControl]="dataGroup.controls.replaceRegularTo" />
+                [formField]="dataGroup.replaceRegularTo" />
             </div>
             <div class="input-group my-2">
               <label class="input-group-text">{{
@@ -90,12 +87,12 @@
               }}</label>
               <input
                 class="form-control"
-                [formControl]="dataGroup.controls.url"
+                [formField]="dataGroup.url"
                 [placeholder]="'scrapy.urlPH' | translate" />
             </div>
             <label class="h6">{{ 'scrapy.cookie' | translate }}</label>
             <!-- <app-cookie-table
-              [formArray]="dataGroup.controls.cookie"
+              [fields]="dataGroup.cookie"
               [initData]="dataInit()[index]?.cookie"></app-cookie-table> -->
             <div class="my-2">
               <label class="form-label" for="type">{{
@@ -103,14 +100,14 @@
               }}</label>
               <select
                 class="form-control form-select"
-                [formControl]="dataGroup.controls.scrapyPageType">
+                [formField]="dataGroup.scrapyPageType">
                 @for (type of eScrapyPageType | keyvalue; track type) {
-                  <option [ngValue]="type.key">
+                  <option [value]="type.key">
                     {{ 'scrapy.' + type.key | translate }}
                   </option>
                 }
               </select>
-              @if (dataGroup.controls.scrapyPageType.value === 'redirect') {
+              @if (dataGroup.scrapyPageType().value() === 'redirect') {
                 <label class="form-text">{{
                   'scrapy.redirectRemind' | translate
                 }}</label>
@@ -120,7 +117,7 @@
               ><div [innerHTML]="'scrapy.cssSelectRemind' | translate"></div
             ></label>
             <app-css-select-table
-              [formArray]="dataGroup.controls.cssSelectList"
+              [fields]="dataGroup.cssSelectList"
               [initData]="
                 dataInit()[index]?.cssSelectList
               "></app-css-select-table>
@@ -128,7 +125,7 @@
               <label>{{ 'scrapy.testHtml' | translate }}</label>
               <code-editor
                 [style.height]="'400px'"
-                [formControl]="dataGroup.controls.html"
+                [formField]="dataGroup.html"
                 [language]="'html'"
                 [indentWithTab]="true"
                 [languages]="languages" />
@@ -141,8 +138,7 @@
             </div>
             <label>{{ 'scrapy.testResult' | translate }}</label>
             <code-editor
-              [ngModel]="testResult()"
-              [ngModelOptions]="{ standalone: true }"
+              [value]="testResult()"
               [language]="'json'"
               [indentWithTab]="true"
               [languages]="languages" />
@@ -155,7 +151,7 @@
               'scrapy.useJsonRemind' | translate
             }}</label>
             <code-editor
-              formControlName="testJson"
+              [formField]="form.testJson"
               [language]="'json'"
               [indentWithTab]="true"
               [languages]="languages" />
@@ -171,15 +167,14 @@
             <label class="form-text">{{
               'scrapy.useUrlRemind' | translate
             }}</label>
-            <input class="form-control" formControlName="testUrl" />
+            <input class="form-control" [formField]="form.testUrl" />
             <button type="button" class="btn btn-primary" (click)="onTestUrl()">
               {{ 'scrapy.test' | translate }}
             </button>
           </div>
           <label>{{ 'scrapy.testResult' | translate }}</label>
           <code-editor
-            [ngModel]="testResult()"
-            [ngModelOptions]="{ standalone: true }"
+            [value]="testResult()"
             [language]="'json'"
             [indentWithTab]="true"
             [languages]="languages" />

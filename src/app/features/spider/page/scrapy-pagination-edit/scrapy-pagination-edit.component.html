@@ -8,14 +8,11 @@
     </button>
     <div class="form-group mb-2">
       <label>{{ 'scrapy.name' | translate }}</label>
-      <input
-        class="form-control"
-        [(ngModel)]="model.name"
-        [disabled]="status === 'edit'" />
+      <input class="form-control" [formField]="modelForm.name" />
     </div>
     <div class="form-group mb-2">
       <label>{{ 'scrapy.startUrl' | translate }}</label>
-      <input class="form-control" [(ngModel)]="model.config.startUrl" />
+      <input class="form-control" [formField]="modelForm.config.startUrl" />
     </div>
     <mat-form-field appearance="outline">
       <mat-label style="color: black">{{
@@ -25,8 +22,7 @@
         style="color: black"
         matInput
         [matDatepicker]="picker"
-        [(ngModel)]="model.config.lastUpdateDate"
-        disabled />
+        [formField]="modelForm.config.lastUpdateDate" />
       <mat-datepicker-toggle
         matIconSuffix
         [for]="picker"></mat-datepicker-toggle>
@@ -39,12 +35,12 @@
       <input
         class="form-control"
         type="number"
-        [(ngModel)]="model.config.updateInterval" />
+        [formField]="modelForm.config.updateInterval" />
       <select
         class="form-control form-select"
-        [(ngModel)]="model.config.updateIntervalType">
+        [formField]="modelForm.config.updateIntervalType">
         @for (type of eUpdateIntervalType | keyvalue; track type) {
-          <option [ngValue]="type.key">
+          <option [value]="type.key">
             {{ 'g.' + type.key | translate }}
           </option>
         }
@@ -52,19 +48,19 @@
     </div>
     <label class="h5">{{ 'scrapy.cookie' | translate }}</label>
     <!-- TODO -->
-    <!-- <app-cookie-table [formArray]="model.config.cookie"></app-cookie-table> -->
+    <!-- <app-cookie-table [fields]="model.config.cookie"></app-cookie-table> -->
     <label class="h5 mt-2">{{ 'scrapy.cssSelect' | translate }}</label>
     <label class="form-text w-100"
       ><div [innerHTML]="'scrapy.cssSelectRemind2' | translate"></div
     ></label>
     <!-- TODO -->
     <!-- <app-css-select-table
-      [formArray]="model.config.cssSelectList"></app-css-select-table> -->
+      [fields]="model.config.cssSelectList"></app-css-select-table> -->
     <div class="form-group mb-2">
       <label>{{ 'scrapy.testHtml' | translate }}</label>
       <code-editor
         [style.height]="'400px'"
-        [(ngModel)]="testHtml"
+        [formField]="testHtmlForm"
         [language]="'html'"
         [indentWithTab]="true"
         [languages]="languages" />
@@ -73,7 +69,7 @@
       </button>
     </div>
     <code-editor
-      [(ngModel)]="testResult"
+      [formField]="testResultForm"
       [language]="'json'"
       [indentWithTab]="true"
       [languages]="languages" />

@@ -1,25 +1,31 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { ScrapyPagination, UpdateIntervalType } from '../../model';
-import { MatButtonModule } from '@angular/material/button';
-import { languages } from '@codemirror/language-data';
 import { CodeEditorModule } from '@acrodata/code-editor';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { CommonModule } from '@angular/common';
+import { Component, OnInit, signal } from '@angular/core';
+import {
+  disabled,
+  form,
+  FormField,
+  min,
+  required,
+} from '@angular/forms/signals';
+import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DATE_LOCALE,
   provideNativeDateAdapter,
 } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { isBlank, isNotBlank, isNumber } from '../../../../shared/util/helper';
-import { debounceTime, EMPTY, filter, switchMap } from 'rxjs';
-import { ScrapyPaginationService } from '../../services/scrapy-pagination.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { languages } from '@codemirror/language-data';
+import { TranslateModule } from '@ngx-translate/core';
 import dayjs from 'dayjs';
+import { debounceTime, EMPTY, filter, switchMap } from 'rxjs';
+import { SnackbarService } from '../../../../core/services/snackbar.service';
+import { isBlank, isNotBlank } from '../../../../shared/util/helper';
+import { ScrapyPagination, UpdateIntervalType } from '../../model';
+import { ScrapyPaginationService } from '../../services/scrapy-pagination.service';
 
 @Component({
   selector: 'app-scrapy-pagination-edit',
@@ -29,8 +35,7 @@ import dayjs from 'dayjs';
     { provide: MAT_DATE_LOCALE, useValue: 'zh-tw' },
   ],
   imports: [
-    ReactiveFormsModule,
-    FormsModule,
+    FormField,
     CommonModule,
     MatIconModule,
     TranslateModule,
@@ -43,8 +48,15 @@ import dayjs from 'dayjs';
   templateUrl: './scrapy-pagination-edit.component.html',
 })
 export class ScrapyPaginationEditComponent implements OnInit {
-  status: 'new' | 'edit' = 'new';
-  model: ScrapyPagination = {
+  readonly statusModel = signal<'new' | 'edit'>('new');
+  readonly statusForm = form(this.statusModel);
+  get status() {
+    return this.statusModel();
+  }
+  set status(value: 'new' | 'edit') {
+    this.statusModel.set(value);
+  }
+  readonly modelModel = signal<ScrapyPagination>({
     name: '',
     config: {
       startUrl: '',
@@ -56,9 +68,36 @@ export class ScrapyPaginationEditComponent implements OnInit {
       updateInterval: 0,
       lastUpdateDate: dayjs().startOf('day').toDate(),
     },
-  };
-  testHtml: string = '';
-  testResult: string = '';
+  });
+  readonly modelForm = form(this.modelModel, p => {
+    disabled(p.name, { when: () => this.statusModel() === 'edit' });
+    disabled(p.config.lastUpdateDate);
+    required(p.name);
+    required(p.config.startUrl);
+    min(p.config.updateInterval, 0);
+  });
+  get model() {
+    return this.modelModel();
+  }
+  set model(value: ScrapyPagination) {
+    this.modelModel.set(value);
+  }
+  readonly testHtmlModel = signal<string>('');
+  readonly testHtmlForm = form(this.testHtmlModel);
+  get testHtml() {
+    return this.testHtmlModel();
+  }
+  set testHtml(value: string) {
+    this.testHtmlModel.set(value);
+  }
+  readonly testResultModel = signal<string>('');
+  readonly testResultForm = form(this.testResultModel);
+  get testResult() {
+    return this.testResultModel();
+  }
+  set testResult(value: string) {
+    this.testResultModel.set(value);
+  }
   languages = languages;
   eUpdateIntervalType = UpdateIntervalType;
 
