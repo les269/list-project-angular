@@ -218,6 +218,7 @@ describe('Signal form migration regressions', () => {
 
   it('clears a managed theme form to explicit defaults instead of retaining its loaded values', async () => {
     const model = signal({
+      type: ThemeItemType.CUSTOM,
       itemId: 'loaded',
       description: 'Description',
       json: [{ key: 'loaded' }],
@@ -225,8 +226,9 @@ describe('Signal form migration regressions', () => {
     const fields = TestBed.runInInjectionContext(() => form(model));
     const fixture = TestBed.createComponent(ThemeItemManageComponent);
     fixture.componentRef.setInput('form', fields);
-    fixture.componentRef.setInput('type', ThemeItemType.CUSTOM);
+
     fixture.componentRef.setInput('resetValue', {
+      type: ThemeItemType.CUSTOM,
       itemId: '',
       description: '',
       json: [],
@@ -234,7 +236,12 @@ describe('Signal form migration regressions', () => {
     await fixture.whenStable();
     fixture.componentInstance.onClear();
     await fixture.whenStable();
-    expect(model()).toEqual({ itemId: '', description: '', json: [] });
+    expect(model()).toEqual({
+      type: ThemeItemType.CUSTOM,
+      itemId: '',
+      description: '',
+      json: [],
+    });
     expect(fields().dirty()).toBe(false);
   });
 

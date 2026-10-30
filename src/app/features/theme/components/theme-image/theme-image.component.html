@@ -3,18 +3,18 @@
   <div class="card-body">
     <app-theme-item-manage
       [headerId]="headerId()"
-      [type]="eThemeItemType.IMAGE"
       [form]="form"
+      [resetValue]="initialFormValue"
       [defaultBinding]="defaultBinding()">
     </app-theme-item-manage>
-    <div [formGroup]="group()">
+    <div>
       <div class="form-check form-check-inline">
         <input
           class="form-check-input"
           type="radio"
           [value]="eThemeImageType.key"
           id="imageKeyRadio"
-          formControlName="type" />
+          [formField]="group().type" />
         <label class="form-check-label" for="imageKeyRadio">
           {{ 'themeImage.imageKey' | translate }}
         </label>
@@ -25,27 +25,25 @@
           type="radio"
           [value]="eThemeImageType.url"
           id="imageUrlRadio"
-          formControlName="type" />
+          [formField]="group().type" />
         <label class="form-check-label" for="imageUrlRadio">
           {{ 'themeImage.imageUrl' | translate }}
         </label>
       </div>
-      @let type = group().get('type')?.value;
+      @let type = group().type().value();
       @if (type === eThemeImageType.key) {
         <div class="mb-3">
           <input
             class="form-control"
-            formControlName="imageKey"
-            name="imageKey"
+            [formField]="group().imageKey"
             trimOnBlur />
         </div>
       } @else if (type === eThemeImageType.url) {
         <div class="mb-3">
           <input
             class="form-control"
-            name="imageUrl"
             [placeholder]="'themeImage.imageUrlPlaceholder' | translate"
-            formControlName="imageUrl"
+            [formField]="group().imageUrl"
             trimOnBlur />
         </div>
       }

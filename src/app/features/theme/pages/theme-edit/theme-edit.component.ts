@@ -27,13 +27,9 @@ import { FormInvalidsComponent } from '../../../../core/components/form-invalids
 import { FormAlert } from '../../../../core/model';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { LayoutStore } from '../../../../core/stores/layout.store';
-import {
-  getHeaderId,
-  isNotBlank,
-} from '../../../../shared/util/helper';
+import { getHeaderId, isNotBlank } from '../../../../shared/util/helper';
 import { patchField } from '../../../../shared/util/signal-form';
 import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
-import { QuickRefreshType } from '../../../dataset/model';
 import { ThemeCustomTableComponent } from '../../components/theme-custom-table/theme-custom-table.component';
 import { ThemeDatasetTableComponent } from '../../components/theme-dataset-table/theme-dataset-table.component';
 import { ThemeImageComponent } from '../../components/theme-image/theme-image.component';
@@ -45,9 +41,7 @@ import {
   ThemeEditMode,
   ThemeHeader,
   ThemeHeaderType,
-  ThemeImageType,
   ThemeItemType,
-  ThemeOtherSetting,
 } from '../../models';
 import { ThemeItemService } from '../../services';
 import { ThemeService } from '../../services/theme.service';
@@ -89,7 +83,6 @@ export class ThemeEditComponent {
   // 列舉
   readonly eThemeEditMode = ThemeEditMode;
   readonly eThemeHeaderType = ThemeHeaderType;
-  readonly eThemeImageType = ThemeImageType;
 
   // 頁面狀態
   readonly isSaving = signal(false);
@@ -107,47 +100,26 @@ export class ThemeEditComponent {
     stream: ({ params }) => this.themeItemService.getItemsByHeaderId(params),
   });
 
-  //TODO資料轉移後刪除
   readonly imageItem = computed(() => {
     const items = this.themeItems.value();
     if (!items) return undefined;
     return items.find(item => item.type === ThemeItemType.IMAGE) ?? undefined;
   });
-  readonly imageRawData = computed(
-    () =>
-      this.headerResource.value()?.themeImage ?? {
-        type: ThemeImageType.key,
-        imageKey: '',
-        imageUrl: '',
-      }
-  );
   readonly labelItem = computed(() => {
     const items = this.themeItems.value();
     if (!items) return undefined;
     return items.find(item => item.type === ThemeItemType.LABEL) ?? undefined;
   });
-  readonly labelRawData = computed(
-    () => this.headerResource.value()?.themeLabelList ?? []
-  );
-  readonly datasetRawData = computed(
-    () => this.headerResource.value()?.themeDatasetList ?? []
-  );
   readonly datasetItem = computed(() => {
     const items = this.themeItems.value();
     if (!items) return undefined;
     return items.find(item => item.type === ThemeItemType.DATASET) ?? undefined;
   });
-  readonly customRawData = computed(
-    () => this.headerResource.value()?.themeCustomList ?? []
-  );
   readonly customItem = computed(() => {
     const items = this.themeItems.value();
     if (!items) return undefined;
     return items.find(item => item.type === ThemeItemType.CUSTOM) ?? undefined;
   });
-  readonly tagRawData = computed(
-    () => this.headerResource.value()?.themeTagList ?? []
-  );
   readonly tagItem = computed(() => {
     const items = this.themeItems.value();
     if (!items) return undefined;
@@ -160,24 +132,6 @@ export class ThemeEditComponent {
       items.find(item => item.type === ThemeItemType.OTHERSETTING) ?? undefined
     );
   });
-  readonly otherSettingRawData = computed(
-    () =>
-      this.headerResource.value()?.themeOtherSetting ??
-      ({
-        rowColor: [],
-        listPageSize: 0,
-        showDuplicate: false,
-        themeTopCustomList: [],
-        checkFileExist: '',
-        useQuickRefresh: false,
-        quickRefresh: '',
-        quickRefreshType: QuickRefreshType.params,
-        useSpider: '',
-      } satisfies ThemeOtherSetting)
-  );
-  readonly topCustomRawData = computed(
-    () => this.otherSettingRawData().themeTopCustomList ?? []
-  );
   readonly topCustomItem = computed(() => {
     const items = this.themeItems.value();
     if (!items) return undefined;

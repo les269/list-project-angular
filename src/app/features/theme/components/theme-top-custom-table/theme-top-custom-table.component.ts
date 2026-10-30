@@ -1,24 +1,44 @@
 import {
+  createThemeTopCustomRow,
+  normalizeThemeItem,
+} from '../../util/theme-item-form';
+import { CommonModule } from '@angular/common';
+import {
   Component,
   computed,
   effect,
   inject,
   input,
   signal,
+  untracked,
+  viewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import {
-  FormBuilder,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+  applyEach,
+  disabled,
+  form,
+  FormField,
+  required,
+} from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ChipSelectButtonComponent } from '../../../../core/components/chip-select-button/chip-select-button.component';
+import { FormInvalidsComponent } from '../../../../core/components/form-invalids/form-invalids.component';
+import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
+import {
+  GenericColumnType,
+  GenericTableColumn,
+  SelectColumn,
+} from '../../../../core/model/generic-table';
+import { SelectTableService } from '../../../../core/services/select-table.service';
+import { toKeyValueArray } from '../../../../shared/util/helper';
+import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
+import { ApiConfig } from '../../../api-config/model';
+import { ApiConfigService } from '../../../api-config/service/api-config.service';
 import {
   OpenWindowTargetType,
   ThemeItem,
@@ -27,30 +47,14 @@ import {
   ThemeTopCustomItem,
   ThemeTopCustomType,
 } from '../../models';
-import { SelectTableService } from '../../../../core/services/select-table.service';
-import { ApiConfigService } from '../../../api-config/service/api-config.service';
-import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
-import { rxResource } from '@angular/core/rxjs-interop';
-import {
-  GenericColumnType,
-  GenericTableColumn,
-  SelectColumn,
-  ToFormArray,
-} from '../../../../core/model/generic-table';
-import { toKeyValueArray } from '../../../../shared/util/helper';
 import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage.component';
-import { FormInvalidsComponent } from '../../../../core/components/form-invalids/form-invalids.component';
-import { ChipSelectButtonComponent } from '../../../../core/components/chip-select-button/chip-select-button.component';
-import { ApiConfig } from '../../../api-config/model';
-import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 
 @Component({
   selector: 'app-theme-top-custom-table',
 
   imports: [
     TranslateModule,
-    FormsModule,
-    ReactiveFormsModule,
+    FormField,
     MatIconModule,
     CommonModule,
     MatTableModule,
@@ -66,30 +70,40 @@ import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 })
 export class ThemeTopCustomTableComponent {
   //inject
-  readonly fb = inject(FormBuilder);
   readonly apiConfigService = inject(ApiConfigService);
   readonly selectTableService = inject(SelectTableService);
   readonly translateService = inject(TranslateService);
   //inputs
   readonly headerId = input<string>();
   readonly topCustomItem = input<ThemeTopCustomItem>();
-  readonly oldData = input<ThemeTopCustom[]>();
   //form
-  readonly form = this.fb.group({
-    itemId: ['', [Validators.required]],
-    description: [''],
-    json: this.fb.array([]),
+  readonly itemManager = viewChild(ThemeItemManageComponent);
+  readonly formModel = signal<ThemeTopCustomItem>({
+    itemId: '',
+    description: '',
+    json: [],
+    type: ThemeItemType.TOPCUSTOM,
   });
-  readonly formArray = this.form.get('json') as ToFormArray<ThemeTopCustom>;
+  readonly initialFormValue = structuredClone(this.formModel());
+  readonly form = form(this.formModel, p => {
+    disabled(p.itemId, {
+      when: () => this.itemManager()?.isEditMode() ?? false,
+    });
+    applyEach(p.json, row => {
+      required(row.openUrl, {
+        when: ({ valueOf }) => valueOf(row.type) === ThemeTopCustomType.openUrl,
+      });
+      required(row.apiName, {
+        when: ({ valueOf }) =>
+          valueOf(row.type) === ThemeTopCustomType.apiConfig,
+      });
+      required(row.label);
+      required(row.byKey);
+    });
+    required(p.itemId);
+  });
+  readonly fields = this.form.json;
   //signals
-  readonly initData = computed(() => {
-    const resetData = this.resetData();
-    if (resetData) {
-      return resetData;
-    }
-    return this.topCustomItem()?.json || this.oldData() || [];
-  });
-  readonly resetData = signal<ThemeTopCustom[] | null>(null);
   readonly defaultBinding = computed(() =>
     this.topCustomItem() ? true : false
   );
@@ -97,13 +111,23 @@ export class ThemeTopCustomTableComponent {
     stream: () => this.apiConfigService.getAll(),
     defaultValue: [],
   });
+  private readonly validationMessages = toSignal(
+    this.translateService.stream(['msg.required', 'themeCustom.openUrl']),
+    {
+      initialValue: this.translateService.instant([
+        'msg.required',
+        'themeCustom.openUrl',
+      ]),
+    }
+  );
   readonly formAlertsObj = computed(() => {
-    const required = this.translateService.instant('msg.required');
+    const messages = this.validationMessages();
+    const required = messages['msg.required'];
     return {
       openUrl: [
         {
           errorId: 'required',
-          msg: this.translateService.instant('themeCustom.openUrl') + required,
+          msg: messages['themeCustom.openUrl'] + required,
         },
       ],
     };
@@ -139,60 +163,12 @@ export class ThemeTopCustomTableComponent {
     effect(() => {
       const data = this.topCustomItem();
       if (!data) return;
-      this.form.patchValue(data);
+      untracked(() => this.loadItem(data));
     });
   }
 
-  readonly createGroup = () => {
-    const group = this.fb.group({
-      seq: [0],
-      type: [ThemeTopCustomType.openUrl],
-      label: ['', [Validators.required]],
-      byKey: ['', [Validators.required]],
-      openUrl: [''],
-      openWindowsTarget: [OpenWindowTargetType._blank],
-      apiName: [''],
-    });
-    this.initTypeWatcher(group);
-    return group;
-  };
-  initTypeWatcher(group: FormGroup) {
-    group.get('type')!.valueChanges.subscribe(type => {
-      this.updateValidatorsByType(group, type);
-    });
+  readonly createRow = createThemeTopCustomRow;
 
-    // 初始化也要跑一次
-    this.updateValidatorsByType(group, group.get('type')!.value);
-  }
-  updateValidatorsByType(group: FormGroup, type: ThemeTopCustomType) {
-    const setRequired = (name: string, required: boolean) => {
-      const ctrl = group.get(name);
-      if (!ctrl) return;
-
-      if (required) {
-        ctrl.setValidators([Validators.required]);
-      } else {
-        ctrl.clearValidators();
-        ctrl.setErrors(null); // 清除舊錯誤
-      }
-
-      ctrl.updateValueAndValidity({ emitEvent: false });
-    };
-    // 先全部清空
-    const allFields = ['openUrl', 'apiName'];
-    allFields.forEach(f => setRequired(f, false));
-
-    // 根據 type 開啟需要的
-    switch (type) {
-      case ThemeTopCustomType.openUrl:
-        setRequired('openUrl', true);
-        break;
-      case ThemeTopCustomType.apiConfig:
-        setRequired('apiName', true);
-        break;
-    }
-    group.updateValueAndValidity();
-  }
   readonly selectApi = () =>
     this.selectTableService.selectSingleApi(this.apis.value());
 
@@ -202,8 +178,8 @@ export class ThemeTopCustomTableComponent {
     element.apiConfig = undefined;
   }
 
-  jsonReset(data: ThemeItem) {
+  loadItem(data: ThemeItem) {
     if (data.type !== ThemeItemType.TOPCUSTOM) return;
-    this.resetData.set(data.json);
+    this.form().reset(normalizeThemeItem(data, this.initialFormValue));
   }
 }

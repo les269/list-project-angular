@@ -66,6 +66,7 @@ export class GenericTableComponent {
   readonly cols = input.required<GenericTableColumn[]>();
   readonly displayedColumns = input.required<string[]>();
   readonly createRow = input.required<GenericTableRowFactory>();
+  // TODO deprecated
   readonly initData = input<readonly object[]>();
   readonly customColTmpls =
     input<Record<string, TemplateRef<GenericTableCellContext>>>();
@@ -96,6 +97,7 @@ export class GenericTableComponent {
   readonly getWidth = getWidth;
 
   constructor() {
+    // TODO deprecated
     effect(() => {
       const data = this.initData();
       if (!data) return;
@@ -104,7 +106,7 @@ export class GenericTableComponent {
       });
     });
   }
-
+  // TODO deprecated
   setData(data: readonly object[]) {
     this.fields()().reset(data.map(item => this.createRow()(item)));
   }

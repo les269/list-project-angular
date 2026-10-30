@@ -3,20 +3,18 @@
   <div class="card-body">
     <app-theme-item-manage
       [headerId]="headerId()"
-      [type]="eThemeItemType.TAG"
       [form]="form"
-      [defaultBinding]="defaultBinding()"
-      (jsonReset)="jsonReset($event)">
+      [resetValue]="initialFormValue"
+      [defaultBinding]="defaultBinding()">
     </app-theme-item-manage>
     <app-form-alerts
-      [form]="formArray"
+      [form]="fields"
       [formAlerts]="formAlerts()"></app-form-alerts>
     <div class="card mb-3">
       <app-generic-table
-        [class.table-invalid]="formArray.invalid"
-        [initData]="initData()"
-        [formArray]="formArray"
-        [createGroup]="createGroup"
+        [class.table-invalid]="fields().invalid()"
+        [fields]="fields"
+        [createRow]="createRow"
         [cols]="cols()"
         [displayedColumns]="displayedColumns">
       </app-generic-table>

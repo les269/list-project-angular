@@ -1,66 +1,61 @@
 import {
+  createThemeCustomRow,
+  normalizeThemeItem,
+} from '../../util/theme-item-form';
+import { CommonModule } from '@angular/common';
+import {
   Component,
   computed,
   effect,
   inject,
   input,
-  OnInit,
   signal,
+  untracked,
+  viewChild,
 } from '@angular/core';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
+import {
+  applyEach,
+  disabled,
+  form,
+  FormField,
+  required,
+  validate,
+} from '@angular/forms/signals';
+import { MatButtonModule } from '@angular/material/button';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTableModule } from '@angular/material/table';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ChipInputComponent } from '../../../../core/components/chip-input/chip-input.component';
+import { ChipSelectButtonComponent } from '../../../../core/components/chip-select-button/chip-select-button.component';
+import { FormAlertsComponent } from '../../../../core/components/form-alerts/form-alerts.component';
+import { FormInvalidsComponent } from '../../../../core/components/form-invalids/form-invalids.component';
+import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
+import { FormAlert } from '../../../../core/model';
+import {
+  GenericColumnType,
+  GenericTableColumn,
+  SelectColumn,
+} from '../../../../core/model/generic-table';
+import { SelectTableService } from '../../../../core/services/select-table.service';
+import { isDuplicate, toKeyValueArray } from '../../../../shared/util/helper';
+import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
+import { ApiConfig } from '../../../api-config/model';
+import { ApiConfigService } from '../../../api-config/service/api-config.service';
 import {
   OpenWindowTargetType,
-  ThemeCustom,
   ThemeCustomItem,
   ThemeCustomType,
   ThemeItem,
   ThemeItemType,
 } from '../../models';
-import {
-  AbstractControl,
-  FormArray,
-  FormBuilder,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  ValidationErrors,
-  ValidatorFn,
-  Validators,
-} from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-import { CommonModule } from '@angular/common';
-import { MatTableModule } from '@angular/material/table';
-import { MatButtonModule } from '@angular/material/button';
-import { MatChipsModule } from '@angular/material/chips';
-import { ApiConfigService } from '../../../api-config/service/api-config.service';
-import {
-  isDuplicate,
-  isBlank,
-  toKeyValueArray,
-} from '../../../../shared/util/helper';
-import { SelectTableService } from '../../../../core/services/select-table.service';
-import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
-import { rxResource } from '@angular/core/rxjs-interop';
-import {
-  GenericColumnType,
-  GenericTableColumn,
-  SelectColumn,
-  ToFormArray,
-} from '../../../../core/model/generic-table';
-import { ChipSelectButtonComponent } from '../../../../core/components/chip-select-button/chip-select-button.component';
-import { ApiConfig } from '../../../api-config/model';
 import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage.component';
-import { FormAlertsComponent } from '../../../../core/components/form-alerts/form-alerts.component';
-import { FormAlert } from '../../../../core/model';
-import { ChipInputComponent } from '../../../../core/components/chip-input/chip-input.component';
-import { FormInvalidsComponent } from '../../../../core/components/form-invalids/form-invalids.component';
-import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 
 @Component({
   imports: [
     TranslateModule,
-    FormsModule,
-    ReactiveFormsModule,
+    FormField,
     MatIconModule,
     CommonModule,
     MatTableModule,
@@ -77,50 +72,129 @@ import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
   selector: 'app-theme-custom-table',
   templateUrl: 'theme-custom-table.component.html',
 })
-export class ThemeCustomTableComponent implements OnInit {
+export class ThemeCustomTableComponent {
   // injects
-  readonly fb = inject(FormBuilder);
   readonly translateService = inject(TranslateService);
   readonly apiConfigService = inject(ApiConfigService);
   readonly selectTableService = inject(SelectTableService);
   // inputs
   readonly headerId = input<string>();
   readonly customItem = input<ThemeCustomItem>();
-  readonly oldData = input<ThemeCustom[]>();
 
   //form
-  readonly form = this.fb.group({
-    itemId: ['', [Validators.required]],
-    description: [''],
-    json: this.fb.array([]),
+  readonly itemManager = viewChild(ThemeItemManageComponent);
+  readonly formModel = signal<ThemeCustomItem>({
+    type: ThemeItemType.CUSTOM,
+    itemId: '',
+    description: '',
+    json: [],
   });
-  readonly formArray = this.form.get('json') as ToFormArray<ThemeCustom>;
+  readonly initialFormValue = structuredClone(this.formModel());
+  readonly form = form(this.formModel, p => {
+    disabled(p.itemId, {
+      when: () => this.itemManager()?.isEditMode() ?? false,
+    });
+    applyEach(p.json, row => {
+      required(row.byKey);
+      required(row.label);
+      required(row.openUrl, {
+        when: ({ valueOf }) => valueOf(row.type) === ThemeCustomType.openUrl,
+      });
+      required(row.apiName, {
+        when: ({ valueOf }) => valueOf(row.type) === ThemeCustomType.apiConfig,
+      });
+      required(row.copyValue, {
+        when: ({ valueOf }) => valueOf(row.type) === ThemeCustomType.copyValue,
+      });
+      required(row.moveTo, {
+        when: ({ valueOf }) => valueOf(row.type) === ThemeCustomType.moveTo,
+      });
+      required(row.filePathForMoveTo, {
+        when: ({ valueOf }) => valueOf(row.type) === ThemeCustomType.moveTo,
+      });
+      required(row.deleteFile, {
+        when: ({ valueOf }) => valueOf(row.type) === ThemeCustomType.deleteFile,
+      });
+      required(row.openFolder, {
+        when: ({ valueOf }) => valueOf(row.type) === ThemeCustomType.openFolder,
+      });
+      required(row.buttonIconFill, {
+        when: ({ valueOf }) =>
+          valueOf(row.type) === ThemeCustomType.buttonIconFill,
+      });
+      required(row.buttonIconTrue, {
+        when: ({ valueOf }) =>
+          valueOf(row.type) === ThemeCustomType.buttonIconBoolean,
+      });
+      required(row.buttonIconFalse, {
+        when: ({ valueOf }) =>
+          valueOf(row.type) === ThemeCustomType.buttonIconBoolean,
+      });
+    });
+
+    validate(p.json, ({ value }) =>
+      isDuplicate(
+        value()
+          .map(row => row.byKey)
+          .filter(Boolean)
+      )
+        ? { kind: 'duplicateByKey' }
+        : undefined
+    );
+
+    required(p.itemId);
+  });
+  readonly fields = this.form.json;
 
   //signals
-  readonly initData = computed(() => {
-    const resetData = this.resetData();
-    if (resetData) {
-      return resetData;
-    }
-    return this.customItem()?.json || this.oldData() || [];
-  });
-  readonly resetData = signal<ThemeCustom[] | null>(null);
   readonly defaultBinding = computed(() => (this.customItem() ? true : false));
   readonly apis = rxResource({
     stream: () => this.apiConfigService.getAll(),
     defaultValue: [],
   });
-  readonly formAlerts = computed(
-    () =>
-      [
-        {
-          errorId: 'duplicateByKey',
-          msg: this.translateService.instant('msg.duplicateColumn', {
-            text: this.translateService.instant('themeCustom.byKey'),
-          }),
-        },
-      ] satisfies FormAlert[]
+  private readonly validationMessages = toSignal(
+    this.translateService.stream([
+      'msg.duplicateColumn',
+      'themeCustom.byKey',
+      'msg.required',
+      'themeCustom.buttonIconFalse',
+      'themeCustom.buttonIconTrue',
+      'themeCustom.buttonIconFill',
+      'themeCustom.openUrl',
+      'themeCustom.copyValue',
+      'themeCustom.deleteFile',
+      'themeCustom.moveToDir',
+      'themeCustom.filePathForMoveTo',
+      'themeCustom.openFolder',
+    ]),
+    {
+      initialValue: this.translateService.instant([
+        'msg.duplicateColumn',
+        'themeCustom.byKey',
+        'msg.required',
+        'themeCustom.buttonIconFalse',
+        'themeCustom.buttonIconTrue',
+        'themeCustom.buttonIconFill',
+        'themeCustom.openUrl',
+        'themeCustom.copyValue',
+        'themeCustom.deleteFile',
+        'themeCustom.moveToDir',
+        'themeCustom.filePathForMoveTo',
+        'themeCustom.openFolder',
+      ]),
+    }
   );
+  readonly formAlerts = computed(() => {
+    const messages = this.validationMessages();
+    return [
+      {
+        errorId: 'duplicateByKey',
+        msg: this.translateService.instant('msg.duplicateColumn', {
+          text: messages['themeCustom.byKey'],
+        }),
+      },
+    ] satisfies FormAlert[];
+  });
   // enums and constants
   readonly eThemeItemType = ThemeItemType;
   readonly displayedColumns = ['type', 'byKey', 'label'];
@@ -147,72 +221,61 @@ export class ThemeCustomTableComponent implements OnInit {
   readonly eThemeCustomType = ThemeCustomType;
   readonly eOpenWindowTargetType = OpenWindowTargetType;
   readonly formAlertsObj = computed(() => {
-    const required = this.translateService.instant('msg.required');
+    const messages = this.validationMessages();
+    const required = messages['msg.required'];
     return {
       buttonIconFalse: [
         {
           errorId: 'required',
-          msg:
-            this.translateService.instant('themeCustom.buttonIconFalse') +
-            required,
+          msg: messages['themeCustom.buttonIconFalse'] + required,
         },
       ],
       buttonIconTrue: [
         {
           errorId: 'required',
-          msg:
-            this.translateService.instant('themeCustom.buttonIconTrue') +
-            required,
+          msg: messages['themeCustom.buttonIconTrue'] + required,
         },
       ],
       buttonIconFill: [
         {
           errorId: 'required',
-          msg:
-            this.translateService.instant('themeCustom.buttonIconFill') +
-            required,
+          msg: messages['themeCustom.buttonIconFill'] + required,
         },
       ],
       openUrl: [
         {
           errorId: 'required',
-          msg: this.translateService.instant('themeCustom.openUrl') + required,
+          msg: messages['themeCustom.openUrl'] + required,
         },
       ],
       copyValue: [
         {
           errorId: 'required',
-          msg:
-            this.translateService.instant('themeCustom.copyValue') + required,
+          msg: messages['themeCustom.copyValue'] + required,
         },
       ],
       deleteFile: [
         {
           errorId: 'required',
-          msg:
-            this.translateService.instant('themeCustom.deleteFile') + required,
+          msg: messages['themeCustom.deleteFile'] + required,
         },
       ],
       moveTo: [
         {
           errorId: 'required',
-          msg:
-            this.translateService.instant('themeCustom.moveToDir') + required,
+          msg: messages['themeCustom.moveToDir'] + required,
         },
       ],
       filePathForMoveTo: [
         {
           errorId: 'required',
-          msg:
-            this.translateService.instant('themeCustom.filePathForMoveTo') +
-            required,
+          msg: messages['themeCustom.filePathForMoveTo'] + required,
         },
       ],
       openFolder: [
         {
           errorId: 'required',
-          msg:
-            this.translateService.instant('themeCustom.openFolder') + required,
+          msg: messages['themeCustom.openFolder'] + required,
         },
       ],
     } satisfies Record<string, FormAlert[]>;
@@ -222,130 +285,19 @@ export class ThemeCustomTableComponent implements OnInit {
     effect(() => {
       const data = this.customItem();
       if (!data) return;
-      this.form.patchValue(data);
+      untracked(() => this.loadItem(data));
     });
   }
 
-  ngOnInit() {
-    const arr = this.formArray;
-    arr.setValidators([this.duplicateByKeyValidator()]);
-    arr.updateValueAndValidity({ emitEvent: false });
-  }
-
-  readonly createGroup = () => {
-    const group = this.fb.group({
-      seq: [0],
-      type: [ThemeCustomType.openUrl],
-      byKey: ['', [Validators.required]],
-      label: ['', [Validators.required]],
-      apiName: [''],
-      openUrl: [''],
-      copyValue: [''],
-      buttonIconFill: [''],
-      buttonIconFillColor: [''],
-      buttonIconTrue: [''],
-      buttonIconFalse: [''],
-      moveTo: [''],
-      filePathForMoveTo: [''],
-      deleteFile: [''],
-      openWindowsTarget: [OpenWindowTargetType._self],
-      openFolder: [''],
-      apiConfig: [null],
-      visibleDatasetNameList: [[]],
-    });
-    this.initTypeWatcher(group);
-    return group;
-  };
-  initTypeWatcher(group: FormGroup) {
-    group.get('type')!.valueChanges.subscribe(type => {
-      this.updateValidatorsByType(group, type);
-    });
-
-    // 初始化也要跑一次
-    this.updateValidatorsByType(group, group.get('type')!.value);
-  }
-  updateValidatorsByType(group: FormGroup, type: ThemeCustomType) {
-    const setRequired = (name: string, required: boolean) => {
-      const ctrl = group.get(name);
-      if (!ctrl) return;
-
-      if (required) {
-        ctrl.setValidators([Validators.required]);
-      } else {
-        ctrl.clearValidators();
-        ctrl.setErrors(null); // 清除舊錯誤
-      }
-
-      ctrl.updateValueAndValidity({ emitEvent: false });
-    };
-    // 先全部清空
-    const allFields = [
-      'openUrl',
-      'copyValue',
-      'buttonIconFill',
-      'buttonIconTrue',
-      'buttonIconFalse',
-      'moveTo',
-      'filePathForMoveTo',
-      'deleteFile',
-      'openFolder',
-      'apiName',
-    ];
-    allFields.forEach(f => setRequired(f, false));
-
-    // 根據 type 開啟需要的
-    switch (type) {
-      case ThemeCustomType.openUrl:
-        setRequired('openUrl', true);
-        break;
-      case ThemeCustomType.copyValue:
-        setRequired('copyValue', true);
-        break;
-      case ThemeCustomType.moveTo:
-        setRequired('moveTo', true);
-        setRequired('filePathForMoveTo', true);
-        break;
-      case ThemeCustomType.openFolder:
-        setRequired('openFolder', true);
-        break;
-      case ThemeCustomType.deleteFile:
-        setRequired('deleteFile', true);
-        break;
-      case ThemeCustomType.buttonIconFill:
-        setRequired('buttonIconFill', true);
-        break;
-      case ThemeCustomType.buttonIconBoolean:
-        setRequired('buttonIconTrue', true);
-        setRequired('buttonIconFalse', true);
-        break;
-      case ThemeCustomType.apiConfig:
-        setRequired('apiName', true);
-        break;
-    }
-    group.updateValueAndValidity();
-  }
+  readonly createRow = createThemeCustomRow;
 
   readonly selectApi = () =>
     this.selectTableService.selectSingleApi(this.apis.value());
 
   readonly getApiLabelName = (item: ApiConfig) => item.apiName;
 
-  jsonReset(data: ThemeItem) {
+  loadItem(data: ThemeItem) {
     if (data.type !== ThemeItemType.CUSTOM) return;
-    this.resetData.set(data.json);
-  }
-
-  private duplicateByKeyValidator(): ValidatorFn {
-    return (ctrl: AbstractControl): ValidationErrors | null => {
-      const arr = ctrl as FormArray;
-      const keys = arr.controls
-        .map(c => c.get('byKey')?.value)
-        .filter(k => !isBlank(k));
-
-      if (isDuplicate(keys)) {
-        return { duplicateByKey: true };
-      }
-      return null;
-    };
+    this.form().reset(normalizeThemeItem(data, this.initialFormValue));
   }
 }

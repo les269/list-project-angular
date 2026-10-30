@@ -24,7 +24,7 @@ export enum ThemeTableEditMode {
 }
 export interface ThemeItemSummary {
   itemId: string;
-  description?: string;
+  description: string;
   updatedTime?: Date;
 }
 

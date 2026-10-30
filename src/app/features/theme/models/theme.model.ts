@@ -6,13 +6,7 @@ export interface ThemeHeader {
   version: string;
   title: string;
   type: ThemeHeaderType;
-  themeImage: ThemeImage;
-  themeLabelList: ThemeLabel[];
-  themeDatasetList: ThemeDataset[];
-  themeCustomList: ThemeCustom[];
-  themeTagList: ThemeTag[];
   seq: number;
-  themeOtherSetting: ThemeOtherSetting;
 }
 
 export interface ThemeOtherSetting {
@@ -139,6 +133,7 @@ export interface ThemeTopCustom {
   byKey: string;
   seq: number; //顯示順序
   openUrl: string;
+  openWindowsTarget: OpenWindowTargetType;
   apiName: string;
   apiConfig?: ApiConfig;
 }

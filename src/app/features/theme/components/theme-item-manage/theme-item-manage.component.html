@@ -1,13 +1,16 @@
+@let fields = form();
+@let itemIdState = fields.itemId();
 <div class="row g-2 align-items-end">
-  <div [formGroup]="form()">
+  <div>
     <label class="form-label require">{{ itemIdLabelKey() | translate }}</label>
     <input
       type="text"
       class="form-control"
       trimOnBlur
-      [formControl]="itemIdControl()"
-      [class.is-invalid]="itemIdControl().invalid && itemIdControl().touched" />
-    @if (itemIdControl().invalid && itemIdControl().touched) {
+      [formField]="fields.itemId"
+      [readOnly]="isProcessing()"
+      [class.is-invalid]="itemIdState.invalid() && itemIdState.touched()" />
+    @if (itemIdState.invalid() && itemIdState.touched()) {
       <div class="invalid-feedback d-block">
         {{ 'msg.blank' | translate: { name: (itemIdLabelKey() | translate) } }}
       </div>
@@ -19,7 +22,8 @@
       type="text"
       class="form-control"
       trimOnBlur
-      [formControl]="descriptionControl()" />
+      [formField]="fields.description"
+      [readOnly]="isProcessing()" />
   </div>
   <div class="col-md-3 d-flex gap-2 justify-content-md-end"></div>
 </div>
@@ -28,6 +32,7 @@
     <button
       type="button"
       class="btn btn-outline-primary"
+      [disabled]="isProcessing()"
       (click)="openItemSelector()">
       {{ 'g.read' | translate }}
     </button>
@@ -37,7 +42,7 @@
       type="button"
       class="btn btn-outline-primary"
       (click)="addItem()"
-      [disabled]="!form().valid">
+      [disabled]="!fields().valid() || isProcessing()">
       {{ 'g.add' | translate }}
     </button>
   }
@@ -47,10 +52,14 @@
       type="button"
       class="btn btn-outline-primary"
       (click)="saveItem()"
-      [disabled]="!form().valid">
+      [disabled]="!fields().valid() || isProcessing()">
       {{ 'g.save' | translate }}
     </button>
-    <button type="button" class="btn btn-outline-primary" (click)="copyItem()">
+    <button
+      type="button"
+      class="btn btn-outline-primary"
+      [disabled]="isProcessing()"
+      (click)="copyItem()">
       {{ 'g.copy' | translate }}
     </button>
   }
@@ -59,17 +68,26 @@
     <button
       type="button"
       class="btn btn-outline-primary"
+      [disabled]="isProcessing()"
       (click)="toggleBind()">
       {{ (isBinding() ? 'g.unbind' : 'g.bind') | translate }}
     </button>
   }
   @if (!isBinding()) {
-    <button type="button" class="btn btn-danger" (click)="onClear()">
+    <button
+      type="button"
+      class="btn btn-danger"
+      [disabled]="isProcessing()"
+      (click)="onClear()">
       {{ 'g.clear' | translate }}
     </button>
   }
   @if (showDeleteButton()) {
-    <button type="button" class="btn btn-danger" (click)="deleteItem()">
+    <button
+      type="button"
+      class="btn btn-danger"
+      [disabled]="isProcessing()"
+      (click)="deleteItem()">
       {{ 'g.delete' | translate }}
     </button>
   }

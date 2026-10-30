@@ -111,35 +111,28 @@
       <app-theme-image
         [headerId]="currentHeaderId()"
         [imageItem]="imageItem()"
-        [oldData]="imageRawData()"
         [themeHeaderType]="form.type().value()"></app-theme-image>
     }
     <app-theme-label-table
       [headerId]="currentHeaderId()"
       [labelItem]="labelItem()"
-      [oldData]="labelRawData()"
       [themeHeaderType]="form.type().value()"></app-theme-label-table>
     <app-theme-dataset-table
       [headerId]="currentHeaderId()"
-      [datasetItem]="datasetItem()"
-      [oldData]="datasetRawData()"></app-theme-dataset-table>
+      [datasetItem]="datasetItem()"></app-theme-dataset-table>
     <app-theme-custom-table
       [headerId]="currentHeaderId()"
-      [customItem]="customItem()"
-      [oldData]="customRawData()"></app-theme-custom-table>
+      [customItem]="customItem()"></app-theme-custom-table>
     <app-theme-tag-table
       [headerId]="currentHeaderId()"
-      [tagItem]="tagItem()"
-      [oldData]="tagRawData()"></app-theme-tag-table>
+      [tagItem]="tagItem()"></app-theme-tag-table>
     <app-theme-other-setting
       [headerId]="currentHeaderId()"
       [otherSettingItem]="otherSettingItem()"
-      [themeHeaderType]="form.type().value()"
-      [oldData]="otherSettingRawData()"></app-theme-other-setting>
+      [themeHeaderType]="form.type().value()"></app-theme-other-setting>
     <app-theme-top-custom-table
       [headerId]="currentHeaderId()"
-      [topCustomItem]="topCustomItem()"
-      [oldData]="topCustomRawData()">
+      [topCustomItem]="topCustomItem()">
     </app-theme-top-custom-table>
   </div>
 </div>

@@ -3,22 +3,20 @@
   <div class="card-body">
     <app-theme-item-manage
       [headerId]="headerId()"
-      [type]="eThemeItemType.DATASET"
       [form]="form"
+      [resetValue]="initialFormValue"
       [defaultBinding]="defaultBinding()"
-      (jsonReset)="jsonReset($event)"
       (afterSave)="layoutStore.loadThemeDatasetItemList()"
-      (afterBind)="layoutStore.loadThemeDatasetItemMapList()">
+      (bindingChange)="layoutStore.loadThemeDatasetItemMapList()">
     </app-theme-item-manage>
     <app-form-alerts
-      [form]="formArray"
+      [form]="fields"
       [formAlerts]="formAlerts()"></app-form-alerts>
     <div class="card mb-3">
       <app-generic-table
-        [class.table-invalid]="formArray.invalid"
-        [initData]="initData()"
-        [formArray]="formArray"
-        [createGroup]="createGroup"
+        [class.table-invalid]="fields().invalid()"
+        [fields]="fields"
+        [createRow]="createRow"
         [displayedColumns]="displayedColumns"
         [expandedTmpl]="expandedDetail"
         [cols]="cols()"></app-generic-table>
@@ -27,10 +25,10 @@
 </div>
 
 <ng-template #expandedDetail let-element let-index="index">
-  <div class="d-flex" [formGroup]="element">
+  <div class="d-flex">
     <div class="column p-1">
       <mat-checkbox
-        formControlName="isDefault"
+        [formField]="element.isDefault"
         (change)="changeDefaultKey(index)">
         {{ 'themeDataset.isDefault' | translate }}
       </mat-checkbox>

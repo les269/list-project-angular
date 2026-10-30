@@ -1,51 +1,50 @@
 import {
+  createThemeTagRow,
+  normalizeThemeItem,
+} from '../../util/theme-item-form';
+import {
   Component,
   computed,
   effect,
   inject,
   input,
-  OnInit,
   signal,
+  untracked,
+  viewChild,
 } from '@angular/core';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import {
-  ReactiveFormsModule,
-  FormsModule,
-  FormArray,
-  FormBuilder,
-  Validators,
-  AbstractControl,
-  ValidationErrors,
-} from '@angular/forms';
+  applyEach,
+  disabled,
+  form,
+  required,
+  validate,
+} from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatTableModule } from '@angular/material/table';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { ThemeItem, ThemeItemType, ThemeTag, ThemeTagItem } from '../../models';
-import { ShareTagService } from '../../services/share-tag.service';
-import { ShareTag } from '../../models';
-import { isDuplicate } from '../../../../shared/util/helper';
+import { FormAlertsComponent } from '../../../../core/components/form-alerts/form-alerts.component';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
-import { MatChipsModule } from '@angular/material/chips';
-import { rxResource } from '@angular/core/rxjs-interop';
-import { SelectTableService } from '../../../../core/services/select-table.service';
+import { FormAlert } from '../../../../core/model';
 import {
   GenericColumnType,
   GenericTableColumn,
-  ToFormArray,
 } from '../../../../core/model/generic-table';
-import { FormAlertsComponent } from '../../../../core/components/form-alerts/form-alerts.component';
-import { FormAlert } from '../../../../core/model';
+import { SelectTableService } from '../../../../core/services/select-table.service';
+import { isDuplicate } from '../../../../shared/util/helper';
+import { ShareTag, ThemeItem, ThemeItemType, ThemeTagItem } from '../../models';
+import { ShareTagService } from '../../services/share-tag.service';
 import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage.component';
 
 @Component({
   selector: 'app-theme-tag-table',
 
   imports: [
-    ReactiveFormsModule,
     MatTableModule,
-    FormsModule,
     MatIconModule,
     MatButtonModule,
     MatCheckboxModule,
@@ -58,31 +57,48 @@ import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage
   ],
   templateUrl: './theme-tag-table.component.html',
 })
-export class ThemeTagTableComponent implements OnInit {
+export class ThemeTagTableComponent {
   readonly translateService = inject(TranslateService);
   readonly selectTableService = inject(SelectTableService);
   readonly shareTagService = inject(ShareTagService);
-  readonly fb = inject(FormBuilder);
 
   readonly headerId = input<string>();
   readonly tagItem = input<ThemeTagItem>();
-  readonly oldData = input<ThemeTag[]>();
 
-  readonly form = this.fb.group({
-    itemId: ['', [Validators.required]],
-    description: [''],
-    json: this.fb.array([]),
+  readonly itemManager = viewChild(ThemeItemManageComponent);
+  readonly formModel = signal<ThemeTagItem>({
+    type: ThemeItemType.TAG,
+    itemId: '',
+    description: '',
+    json: [],
   });
-  readonly formArray = this.form.get('json') as ToFormArray<ThemeTag>;
+  readonly initialFormValue = structuredClone(this.formModel());
+  readonly form = form(this.formModel, p => {
+    disabled(p.itemId, {
+      when: () => this.itemManager()?.isEditMode() ?? false,
+    });
+    validate(p.json, ({ value }) =>
+      isDuplicate(
+        value()
+          .map(row => row.shareTagId)
+          .filter(Boolean)
+      )
+        ? { kind: 'duplicateByShareTagId' }
+        : undefined
+    );
+    validate(p.json, ({ value }) =>
+      value().some(row => !row.shareTagId)
+        ? { kind: 'shareTagIdEmpty' }
+        : undefined
+    );
 
-  readonly initData = computed(() => {
-    const resetData = this.resetData();
-    if (resetData) {
-      return resetData;
-    }
-    return this.tagItem()?.json || this.oldData() || [];
+    applyEach(p.json, p => {
+      required(p.shareTagId);
+    });
+    required(p.itemId);
   });
-  readonly resetData = signal<ThemeTag[] | null>(null);
+  readonly fields = this.form.json;
+
   readonly defaultBinding = computed(() => (this.tagItem() ? true : false));
   readonly eThemeItemType = ThemeItemType;
 
@@ -104,21 +120,35 @@ export class ThemeTagTableComponent implements OnInit {
         } satisfies GenericTableColumn<ShareTag>,
       ] satisfies GenericTableColumn[]
   );
-  readonly formAlerts = computed(
-    () =>
-      [
-        {
-          errorId: 'duplicateByShareTagId',
-          msg: this.translateService.instant('msg.duplicateColumn', {
-            text: this.translateService.instant('themeTag.shareTag'),
-          }),
-        },
-        {
-          errorId: 'shareTagIdEmpty',
-          msg: this.translateService.instant('themeTag.shareTagIdEmpty'),
-        },
-      ] satisfies FormAlert[]
+  private readonly validationMessages = toSignal(
+    this.translateService.stream([
+      'msg.duplicateColumn',
+      'themeTag.shareTag',
+      'themeTag.shareTagIdEmpty',
+    ]),
+    {
+      initialValue: this.translateService.instant([
+        'msg.duplicateColumn',
+        'themeTag.shareTag',
+        'themeTag.shareTagIdEmpty',
+      ]),
+    }
   );
+  readonly formAlerts = computed(() => {
+    const messages = this.validationMessages();
+    return [
+      {
+        errorId: 'duplicateByShareTagId',
+        msg: this.translateService.instant('msg.duplicateColumn', {
+          text: messages['themeTag.shareTag'],
+        }),
+      },
+      {
+        errorId: 'shareTagIdEmpty',
+        msg: messages['themeTag.shareTagIdEmpty'],
+      },
+    ] satisfies FormAlert[];
+  });
   readonly tags = rxResource({
     stream: () => this.shareTagService.getAllTag(),
     defaultValue: [],
@@ -128,55 +158,14 @@ export class ThemeTagTableComponent implements OnInit {
     effect(() => {
       const data = this.tagItem();
       if (!data) return;
-      this.form.patchValue(data);
+      untracked(() => this.loadItem(data));
     });
   }
 
-  ngOnInit(): void {
-    const arr = this.formArray;
-    arr.setValidators([
-      this.shareTagIdDuplicateValidator(),
-      this.shareTagIdEmptyValidator(),
-    ]);
-    arr.updateValueAndValidity({ emitEvent: false });
-  }
+  readonly createRow = createThemeTagRow;
 
-  readonly createGroup = () => {
-    return this.fb.group({
-      seq: [0],
-      shareTagId: ['', [Validators.required]],
-    });
-  };
-
-  shareTagIdEmptyValidator() {
-    return (ctrl: AbstractControl): ValidationErrors | null => {
-      const arr = ctrl as FormArray;
-      if (arr.controls.length === 0) return null;
-      const keys = arr.controls.find(
-        c => c.get('shareTagId')?.value.length === 0
-      );
-      if (!!keys) {
-        return { shareTagIdEmpty: true };
-      }
-      return null;
-    };
-  }
-
-  shareTagIdDuplicateValidator() {
-    return (ctrl: AbstractControl): ValidationErrors | null => {
-      const arr = ctrl as FormArray;
-      const keys: string[] = arr.controls
-        .map(c => c.get('shareTagId')?.value)
-        .filter(k => k);
-      if (isDuplicate(keys)) {
-        return { duplicateByShareTagId: true };
-      }
-      return null;
-    };
-  }
-
-  jsonReset(data: ThemeItem) {
+  loadItem(data: ThemeItem) {
     if (data.type !== ThemeItemType.TAG) return;
-    this.resetData.set(data.json);
+    this.form().reset(normalizeThemeItem(data, this.initialFormValue));
   }
 }

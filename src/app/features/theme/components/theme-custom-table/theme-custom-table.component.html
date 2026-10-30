@@ -3,20 +3,18 @@
   <div class="card-body">
     <app-theme-item-manage
       [headerId]="headerId()"
-      [type]="eThemeItemType.CUSTOM"
       [form]="form"
-      [defaultBinding]="defaultBinding()"
-      (jsonReset)="jsonReset($event)">
+      [resetValue]="initialFormValue"
+      [defaultBinding]="defaultBinding()">
     </app-theme-item-manage>
     <app-form-alerts
-      [form]="formArray"
+      [form]="fields"
       [formAlerts]="formAlerts()"></app-form-alerts>
     <div class="card mb-3">
       <app-generic-table
-        [class.table-invalid]="formArray.invalid"
-        [formArray]="formArray"
-        [initData]="initData()"
-        [createGroup]="createGroup"
+        [class.table-invalid]="fields().invalid()"
+        [fields]="fields"
+        [createRow]="createRow"
         [cols]="cols"
         [displayedColumns]="displayedColumns"
         [expandedTmpl]="expandedTmpl"></app-generic-table>
@@ -24,12 +22,12 @@
   </div>
 </div>
 <ng-template #expandedTmpl let-element>
-  <div class="d-flex flex-column mb-2" [formGroup]="element">
-    @switch (element.get('type')?.value) {
+  <div class="d-flex flex-column mb-2">
+    @switch (element.type().value()) {
       <!-- 按鈕圖案自定義正反 -->
       @case (eThemeCustomType.buttonIconBoolean) {
-        @let buttonIconTrue = element.get('buttonIconTrue');
-        @let buttonIconFalse = element.get('buttonIconFalse');
+        @let buttonIconTrue = element.buttonIconTrue;
+        @let buttonIconFalse = element.buttonIconFalse;
         <div class="d-flex align-items-center">
           <h6 class="mb-0">
             {{ 'themeCustom.writeIconName' | translate }}
@@ -45,14 +43,14 @@
           <div class="mx-1 d-flex">
             <mat-icon class="material-icons-outlined"
               ><span class="material-symbols-outlined">
-                {{ buttonIconTrue?.value }}
+                {{ buttonIconTrue().value() }}
               </span></mat-icon
             >
           </div>
           <div class="mx-1 d-flex">
             <mat-icon class="material-icons-outlined"
               ><span class="material-symbols-outlined">
-                {{ buttonIconFalse?.value }}
+                {{ buttonIconFalse().value() }}
               </span></mat-icon
             >
           </div>
@@ -60,21 +58,19 @@
             type="text"
             class="form-control"
             [placeholder]="'themeCustom.buttonIconTrue' | translate"
-            [formControl]="buttonIconTrue"
+            [formField]="buttonIconTrue"
             [class.is-invalid]="
-              buttonIconTrue.invalid && buttonIconTrue.touched
+              buttonIconTrue().invalid() && buttonIconTrue().touched()
             "
-            required
             trimOnBlur />
           <input
             type="text"
             class="form-control"
             [placeholder]="'themeCustom.buttonIconFalse' | translate"
-            [formControl]="buttonIconFalse"
+            [formField]="buttonIconFalse"
             [class.is-invalid]="
-              buttonIconFalse.invalid && buttonIconFalse.touched
+              buttonIconFalse().invalid() && buttonIconFalse().touched()
             "
-            required
             trimOnBlur />
         </div>
         <app-form-invalids
@@ -86,8 +82,8 @@
       }
       <!-- 按鈕圖案自定義填充顏色 -->
       @case (eThemeCustomType.buttonIconFill) {
-        @let buttonIconFill = element.get('buttonIconFill');
-        @let buttonIconFillColor = element.get('buttonIconFillColor');
+        @let buttonIconFill = element.buttonIconFill;
+        @let buttonIconFillColor = element.buttonIconFillColor;
         <div class="d-flex align-items-center">
           <h6 class="mb-0">
             {{ 'themeCustom.writeIconName' | translate }}
@@ -103,26 +99,25 @@
           <div class="mx-1 d-flex">
             <mat-icon class="material-icons-outlined"
               ><span class="material-symbols-outlined">
-                {{ buttonIconFill?.value }}
+                {{ buttonIconFill().value() }}
               </span></mat-icon
             >
           </div>
           <div class="mx-1 d-flex">
-            <mat-icon [ngStyle]="{ color: buttonIconFillColor?.value }">{{
-              buttonIconFill?.value
+            <mat-icon [ngStyle]="{ color: buttonIconFillColor().value() }">{{
+              buttonIconFill().value()
             }}</mat-icon>
           </div>
           <input
             class="form-control mt-1"
             [placeholder]="'themeCustom.fillIcon' | translate"
-            [formControl]="buttonIconFill"
-            required
+            [formField]="buttonIconFill"
             trimOnBlur />
           <input
             type="color"
             [placeholder]="'themeCustom.fillIconColor' | translate"
             class="form-control form-control-color mt-1"
-            [formControl]="buttonIconFillColor" />
+            [formField]="buttonIconFillColor" />
         </div>
         <app-form-invalids
           [control]="buttonIconFill"
@@ -130,25 +125,24 @@
       }
       <!-- 複製自定義內容 -->
       @case (eThemeCustomType.copyValue) {
-        @let copyValue = element.get('copyValue');
+        @let copyValue = element.copyValue;
         <input
           class="form-control mt-1"
           [placeholder]="'themeCustom.copyValuePH' | translate"
-          [formControl]="copyValue"
+          [formField]="copyValue"
           trimOnBlur />
       }
       <!-- 開啟自定義網址 -->
       @case (eThemeCustomType.openUrl) {
-        @let openUrl = element.get('openUrl');
-        @let openWindowsTarget = element.get('openWindowsTarget');
+        @let openUrl = element.openUrl;
+        @let openWindowsTarget = element.openWindowsTarget;
         <input
           class="form-control mt-1"
           [placeholder]="'themeCustom.openUrlPH' | translate"
-          [formControl]="openUrl"
-          required
+          [formField]="openUrl"
           trimOnBlur />
         <select
-          [formControl]="openWindowsTarget"
+          [formField]="openWindowsTarget"
           class="form-control"
           style="min-width: 200px">
           @for (type of eOpenWindowTargetType | keyvalue; track type.key) {
@@ -166,11 +160,10 @@
         <div class="mt-1 d-flex flex-wrap gap-3 align-items-center">
           <app-chip-select-button
             valueKey="apiName"
-            [formControl]="element.get('apiName')"
+            [formField]="element.apiName"
             [selectTable]="selectApi"
             [options]="apis.value"
             [labelKey]="getApiLabelName"
-            [required]="true"
             [requiredMsg]="
               'msg.requiredSelectOne' | translate
             "></app-chip-select-button>
@@ -178,11 +171,11 @@
       }
       <!-- 刪除檔案 -->
       @case (eThemeCustomType.deleteFile) {
-        @let deleteFile = element.get('deleteFile');
+        @let deleteFile = element.deleteFile;
         <input
           class="form-control mt-1"
           [placeholder]="'themeCustom.deleteFilePH' | translate"
-          [formControl]="deleteFile"
+          [formField]="deleteFile"
           trimOnBlur />
         <app-form-invalids
           [control]="deleteFile"
@@ -190,20 +183,18 @@
       }
       <!-- 移動檔案 -->
       @case (eThemeCustomType.moveTo) {
-        @let moveTo = element.get('moveTo');
-        @let filePathForMoveTo = element.get('filePathForMoveTo');
+        @let moveTo = element.moveTo;
+        @let filePathForMoveTo = element.filePathForMoveTo;
         <div class="d-flex input-group">
           <input
             class="form-control"
             [placeholder]="'themeCustom.filePathForMoveToPH' | translate"
-            [formControl]="filePathForMoveTo"
-            required
+            [formField]="filePathForMoveTo"
             trimOnBlur />
           <input
             class="form-control"
             [placeholder]="'themeCustom.moveToPH' | translate"
-            [formControl]="moveTo"
-            required
+            [formField]="moveTo"
             trimOnBlur />
         </div>
         <app-form-invalids
@@ -215,11 +206,11 @@
       }
       <!-- 開啟資料夾 -->
       @case (eThemeCustomType.openFolder) {
-        @let openFolder = element.get('openFolder');
+        @let openFolder = element.openFolder;
         <input
           class="form-control mt-1"
           [placeholder]="'themeCustom.openFolderPH' | translate"
-          [formControl]="openFolder"
+          [formField]="openFolder"
           trimOnBlur />
         <app-form-invalids
           [control]="openFolder"
@@ -229,7 +220,7 @@
     <div class="mt-1">
       <app-chip-input
         [label]="'themeLabel.visibleDatasetNameListPH' | translate"
-        formControlName="visibleDatasetNameList">
+        [formField]="element.visibleDatasetNameList">
       </app-chip-input>
     </div>
   </div>

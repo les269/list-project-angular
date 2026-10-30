@@ -1,61 +1,63 @@
+import { toSignal } from '@angular/core/rxjs-interop';
+import {
+  createThemeLabelRow,
+  normalizeThemeItem,
+} from '../../util/theme-item-form';
+import { CommonModule } from '@angular/common';
 import {
   Component,
   computed,
   effect,
   inject,
   input,
-  OnInit,
   signal,
+  untracked,
+  viewChild,
 } from '@angular/core';
 import {
-  ThemeHeaderType,
-  ThemeLabel,
-  ThemeLabelType,
-  ThemeItemType,
-  ThemeLabelItem,
-  ThemeItem,
-} from '../../models';
-import { CommonModule } from '@angular/common';
-import {
-  ReactiveFormsModule,
-  FormsModule,
-  FormArray,
-  Validators,
-  FormBuilder,
-  AbstractControl,
-  ValidationErrors,
-  ValidatorFn,
-} from '@angular/forms';
+  applyEach,
+  disabled,
+  form,
+  FormField,
+  required,
+  validate,
+} from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatTableModule } from '@angular/material/table';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ChipInputComponent } from '../../../../core/components/chip-input/chip-input.component';
+import { FormAlertsComponent } from '../../../../core/components/form-alerts/form-alerts.component';
+import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
+import { FormAlert } from '../../../../core/model';
+import {
+  GenericColumnType,
+  GenericTableColumn,
+  SelectColumn,
+} from '../../../../core/model/generic-table';
+import { LayoutStore } from '../../../../core/stores/layout.store';
 import {
   isDuplicate,
   isNotBlank,
   isValidWidth,
   toKeyValueArray,
 } from '../../../../shared/util/helper';
-import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
+import { hasFieldError } from '../../../../shared/util/signal-form';
 import {
-  GenericColumnType,
-  GenericTableColumn,
-  SelectColumn,
-  ToFormArray,
-} from '../../../../core/model/generic-table';
-import { ChipInputComponent } from '../../../../core/components/chip-input/chip-input.component';
-import { FormAlertsComponent } from '../../../../core/components/form-alerts/form-alerts.component';
-import { FormAlert } from '../../../../core/model';
+  ThemeHeaderType,
+  ThemeItem,
+  ThemeItemType,
+  ThemeLabelItem,
+  ThemeLabelType,
+} from '../../models';
 import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage.component';
-import { LayoutStore } from '../../../../core/stores/layout.store';
 
 @Component({
   imports: [
-    ReactiveFormsModule,
+    FormField,
     MatTableModule,
-    FormsModule,
     MatIconModule,
     MatButtonModule,
     MatCheckboxModule,
@@ -70,9 +72,9 @@ import { LayoutStore } from '../../../../core/stores/layout.store';
   selector: 'app-theme-label-table',
   templateUrl: 'theme-label-table.component.html',
 })
-export class ThemeLabelTableComponent implements OnInit {
+export class ThemeLabelTableComponent {
+  readonly hasError = hasFieldError;
   // inject
-  readonly fb = inject(FormBuilder);
   readonly translateService = inject(TranslateService);
   readonly layoutStore = inject(LayoutStore);
 
@@ -80,28 +82,63 @@ export class ThemeLabelTableComponent implements OnInit {
   readonly headerId = input<string>();
   readonly labelItem = input<ThemeLabelItem>();
   readonly themeHeaderType = input<ThemeHeaderType>();
-  readonly oldData = input<ThemeLabel[]>();
   //enum
   readonly eThemeHeaderType = ThemeHeaderType;
   readonly eThemeLabelType = ThemeLabelType;
   readonly eThemeItemType = ThemeItemType;
 
   // form
-  readonly form = this.fb.group({
-    itemId: ['', [Validators.required]],
-    description: [''],
-    json: this.fb.array([]),
+  readonly itemManager = viewChild(ThemeItemManageComponent);
+  readonly formModel = signal<ThemeLabelItem>({
+    type: ThemeItemType.LABEL,
+    itemId: '',
+    description: '',
+    json: [],
   });
-  readonly formArray = this.form.get('json') as ToFormArray<ThemeLabel>;
+  readonly initialFormValue = structuredClone(this.formModel());
+  readonly form = form(this.formModel, p => {
+    disabled(p.itemId, {
+      when: () => this.itemManager()?.isEditMode() ?? false,
+    });
+    applyEach(p.json, row => {
+      required(row.byKey);
+      required(row.label);
+      validate(row.maxWidth, ({ value }) =>
+        this.themeHeaderType() === this.eThemeHeaderType.table &&
+        isNotBlank(value()) &&
+        !isValidWidth(value())
+          ? { kind: 'invalidMaxWidth' }
+          : undefined
+      );
+      validate(row.minWidth, ({ value }) =>
+        this.themeHeaderType() === this.eThemeHeaderType.table &&
+        isNotBlank(value()) &&
+        !isValidWidth(value())
+          ? { kind: 'invalidMinWidth' }
+          : undefined
+      );
+      validate(row.width, ({ value }) =>
+        this.themeHeaderType() === this.eThemeHeaderType.table &&
+        isNotBlank(value()) &&
+        !isValidWidth(value())
+          ? { kind: 'invalidWidth' }
+          : undefined
+      );
+    });
+
+    validate(p.json, ({ value }) =>
+      isDuplicate(
+        value()
+          .map(row => row.byKey)
+          .filter(Boolean)
+      )
+        ? { kind: 'duplicateByKey' }
+        : undefined
+    );
+    required(p.itemId);
+  });
+  readonly fields = this.form.json;
   // signals
-  readonly initData = computed(() => {
-    const resetData = this.resetData();
-    if (resetData) {
-      return resetData;
-    }
-    return this.labelItem()?.json || this.oldData() || [];
-  });
-  readonly resetData = signal<ThemeLabel[] | null>(null);
   readonly defaultBinding = computed(() => (this.labelItem() ? true : false));
 
   //constant
@@ -131,145 +168,50 @@ export class ThemeLabelTableComponent implements OnInit {
   // util
   readonly isValidWidth = isValidWidth;
 
-  readonly formAlerts = computed(
-    () =>
-      [
-        {
-          errorId: 'duplicateByKey',
-          msg: this.translateService.instant('msg.duplicateColumn', {
-            text: this.translateService.instant('themeLabel.byKey'),
-          }),
-        },
-      ] satisfies FormAlert[]
+  private readonly validationMessages = toSignal(
+    this.translateService.stream(['msg.duplicateColumn', 'themeLabel.byKey']),
+    {
+      initialValue: this.translateService.instant([
+        'msg.duplicateColumn',
+        'themeLabel.byKey',
+      ]),
+    }
   );
+  readonly formAlerts = computed(() => {
+    const messages = this.validationMessages();
+    return [
+      {
+        errorId: 'duplicateByKey',
+        msg: this.translateService.instant('msg.duplicateColumn', {
+          text: messages['themeLabel.byKey'],
+        }),
+      },
+    ] satisfies FormAlert[];
+  });
 
   constructor() {
     effect(() => {
       const data = this.labelItem();
       if (!data) return;
-      this.form.patchValue(data);
+      untracked(() => this.loadItem(data));
     });
   }
 
-  ngOnInit() {
-    const arr = this.formArray;
-    arr.setValidators(this.duplicateByKeyValidator());
-    arr.updateValueAndValidity({ emitEvent: false });
-  }
-
-  readonly createGroup = () => {
-    // add a group-level validator so a single theme label can enforce width rules
-    return this.fb.group(
-      {
-        seq: [0],
-        byKey: ['', [Validators.required]],
-        label: ['', [Validators.required]],
-        type: [ThemeLabelType.string],
-        splitBy: [''],
-        useSpace: [''],
-        isSearchButton: [false],
-        isSearchValue: [false],
-        isCopy: [false],
-        isVisible: [false],
-        isSort: [false],
-        isDefaultKey: [false],
-        dateFormat: [''],
-        width: [''],
-        maxWidth: [''],
-        minWidth: [''],
-        autoComplete: [false],
-        useVisibleDataset: [false],
-        visibleDatasetNameList: [[] as string[]],
-      },
-      {
-        validators: [
-          this.widthValidator(),
-          this.maxWidthValidator(),
-          this.minWidthValidator(),
-        ],
-      }
-    );
-  };
+  readonly createRow = createThemeLabelRow;
   //改變資料欄位的預設欄位,只能有一筆或無
   changeDefaultKey(index: number) {
-    const ctrls = this.formArray.controls;
+    const ctrls = this.fields;
     for (let i = 0; i < ctrls.length; i++) {
       if (i === index) continue;
-      const ctrl = ctrls[i];
-      ctrl.patchValue(
-        { ...ctrl.value, isDefaultKey: false },
-        {
-          emitEvent: false,
-        }
-      );
+      const state = ctrls[i].isDefaultKey();
+      if (!state.value()) continue;
+      state.value.set(false);
+      state.markAsDirty();
     }
   }
 
-  jsonReset(data: ThemeItem) {
+  loadItem(data: ThemeItem) {
     if (data.type !== ThemeItemType.LABEL) return;
-    this.resetData.set(data.json);
-  }
-
-  /**
-   * group-level validator to enforce width rules when the header type is table.
-   * returns error object with keys `invalidWidth`, `invalidMinWidth`, `invalidMaxWidth`
-   * or null when valid.
-   */
-  private widthValidator(): ValidatorFn {
-    return (ctrl: AbstractControl): ValidationErrors | null => {
-      if (this.themeHeaderType() !== this.eThemeHeaderType.table) {
-        return null;
-      }
-
-      const w = ctrl.get('width')?.value;
-      if (isNotBlank(w) && !isValidWidth(w)) {
-        return { invalidWidth: true };
-      }
-      return null;
-    };
-  }
-  private minWidthValidator(): ValidatorFn {
-    return (ctrl: AbstractControl): ValidationErrors | null => {
-      if (this.themeHeaderType() !== this.eThemeHeaderType.table) {
-        return null;
-      }
-
-      const min = ctrl.get('minWidth')?.value;
-      if (isNotBlank(min) && !isValidWidth(min)) {
-        return { invalidMinWidth: true };
-      }
-      return null;
-    };
-  }
-
-  private maxWidthValidator(): ValidatorFn {
-    return (ctrl: AbstractControl): ValidationErrors | null => {
-      if (this.themeHeaderType() !== this.eThemeHeaderType.table) {
-        return null;
-      }
-
-      const max = ctrl.get('maxWidth')?.value;
-      if (isNotBlank(max) && !isValidWidth(max)) {
-        return { invalidMaxWidth: true };
-      }
-      return null;
-    };
-  }
-
-  /**
-   * array-level validator to detect duplicate byKey values.
-   * applied on the FormArray itself in ngOnInit.
-   */
-  private duplicateByKeyValidator(): ValidatorFn {
-    return (ctrl: AbstractControl): ValidationErrors | null => {
-      const arr = ctrl as FormArray;
-      const keys: string[] = arr.controls
-        .map(c => c.get('byKey')?.value)
-        .filter(k => k);
-      if (isDuplicate(keys)) {
-        return { duplicateByKey: true };
-      }
-      return null;
-    };
+    this.form().reset(normalizeThemeItem(data, this.initialFormValue));
   }
 }

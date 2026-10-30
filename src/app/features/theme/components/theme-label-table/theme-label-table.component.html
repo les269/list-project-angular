@@ -3,22 +3,20 @@
   <div class="card-body">
     <app-theme-item-manage
       [headerId]="headerId()"
-      [type]="eThemeItemType.LABEL"
       [form]="form"
+      [resetValue]="initialFormValue"
       [defaultBinding]="defaultBinding()"
-      (jsonReset)="jsonReset($event)"
       (afterSave)="layoutStore.loadThemeLabelItemList()"
-      (afterBind)="layoutStore.loadThemeLabelItemMapList()">
+      (bindingChange)="layoutStore.loadThemeLabelItemMapList()">
     </app-theme-item-manage>
     <app-form-alerts
-      [form]="formArray"
+      [form]="fields"
       [formAlerts]="formAlerts()"></app-form-alerts>
     <div class="card mb-3">
       <app-generic-table
-        [class.table-invalid]="formArray.invalid"
-        [initData]="initData()"
-        [formArray]="formArray"
-        [createGroup]="createGroup"
+        [class.table-invalid]="fields().invalid()"
+        [fields]="fields"
+        [createRow]="createRow"
         [displayedColumns]="displayedColumns"
         [cols]="cols"
         [expandedTmpl]="expandedDetail">
@@ -27,30 +25,30 @@
   </div>
 </div>
 <ng-template #expandedDetail let-element let-index="index">
-  <div class="d-flex" [formGroup]="element">
+  <div class="d-flex">
     <div class="column p-1">
-      @let type = element.get('type');
-      @if (type?.value === eThemeLabelType.stringSplit) {
+      @let type = element.type;
+      @if (type().value() === eThemeLabelType.stringSplit) {
         <div class="input-group">
           <input
             type="text"
             class="form-control"
             [placeholder]="'themeLabel.splitByPh' | translate"
-            formControlName="splitBy" />
+            [formField]="element.splitBy" />
           <input
             type="text"
             class="form-control"
             [placeholder]="'themeLabel.useSpacePh' | translate"
-            formControlName="useSpace" />
+            [formField]="element.useSpace" />
         </div>
       }
-      @if (type?.value === eThemeLabelType.date) {
+      @if (type().value() === eThemeLabelType.date) {
         <div class="input-group">
           <input
             type="text"
             class="form-control"
             [placeholder]="'themeLabel.dateFormatPh' | translate"
-            formControlName="dateFormat" />
+            [formField]="element.dateFormat" />
         </div>
       }
       @if (themeHeaderType() === eThemeHeaderType.table) {
@@ -60,51 +58,51 @@
               type="text"
               class="form-control"
               [placeholder]="'themeLabel.width' | translate"
-              formControlName="width"
+              [formField]="element.width"
               [class.is-invalid]="
-                element.hasError('invalidWidth') &&
-                element.get('width')?.touched
+                hasError(element.width, 'invalidWidth') &&
+                element.width().touched()
               " />
             <input
               type="text"
               class="form-control"
               [placeholder]="'themeLabel.minWidth' | translate"
-              formControlName="minWidth"
+              [formField]="element.minWidth"
               [class.is-invalid]="
-                element.hasError('invalidMinWidth') &&
-                element.get('minWidth')?.touched
+                hasError(element.minWidth, 'invalidMinWidth') &&
+                element.minWidth().touched()
               " />
             <input
               type="text"
               class="form-control"
               [placeholder]="'themeLabel.maxWidth' | translate"
-              formControlName="maxWidth"
+              [formField]="element.maxWidth"
               [class.is-invalid]="
-                element.hasError('invalidMaxWidth') &&
-                element.get('maxWidth')?.touched
+                hasError(element.maxWidth, 'invalidMaxWidth') &&
+                element.maxWidth().touched()
               " />
           </div>
           @if (
-            (element.hasError('invalidWidth') &&
-              element.get('width')?.touched) ||
-            (element.hasError('invalidMinWidth') &&
-              element.get('minWidth')?.touched) ||
-            (element.hasError('invalidMaxWidth') &&
-              element.get('maxWidth')?.touched)
+            (hasError(element.width, 'invalidWidth') &&
+              element.width().touched()) ||
+            (hasError(element.minWidth, 'invalidMinWidth') &&
+              element.minWidth().touched()) ||
+            (hasError(element.maxWidth, 'invalidMaxWidth') &&
+              element.maxWidth().touched())
           ) {
             <div class="invalid-feedback d-flex">
               <span class="w-100 d-flex justify-content-center">
-                @if (element.hasError('invalidWidth')) {
+                @if (hasError(element.width, 'invalidWidth')) {
                   {{ 'msg.widthError' | translate }}
                 }
               </span>
               <span class="w-100 d-flex justify-content-center">
-                @if (element.hasError('invalidMinWidth')) {
+                @if (hasError(element.minWidth, 'invalidMinWidth')) {
                   {{ 'msg.widthError' | translate }}
                 }
               </span>
               <span class="w-100 d-flex justify-content-center">
-                @if (element.hasError('invalidMaxWidth')) {
+                @if (hasError(element.maxWidth, 'invalidMaxWidth')) {
                   {{ 'msg.widthError' | translate }}
                 }
               </span>
@@ -113,39 +111,39 @@
         </div>
       }
       <mat-checkbox
-        formControlName="isDefaultKey"
+        [formField]="element.isDefaultKey"
         (change)="changeDefaultKey(index)"
         >{{ 'themeLabel.isDefaultKey' | translate }}</mat-checkbox
       >
-      <mat-checkbox formControlName="isVisible">
+      <mat-checkbox [formField]="element.isVisible">
         {{ 'themeLabel.isVisible' | translate }}
       </mat-checkbox>
-      <mat-checkbox formControlName="isSort">{{
+      <mat-checkbox [formField]="element.isSort">{{
         'themeLabel.isSort' | translate
       }}</mat-checkbox>
-      @if (type?.value !== eThemeLabelType.seq) {
-        <mat-checkbox formControlName="isSearchValue">{{
+      @if (type().value() !== eThemeLabelType.seq) {
+        <mat-checkbox [formField]="element.isSearchValue">{{
           'themeLabel.isSearchValue' | translate
         }}</mat-checkbox>
       }
 
-      <mat-checkbox formControlName="isSearchButton">{{
+      <mat-checkbox [formField]="element.isSearchButton">{{
         'themeLabel.isSearchButton' | translate
       }}</mat-checkbox>
-      <mat-checkbox formControlName="isCopy">{{
+      <mat-checkbox [formField]="element.isCopy">{{
         'themeLabel.isCopy' | translate
       }}</mat-checkbox>
 
-      <mat-checkbox formControlName="autoComplete">{{
+      <mat-checkbox [formField]="element.autoComplete">{{
         'themeLabel.autoComplete' | translate
       }}</mat-checkbox>
-      <mat-checkbox formControlName="useVisibleDataset">{{
+      <mat-checkbox [formField]="element.useVisibleDataset">{{
         'themeLabel.useVisibleDataset' | translate
       }}</mat-checkbox>
-      @if (element.get('useVisibleDataset')?.value) {
+      @if (element.useVisibleDataset().value()) {
         <app-chip-input
           [label]="'themeLabel.visibleDatasetNameListPH' | translate"
-          formControlName="visibleDatasetNameList">
+          [formField]="element.visibleDatasetNameList">
         </app-chip-input>
       }
     </div>

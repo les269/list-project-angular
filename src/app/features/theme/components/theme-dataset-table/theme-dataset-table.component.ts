@@ -1,3 +1,7 @@
+import {
+  createThemeDatasetRow,
+  normalizeThemeItem,
+} from '../../util/theme-item-form';
 import { CommonModule } from '@angular/common';
 import {
   Component,
@@ -5,54 +9,47 @@ import {
   effect,
   inject,
   input,
-  OnInit,
   signal,
+  untracked,
+  viewChild,
 } from '@angular/core';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import {
-  ReactiveFormsModule,
-  FormsModule,
-  FormBuilder,
-  Validators,
-  ValidatorFn,
-  AbstractControl,
-  FormArray,
-  ValidationErrors,
-} from '@angular/forms';
+  applyEach,
+  disabled,
+  form,
+  FormField,
+  minLength,
+  required,
+  validate,
+} from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatTableModule } from '@angular/material/table';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { MatChipsModule } from '@angular/material/chips';
-import { SelectTableService } from '../../../../core/services/select-table.service';
-import { DatasetService } from '../../../dataset/service/dataset.service';
-import {
-  ThemeDataset,
-  ThemeDatasetItem,
-  ThemeItem,
-  ThemeItemType,
-} from '../../models';
+import { FormAlertsComponent } from '../../../../core/components/form-alerts/form-alerts.component';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
-import { rxResource } from '@angular/core/rxjs-interop';
+import { FormAlert } from '../../../../core/model';
 import {
   ChipSelectMultipleColumn,
   GenericColumnType,
   GenericTableColumn,
-  ToFormArray,
 } from '../../../../core/model/generic-table';
-import { Dataset } from '../../../dataset/model';
-import { isDuplicate } from '../../../../shared/util/helper';
-import { FormAlertsComponent } from '../../../../core/components/form-alerts/form-alerts.component';
-import { FormAlert } from '../../../../core/model';
-import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage.component';
+import { SelectTableService } from '../../../../core/services/select-table.service';
 import { LayoutStore } from '../../../../core/stores/layout.store';
+import { isDuplicate } from '../../../../shared/util/helper';
+import { Dataset } from '../../../dataset/model';
+import { DatasetService } from '../../../dataset/service/dataset.service';
+import { ThemeDatasetItem, ThemeItem, ThemeItemType } from '../../models';
+import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage.component';
 
 @Component({
   imports: [
-    ReactiveFormsModule,
+    FormField,
     MatTableModule,
-    FormsModule,
     MatIconModule,
     MatButtonModule,
     MatCheckboxModule,
@@ -67,19 +64,17 @@ import { LayoutStore } from '../../../../core/stores/layout.store';
   selector: 'app-theme-dataset-table',
   templateUrl: 'theme-dataset-table.component.html',
 })
-export class ThemeDatasetTableComponent implements OnInit {
+export class ThemeDatasetTableComponent {
   // inject
   readonly selectTableService = inject(SelectTableService);
   readonly datasetService = inject(DatasetService);
   readonly translateService = inject(TranslateService);
-  readonly fb = inject(FormBuilder);
   readonly layoutStore = inject(LayoutStore);
   // constant
   readonly displayedColumns: string[] = ['datasetList', 'label'];
   // input
   readonly headerId = input<string>();
   readonly datasetItem = input<ThemeDatasetItem>();
-  readonly oldData = input<ThemeDataset[]>();
   // resource
   readonly datasets = rxResource({
     stream: () => this.datasetService.getAllDataset(),
@@ -88,40 +83,78 @@ export class ThemeDatasetTableComponent implements OnInit {
   // enum
   readonly eThemeItemType = ThemeItemType;
   // form
-  readonly form = this.fb.group({
-    itemId: ['', [Validators.required]],
-    description: [''],
-    json: this.fb.array([]),
+  readonly itemManager = viewChild(ThemeItemManageComponent);
+  readonly formModel = signal<ThemeDatasetItem>({
+    type: ThemeItemType.DATASET,
+    itemId: '',
+    description: '',
+    json: [],
   });
-  readonly formArray = this.form.get('json') as ToFormArray<ThemeDataset>;
+  readonly initialFormValue = structuredClone(this.formModel());
+  readonly form = form(this.formModel, p => {
+    disabled(p.itemId, {
+      when: () => this.itemManager()?.isEditMode() ?? false,
+    });
+    validate(p.json, ({ value }) =>
+      value().length === 0 ? { kind: 'tableEmpty' } : undefined
+    );
+    validate(p.json, ({ value }) =>
+      value().some(row => row.datasetList.length === 0)
+        ? { kind: 'datasetEmpty' }
+        : undefined
+    );
+    validate(p.json, ({ value }) =>
+      isDuplicate(
+        value()
+          .map(row => row.label)
+          .filter(Boolean)
+      )
+        ? { kind: 'duplicateByLabel' }
+        : undefined
+    );
+
+    applyEach(p.json, p => {
+      required(p.datasetList);
+      minLength(p.datasetList, 1);
+      required(p.label);
+    });
+    required(p.itemId);
+  });
+  readonly fields = this.form.json;
   // signals
-  readonly initData = computed(() => {
-    const resetData = this.resetData();
-    if (resetData) {
-      return resetData;
-    }
-    return this.datasetItem()?.json || this.oldData() || [];
-  });
-  readonly resetData = signal<ThemeDataset[] | null>(null);
   readonly defaultBinding = computed(() => (this.datasetItem() ? true : false));
 
-  readonly formAlerts = computed(
-    () =>
-      [
-        {
-          errorId: 'tableEmpty',
-          msg: this.translateService.instant('themeDataset.tableEmpty'),
-        },
-        {
-          errorId: 'datasetEmpty',
-          msg: this.translateService.instant('themeDataset.datasetEmpty'),
-        },
-        {
-          errorId: 'duplicateByLabel',
-          msg: this.translateService.instant('themeDataset.duplicateByLabel'),
-        },
-      ] satisfies FormAlert[]
+  private readonly validationMessages = toSignal(
+    this.translateService.stream([
+      'themeDataset.tableEmpty',
+      'themeDataset.datasetEmpty',
+      'themeDataset.duplicateByLabel',
+    ]),
+    {
+      initialValue: this.translateService.instant([
+        'themeDataset.tableEmpty',
+        'themeDataset.datasetEmpty',
+        'themeDataset.duplicateByLabel',
+      ]),
+    }
   );
+  readonly formAlerts = computed(() => {
+    const messages = this.validationMessages();
+    return [
+      {
+        errorId: 'tableEmpty',
+        msg: messages['themeDataset.tableEmpty'],
+      },
+      {
+        errorId: 'datasetEmpty',
+        msg: messages['themeDataset.datasetEmpty'],
+      },
+      {
+        errorId: 'duplicateByLabel',
+        msg: messages['themeDataset.duplicateByLabel'],
+      },
+    ] satisfies FormAlert[];
+  });
   readonly datasetColumn = computed(
     () =>
       ({
@@ -156,81 +189,25 @@ export class ThemeDatasetTableComponent implements OnInit {
     effect(() => {
       const data = this.datasetItem();
       if (!data) return;
-      this.form.patchValue(data);
+      untracked(() => this.loadItem(data));
     });
   }
 
-  ngOnInit() {
-    // ensure the duplicated-key validator is attached to the form array
-    const arr = this.formArray;
-    arr.setValidators([
-      this.tableEmptyValidator(),
-      this.datasetEmptyValidator(),
-      this.duplicateByLabelValidator(),
-    ]);
-    arr.updateValueAndValidity({ emitEvent: false });
-  }
-  readonly createGroup = () => {
-    return this.fb.group({
-      seq: [0],
-      datasetList: [[], [Validators.required, Validators.minLength(1)]],
-      label: ['', [Validators.required]],
-      isDefault: [false],
-    });
-  };
+  readonly createRow = createThemeDatasetRow;
   //改變清單預設使用的資料來源
   changeDefaultKey(index: number) {
-    const ctrls = this.formArray.controls;
+    const ctrls = this.fields;
     for (let i = 0; i < ctrls.length; i++) {
       if (i === index) continue;
-      const control = ctrls[i];
-      control.patchValue(
-        { ...control.value, isDefault: false },
-        {
-          emitEvent: false,
-        }
-      );
+      const state = ctrls[i].isDefault();
+      if (!state.value()) continue;
+      state.value.set(false);
+      state.markAsDirty();
     }
   }
 
-  jsonReset(data: ThemeItem) {
+  loadItem(data: ThemeItem) {
     if (data.type !== ThemeItemType.DATASET) return;
-    this.resetData.set(data.json);
-  }
-
-  tableEmptyValidator(): ValidatorFn {
-    return (ctrl: AbstractControl): ValidationErrors | null => {
-      const arr = ctrl as FormArray;
-      if (arr.controls.length === 0) {
-        return { tableEmpty: true };
-      }
-      return null;
-    };
-  }
-
-  datasetEmptyValidator(): ValidatorFn {
-    return (ctrl: AbstractControl): ValidationErrors | null => {
-      const arr = ctrl as FormArray;
-      if (arr.controls.length === 0) return null;
-      const keys = arr.controls.find(
-        c => c.get('datasetList')?.value.length === 0
-      );
-      if (!!keys) {
-        return { datasetEmpty: true };
-      }
-      return null;
-    };
-  }
-  duplicateByLabelValidator(): ValidatorFn {
-    return (ctrl: AbstractControl): ValidationErrors | null => {
-      const arr = ctrl as FormArray;
-      const keys: string[] = arr.controls
-        .map(c => c.get('label')?.value)
-        .filter(k => k);
-      if (isDuplicate(keys)) {
-        return { duplicateByLabel: true };
-      }
-      return null;
-    };
+    this.form().reset(normalizeThemeItem(data, this.initialFormValue));
   }
 }
