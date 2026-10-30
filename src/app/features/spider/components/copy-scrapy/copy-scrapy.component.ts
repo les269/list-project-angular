@@ -1,29 +1,27 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { form, FormField, required } from '@angular/forms/signals';
 
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import {
+  MAT_DIALOG_DATA,
   MatDialogActions,
   MatDialogClose,
-  MatDialogTitle,
   MatDialogContent,
-  MAT_DIALOG_DATA,
   MatDialogRef,
+  MatDialogTitle,
 } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
-import { ScrapyService } from '../../services/scrapy.service';
-import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { ThemeHeaderType } from '../../../theme/models';
-import { ScrapyConfig } from '../../model';
-import { isBlank } from '../../../../shared/util/helper';
 import { EMPTY, switchMap } from 'rxjs';
+import { SnackbarService } from '../../../../core/services/snackbar.service';
+import { isBlank } from '../../../../shared/util/helper';
+import { ScrapyConfig } from '../../model';
+import { ScrapyService } from '../../services/scrapy.service';
 
 @Component({
   selector: 'app-copy-scrapy',
 
   imports: [
-    ReactiveFormsModule,
-    FormsModule,
+    FormField,
     MatButtonModule,
     MatDialogActions,
     MatDialogClose,
@@ -36,7 +34,18 @@ import { EMPTY, switchMap } from 'rxjs';
 export class CopyScrapyComponent {
   readonly dialogRef = inject(MatDialogRef<CopyScrapyComponent>);
   readonly data = inject<{ source: ScrapyConfig }>(MAT_DIALOG_DATA);
-  source: ScrapyConfig = JSON.parse(JSON.stringify(this.data.source));
+  readonly sourceModel = signal<ScrapyConfig>(
+    JSON.parse(JSON.stringify(this.data.source))
+  );
+  readonly sourceForm = form(this.sourceModel, p => {
+    required(p.name);
+  });
+  get source() {
+    return this.sourceModel();
+  }
+  set source(value: ScrapyConfig) {
+    this.sourceModel.set(value);
+  }
   constructor(
     private scrapyService: ScrapyService,
     private snackbarService: SnackbarService
