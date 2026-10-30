@@ -1,33 +1,29 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { form, FormField, readonly, required } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import {
+  MAT_DIALOG_DATA,
   MatDialogActions,
   MatDialogClose,
-  MatDialogTitle,
   MatDialogContent,
-  MAT_DIALOG_DATA,
   MatDialogRef,
+  MatDialogTitle,
 } from '@angular/material/dialog';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { switchMap, EMPTY, take, finalize } from 'rxjs';
-import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { CopyThemeData, ThemeHeaderType, ThemeHeaderCopy } from '../../models';
-import { ThemeService } from '../../services/theme.service';
-import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
-import { FormAlert } from '../../../../core/model';
+import { EMPTY, finalize, switchMap, take } from 'rxjs';
 import { FormInvalidsComponent } from '../../../../core/components/form-invalids/form-invalids.component';
+import { FormAlert } from '../../../../core/model';
+import { SnackbarService } from '../../../../core/services/snackbar.service';
+import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
+import { CopyThemeData, ThemeHeaderCopy, ThemeHeaderType } from '../../models';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-copy-theme',
   imports: [
-    ReactiveFormsModule,
+    FormField,
     MatButtonModule,
     MatDialogActions,
     MatDialogClose,
@@ -44,30 +40,41 @@ export class CopyThemeComponent {
   //inject
   readonly dialogRef = inject(MatDialogRef<CopyThemeComponent>);
   readonly data = inject<CopyThemeData>(MAT_DIALOG_DATA);
-  readonly formBuilder = inject(FormBuilder);
   readonly themeService = inject(ThemeService);
   readonly snackbarService = inject(SnackbarService);
   readonly translateService = inject(TranslateService);
   //enum
   readonly eThemeHeaderType = ThemeHeaderType;
-  readonly form = this.formBuilder.nonNullable.group({
-    name: [this.data.themeHeader.name, [Validators.required]],
-    version: [this.data.themeHeader.version, [Validators.required]],
-    type: [this.data.themeHeader.type, [Validators.required]],
-    title: [this.data.themeHeader.title, [Validators.required]],
+  readonly formModel = signal({
+    name: this.data.themeHeader.name,
+    version: this.data.themeHeader.version,
+    type: this.data.themeHeader.type,
+    title: this.data.themeHeader.title,
+  });
+  readonly form = form(this.formModel, p => {
+    required(p.name);
+    required(p.version);
+    required(p.type);
+    required(p.title);
+    readonly(p, { when: () => this.isProcessing() });
   });
 
   //signals
-  readonly nameControl = this.form.get('name') as FormControl;
-  readonly versionControl = this.form.get('version') as FormControl;
-  readonly typeControl = this.form.get('type') as FormControl;
-  readonly titleControl = this.form.get('title') as FormControl;
+  readonly nameControl = this.form.name;
+  readonly versionControl = this.form.version;
+  readonly typeControl = this.form.type;
+  readonly titleControl = this.form.title;
   readonly isProcessing = signal(false);
+
+  private readonly requiredMessage = toSignal(
+    this.translateService.stream('msg.required'),
+    { initialValue: this.translateService.instant('msg.required') }
+  );
 
   readonly formAlertsObj = computed(() => {
     const required = {
       errorId: 'required',
-      msg: this.translateService.instant('msg.required'),
+      msg: this.requiredMessage(),
     };
     return {
       name: [required],
@@ -77,18 +84,21 @@ export class CopyThemeComponent {
   });
 
   ok() {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
+    if (this.isProcessing()) return;
+    if (this.form().invalid()) {
+      this.form().markAsTouched();
       return;
     }
 
-    const formValue = this.form.getRawValue();
+    const formValue = this.form().value();
     const target: ThemeHeaderCopy = {
       ...this.data.themeHeader,
       ...formValue,
     };
 
     this.isProcessing.set(true);
+    const wasDisableClose = this.dialogRef.disableClose;
+    this.dialogRef.disableClose = true;
     this.themeService
       .existTheme(target)
       .pipe(
@@ -103,10 +113,16 @@ export class CopyThemeComponent {
           });
         }),
         take(1),
-        finalize(() => this.isProcessing.set(false))
+        finalize(() => {
+          this.isProcessing.set(false);
+          this.dialogRef.disableClose = wasDisableClose;
+        })
       )
-      .subscribe(() => {
-        this.dialogRef.close('ok');
+      .subscribe({
+        next: () => {
+          this.dialogRef.close('ok');
+        },
+        error: () => {},
       });
   }
 }

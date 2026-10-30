@@ -1,6 +1,6 @@
 <h2 mat-dialog-title>{{ 'title.copyTheme' | translate }}</h2>
 <mat-dialog-content>
-  <form [formGroup]="form">
+  <form (submit)="$event.preventDefault()">
     <div class="mb-3">
       <label for="name" class="form-label require">{{
         'themeHeader.name' | translate
@@ -8,11 +8,9 @@
       <input
         type="text"
         class="form-control"
-        [formControl]="nameControl"
+        [formField]="nameControl"
         id="name"
-        name="name"
-        trimOnBlur
-        required />
+        trimOnBlur />
       <app-form-invalids
         [control]="nameControl"
         [formAlerts]="formAlertsObj().name"></app-form-invalids>
@@ -24,11 +22,9 @@
       <input
         type="text"
         class="form-control"
-        [formControl]="versionControl"
+        [formField]="versionControl"
         id="version"
-        name="version"
-        trimOnBlur
-        required />
+        trimOnBlur />
       <app-form-invalids
         [control]="versionControl"
         [formAlerts]="formAlertsObj().version"></app-form-invalids>
@@ -37,12 +33,9 @@
       <label class="form-label" for="type">{{
         'themeHeader.type' | translate
       }}</label>
-      <select
-        class="form-control form-select"
-        [formControl]="typeControl"
-        name="type">
+      <select class="form-control form-select" [formField]="typeControl">
         @for (type of eThemeHeaderType | keyvalue; track type) {
-          <option [ngValue]="type.key">
+          <option [value]="type.key">
             {{ 'themeHeader.' + type.key | translate }}
           </option>
         }
@@ -55,11 +48,9 @@
       <input
         type="text"
         class="form-control"
-        [formControl]="titleControl"
+        [formField]="titleControl"
         id="title"
-        name="title"
-        trimOnBlur
-        required />
+        trimOnBlur />
       <app-form-invalids
         [control]="titleControl"
         [formAlerts]="formAlertsObj().title"></app-form-invalids>
@@ -67,14 +58,14 @@
   </form>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close>
+  <button mat-button mat-dialog-close [disabled]="isProcessing()">
     {{ 'g.no' | translate }}
   </button>
   <button
     mat-button
     cdkFocusInitial
     (click)="ok()"
-    [disabled]="form.invalid || isProcessing()">
+    [disabled]="form().invalid() || isProcessing()">
     {{ 'g.ok' | translate }}
   </button>
 </mat-dialog-actions>

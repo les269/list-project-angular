@@ -1,14 +1,13 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { disabled, form, FormField } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import {
-  MatDialogActions,
-  MatDialogClose,
-  MatDialogTitle,
-  MatDialogContent,
   MAT_DIALOG_DATA,
+  MatDialogActions,
+  MatDialogContent,
   MatDialogRef,
+  MatDialogTitle,
 } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { TranslateModule } from '@ngx-translate/core';
@@ -18,8 +17,7 @@ import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
   selector: 'app-theme-note',
 
   imports: [
-    ReactiveFormsModule,
-    FormsModule,
+    FormField,
     MatButtonModule,
     MatDialogActions,
     MatDialogTitle,
@@ -40,8 +38,24 @@ export class ThemeNoteComponent implements OnInit, OnDestroy {
     disabled: boolean;
     save: (text: string) => void;
   }>(MAT_DIALOG_DATA);
-  value = this.data.value;
-  disabled = this.data.disabled;
+  readonly valueModel = signal(this.data.value);
+  readonly valueForm = form(this.valueModel, p => {
+    disabled(p, { when: () => this.disabledModel() });
+  });
+  get value() {
+    return this.valueModel();
+  }
+  set value(value) {
+    this.valueModel.set(value);
+  }
+  readonly disabledModel = signal(this.data.disabled);
+  readonly disabledForm = form(this.disabledModel);
+  get disabled() {
+    return this.disabledModel();
+  }
+  set disabled(value) {
+    this.disabledModel.set(value);
+  }
   editor: Editor = new Editor({ history: true });
   toolbar: Toolbar = [
     ['bold', 'italic'],

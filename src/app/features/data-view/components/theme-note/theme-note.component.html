@@ -12,9 +12,7 @@
       <ngx-editor
         [ngClass]="{ disabled: disabled }"
         [editor]="editor"
-        [ngModel]="value"
-        (ngModelChange)="onChange($event)"
-        [disabled]="disabled"></ngx-editor>
+        [formField]="valueForm"></ngx-editor>
     </div>
   </mat-dialog-content>
   <mat-dialog-actions>
@@ -27,10 +25,7 @@
     <div>
       <ngx-editor-menu class="toolbar" [editor]="editor" [toolbar]="toolbar">
       </ngx-editor-menu>
-      <ngx-editor
-        [editor]="editor"
-        [ngModel]="value"
-        (ngModelChange)="onChange($event)"></ngx-editor>
+      <ngx-editor [editor]="editor" [formField]="valueForm"></ngx-editor>
     </div>
   </mat-dialog-content>
   <mat-dialog-actions>

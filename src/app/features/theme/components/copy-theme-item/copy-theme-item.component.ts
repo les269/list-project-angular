@@ -1,28 +1,27 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { form, FormField, readonly, required } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import {
+  MAT_DIALOG_DATA,
   MatDialogActions,
   MatDialogClose,
   MatDialogContent,
   MatDialogRef,
   MatDialogTitle,
-  MAT_DIALOG_DATA,
 } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
+import { EMPTY, finalize, switchMap } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { isBlank } from '../../../../shared/util/helper';
 import { CopyThemeItemData } from '../../models';
 import { ThemeItemService } from '../../services';
-import { EMPTY, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-copy-theme-item',
 
   imports: [
-    ReactiveFormsModule,
-    FormsModule,
+    FormField,
     MatButtonModule,
     MatDialogActions,
     MatDialogClose,
@@ -41,13 +40,24 @@ export class CopyThemeItemComponent {
   readonly themeItemService = inject(ThemeItemService);
 
   readonly targetItemId = signal('');
+  readonly isProcessing = signal(false);
+
+  readonly targetItemIdForm = form(this.targetItemId, p => {
+    required(p);
+    readonly(p, { when: () => this.isProcessing() });
+  });
 
   ok() {
+    if (this.isProcessing()) return;
+    this.targetItemIdForm().markAsTouched();
     const value = this.targetItemId().trim();
     if (isBlank(value)) {
       this.snackbarService.isBlankMessage('themeItem.targetItemId');
       return;
     }
+    this.isProcessing.set(true);
+    const wasDisableClose = this.dialogRef.disableClose;
+    this.dialogRef.disableClose = true;
     this.themeItemService
       .getThemeItem(this.data.type, value)
       .pipe(
@@ -61,11 +71,18 @@ export class CopyThemeItemComponent {
             targetItemId: value,
             type: this.data.type,
           });
+        }),
+        finalize(() => {
+          this.isProcessing.set(false);
+          this.dialogRef.disableClose = wasDisableClose;
         })
       )
-      .subscribe(() => {
-        this.snackbarService.openI18N('msg.copySuccess');
-        this.dialogRef.close(true);
+      .subscribe({
+        next: () => {
+          this.snackbarService.openI18N('msg.copySuccess');
+          this.dialogRef.close(true);
+        },
+        error: () => {},
       });
   }
 }
