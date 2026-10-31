@@ -1,6 +1,6 @@
 import { CodeEditor } from '@acrodata/code-editor';
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal, untracked } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import {
   disabled,
@@ -21,7 +21,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EMPTY, filter, map, switchMap } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { isNotBlank, isNotJson } from '../../../../shared/util/helper';
-import { patchField } from '../../../../shared/util/signal-form';
 import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 import { CssSelectTableComponent } from '../../components/css-select-table/css-select-table.component';
 import {
@@ -31,6 +30,7 @@ import {
   ScrapyPageType,
 } from '../../model';
 import { ScrapyService } from '../../services/scrapy.service';
+import { createCssSelect } from '../../util/css-select';
 
 @Component({
   imports: [
@@ -82,7 +82,6 @@ export class ScrapyEditComponent {
     },
     defaultValue: undefined,
   });
-  readonly dataInit = computed(() => this.scrapy.value()?.data ?? []);
 
   // form
   readonly formModel = signal({
@@ -90,7 +89,7 @@ export class ScrapyEditComponent {
     paramSize: 1,
     testJson: '',
     testUrl: '',
-    data: [] as any[],
+    data: [] as ScrapyData[],
   });
   readonly form = form(this.formModel, p => {
     disabled(p.name, { when: () => this.isEditMode });
@@ -125,27 +124,32 @@ export class ScrapyEditComponent {
         this.router.navigate(['scrapy-list']);
         return;
       }
-      this.patchForm(scrapy);
-      this.status.set(ScrapyEditMode.edit);
+      untracked(() => {
+        this.patchForm(scrapy);
+        this.status.set(ScrapyEditMode.edit);
+      });
     });
   }
 
   private patchForm(config: ScrapyConfig) {
-    const { data, ...rest } = config;
-    patchField(this.form, rest);
-    this.dataControl().value.set([]);
-    for (const d of data) {
-      this.dataControl().value.update(rows => [...rows, this.createData(d)]);
-    }
+    this.form().reset({
+      name: config.name,
+      paramSize: config.paramSize,
+      testJson: config.testJson ?? '',
+      testUrl: config.testUrl ?? '',
+      data: (config.data ?? []).map(data =>
+        this.createData(structuredClone(data))
+      ),
+    });
   }
 
-  createData(data?: Partial<ScrapyData>): any {
+  createData(data?: Partial<ScrapyData>): ScrapyData {
     return {
       name: data?.name ?? '',
       url: data?.url ?? '',
       cookie: data?.cookie ?? [],
       scrapyPageType: data?.scrapyPageType ?? ScrapyPageType.scrapyData,
-      cssSelectList: data?.cssSelectList ?? [],
+      cssSelectList: (data?.cssSelectList ?? []).map(createCssSelect),
       script: data?.script ?? this.defaultJS,
       html: data?.html ?? '',
       replaceRegular: data?.replaceRegular ?? '',
