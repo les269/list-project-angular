@@ -7,53 +7,46 @@ import {
   linkedSignal,
   output,
   signal,
+  untracked,
 } from '@angular/core';
+import {
+  applyEach,
+  disabled,
+  form,
+  FormField,
+  required,
+  readonly,
+  SchemaFn,
+} from '@angular/forms/signals';
 
-import { TranslateModule } from '@ngx-translate/core';
-import { MatTableModule } from '@angular/material/table';
-import {
-  ReactiveFormsModule,
-  FormsModule,
-  FormBuilder,
-  Validators,
-  FormGroup,
-} from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-import {
-  Cookie,
-  CookieListMapType,
-  CookieListTO,
-  ValuePipeline,
-} from '../../model';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTableModule } from '@angular/material/table';
+import { TranslateModule } from '@ngx-translate/core';
+import { defer, EMPTY, finalize, Observable, switchMap, take, tap } from 'rxjs';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 import {
-  ControlsOf,
   GenericColumnType,
   GenericTableColumn,
-  ToFormArray,
 } from '../../../../core/model/generic-table';
-import { CookieListService } from '../../services/cookie-list.service';
-import { CookieListMapService } from '../../services/cookie-list-map.service';
-import { SelectTableService } from '../../../../core/services/select-table.service';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
+import { SelectTableService } from '../../../../core/services/select-table.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { EMPTY, switchMap } from 'rxjs';
 import { isBlank, isNotBlank } from '../../../../shared/util/helper';
 import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
+import { Cookie, CookieListMapType, CookieListTO } from '../../model';
 import { CookieMode } from '../../model/cookie.model';
-import { rxResource } from '@angular/core/rxjs-interop';
-import { PipelineListComponent } from '../pipeline-list/pipeline-list.component';
+import { CookieListMapService } from '../../services/cookie-list-map.service';
+import { CookieListService } from '../../services/cookie-list.service';
 import { ValuePipelineFormService } from '../../services/value-pipeline-form.service';
-import { FormField } from '@angular/forms/signals';
-
+import { PipelineListComponent } from '../pipeline-list/pipeline-list.component';
 @Component({
   selector: 'app-cookie-table',
 
   imports: [
     MatTableModule,
-    ReactiveFormsModule,
-    FormsModule,
+    FormField,
     TranslateModule,
     MatIconModule,
     MatButtonModule,
@@ -64,6 +57,12 @@ import { FormField } from '@angular/forms/signals';
   templateUrl: './cookie-table.component.html',
 })
 export class CookieTableComponent {
+  static readonly rowSchema: SchemaFn<
+    ReturnType<CookieTableComponent['createCookie']>
+  > = p => {
+    required(p.name);
+    required(p.value);
+  };
   // inject
   readonly cookieListService = inject(CookieListService);
   readonly cookieListMapService = inject(CookieListMapService);
@@ -71,12 +70,9 @@ export class CookieTableComponent {
   readonly messageBoxService = inject(MessageBoxService);
   readonly snackbarService = inject(SnackbarService);
   readonly valuePipelineFormService = inject(ValuePipelineFormService);
-  readonly fb = inject(FormBuilder);
 
   readonly displayedColumns = ['name', 'value'];
 
-  // formArray = input<ToFormArray<Cookie>>();
-  // initData = input<Cookie[]>();
   readonly refId = input<string>();
   readonly mapType = input<CookieListMapType>();
   readonly bindingChange = output<boolean>();
@@ -95,7 +91,7 @@ export class CookieTableComponent {
       const refId = this.refId()?.trim() ?? '';
       const mapType = this.mapType();
       if (isBlank(refId) || !mapType) {
-        return null;
+        return undefined;
       }
       return { refId, mapType };
     },
@@ -110,9 +106,8 @@ export class CookieTableComponent {
     },
     defaultValue: undefined,
   });
-  readonly list = linkedSignal(() => this.initData.value()?.list ?? []);
   readonly isBinding = linkedSignal<boolean>(() => {
-    return this.initData.value() !== null;
+    return !!this.initData.value();
   });
   readonly showBindButton = computed(
     () =>
@@ -122,184 +117,200 @@ export class CookieTableComponent {
     () => this.isEditMode() && !this.isBinding()
   );
 
-  readonly form = this.fb.nonNullable.group({
-    cookieId: ['', [Validators.required]],
-    description: [''],
-    list: this.fb.array([]),
+  readonly isProcessing = signal(false);
+  readonly formModel = signal({
+    cookieId: '',
+    description: '',
+    list: [] as ReturnType<CookieTableComponent['createCookie']>[],
+  });
+  readonly initialFormValue = structuredClone(this.formModel());
+  readonly form = form(this.formModel, p => {
+    readonly(p, { when: () => this.isProcessing() });
+    disabled(p.list, { when: () => this.isProcessing() });
+    disabled(p.cookieId, { when: () => this.isEditMode() });
+    applyEach(p.list, CookieTableComponent.rowSchema);
+    required(p.cookieId);
   });
 
   get cookieIdControl() {
-    return this.form.controls.cookieId;
+    return this.form.cookieId;
   }
 
   get descriptionControl() {
-    return this.form.controls.description;
+    return this.form.description;
   }
   get listControl() {
-    return this.form.get('list') as ToFormArray<Cookie>;
+    return this.form.list;
   }
 
   constructor() {
     effect(() => {
-      if (this.isEditMode()) {
-        this.cookieIdControl.disable({ emitEvent: false });
-      } else {
-        this.cookieIdControl.enable({ emitEvent: false });
-      }
-    });
-    effect(() => {
       const data = this.initData.value();
-      if (data) {
-        this.form.patchValue(data, { emitEvent: false });
-        this.setCookieList(data.list ?? []);
-        this.mode.set(CookieMode.edit);
-      } else {
-        this.form.reset({ cookieId: '', description: '' });
-        this.setCookieList([]);
-        this.mode.set(CookieMode.create);
-      }
+      untracked(() => this.loadItem(data));
     });
+  }
+
+  private loadItem(data?: CookieListTO | null) {
+    this.form().reset({
+      ...structuredClone(this.initialFormValue),
+      cookieId: data?.cookieId ?? '',
+      description: data?.description ?? '',
+      list: (data?.list ?? []).map(row =>
+        this.createCookie(structuredClone(row))
+      ),
+    });
+    this.mode.set(data ? CookieMode.edit : CookieMode.create);
+  }
+
+  private runOperation<T>(
+    operation: () => Observable<T>,
+    onSuccess?: (value: T) => void
+  ) {
+    if (this.isProcessing()) return;
+    this.isProcessing.set(true);
+    defer(operation)
+      .pipe(
+        take(1),
+        finalize(() => this.isProcessing.set(false))
+      )
+      .subscribe({ next: onSuccess, error: () => {} });
+  }
+
+  private buildRequest(): CookieListTO | undefined {
+    this.form().markAsTouched();
+    if (this.form().invalid() || isBlank(this.cookieIdControl().value())) {
+      this.snackbarService.isBlankMessage('scrapy.cookieListId');
+      return undefined;
+    }
+    const raw = this.form().value();
+    return {
+      cookieId: raw.cookieId.trim(),
+      description: raw.description.trim(),
+      list: structuredClone(raw.list),
+    };
+  }
+
+  private persistItem(req: CookieListTO) {
+    return this.cookieListService.update(req).pipe(
+      tap(() => {
+        this.mode.set(CookieMode.edit);
+        this.afterSave.emit(req);
+        this.snackbarService.openI18N('msg.saveSuccess');
+      })
+    );
   }
 
   openItemSelector() {
-    this.cookieListService
-      .getAll()
-      .pipe(
-        switchMap(data => this.selectTableService.selectSingleCookieList(data)),
-        switchMap(item => this.cookieListService.getByCookieId(item.cookieId))
-      )
-      .subscribe(item => {
-        this.form.patchValue({
-          cookieId: item.cookieId,
-          description: item.description ?? '',
-        });
-        this.setCookieList(item.list ?? []);
-        this.mode.set(CookieMode.edit);
-      });
+    this.runOperation(
+      () =>
+        this.cookieListService.getAll().pipe(
+          switchMap(data =>
+            this.selectTableService.selectSingleCookieList(data)
+          ),
+          switchMap(item => this.cookieListService.getByCookieId(item.cookieId))
+        ),
+      item => this.loadItem(item)
+    );
   }
 
   addItem() {
-    this.cookieIdControl.markAsTouched();
-    if (this.form.invalid) {
-      this.snackbarService.isBlankMessage('scrapy.cookieListId');
-      return;
-    }
-    const cookieId = this.cookieIdControl.getRawValue().trim();
-    this.cookieListService.getAll().subscribe(list => {
-      const exist = list.some(x => x.cookieId === cookieId);
-      if (exist) {
-        this.messageBoxService.openI18N('msg.itemIdExist', {
-          params: { text: 'Cookie ID' },
-          onlyOk: true,
-        });
-        return;
-      }
-      this.saveItem();
-    });
+    if (this.isProcessing()) return;
+    const req = this.buildRequest();
+    if (!req) return;
+    this.runOperation(() =>
+      this.cookieListService.getAll().pipe(
+        switchMap(list => {
+          if (list.some(item => item.cookieId === req.cookieId)) {
+            return this.messageBoxService
+              .openI18N('msg.itemIdExist', {
+                params: { text: 'Cookie ID' },
+                onlyOk: true,
+              })
+              .pipe(switchMap(() => EMPTY));
+          }
+          return this.persistItem(req);
+        })
+      )
+    );
   }
 
   saveItem() {
-    this.cookieIdControl.markAsTouched();
-    if (this.form.invalid) {
-      this.snackbarService.isBlankMessage('scrapy.cookieListId');
-      return;
-    }
-    const req: CookieListTO = {
-      cookieId: this.cookieIdControl.getRawValue().trim(),
-      description: this.descriptionControl.getRawValue().trim(),
-      list: this.listControl.getRawValue() as Cookie[],
-    };
-    this.cookieListService.update(req).subscribe(() => {
-      this.mode.set(CookieMode.edit);
-      this.afterSave.emit(req);
-      this.snackbarService.openI18N('msg.saveSuccess');
-    });
+    if (this.isProcessing()) return;
+    const req = this.buildRequest();
+    if (req) this.runOperation(() => this.persistItem(req));
   }
 
   onClear() {
-    this.messageBoxService.openI18N('msg.sureClear').subscribe(result => {
-      if (!result) return;
-      this.mode.set(CookieMode.create);
-      this.form.reset({ cookieId: '', description: '' });
-      this.setCookieList([]);
-    });
+    this.runOperation(
+      () => this.messageBoxService.openI18N('msg.sureClear'),
+      result => {
+        if (result) this.loadItem();
+      }
+    );
   }
 
   toggleBind() {
     const refId = this.refId()?.trim() ?? '';
     const mapType = this.mapType();
-    const cookieId = this.cookieIdControl.getRawValue().trim();
-    if (isBlank(refId) || !mapType || isBlank(cookieId)) {
-      return;
-    }
-
-    if (this.isBinding()) {
-      this.cookieListMapService.delete(refId, mapType).subscribe(() => {
-        this.isBinding.set(false);
-        this.bindingChange.emit(false);
-        this.snackbarService.openI18N('msg.unbindSuccess');
-      });
-      return;
-    }
-
-    this.cookieListMapService
-      .update({ refId, type: mapType, cookieId })
-      .subscribe(() => {
-        this.isBinding.set(true);
-        this.bindingChange.emit(true);
-        this.snackbarService.openI18N('msg.bindSuccess');
-      });
+    const cookieId = this.cookieIdControl().value().trim();
+    if (isBlank(refId) || !mapType || isBlank(cookieId)) return;
+    const wasBinding = this.isBinding();
+    this.runOperation(
+      () =>
+        wasBinding
+          ? this.cookieListMapService.delete(refId, mapType)
+          : this.cookieListMapService.update({
+              refId,
+              type: mapType,
+              cookieId,
+            }),
+      () => {
+        this.isBinding.set(!wasBinding);
+        this.bindingChange.emit(!wasBinding);
+        this.snackbarService.openI18N(
+          wasBinding ? 'msg.unbindSuccess' : 'msg.bindSuccess'
+        );
+      }
+    );
   }
 
   deleteItem() {
-    const cookieId = this.cookieIdControl.getRawValue().trim();
+    if (this.isProcessing()) return;
+    const cookieId = this.cookieIdControl().value().trim();
     if (isBlank(cookieId)) {
       this.snackbarService.isBlankMessage('scrapy.cookieListId');
       return;
     }
-    this.cookieListMapService
-      .cookieIsInUse(cookieId)
-      .pipe(
-        switchMap(inUse => {
-          if (inUse) {
-            this.messageBoxService.openI18N('msg.cookieListInUse', {
-              onlyOk: true,
-            });
-            return EMPTY;
-          }
-          return this.messageBoxService.openI18N('msg.sureDeleteCookieList');
-        }),
-        switchMap(result => {
-          if (!result) return EMPTY;
-          return this.cookieListService.delete(cookieId);
-        })
-      )
-      .subscribe(() => {
-        this.mode.set(CookieMode.create);
-        this.form.reset({ cookieId: '', description: '' });
-        this.setCookieList([]);
+    this.runOperation(
+      () =>
+        this.cookieListMapService.cookieIsInUse(cookieId).pipe(
+          switchMap(inUse =>
+            inUse
+              ? this.messageBoxService
+                  .openI18N('msg.cookieListInUse', { onlyOk: true })
+                  .pipe(switchMap(() => EMPTY))
+              : this.messageBoxService.openI18N('msg.sureDeleteCookieList')
+          ),
+          take(1),
+          switchMap(result =>
+            result ? this.cookieListService.delete(cookieId) : EMPTY
+          )
+        ),
+      () => {
+        this.loadItem();
         this.snackbarService.openI18N('msg.deleteSuccess');
-      });
+      }
+    );
   }
 
-  private setCookieList(list: Cookie[]) {
-    const formArray = this.listControl;
-    formArray.clear();
-    this.list.set(list);
-  }
-
-  readonly createCookieGroup = (item?: Partial<Cookie>) => {
-    return this.fb.nonNullable.group({
-      seq: [item?.seq ?? 0],
-      name: [item?.name ?? '', [Validators.required]],
-      value: [item?.value ?? '', [Validators.required]],
-      valuePipelines: this.fb.nonNullable.array<
-        FormGroup<ControlsOf<ValuePipeline>>
-      >(
-        (item?.valuePipelines ?? []).map(pipeline =>
-          this.valuePipelineFormService.createValuePipelineGroup(pipeline)
-        )
+  readonly createCookie = (item?: Partial<Cookie>) => {
+    return {
+      seq: item?.seq ?? 0,
+      name: item?.name ?? '',
+      value: item?.value ?? '',
+      valuePipelines: (item?.valuePipelines ?? []).map(pipeline =>
+        this.valuePipelineFormService.createValuePipeline(pipeline)
       ),
-    }) as FormGroup<ControlsOf<Cookie>>;
+    };
   };
 }

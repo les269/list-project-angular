@@ -68,6 +68,7 @@
     "widthError": "寬度格式錯誤",
     "requiredSelectOne": "請選擇一筆資料",
     "required": "此欄位為必填",
+    "formInvalid": "請檢查並修正表單中標示的欄位",
     "integer": "需要為整數",
     "nonNegative": "不可為負數",
     "sureClear": "是否要清除所有資料?",

@@ -1,26 +1,38 @@
+import { SignalCodeEditorComponent } from '../../../../core/components/signal-code-editor/signal-code-editor.component';
 import { CommonModule } from '@angular/common';
 import {
   Component,
   computed,
   effect,
-  EventEmitter,
   inject,
   input,
-  Input,
-  linkedSignal,
-  Output,
   ResourceRef,
   signal,
+  untracked,
   WritableSignal,
 } from '@angular/core';
 import {
-  FormBuilder,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+  applyEach,
+  disabled,
+  form,
+  FormField,
+  readonly,
+  required,
+} from '@angular/forms/signals';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatDialog } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { languages } from '@codemirror/language-data';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { defer, EMPTY, finalize, Observable, switchMap, take } from 'rxjs';
+import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
+import { GenericColumnType, GenericTableColumn } from '../../../../core/model';
+import { MessageBoxService } from '../../../../core/services/message-box.service';
+import { SelectTableService } from '../../../../core/services/select-table.service';
+import { SnackbarService } from '../../../../core/services/snackbar.service';
+import { isBlank, isNotBlank } from '../../../../shared/util/helper';
+import { hasFieldError } from '../../../../shared/util/signal-form';
+import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 import {
   CookieListMapType,
   ExtractionRule,
@@ -29,39 +41,14 @@ import {
   HeadersMapType,
   SpiderItem,
   SpiderItemMode,
-  SpiderItemSetting,
   SpiderMapping,
   UrlType,
-  ValuePipeline,
 } from '../../model';
-import {
-  ControlsOf,
-  GenericColumnType,
-  GenericTableColumn,
-  SelectColumn,
-  ToFormArray,
-} from '../../../../core/model';
-import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
-import { PipelineListComponent } from '../pipeline-list/pipeline-list.component';
-import {
-  isBlank,
-  isNotBlank,
-  toKeyValueArray,
-} from '../../../../shared/util/helper';
-import { MatCheckbox } from '@angular/material/checkbox';
-import { SpiderItemService } from '../../services/spider-item.service';
-import { EMPTY, switchMap } from 'rxjs';
-import { SelectTableService } from '../../../../core/services/select-table.service';
-import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { SpiderMappingService } from '../../services/spider-mapping.service';
-import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { CookieListService } from '../../services/cookie-list.service';
-import { CodeEditor } from '@acrodata/code-editor';
-import { languages } from '@codemirror/language-data';
-import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
+import { SpiderItemService } from '../../services/spider-item.service';
+import { SpiderMappingService } from '../../services/spider-mapping.service';
 import { SpiderService } from '../../services/spider.service';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatDialog, MatDialogClose } from '@angular/material/dialog';
+import { ValuePipelineFormService } from '../../services/value-pipeline-form.service';
 import {
   CookieTableDialogComponent,
   CookieTableDialogData,
@@ -70,21 +57,18 @@ import {
   HeadersTableDialogComponent,
   HeadersTableDialogData,
 } from '../headers-table-dialog/headers-table-dialog.component';
-import { CdkDragPlaceholder } from '@angular/cdk/drag-drop';
-import { ValuePipelineFormService } from '../../services/value-pipeline-form.service';
-import { CdkAriaLive } from '../../../../../../node_modules/@angular/cdk/types/_a11y-module-chunk';
+import { PipelineListComponent } from '../pipeline-list/pipeline-list.component';
 
 @Component({
   selector: 'app-spider-item',
 
   imports: [
     CommonModule,
-    FormsModule,
     TranslateModule,
-    ReactiveFormsModule,
+    FormField,
     GenericTableComponent,
     MatCheckbox,
-    CodeEditor,
+    SignalCodeEditorComponent,
     PipelineListComponent,
     TrimOnBlurDirective,
     MatTooltipModule,
@@ -92,8 +76,8 @@ import { CdkAriaLive } from '../../../../../../node_modules/@angular/cdk/types/_
   templateUrl: './spider-item.component.html',
 })
 export class SpiderItemComponent {
+  readonly hasError = hasFieldError;
   // inject
-  readonly fb = inject(FormBuilder);
   readonly translateService = inject(TranslateService);
   readonly spiderItemService = inject(SpiderItemService);
   readonly spiderMappingService = inject(SpiderMappingService);
@@ -110,9 +94,6 @@ export class SpiderItemComponent {
   readonly mappingsRx = input<ResourceRef<SpiderMapping[]>>();
   readonly spiderId = input<string>();
   //signal
-  readonly extractionRuleListData = linkedSignal(
-    () => this.initData()?.itemSetting.extractionRuleList ?? []
-  );
   readonly mappings = computed(() => this.mappingsRx()?.value() ?? []);
   readonly itemMode = signal<SpiderItemMode>(SpiderItemMode.create);
   readonly isCreateMode = computed(
@@ -122,13 +103,13 @@ export class SpiderItemComponent {
   readonly isBinding = computed(() => {
     return (
       this.isEditMode() &&
-      this.mappings()?.find(m => m.spiderItemId === this.spiderItemId.value)
+      this.mappings()?.find(m => m.spiderItemId === this.spiderItemId().value())
     );
   });
   readonly hasSpiderId = computed(() => isNotBlank(this.spiderId()));
   readonly cookieRefId = computed(() => {
     if (this.itemMode() === SpiderItemMode.edit) {
-      return this.spiderItemId.getRawValue();
+      return this.spiderItemId().value();
     }
     return '';
   });
@@ -136,23 +117,42 @@ export class SpiderItemComponent {
   readonly selectedJsonFile = signal<File | null>(null);
 
   // form
-  readonly form = this.fb.nonNullable.group({
-    spiderItemId: ['', [Validators.required]],
-    description: [''],
-    itemSetting: this.fb.nonNullable.group({
-      url: [''],
-      urlType: [UrlType.BY_PRIME_KEY],
-      testData: this.fb.nonNullable.group({
-        html: [''],
-        json: [''],
-        resultJson: [''],
-      }),
-      mode: [ExtractionRuleMode.SELECT],
-      extractionRuleList: this.fb.nonNullable.array<
-        FormGroup<ControlsOf<ExtractionRule>>
-      >([]),
-      skipWhenUsingUrl: [false],
-    }),
+  readonly isProcessing = signal(false);
+  readonly formModel = signal({
+    spiderItemId: '',
+    description: '',
+    itemSetting: {
+      url: '',
+      urlType: UrlType.BY_PRIME_KEY,
+      testData: {
+        html: '',
+        json: '',
+        resultJson: '',
+      },
+      mode: ExtractionRuleMode.SELECT,
+      extractionRuleList: [] as ExtractionRule[],
+      skipWhenUsingUrl: false,
+    },
+  });
+  readonly initialFormValue = structuredClone(this.formModel());
+  readonly form = form(this.formModel, p => {
+    readonly(p, { when: () => this.isProcessing() });
+    disabled(p.itemSetting.extractionRuleList, {
+      when: () => this.isProcessing(),
+    });
+    disabled(p.spiderItemId, { when: () => this.isEditMode() });
+    required(p.spiderItemId);
+    applyEach(p.itemSetting.extractionRuleList, row => {
+      required(row.key);
+      required(row.selector, {
+        when: ({ valueOf }) =>
+          valueOf(p.itemSetting.mode) === ExtractionRuleMode.SELECT,
+      });
+      required(row.jsonPath, {
+        when: ({ valueOf }) =>
+          valueOf(p.itemSetting.mode) === ExtractionRuleMode.JSON_PATH,
+      });
+    });
   });
   // constants
   readonly eUrlType = UrlType;
@@ -184,236 +184,288 @@ export class SpiderItemComponent {
   ];
 
   get spiderItemId() {
-    return this.form.controls.spiderItemId;
+    return this.form.spiderItemId;
   }
 
   get description() {
-    return this.form.controls.description;
+    return this.form.description;
   }
   get url() {
-    return this.form.controls.itemSetting.controls.url;
+    return this.form.itemSetting.url;
   }
   get urlType() {
-    return this.form.controls.itemSetting.controls.urlType;
+    return this.form.itemSetting.urlType;
   }
   get htmlData() {
-    return this.form.controls.itemSetting.controls.testData.controls.html!;
+    return this.form.itemSetting.testData.html!;
   }
 
   get jsonData() {
-    return this.form.controls.itemSetting.controls.testData.controls.json!;
+    return this.form.itemSetting.testData.json!;
   }
   get resultJsonData() {
-    return this.form.controls.itemSetting.controls.testData.controls
-      .resultJson!;
+    return this.form.itemSetting.testData.resultJson!;
   }
 
   get extractionRuleMode() {
-    return this.form.controls.itemSetting.controls.mode;
+    return this.form.itemSetting.mode;
   }
 
   get extractionRuleList() {
-    return this.form.controls.itemSetting.controls.extractionRuleList;
+    return this.form.itemSetting.extractionRuleList;
   }
   get skipWhenUsingUrl() {
-    return this.form.controls.itemSetting.controls.skipWhenUsingUrl;
+    return this.form.itemSetting.skipWhenUsingUrl;
   }
   get modeParams() {
-    return this.urlType.value === UrlType.BY_PARAMS;
+    return this.urlType().value() === UrlType.BY_PARAMS;
   }
   get modePrimeKey() {
-    return this.urlType.value === UrlType.BY_PRIME_KEY;
+    return this.urlType().value() === UrlType.BY_PRIME_KEY;
   }
   get useJsonPath() {
-    return this.extractionRuleMode.value === ExtractionRuleMode.JSON_PATH;
+    return this.extractionRuleMode().value() === ExtractionRuleMode.JSON_PATH;
   }
   get useSelector() {
-    return this.extractionRuleMode.value === ExtractionRuleMode.SELECT;
+    return this.extractionRuleMode().value() === ExtractionRuleMode.SELECT;
   }
 
   constructor() {
     effect(() => {
-      if (this.isEditMode()) {
-        this.spiderItemId.disable({ emitEvent: false });
-      } else {
-        this.spiderItemId.enable({ emitEvent: false });
-      }
-    });
-    effect(() => {
       const item = this.initData();
-      if (item) {
-        this.form.patchValue(item, { emitEvent: false });
-        if (item.spiderItemId) {
-          this.itemMode.set(SpiderItemMode.edit);
-        }
-      }
+      untracked(() => this.loadItem(item));
     });
+  }
+
+  private loadItem(item?: SpiderItem) {
+    const initial = structuredClone(this.initialFormValue);
+    const data = item ? structuredClone(item) : undefined;
+    this.form().reset({
+      ...initial,
+      ...data,
+      itemSetting: {
+        ...initial.itemSetting,
+        ...data?.itemSetting,
+        testData: {
+          ...initial.itemSetting.testData,
+          ...data?.itemSetting.testData,
+        },
+        extractionRuleList: (data?.itemSetting.extractionRuleList ?? []).map(
+          row => this.createExtractionRule(row)
+        ),
+      },
+    });
+    this.itemMode.set(
+      item?.spiderItemId ? SpiderItemMode.edit : SpiderItemMode.create
+    );
+  }
+
+  private runOperation<T>(
+    operation: () => Observable<T>,
+    onSuccess?: (value: T) => void,
+    onError?: (error: unknown) => void
+  ) {
+    if (this.isProcessing()) return;
+    this.isProcessing.set(true);
+    defer(operation)
+      .pipe(
+        take(1),
+        finalize(() => this.isProcessing.set(false))
+      )
+      .subscribe({ next: onSuccess, error: error => onError?.(error) });
+  }
+
+  private buildRequest(): SpiderItem | undefined {
+    this.form().markAsTouched();
+    if (isBlank(this.spiderItemId().value())) {
+      this.snackbarService.isBlankMessage('spider.spiderItemId');
+      this.spiderItemId().focusBoundControl();
+      return undefined;
+    }
+    if (this.form().invalid()) {
+      this.snackbarService.openI18N('msg.formInvalid');
+      this.form().errorSummary()[0]?.fieldTree().focusBoundControl();
+      return undefined;
+    }
+    const value = structuredClone(this.form().value());
+    return {
+      ...value,
+      spiderItemId: value.spiderItemId.trim(),
+      description: value.description.trim(),
+    };
   }
 
   onAddItem() {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-    const value = this.form.getRawValue() as SpiderItem;
-    this.spiderItemService
-      .getBySpiderItemId(value.spiderItemId)
-      .pipe(
-        switchMap(item => {
-          if (item) {
-            this.snackbarService.openI18N('msg.spiderItemExist');
-            return EMPTY;
-          }
-          return this.spiderItemService.update(value);
-        })
-      )
-      .subscribe(() => {
+    if (this.isProcessing()) return;
+    const value = this.buildRequest();
+    if (!value) return;
+    this.runOperation(
+      () =>
+        this.spiderItemService.getBySpiderItemId(value.spiderItemId).pipe(
+          switchMap(item => {
+            if (item) {
+              this.snackbarService.openI18N('msg.spiderItemExist');
+              return EMPTY;
+            }
+            return this.spiderItemService.update(value);
+          })
+        ),
+      () => {
         this.snackbarService.openI18N('msg.addSuccess');
         this.itemMode.set(SpiderItemMode.edit);
-      });
+      }
+    );
   }
+
   onSaveItem() {
-    const value = this.form.getRawValue() as SpiderItem;
-    return this.spiderItemService.update(value).subscribe(() => {
-      this.snackbarService.openI18N('msg.updateSuccess');
-    });
+    if (this.isProcessing()) return;
+    const value = this.buildRequest();
+    if (!value) return;
+    this.runOperation(
+      () => this.spiderItemService.update(value),
+      () => {
+        this.snackbarService.openI18N('msg.updateSuccess');
+      }
+    );
   }
 
   onReadItems() {
-    this.spiderItemService
-      .getAll()
-      .pipe(
-        switchMap(data => this.selectTableService.selectSingleSpiderItem(data)),
-        switchMap(item =>
-          this.spiderItemService.getBySpiderItemId(item.spiderItemId)
-        )
-      )
-      .subscribe(item => {
-        this.form.patchValue(item);
-        this.setExtractionRuleList(item.itemSetting.extractionRuleList ?? []);
-        this.itemMode.set(SpiderItemMode.edit);
-      });
+    this.runOperation(
+      () =>
+        this.spiderItemService.getAll().pipe(
+          switchMap(data =>
+            this.selectTableService.selectSingleSpiderItem(data)
+          ),
+          switchMap(item =>
+            this.spiderItemService.getBySpiderItemId(item.spiderItemId)
+          )
+        ),
+      item => this.loadItem(item)
+    );
   }
 
   toggleBind() {
     const spiderId = this.spiderId();
     const executionOrder = this.index();
-    const spiderItemId = this.spiderItemId.value;
-
-    if (
-      spiderId === undefined ||
-      executionOrder === undefined ||
-      isBlank(spiderItemId)
-    ) {
+    const spiderItemId = this.spiderItemId().value();
+    if (!spiderId || executionOrder === undefined || isBlank(spiderItemId))
       return;
-    }
-    if (this.isBinding()) {
-      this.spiderMappingService
-        .delete(spiderId, executionOrder, spiderItemId)
-        .subscribe(() => {
-          this.snackbarService.openI18N('msg.unbindSuccess');
-          this.mappingsRx()?.reload();
-        });
-    } else {
-      this.spiderMappingService
-        .update({ spiderId, executionOrder, spiderItemId })
-        .subscribe(() => {
-          this.snackbarService.openI18N('msg.bindSuccess');
-          this.mappingsRx()?.reload();
-        });
-    }
+    const wasBinding = !!this.isBinding();
+    this.runOperation(
+      () =>
+        wasBinding
+          ? this.spiderMappingService.delete(
+              spiderId,
+              executionOrder,
+              spiderItemId
+            )
+          : this.spiderMappingService.update({
+              spiderId,
+              executionOrder,
+              spiderItemId,
+            }),
+      () => {
+        this.snackbarService.openI18N(
+          wasBinding ? 'msg.unbindSuccess' : 'msg.bindSuccess'
+        );
+        this.mappingsRx()?.reload();
+      }
+    );
   }
 
   onClear() {
-    this.messageBoxService.openI18N('msg.sureClear').subscribe(result => {
-      if (!result) {
-        return;
+    this.runOperation(
+      () => this.messageBoxService.openI18N('msg.sureClear'),
+      result => {
+        if (result) this.clearItem();
       }
-      this.clearItem();
-    });
+    );
   }
 
   clearItem() {
-    this.itemMode.set(SpiderItemMode.create);
-    this.form.reset();
-    this.extractionRuleList.clear();
-    this.extractionRuleListData.set([]);
+    this.loadItem();
   }
 
   onDeleteItem() {
-    const spiderItemId = this.spiderItemId.value;
-    this.spiderMappingService
-      .inUseBySpiderItemId(spiderItemId)
-      .pipe(
-        switchMap(inUse => {
-          if (inUse) {
-            this.snackbarService.openI18N('msg.spiderItemInUse');
-            return EMPTY;
-          }
-          return this.messageBoxService.openI18N('msg.sureDeleteSpiderItem');
-        }),
-        switchMap(result => {
-          if (!result) {
-            return EMPTY;
-          }
-          return this.spiderItemService.delete(spiderItemId);
-        })
-      )
-      .subscribe(() => {
+    const spiderItemId = this.spiderItemId().value();
+    if (isBlank(spiderItemId)) return;
+    this.runOperation(
+      () =>
+        this.spiderMappingService.inUseBySpiderItemId(spiderItemId).pipe(
+          switchMap(inUse => {
+            if (inUse) {
+              this.snackbarService.openI18N('msg.spiderItemInUse');
+              return EMPTY;
+            }
+            return this.messageBoxService.openI18N('msg.sureDeleteSpiderItem');
+          }),
+          take(1),
+          switchMap(result =>
+            result ? this.spiderItemService.delete(spiderItemId) : EMPTY
+          )
+        ),
+      () => {
         this.snackbarService.openI18N('msg.deleteSuccess');
         this.clearItem();
-      });
+      }
+    );
   }
 
   onFormatJson() {
+    if (this.isProcessing()) return;
     try {
-      const jsonValue = this.jsonData.value;
+      const jsonValue = this.jsonData().value();
       if (isBlank(jsonValue)) {
         return;
       }
       const parsed = JSON.parse(jsonValue);
       const formatted = JSON.stringify(parsed, null, 2);
-      this.jsonData.setValue(formatted);
+      this.jsonData().value.set(formatted);
     } catch (e) {
       this.snackbarService.openI18N('msg.invalidJson');
     }
   }
 
   onTestParse() {
-    this.resultJsonData.setValue('{}');
-    this.spiderService
-      .previewExtraction(this.form.getRawValue() as SpiderItem)
-      .subscribe({
-        next: result => {
-          this.resultJsonData.setValue(JSON.stringify(result, null, 2));
-          this.snackbarService.openI18N('msg.extractSuccess');
-        },
-        error: err => {
-          this.snackbarService.openI18N('msg.extractFailed', {
-            message: err.message || '',
-          });
-        },
-      });
+    if (this.isProcessing()) return;
+    const value = structuredClone(this.form().value());
+    this.resultJsonData().value.set('{}');
+    this.runOperation(
+      () => this.spiderService.previewExtraction(value),
+      result => {
+        this.resultJsonData().value.set(JSON.stringify(result, null, 2));
+        this.snackbarService.openI18N('msg.extractSuccess');
+      },
+      error => {
+        this.snackbarService.openI18N('msg.extractFailed', {
+          message:
+            error && typeof error === 'object' && 'message' in error
+              ? String(error.message ?? '')
+              : '',
+        });
+      }
+    );
   }
 
   onTestParseWithFile(file: File | null) {
-    if (!file) {
-      return;
-    }
-    this.resultJsonData.setValue('{}');
-    this.spiderService
-      .previewExtractionWithFile(this.form.getRawValue() as SpiderItem, file)
-      .subscribe({
-        next: result => {
-          this.resultJsonData.setValue(JSON.stringify(result, null, 2));
-          this.snackbarService.openI18N('msg.extractSuccess');
-        },
-        error: err => {
-          this.snackbarService.openI18N('msg.extractFailed', {
-            message: err.message || '',
-          });
-        },
-      });
+    if (!file || this.isProcessing()) return;
+    const value = structuredClone(this.form().value());
+    this.resultJsonData().value.set('{}');
+    this.runOperation(
+      () => this.spiderService.previewExtractionWithFile(value, file),
+      result => {
+        this.resultJsonData().value.set(JSON.stringify(result, null, 2));
+        this.snackbarService.openI18N('msg.extractSuccess');
+      },
+      error => {
+        this.snackbarService.openI18N('msg.extractFailed', {
+          message:
+            error && typeof error === 'object' && 'message' in error
+              ? String(error.message ?? '')
+              : '',
+        });
+      }
+    );
   }
 
   onUpload(event: Event, selectedFileSignal: WritableSignal<File | null>) {
@@ -425,7 +477,7 @@ export class SpiderItemComponent {
 
   onCookiesDialog() {
     const data: CookieTableDialogData = {
-      refId: this.spiderItemId.getRawValue() ?? '',
+      refId: this.spiderItemId().value() ?? '',
       mapType: CookieListMapType.SPIDER,
     };
     this.matDialog.open(CookieTableDialogComponent, {
@@ -437,7 +489,7 @@ export class SpiderItemComponent {
 
   onHeadersDialog() {
     const data: HeadersTableDialogData = {
-      refId: this.spiderItemId.getRawValue() ?? '',
+      refId: this.spiderItemId().value() ?? '',
       mapType: HeadersMapType.SPIDER,
     };
     this.matDialog.open(HeadersTableDialogComponent, {
@@ -447,15 +499,6 @@ export class SpiderItemComponent {
     });
   }
 
-  private setExtractionRuleList(list: ExtractionRule[]) {
-    const items = this.extractionRuleList;
-    items.clear();
-    for (const item of list) {
-      const group = this.createExtractionRule(item);
-      group.patchValue(item);
-      items.push(group);
-    }
-  }
   shouldShowValueInput(condition: ExtractionStepCondition): boolean {
     const valueConditions = [
       ExtractionStepCondition.CONTAINS,
@@ -478,26 +521,21 @@ export class SpiderItemComponent {
   }
 
   readonly createExtractionRule = (data?: Partial<ExtractionRule>) => {
-    return this.fb.nonNullable.group({
-      seq: [data?.seq ?? 0],
-      key: [data?.key ?? ''],
-      selector: [data?.selector ?? ''],
-      jsonPath: [data?.jsonPath ?? ''],
-      pipelines: this.fb.nonNullable.array<
-        FormGroup<ControlsOf<ValuePipeline>>
-      >(
-        (data?.pipelines ?? []).map(pipeline =>
-          this.valuePipelineFormService.createValuePipelineGroup(pipeline)
-        )
+    return {
+      seq: data?.seq ?? 0,
+      key: data?.key ?? '',
+      selector: data?.selector ?? '',
+      jsonPath: data?.jsonPath ?? '',
+      pipelines: (data?.pipelines ?? []).map(pipeline =>
+        this.valuePipelineFormService.createValuePipeline(pipeline)
       ),
-      conditionValue: this.fb.nonNullable.group({
-        conditionType: [
+      conditionValue: {
+        conditionType:
           data?.conditionValue?.conditionType ?? ExtractionStepCondition.ALWAYS,
-        ],
-        key: [data?.conditionValue?.key ?? ''],
-        value: [data?.conditionValue?.value ?? ''],
-        ignoreCase: [data?.conditionValue?.ignoreCase ?? false],
-      }),
-    }) as FormGroup<ControlsOf<ExtractionRule>>;
+        key: data?.conditionValue?.key ?? '',
+        value: data?.conditionValue?.value ?? '',
+        ignoreCase: data?.conditionValue?.ignoreCase ?? false,
+      },
+    };
   };
 }

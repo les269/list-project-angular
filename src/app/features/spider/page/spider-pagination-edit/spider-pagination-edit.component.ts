@@ -1,25 +1,6 @@
-import {
-  Component,
-  computed,
-  effect,
-  inject,
-  linkedSignal,
-  OnInit,
-  signal,
-} from '@angular/core';
-import { rxResource, toSignal } from '@angular/core/rxjs-interop';
-import { Router, ActivatedRoute } from '@angular/router';
-import { map, filter, EMPTY, switchMap } from 'rxjs';
-import { isNotBlank } from '../../../../shared/util/helper';
-import { SpiderPaginationService } from '../../services';
-import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CodeEditor } from '@acrodata/code-editor';
 import { CommonModule } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { EditMode } from '../../../../core/model';
-import { SnackbarService } from '../../../../core/services/snackbar.service';
+import { Component, computed, inject, linkedSignal } from '@angular/core';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import {
   debounce,
   disabled,
@@ -27,29 +8,35 @@ import {
   FormField,
   required,
 } from '@angular/forms/signals';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
+import { EMPTY, filter, map, switchMap } from 'rxjs';
+import { EditMode } from '../../../../core/model';
+import { SnackbarService } from '../../../../core/services/snackbar.service';
+import { isNotBlank } from '../../../../shared/util/helper';
+import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 import {
-  CookieListMapType,
-  ExtractionRuleMode,
-  HeadersMapType,
-  SpiderPagination,
-  SpiderPaginationConfig,
-} from '../../model';
+  CookieTableDialogComponent,
+  CookieTableDialogData,
+} from '../../components/cookie-table-dialog/cookie-table-dialog.component';
 import {
   HeadersTableDialogComponent,
   HeadersTableDialogData,
 } from '../../components/headers-table-dialog/headers-table-dialog.component';
 import {
-  CookieTableDialogComponent,
-  CookieTableDialogData,
-} from '../../components/cookie-table-dialog/cookie-table-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
-import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
+  CookieListMapType,
+  ExtractionRuleMode,
+  HeadersMapType,
+  SpiderPagination,
+} from '../../model';
+import { SpiderPaginationService } from '../../services';
 
 @Component({
   imports: [
     CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
     TranslateModule,
     MatIconModule,
     MatButtonModule,

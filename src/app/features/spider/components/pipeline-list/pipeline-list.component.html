@@ -1,16 +1,20 @@
 <button
   type="button"
   class="btn btn-outline-primary btn-sm mb-2"
+  [disabled]="fields()().disabled()"
   (click)="onAdd()">
   + {{ 'pipeline.addPipeline' | translate }}
 </button>
 <div
   cdkDropList
-  [cdkDropListData]="formArray().controls"
+  [cdkDropListData]="rows()"
   (cdkDropListDropped)="dropPipeline($event)">
-  @for (pipeline of formArray().controls; track $index) {
-    @let pipelineType = pipeline.get('type')?.value;
-    <div cdkDrag [formGroup]="pipeline" class="card mb-2 p-2 bg-light">
+  @for (pipeline of rows(); track $index) {
+    @let pipelineType = pipeline.type().value();
+    <div
+      cdkDrag
+      [cdkDragDisabled]="fields()().disabled()"
+      class="card mb-2 p-2 bg-light">
       <div class="d-flex align-items-center gap-2">
         <div class="d-flex">
           <mat-icon cdkDragHandle class="drag-cursor">reorder</mat-icon>
@@ -19,12 +23,12 @@
           <input
             type="checkbox"
             class="form-check-input"
-            formControlName="enabled"
+            [formField]="pipeline.enabled"
             [matTooltip]="'g.enabled' | translate"
             [matTooltipShowDelay]="500" />
         </div>
         <div class="d-flex gap-2">
-          <select formControlName="type" class="form-select">
+          <select [formField]="pipeline.type" class="form-select">
             @for (type of eValuePipelineType | enumKeys; track type) {
               <option [value]="type">
                 {{ 'pipeline.' + type | translate }}
@@ -38,20 +42,19 @@
             <div class="d-flex input-group">
               <input
                 class="form-control"
-                formControlName="fixedValue"
+                [formField]="pipeline.fixedValue"
                 trimOnBlur />
             </div>
           }
           <!-- 固定JSON值 -->
           @case (eValuePipelineType.FIXED_JSON_VALUE) {
             <div class="d-flex input-group">
-              <code-editor
+              <app-signal-code-editor
                 [style.height]="'100px'"
                 class="w-100"
-                formControlName="fixedJsonValue"
+                [formField]="pipeline.fixedJsonValue"
                 [language]="'json'"
-                [indentWithTab]="true"
-                [languages]="CodeEditorLanguages" />
+                [indentWithTab]="true" />
             </div>
           }
           <!-- 當前資料鍵值 -->
@@ -59,7 +62,7 @@
             <div class="d-flex input-group">
               <input
                 class="form-control"
-                formControlName="currentDataKey"
+                [formField]="pipeline.currentDataKey"
                 [placeholder]="'pipeline.currentDataKeyPH' | translate"
                 trimOnBlur />
             </div>
@@ -69,7 +72,7 @@
             <div class="d-flex input-group">
               <input
                 class="form-control"
-                formControlName="attributeName"
+                [formField]="pipeline.attributeName"
                 [placeholder]="'pipeline.attributeName' | translate"
                 trimOnBlur />
             </div>
@@ -81,12 +84,12 @@
             <div class="d-flex input-group">
               <input
                 class="form-control"
-                formControlName="pattern"
+                [formField]="pipeline.pattern"
                 [placeholder]="'pipeline.pattern' | translate"
                 trimOnBlur />
               <input
                 class="form-control"
-                formControlName="replacement"
+                [formField]="pipeline.replacement"
                 [placeholder]="'pipeline.replacement' | translate"
                 trimOnBlur />
             </div>
@@ -96,7 +99,7 @@
             <div class="d-flex input-group">
               <input
                 class="form-control"
-                formControlName="separator"
+                [formField]="pipeline.separator"
                 [placeholder]="'pipeline.separator' | translate"
                 trimOnBlur />
             </div>
@@ -106,7 +109,7 @@
             <div class="d-flex input-group">
               <input
                 class="form-control"
-                formControlName="joinSeparator"
+                [formField]="pipeline.joinSeparator"
                 [placeholder]="'pipeline.joinSeparator' | translate" />
             </div>
           }
@@ -115,7 +118,7 @@
             <div class="d-flex input-group">
               <input
                 class="form-control"
-                formControlName="combineToString"
+                [formField]="pipeline.combineToString"
                 [placeholder]="'pipeline.combineToStringPH' | translate"
                 trimOnBlur />
             </div>
@@ -125,7 +128,7 @@
             <div class="d-flex input-group">
               <input
                 class="form-control"
-                formControlName="combineByKey"
+                [formField]="pipeline.combineByKey"
                 [placeholder]="'pipeline.combineByKeyPH' | translate"
                 trimOnBlur />
             </div>
@@ -135,7 +138,7 @@
             <div class="d-flex input-group">
               <app-chip-input
                 class="form-control"
-                formControlName="mergeMultiObjKeys"
+                [formField]="pipeline.mergeMultiObjKeys"
                 [matTooltip]="
                   'pipeline.MERGE_MULTI_OBJ_TO_ARRAY_PH' | translate
                 "></app-chip-input>
@@ -146,7 +149,7 @@
             <div class="d-flex input-group">
               <app-chip-input
                 class="form-control"
-                formControlName="mergeMultiArrayKeys"
+                [formField]="pipeline.mergeMultiArrayKeys"
                 [matTooltip]="
                   'pipeline.MERGE_MULTI_ARRAY_TO_ARRAY_PH' | translate
                 "></app-chip-input>
@@ -155,7 +158,9 @@
           <!-- 轉換大小寫 -->
           @case (eValuePipelineType.CONVERT_TO_CASE) {
             <div class="d-flex input-group">
-              <select formControlName="convertToCaseType" class="form-select">
+              <select
+                [formField]="pipeline.convertToCaseType"
+                class="form-select">
                 @for (type of eConvertToCaseType | enumKeys; track type) {
                   <option [value]="type">
                     {{ 'pipeline.convertToCase.' + type | translate }}
@@ -166,17 +171,20 @@
           }
           <!-- 獲取當前時間 -->
           @case (eValuePipelineType.CURRENT_TIME) {
-            <div
-              class="d-flex input-group"
-              formGroupName="currentTimeFormatOption">
-              <select formControlName="timezones" class="form-select">
+            <div class="d-flex input-group">
+              <select
+                [formField]="pipeline.currentTimeFormatOption.timezones"
+                class="form-select">
                 @for (type of eTimezones | keyvalue; track type.key) {
                   <option [value]="type.key">
                     {{ 'timezones.' + type.key | translate }}
                   </option>
                 }
               </select>
-              <input class="form-control" formControlName="format" trimOnBlur />
+              <input
+                class="form-control"
+                [formField]="pipeline.currentTimeFormatOption.format"
+                trimOnBlur />
             </div>
             <a
               mat-icon-button
@@ -187,18 +195,20 @@
           }
           <!-- 時間格式化 -->
           @case (eValuePipelineType.TIME_FORMAT) {
-            <div class="d-flex input-group" formGroupName="timeFormat">
+            <div class="d-flex input-group">
               <div class="input-group-text">
                 <input
                   type="checkbox"
                   class="form-check-input"
-                  formControlName="skipTimezoneConversion"
+                  [formField]="pipeline.timeFormat.skipTimezoneConversion"
                   [matTooltip]="
                     'pipeline.skipTimezoneConversion' | translate
                   " />
               </div>
-              @if (!pipeline.get('timeFormat.skipTimezoneConversion')?.value) {
-                <select formControlName="timezones" class="form-select">
+              @if (!pipeline.timeFormat.skipTimezoneConversion().value()) {
+                <select
+                  [formField]="pipeline.timeFormat.timezones"
+                  class="form-select">
                   @for (type of eTimezones | keyvalue; track type.key) {
                     <option [value]="type.key">
                       {{ 'timezones.' + type.key | translate }}
@@ -208,12 +218,12 @@
               }
               <input
                 class="form-control"
-                formControlName="formatParsed"
+                [formField]="pipeline.timeFormat.formatParsed"
                 [matTooltip]="'pipeline.formatParsed' | translate"
                 trimOnBlur />
               <input
                 class="form-control"
-                formControlName="format"
+                [formField]="pipeline.timeFormat.format"
                 [matTooltip]="'pipeline.formatTo' | translate"
                 trimOnBlur />
             </div>
@@ -226,15 +236,19 @@
           }
           <!-- 繁簡轉換 -->
           @case (eValuePipelineType.CHINESE_CONVERT) {
-            <div class="d-flex input-group" formGroupName="chineseConvert">
-              <select formControlName="zhConverterUtilType" class="form-select">
+            <div class="d-flex input-group">
+              <select
+                [formField]="pipeline.chineseConvert.zhConverterUtilType"
+                class="form-select">
                 @for (type of eZhConverterUtilType | enumKeys; track type) {
                   <option [value]="type">
                     {{ 'pipeline.zhConverterUtilType.' + type | translate }}
                   </option>
                 }
               </select>
-              <select formControlName="chineseConvertType" class="form-select">
+              <select
+                [formField]="pipeline.chineseConvert.chineseConvertType"
+                class="form-select">
                 @for (type of eChineseConvertType | enumKeys; track type) {
                   <option [value]="type">
                     {{ 'pipeline.chineseConvertType.' + type | translate }}
@@ -245,8 +259,10 @@
           }
           <!-- 插入值到指定位置到字串或陣列 -->
           @case (eValuePipelineType.INSERT) {
-            <div class="d-flex input-group" formGroupName="insertConfig">
-              <select formControlName="position" class="form-select">
+            <div class="d-flex input-group">
+              <select
+                [formField]="pipeline.insertConfig.position"
+                class="form-select">
                 @for (type of ePositionType | enumKeys; track type) {
                   <option [value]="type">
                     {{ 'pipeline.positionType.' + type | translate }}
@@ -254,27 +270,28 @@
                 }
               </select>
               @if (
-                pipeline.get('insertConfig.position')?.value ===
-                ePositionType.NTH
+                pipeline.insertConfig.position().value() === ePositionType.NTH
               ) {
                 <input
                   type="number"
                   class="form-control"
-                  formControlName="index"
+                  [formField]="pipeline.insertConfig.index"
                   [matTooltip]="'pipeline.indexNTH' | translate"
                   trimOnBlur />
               }
               <input
                 class="form-control"
-                formControlName="text"
+                [formField]="pipeline.insertConfig.text"
                 [placeholder]="'pipeline.insertText' | translate"
                 trimOnBlur />
             </div>
           }
           <!-- 刪除字串指定位置 -->
           @case (eValuePipelineType.DELETE) {
-            <div class="d-flex input-group" formGroupName="deleteConfig">
-              <select formControlName="position" class="form-select">
+            <div class="d-flex input-group">
+              <select
+                [formField]="pipeline.deleteConfig.position"
+                class="form-select">
                 @for (type of ePositionType | enumKeys; track type) {
                   <option [value]="type">
                     {{ 'pipeline.positionType.' + type | translate }}
@@ -282,19 +299,18 @@
                 }
               </select>
               @if (
-                pipeline.get('deleteConfig.position')?.value ===
-                ePositionType.NTH
+                pipeline.deleteConfig.position().value() === ePositionType.NTH
               ) {
                 <input
                   class="form-control"
                   type="number"
-                  formControlName="index"
+                  [formField]="pipeline.deleteConfig.index"
                   [matTooltip]="'pipeline.indexNTH' | translate" />
               }
               <input
                 class="form-control"
                 type="number"
-                formControlName="length"
+                [formField]="pipeline.deleteConfig.length"
                 [matTooltip]="'pipeline.deleteLength' | translate"
                 trimOnBlur />
             </div>
@@ -304,7 +320,7 @@
             <div class="d-flex input-group">
               <app-chip-input
                 class="form-control"
-                formControlName="deletePaths"
+                [formField]="pipeline.deletePaths"
                 [matTooltip]="
                   'pipeline.deletePathsPH' | translate
                 "></app-chip-input>
@@ -312,28 +328,26 @@
           }
           <!-- 移動字元 -->
           @case (eValuePipelineType.MOVE_CHAR) {
-            <div class="d-flex input-group" formGroupName="moveCharConfig">
+            <div class="d-flex input-group">
               <input
                 class="form-control"
                 type="number"
-                formControlName="fromIndex"
+                [formField]="pipeline.moveCharConfig.fromIndex"
                 [matTooltip]="'pipeline.fromIndex' | translate" />
               <input
                 class="form-control"
                 type="number"
-                formControlName="toIndex"
+                [formField]="pipeline.moveCharConfig.toIndex"
                 [matTooltip]="'pipeline.toIndex' | translate" />
             </div>
           }
           <!-- 計算表達式 -->
           @case (eValuePipelineType.CALCULATE) {
-            <div
-              class="d-flex flex-column gap-2 w-100"
-              formGroupName="calculateConfig">
+            <div class="d-flex flex-column gap-2 w-100">
               <div class="d-flex input-group">
                 <app-chip-input-map
                   class="form-control"
-                  formControlName="variablePaths"
+                  [formField]="pipeline.calculateConfig.variablePaths"
                   [matTooltip]="
                     'pipeline.variablePathsPH' | translate
                   "></app-chip-input-map>
@@ -341,12 +355,12 @@
               <div class="d-flex input-group">
                 <input
                   class="form-control"
-                  formControlName="expression"
+                  [formField]="pipeline.calculateConfig.expression"
                   [matTooltip]="'pipeline.expressionPH' | translate"
                   trimOnBlur />
                 <input
                   class="form-control"
-                  formControlName="defaultValue"
+                  [formField]="pipeline.calculateConfig.defaultValue"
                   [matTooltip]="'pipeline.defaultValuePH' | translate"
                   trimOnBlur />
                 <a
@@ -363,7 +377,7 @@
             <div class="d-flex input-group">
               <input
                 class="form-control"
-                formControlName="fetchCookieName"
+                [formField]="pipeline.fetchCookieName"
                 [matTooltip]="'pipeline.fetchCookieTip' | translate"
                 trimOnBlur />
             </div>
@@ -373,7 +387,7 @@
             <div class="d-flex input-group">
               <input
                 class="form-control"
-                formControlName="fetchHeaderName"
+                [formField]="pipeline.fetchHeaderName"
                 [matTooltip]="'pipeline.fetchHeaderTip' | translate"
                 trimOnBlur />
             </div>
@@ -383,14 +397,19 @@
             <div class="d-flex input-group">
               <input
                 class="form-control"
-                formControlName="fetchCurrentDataKey"
+                [formField]="pipeline.fetchCurrentDataKey"
                 [matTooltip]="'pipeline.fetchCurrentDataKeyTip' | translate"
                 trimOnBlur />
             </div>
           }
         }
 
-        <button mat-icon-button class="ms-auto" (click)="onDelete($index)">
+        <button
+          type="button"
+          [disabled]="fields()().disabled()"
+          mat-icon-button
+          class="ms-auto"
+          (click)="onDelete($index)">
           <mat-icon>delete</mat-icon>
         </button>
       </div>

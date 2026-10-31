@@ -1,26 +1,24 @@
-import { computed, inject, Injectable } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { computed, Injectable } from '@angular/core';
 import dayjs from 'dayjs';
-import { ControlsOf, ChipsMapValue } from '../../../core/model';
+import { ChipsMapValue } from '../../../core/model';
 import {
-  ValuePipelineType,
-  ConvertToCaseType,
+  CalculateConfig,
+  ChineseConvert,
   ChineseConvertType,
+  ConvertToCaseType,
+  DeleteConfig,
+  InsertConfig,
+  MoveCharConfig,
   PositionType,
+  TimeFormatOption,
   Timezones,
   ValuePipeline,
-  InsertConfig,
-  DeleteConfig,
-  MoveCharConfig,
-  TimeFormatOption,
-  ChineseConvert,
+  ValuePipelineType,
   ZhConverterUtilType,
-  CalculateConfig,
 } from '../model';
 
 @Injectable({ providedIn: 'root' })
 export class ValuePipelineFormService {
-  readonly fb = inject(FormBuilder);
   readonly eValuePipelineType = ValuePipelineType;
   readonly eConvertToCaseType = ConvertToCaseType;
   readonly eChineseConvertType = ChineseConvertType;
@@ -41,90 +39,86 @@ export class ValuePipelineFormService {
     return Timezones[key] ?? Timezones.GMT_P00;
   });
 
-  createValuePipelineGroup(
-    data?: Partial<ValuePipeline>
-  ): FormGroup<ControlsOf<ValuePipeline>> {
-    return this.fb.nonNullable.group({
-      seq: [data?.seq ?? 0],
-      type: [data?.type ?? ValuePipelineType.FIXED_VALUE],
-      enabled: [data?.enabled ?? true],
-      fixedValue: [data?.fixedValue ?? ''],
-      fixedJsonValue: [data?.fixedJsonValue ?? ''],
-      currentDataKey: [data?.currentDataKey ?? ''],
-      attributeName: [data?.attributeName ?? ''],
-      pattern: [data?.pattern ?? ''],
-      replacement: [data?.replacement ?? ''],
-      separator: [data?.separator ?? ''],
-      joinSeparator: [data?.joinSeparator ?? ','],
-      combineToString: [data?.combineToString ?? ''],
-      combineByKey: [data?.combineByKey ?? ''],
-      mergeMultiObjKeys: [data?.mergeMultiObjKeys ?? []],
-      mergeMultiArrayKeys: [data?.mergeMultiArrayKeys ?? []],
-      convertToCaseType: [data?.convertToCaseType ?? ConvertToCaseType.UPPER],
-      currentTimeFormatOption: this.createTimeFormatOptionGroup(
+  createValuePipeline(data?: Partial<ValuePipeline>) {
+    return {
+      seq: data?.seq ?? 0,
+      type: data?.type ?? ValuePipelineType.FIXED_VALUE,
+      enabled: data?.enabled ?? true,
+      fixedValue: data?.fixedValue ?? '',
+      fixedJsonValue: data?.fixedJsonValue ?? '',
+      currentDataKey: data?.currentDataKey ?? '',
+      attributeName: data?.attributeName ?? '',
+      pattern: data?.pattern ?? '',
+      replacement: data?.replacement ?? '',
+      separator: data?.separator ?? '',
+      joinSeparator: data?.joinSeparator ?? ',',
+      combineToString: data?.combineToString ?? '',
+      combineByKey: data?.combineByKey ?? '',
+      mergeMultiObjKeys: data?.mergeMultiObjKeys ?? [],
+      mergeMultiArrayKeys: data?.mergeMultiArrayKeys ?? [],
+      convertToCaseType: data?.convertToCaseType ?? ConvertToCaseType.UPPER,
+      currentTimeFormatOption: this.createTimeFormatOption(
         data?.currentTimeFormatOption
       ),
-      timeFormat: this.createTimeFormatOptionGroup(data?.timeFormat),
-      chineseConvert: this.createChineseConvertGroup(data?.chineseConvert),
-      insertConfig: this.createInsertConfigGroup(data?.insertConfig),
-      deleteConfig: this.createDeleteConfigGroup(data?.deleteConfig),
-      deletePaths: [data?.deletePaths ?? []],
-      moveCharConfig: this.createMoveCharConfigGroup(data?.moveCharConfig),
-      calculateConfig: this.createCalculateConfigGroup(data?.calculateConfig),
-      fetchCookieName: [data?.fetchCookieName ?? ''],
-      fetchHeaderName: [data?.fetchHeaderName ?? ''],
-      fetchCurrentDataKey: [data?.fetchCurrentDataKey ?? ''],
-    }) as FormGroup<ControlsOf<ValuePipeline>>;
+      timeFormat: this.createTimeFormatOption(data?.timeFormat),
+      chineseConvert: this.createChineseConvert(data?.chineseConvert),
+      insertConfig: this.createInsertConfig(data?.insertConfig),
+      deleteConfig: this.createDeleteConfig(data?.deleteConfig),
+      deletePaths: data?.deletePaths ?? [],
+      moveCharConfig: this.createMoveCharConfig(data?.moveCharConfig),
+      calculateConfig: this.createCalculateConfig(data?.calculateConfig),
+      fetchCookieName: data?.fetchCookieName ?? '',
+      fetchHeaderName: data?.fetchHeaderName ?? '',
+      fetchCurrentDataKey: data?.fetchCurrentDataKey ?? '',
+    };
   }
 
-  createInsertConfigGroup(data?: Partial<InsertConfig>) {
-    return this.fb.nonNullable.group({
-      position: [data?.position ?? PositionType.START],
-      text: [data?.text ?? ''],
-      index: [data?.index ?? 1],
-    }) as FormGroup<ControlsOf<InsertConfig>>;
+  createInsertConfig(data?: Partial<InsertConfig>) {
+    return {
+      position: data?.position ?? PositionType.START,
+      text: data?.text ?? '',
+      index: data?.index ?? 1,
+    };
   }
 
-  createDeleteConfigGroup(data?: Partial<DeleteConfig>) {
-    return this.fb.nonNullable.group({
-      position: [data?.position ?? PositionType.START],
-      length: [data?.length ?? 1],
-      index: [data?.index ?? 1],
-    }) as FormGroup<ControlsOf<DeleteConfig>>;
+  createDeleteConfig(data?: Partial<DeleteConfig>) {
+    return {
+      position: data?.position ?? PositionType.START,
+      length: data?.length ?? 1,
+      index: data?.index ?? 1,
+    };
   }
 
-  createMoveCharConfigGroup(data?: Partial<MoveCharConfig>) {
-    return this.fb.nonNullable.group({
-      fromIndex: [data?.fromIndex ?? 1],
-      toIndex: [data?.toIndex ?? 1],
-    }) as FormGroup<ControlsOf<MoveCharConfig>>;
+  createMoveCharConfig(data?: Partial<MoveCharConfig>) {
+    return {
+      fromIndex: data?.fromIndex ?? 1,
+      toIndex: data?.toIndex ?? 1,
+    };
   }
 
-  createTimeFormatOptionGroup(data?: Partial<TimeFormatOption>) {
-    return this.fb.nonNullable.group({
-      format: [data?.format ?? 'YYYY-MM-dd HH:mm:ss'],
-      timezones: [data?.timezones ?? this.currentTimezones()],
-      skipTimezoneConversion: [data?.skipTimezoneConversion ?? false],
-      formatParsed: [data?.formatParsed ?? 'YYYY-MM-dd HH:mm:ss'],
-    }) as FormGroup<ControlsOf<TimeFormatOption>>;
+  createTimeFormatOption(data?: Partial<TimeFormatOption>) {
+    return {
+      format: data?.format ?? 'YYYY-MM-dd HH:mm:ss',
+      timezones: data?.timezones ?? this.currentTimezones(),
+      skipTimezoneConversion: data?.skipTimezoneConversion ?? false,
+      formatParsed: data?.formatParsed ?? 'YYYY-MM-dd HH:mm:ss',
+    };
   }
 
-  createChineseConvertGroup(data?: Partial<ChineseConvert>) {
-    return this.fb.nonNullable.group({
-      chineseConvertType: [
+  createChineseConvert(data?: Partial<ChineseConvert>) {
+    return {
+      chineseConvertType:
         data?.chineseConvertType ??
-          ChineseConvertType.SIMPLIFIED_TO_TRADITIONAL,
-      ],
-      zhConverterUtilType: [
+        ChineseConvertType.SIMPLIFIED_TO_TRADITIONAL,
+      zhConverterUtilType:
         data?.zhConverterUtilType ?? ZhConverterUtilType.ZH_CONVERTER_UTIL,
-      ],
-    }) as FormGroup<ControlsOf<ChineseConvert>>;
+    };
   }
-  createCalculateConfigGroup(data?: Partial<CalculateConfig>) {
-    return this.fb.nonNullable.group({
-      variablePaths: [data?.variablePaths ?? ([] as ChipsMapValue[])],
-      expression: [data?.expression ?? ''],
-      defaultValue: [data?.defaultValue ?? ''],
-    }) as FormGroup<ControlsOf<CalculateConfig>>;
+  createCalculateConfig(data?: Partial<CalculateConfig>) {
+    return {
+      variablePaths: data?.variablePaths ?? ([] as ChipsMapValue[]),
+      expression: data?.expression ?? '',
+      defaultValue: data?.defaultValue ?? '',
+    };
   }
 }

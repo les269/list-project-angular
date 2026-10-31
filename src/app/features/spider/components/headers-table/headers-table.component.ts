@@ -7,47 +7,47 @@ import {
   linkedSignal,
   output,
   signal,
+  untracked,
 } from '@angular/core';
-
-import { TranslateModule } from '@ngx-translate/core';
-import { MatTableModule } from '@angular/material/table';
 import {
-  ReactiveFormsModule,
-  FormsModule,
-  FormBuilder,
-  Validators,
-  FormGroup,
-} from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-import { Header, HeadersMapType, HeadersTO, ValuePipeline } from '../../model';
+  applyEach,
+  disabled,
+  form,
+  FormField,
+  required,
+  readonly,
+  SchemaFn,
+} from '@angular/forms/signals';
+
+import { rxResource } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTableModule } from '@angular/material/table';
+import { TranslateModule } from '@ngx-translate/core';
+import { defer, EMPTY, finalize, Observable, switchMap, take, tap } from 'rxjs';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 import {
-  ControlsOf,
   GenericColumnType,
   GenericTableColumn,
-  ToFormArray,
 } from '../../../../core/model/generic-table';
-import { HeadersService } from '../../services/headers.service';
-import { HeadersMapService } from '../../services/headers-map.service';
-import { SelectTableService } from '../../../../core/services/select-table.service';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
+import { SelectTableService } from '../../../../core/services/select-table.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { EMPTY, switchMap } from 'rxjs';
 import { isBlank, isNotBlank } from '../../../../shared/util/helper';
 import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
+import { Header, HeadersMapType, HeadersTO } from '../../model';
 import { HeadersMode } from '../../model/headers.model';
-import { rxResource } from '@angular/core/rxjs-interop';
-import { PipelineListComponent } from '../pipeline-list/pipeline-list.component';
+import { HeadersMapService } from '../../services/headers-map.service';
+import { HeadersService } from '../../services/headers.service';
 import { ValuePipelineFormService } from '../../services/value-pipeline-form.service';
+import { PipelineListComponent } from '../pipeline-list/pipeline-list.component';
 
 @Component({
   selector: 'app-headers-table',
 
   imports: [
     MatTableModule,
-    ReactiveFormsModule,
-    FormsModule,
+    FormField,
     TranslateModule,
     MatIconModule,
     MatButtonModule,
@@ -58,13 +58,18 @@ import { ValuePipelineFormService } from '../../services/value-pipeline-form.ser
   templateUrl: './headers-table.component.html',
 })
 export class HeadersTableComponent {
+  static readonly rowSchema: SchemaFn<
+    ReturnType<HeadersTableComponent['createHeader']>
+  > = p => {
+    required(p.name);
+    required(p.value);
+  };
   readonly headersService = inject(HeadersService);
   readonly headersMapService = inject(HeadersMapService);
   readonly selectTableService = inject(SelectTableService);
   readonly messageBoxService = inject(MessageBoxService);
   readonly snackbarService = inject(SnackbarService);
   readonly valuePipelineFormService = inject(ValuePipelineFormService);
-  readonly fb = inject(FormBuilder);
 
   readonly displayedColumns = ['name', 'value'];
 
@@ -85,7 +90,7 @@ export class HeadersTableComponent {
       const refId = this.refId()?.trim() ?? '';
       const mapType = this.mapType();
       if (isBlank(refId) || !mapType) {
-        return null;
+        return undefined;
       }
       return { refId, mapType };
     },
@@ -100,9 +105,8 @@ export class HeadersTableComponent {
     },
     defaultValue: undefined,
   });
-  readonly list = linkedSignal(() => this.initData.value()?.list ?? []);
   readonly isBinding = linkedSignal<boolean>(() => {
-    return this.initData.value() !== null;
+    return !!this.initData.value();
   });
   readonly showBindButton = computed(
     () =>
@@ -112,187 +116,197 @@ export class HeadersTableComponent {
     () => this.isEditMode() && !this.isBinding()
   );
 
-  readonly form = this.fb.nonNullable.group({
-    headersId: ['', [Validators.required]],
-    description: [''],
-    list: this.fb.array([]),
+  readonly isProcessing = signal(false);
+  readonly formModel = signal({
+    headersId: '',
+    description: '',
+    list: [] as ReturnType<HeadersTableComponent['createHeader']>[],
+  });
+  readonly initialFormValue = structuredClone(this.formModel());
+  readonly form = form(this.formModel, p => {
+    readonly(p, { when: () => this.isProcessing() });
+    disabled(p.list, { when: () => this.isProcessing() });
+    disabled(p.headersId, { when: () => this.isEditMode() });
+    applyEach(p.list, HeadersTableComponent.rowSchema);
+    required(p.headersId);
   });
 
   get headersIdControl() {
-    return this.form.controls.headersId;
+    return this.form.headersId;
   }
 
   get descriptionControl() {
-    return this.form.controls.description;
+    return this.form.description;
   }
 
   get listControl() {
-    return this.form.get('list') as ToFormArray<Header>;
+    return this.form.list;
   }
 
   constructor() {
     effect(() => {
-      if (this.isEditMode()) {
-        this.headersIdControl.disable({ emitEvent: false });
-      } else {
-        this.headersIdControl.enable({ emitEvent: false });
-      }
-    });
-    effect(() => {
       const data = this.initData.value();
-      if (data) {
-        this.form.patchValue(data, { emitEvent: false });
-        this.setHeadersList(data.list ?? []);
-        this.mode.set(HeadersMode.edit);
-      } else {
-        this.form.reset({ headersId: '', description: '' });
-        this.setHeadersList([]);
-        this.mode.set(HeadersMode.create);
-      }
+      untracked(() => this.loadItem(data));
     });
+  }
+
+  private loadItem(data?: HeadersTO | null) {
+    this.form().reset({
+      ...structuredClone(this.initialFormValue),
+      headersId: data?.headersId ?? '',
+      description: data?.description ?? '',
+      list: (data?.list ?? []).map(row =>
+        this.createHeader(structuredClone(row))
+      ),
+    });
+    this.mode.set(data ? HeadersMode.edit : HeadersMode.create);
+  }
+
+  private runOperation<T>(
+    operation: () => Observable<T>,
+    onSuccess?: (value: T) => void
+  ) {
+    if (this.isProcessing()) return;
+    this.isProcessing.set(true);
+    defer(operation)
+      .pipe(
+        take(1),
+        finalize(() => this.isProcessing.set(false))
+      )
+      .subscribe({ next: onSuccess, error: () => {} });
+  }
+
+  private buildRequest(): HeadersTO | undefined {
+    this.form().markAsTouched();
+    if (this.form().invalid() || isBlank(this.headersIdControl().value())) {
+      this.snackbarService.isBlankMessage('scrapy.headersId');
+      return undefined;
+    }
+    const raw = this.form().value();
+    return {
+      headersId: raw.headersId.trim(),
+      description: raw.description.trim(),
+      list: structuredClone(raw.list),
+    };
+  }
+
+  private persistItem(req: HeadersTO) {
+    return this.headersService.update(req).pipe(
+      tap(() => {
+        this.mode.set(HeadersMode.edit);
+        this.afterSave.emit(req);
+        this.snackbarService.openI18N('msg.saveSuccess');
+      })
+    );
   }
 
   openItemSelector() {
-    this.headersService
-      .getAll()
-      .pipe(
-        switchMap(data =>
-          this.selectTableService.selectSingleHeadersList(data)
+    this.runOperation(
+      () =>
+        this.headersService.getAll().pipe(
+          switchMap(data =>
+            this.selectTableService.selectSingleHeadersList(data)
+          ),
+          switchMap(item => this.headersService.getByHeadersId(item.headersId))
         ),
-        switchMap(item => this.headersService.getByHeadersId(item.headersId))
-      )
-      .subscribe(item => {
-        this.form.patchValue({
-          headersId: item.headersId,
-          description: item.description ?? '',
-        });
-        this.setHeadersList(item.list ?? []);
-        this.mode.set(HeadersMode.edit);
-      });
+      item => this.loadItem(item)
+    );
   }
 
   addItem() {
-    this.headersIdControl.markAsTouched();
-    if (this.form.invalid) {
-      this.snackbarService.isBlankMessage('scrapy.headersId');
-      return;
-    }
-    const headersId = this.headersIdControl.getRawValue().trim();
-    this.headersService.getAll().subscribe(list => {
-      const exist = list.some(x => x.headersId === headersId);
-      if (exist) {
-        this.messageBoxService.openI18N('msg.itemIdExist', {
-          params: { text: 'Headers ID' },
-          onlyOk: true,
-        });
-        return;
-      }
-      this.saveItem();
-    });
+    if (this.isProcessing()) return;
+    const req = this.buildRequest();
+    if (!req) return;
+    this.runOperation(() =>
+      this.headersService.getAll().pipe(
+        switchMap(list => {
+          if (list.some(item => item.headersId === req.headersId)) {
+            return this.messageBoxService
+              .openI18N('msg.itemIdExist', {
+                params: { text: 'Header ID' },
+                onlyOk: true,
+              })
+              .pipe(switchMap(() => EMPTY));
+          }
+          return this.persistItem(req);
+        })
+      )
+    );
   }
 
   saveItem() {
-    this.headersIdControl.markAsTouched();
-    if (this.form.invalid) {
-      this.snackbarService.isBlankMessage('scrapy.headersId');
-      return;
-    }
-    const req: HeadersTO = {
-      headersId: this.headersIdControl.getRawValue().trim(),
-      description: this.descriptionControl.getRawValue().trim(),
-      list: this.listControl.getRawValue() as Header[],
-    };
-    this.headersService.update(req).subscribe(() => {
-      this.mode.set(HeadersMode.edit);
-      this.afterSave.emit(req);
-      this.snackbarService.openI18N('msg.saveSuccess');
-    });
+    if (this.isProcessing()) return;
+    const req = this.buildRequest();
+    if (req) this.runOperation(() => this.persistItem(req));
   }
 
   onClear() {
-    this.messageBoxService.openI18N('msg.sureClear').subscribe(result => {
-      if (!result) return;
-      this.mode.set(HeadersMode.create);
-      this.form.reset({ headersId: '', description: '' });
-      this.setHeadersList([]);
-    });
+    this.runOperation(
+      () => this.messageBoxService.openI18N('msg.sureClear'),
+      result => {
+        if (result) this.loadItem();
+      }
+    );
   }
 
   toggleBind() {
     const refId = this.refId()?.trim() ?? '';
     const mapType = this.mapType();
-    const headersId = this.headersIdControl.getRawValue().trim();
-    if (isBlank(refId) || !mapType || isBlank(headersId)) {
-      return;
-    }
-
-    if (this.isBinding()) {
-      this.headersMapService.delete(refId, mapType).subscribe(() => {
-        this.isBinding.set(false);
-        this.bindingChange.emit(false);
-        this.snackbarService.openI18N('msg.unbindSuccess');
-      });
-      return;
-    }
-
-    this.headersMapService
-      .update({ refId, type: mapType, headersId })
-      .subscribe(() => {
-        this.isBinding.set(true);
-        this.bindingChange.emit(true);
-        this.snackbarService.openI18N('msg.bindSuccess');
-      });
+    const headersId = this.headersIdControl().value().trim();
+    if (isBlank(refId) || !mapType || isBlank(headersId)) return;
+    const wasBinding = this.isBinding();
+    this.runOperation(
+      () =>
+        wasBinding
+          ? this.headersMapService.delete(refId, mapType)
+          : this.headersMapService.update({ refId, type: mapType, headersId }),
+      () => {
+        this.isBinding.set(!wasBinding);
+        this.bindingChange.emit(!wasBinding);
+        this.snackbarService.openI18N(
+          wasBinding ? 'msg.unbindSuccess' : 'msg.bindSuccess'
+        );
+      }
+    );
   }
 
   deleteItem() {
-    const headersId = this.headersIdControl.getRawValue().trim();
+    if (this.isProcessing()) return;
+    const headersId = this.headersIdControl().value().trim();
     if (isBlank(headersId)) {
       this.snackbarService.isBlankMessage('scrapy.headersId');
       return;
     }
-    this.headersMapService
-      .headersIsInUse(headersId)
-      .pipe(
-        switchMap(inUse => {
-          if (inUse) {
-            this.messageBoxService.openI18N('msg.headersListInUse', {
-              onlyOk: true,
-            });
-            return EMPTY;
-          }
-          return this.messageBoxService.openI18N('msg.sureDeleteHeadersList');
-        }),
-        switchMap(result => {
-          if (!result) return EMPTY;
-          return this.headersService.delete(headersId);
-        })
-      )
-      .subscribe(() => {
-        this.mode.set(HeadersMode.create);
-        this.form.reset({ headersId: '', description: '' });
-        this.setHeadersList([]);
+    this.runOperation(
+      () =>
+        this.headersMapService.headersIsInUse(headersId).pipe(
+          switchMap(inUse =>
+            inUse
+              ? this.messageBoxService
+                  .openI18N('msg.headersListInUse', { onlyOk: true })
+                  .pipe(switchMap(() => EMPTY))
+              : this.messageBoxService.openI18N('msg.sureDeleteHeadersList')
+          ),
+          take(1),
+          switchMap(result =>
+            result ? this.headersService.delete(headersId) : EMPTY
+          )
+        ),
+      () => {
+        this.loadItem();
         this.snackbarService.openI18N('msg.deleteSuccess');
-      });
+      }
+    );
   }
 
-  private setHeadersList(list: Header[]) {
-    const formArray = this.listControl;
-    formArray.clear();
-    this.list.set(list);
-  }
-
-  readonly createHeadersGroup = (item?: Partial<Header>) => {
-    return this.fb.nonNullable.group({
-      seq: [item?.seq ?? 0],
-      name: [item?.name ?? '', [Validators.required]],
-      value: [item?.value ?? '', [Validators.required]],
-      valuePipelines: this.fb.nonNullable.array<
-        FormGroup<ControlsOf<ValuePipeline>>
-      >(
-        (item?.valuePipelines ?? []).map(pipeline =>
-          this.valuePipelineFormService.createValuePipelineGroup(pipeline)
-        )
+  readonly createHeader = (item?: Partial<Header>) => {
+    return {
+      seq: item?.seq ?? 0,
+      name: item?.name ?? '',
+      value: item?.value ?? '',
+      valuePipelines: (item?.valuePipelines ?? []).map(pipeline =>
+        this.valuePipelineFormService.createValuePipeline(pipeline)
       ),
-    }) as FormGroup<ControlsOf<Header>>;
+    };
   };
 }

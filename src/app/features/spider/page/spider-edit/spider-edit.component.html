@@ -1,6 +1,6 @@
 <div class="container d-flex">
   <div class="col-md-10 offset-md-1 col-xs-12 mt-2">
-    <form [formGroup]="form">
+    <form (submit)="$event.preventDefault()">
       <button
         type="button"
         mat-icon-button
@@ -11,12 +11,12 @@
 
       <div class="form-group mb-2">
         <label>{{ 'spider.spiderId' | translate }}</label>
-        <input class="form-control" formControlName="spiderId" trimOnBlur />
+        <input class="form-control" [formField]="form.spiderId" trimOnBlur />
       </div>
 
       <div class="form-group mb-2">
         <label>{{ 'g.description' | translate }}</label>
-        <input class="form-control" formControlName="description" trimOnBlur />
+        <input class="form-control" [formField]="form.description" trimOnBlur />
       </div>
 
       <div class="form-group mb-2">
@@ -24,26 +24,31 @@
         <input
           class="form-control"
           type="number"
-          formControlName="primeKeySize" />
+          [formField]="form.primeKeySize" />
         <label class="form-text">{{
           'spider.primeKeySizeDesc' | translate
         }}</label>
       </div>
 
       <div class="my-3">
-        <mat-checkbox formControlName="isUrlBased">
+        <mat-checkbox [formField]="form.isUrlBased">
           {{ 'spider.isUrlBased' | translate }}
         </mat-checkbox>
       </div>
       <div class="d-flex gap-2">
-        <button type="button" class="btn btn-success" (click)="update()">
+        <button
+          type="button"
+          class="btn btn-success"
+          (click)="update()"
+          [disabled]="isProcessing()">
           {{ 'g.save' | translate }}
         </button>
         @if (isEditMode) {
           <button
             type="button"
             class="btn btn-primary"
-            (click)="onAddItemTab()">
+            (click)="onAddItemTab()"
+            [disabled]="isProcessing()">
             {{ 'spider.createSpiderItem' | translate }}
           </button>
         }
@@ -51,7 +56,8 @@
           <button
             type="button"
             class="btn btn-danger"
-            (click)="onDeleteItemTab()">
+            (click)="onDeleteItemTab()"
+            [disabled]="isProcessing()">
             {{ 'spider.deleteSpiderItem' | translate }}
           </button>
         }
@@ -67,28 +73,28 @@
       <mat-tab-group
         cdkDropList
         cdkDropListOrientation="horizontal"
-        [cdkDropListDisabled]="!canDragTabs"
+        [cdkDropListDisabled]="!canDragTabs || isProcessing()"
         [cdkDropListData]="spiderItems()"
         cdkDropListElementContainer=".mat-mdc-tab-labels"
         (cdkDropListDropped)="dropTab($event)"
         [selectedIndex]="selected()"
         (selectedIndexChange)="onTabChange($event)">
         <mat-tab [label]="'spider.testArea' | translate">
-          <div formGroupName="testData">
+          <div>
             <div class="form-group mb-2">
               <label>{{ 'spider.testPrimeKeyList' | translate }}</label>
-              <code-editor
-                formControlName="primeKeyListJson"
+              <app-signal-code-editor
+                [formField]="form.testData.primeKeyListJson"
                 [language]="'json'"
-                [indentWithTab]="true"
-                [languages]="languages" />
+                [indentWithTab]="true" />
               <label class="form-text w-100">{{
                 'spider.testPrimeKeyListDesc' | translate
               }}</label>
               <button
                 type="button"
                 class="btn btn-primary"
-                (click)="onPreviewByPrimeKeyList()">
+                (click)="onPreviewByPrimeKeyList()"
+                [disabled]="isProcessing()">
                 {{ 'spider.test' | translate }}
               </button>
             </div>
@@ -97,22 +103,22 @@
               <div>{{ 'spider.testUrl' | translate }}</div>
               <input
                 class="form-control mb-2"
-                formControlName="url"
+                [formField]="form.testData.url"
                 trimOnBlur />
               <button
                 type="button"
                 class="btn btn-primary"
-                (click)="onPreviewByUrl()">
+                (click)="onPreviewByUrl()"
+                [disabled]="isProcessing()">
                 {{ 'spider.test' | translate }}
               </button>
             </div>
             <div class="form-group mb-2">
               <label>{{ 'spider.testResultJson' | translate }}</label>
-              <code-editor
-                formControlName="resultJson"
+              <app-signal-code-editor
+                [formField]="form.testData.resultJson"
                 [language]="'json'"
-                [indentWithTab]="true"
-                [languages]="languages" />
+                [indentWithTab]="true" />
             </div>
           </div>
         </mat-tab>

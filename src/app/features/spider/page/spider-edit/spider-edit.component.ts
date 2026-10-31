@@ -1,3 +1,9 @@
+import { SignalCodeEditorComponent } from '../../../../core/components/signal-code-editor/signal-code-editor.component';
+import {
+  CdkDragDrop,
+  DragDropModule,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import {
   Component,
@@ -6,29 +12,40 @@ import {
   inject,
   linkedSignal,
   signal,
+  untracked,
 } from '@angular/core';
-import { toSignal, rxResource } from '@angular/core/rxjs-interop';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import {
-  CdkDragDrop,
-  DragDropModule,
-  moveItemInArray,
-} from '@angular/cdk/drag-drop';
-import { ActivatedRoute, Router } from '@angular/router';
-import {
-  FormBuilder,
-  FormControl,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+  disabled,
+  form,
+  FormField,
+  min,
+  required,
+  readonly,
+} from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { languages } from '@codemirror/language-data';
 import { TranslateModule } from '@ngx-translate/core';
-import { EMPTY, filter, forkJoin, map, of, startWith, switchMap } from 'rxjs';
+import {
+  defer,
+  EMPTY,
+  filter,
+  finalize,
+  map,
+  Observable,
+  switchMap,
+  take,
+} from 'rxjs';
+import { EditMode } from '../../../../core/model';
+import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { isNotBlank, isNotJson } from '../../../../shared/util/helper';
+import { isNotBlank } from '../../../../shared/util/helper';
+import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
+import { SpiderItemComponent } from '../../components/spider-item/spider-item.component';
 import {
   ExtractionRuleMode,
   SpiderConfig,
@@ -37,26 +54,17 @@ import {
   SpiderReq,
   UrlType,
 } from '../../model';
-import { SpiderConfigService } from '../../services/spider-config.service';
-import { SpiderMappingService } from '../../services/spider-mapping.service';
-import { SpiderItemComponent } from '../../components/spider-item/spider-item.component';
-import { CodeEditor } from '@acrodata/code-editor';
-import { languages } from '@codemirror/language-data';
-import { SpiderItemService } from '../../services/spider-item.service';
-import { MessageBoxService } from '../../../../core/services/message-box.service';
-import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 import { SpiderService } from '../../services';
-import { EditMode } from '../../../../core/model';
-
-type SpiderEditMode = 'create' | 'edit';
+import { SpiderConfigService } from '../../services/spider-config.service';
+import { SpiderItemService } from '../../services/spider-item.service';
+import { SpiderMappingService } from '../../services/spider-mapping.service';
 
 @Component({
   selector: 'app-spider-edit',
   templateUrl: './spider-edit.component.html',
   imports: [
     CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
+    FormField,
     MatButtonModule,
     MatCheckboxModule,
     MatIconModule,
@@ -64,7 +72,7 @@ type SpiderEditMode = 'create' | 'edit';
     DragDropModule,
     TranslateModule,
     SpiderItemComponent,
-    CodeEditor,
+    SignalCodeEditorComponent,
     TrimOnBlurDirective,
   ],
 })
@@ -78,12 +86,12 @@ export class SpiderEditComponent {
   readonly spiderService = inject(SpiderService);
   readonly snackbarService = inject(SnackbarService);
   readonly messageBoxService = inject(MessageBoxService);
-  readonly fb = inject(FormBuilder);
   // constants
   readonly languages = languages;
   readonly editMode = EditMode;
 
   // signals
+  readonly isProcessing = signal(false);
   readonly status = signal<EditMode>(EditMode.CREATE);
 
   readonly spiderId = toSignal(
@@ -155,16 +163,23 @@ export class SpiderEditComponent {
   });
 
   // form
-  readonly form = this.fb.nonNullable.group({
-    spiderId: ['', Validators.required],
-    description: [''],
-    primeKeySize: [1, [Validators.required, Validators.min(1)]],
-    isUrlBased: [false],
-    testData: this.fb.nonNullable.group({
-      primeKeyListJson: ['[]'],
-      url: [''],
-      resultJson: [''],
-    }),
+  readonly formModel = signal({
+    spiderId: '',
+    description: '',
+    primeKeySize: 1,
+    isUrlBased: false,
+    testData: {
+      primeKeyListJson: '[]',
+      url: '',
+      resultJson: '',
+    },
+  });
+  readonly form = form(this.formModel, p => {
+    readonly(p, { when: () => this.isProcessing() });
+    disabled(p.spiderId, { when: () => this.isEditMode });
+    required(p.spiderId);
+    required(p.primeKeySize);
+    min(p.primeKeySize, ({ valueOf }) => (valueOf(p.isUrlBased) ? 0 : 1));
   });
 
   get isCreateMode() {
@@ -175,12 +190,12 @@ export class SpiderEditComponent {
     return this.status() === this.editMode.EDIT;
   }
 
-  get spiderIdControl(): FormControl<string> {
-    return this.form.controls.spiderId;
+  get spiderIdControl() {
+    return this.form.spiderId;
   }
 
-  get isUrlBasedControl(): FormControl<boolean> {
-    return this.form.controls.isUrlBased;
+  get isUrlBasedControl() {
+    return this.form.isUrlBased;
   }
 
   get canDragTabs(): boolean {
@@ -188,33 +203,20 @@ export class SpiderEditComponent {
   }
 
   get testDataUrl(): string {
-    const url = this.form.controls.testData.controls.url.value;
+    const url = this.form.testData.url().value();
     return url ? url : '';
   }
 
-  get resultJson(): FormControl<string> {
-    return this.form.controls.testData.controls.resultJson;
+  get resultJson() {
+    return this.form.testData.resultJson;
   }
 
   get testDataPrimeKeyListJson(): string {
-    const primeKeyListJson =
-      this.form.controls.testData.controls.primeKeyListJson.value;
+    const primeKeyListJson = this.form.testData.primeKeyListJson().value();
     return primeKeyListJson ? primeKeyListJson : '';
   }
 
   constructor() {
-    this.form.controls.isUrlBased.valueChanges
-      .pipe(startWith(this.form.controls.isUrlBased.value))
-      .subscribe(isUrlBased => {
-        const validators = isUrlBased
-          ? [Validators.required, Validators.min(0)]
-          : [Validators.required, Validators.min(1)];
-        this.form.controls.primeKeySize.setValidators(validators);
-        this.form.controls.primeKeySize.updateValueAndValidity({
-          emitEvent: false,
-        });
-      });
-
     effect(() => {
       const spiderId = this.spiderId();
       const spider = this.spider.value();
@@ -225,49 +227,37 @@ export class SpiderEditComponent {
         this.router.navigate(['spider-list']);
         return;
       }
-      this.patchForm(spider);
-      this.status.set(this.editMode.EDIT);
-      this.form.controls.spiderId.disable({ emitEvent: false });
+      untracked(() => {
+        this.patchForm(spider);
+        this.status.set(this.editMode.EDIT);
+      });
     });
   }
 
   private patchForm(config: SpiderConfig) {
-    this.form.patchValue(
-      {
-        spiderId: config.spiderId,
-        description: config.description,
-        primeKeySize: config.primeKeySize,
-        isUrlBased: config.isUrlBased,
-        testData: {
-          primeKeyListJson: JSON.stringify(
-            config.testData?.primeKeyList ?? [],
-            undefined,
-            2
-          ),
-          url: config.testData?.url ?? '',
-          resultJson: config.testData?.resultJson ?? '',
-        },
+    this.form().reset({
+      spiderId: config.spiderId,
+      description: config.description ?? '',
+      primeKeySize: config.primeKeySize ?? 1,
+      isUrlBased: config.isUrlBased ?? false,
+      testData: {
+        primeKeyListJson: JSON.stringify(
+          config.testData?.primeKeyList ?? [],
+          undefined,
+          2
+        ),
+        url: config.testData?.url ?? '',
+        resultJson: config.testData?.resultJson ?? '',
       },
-      { emitEvent: false }
-    );
+    });
   }
 
   private buildPayload(): SpiderConfig | null {
-    const formValue = this.form.getRawValue();
-    const primeKeyListJson = formValue.testData.primeKeyListJson.trim() || '[]';
-    if (isNotJson(primeKeyListJson)) {
-      this.snackbarService.openI18N('msg.spiderPrimeKeyListError');
-      return null;
-    }
-
-    const primeKeyList = JSON.parse(primeKeyListJson);
-    if (
-      !Array.isArray(primeKeyList) ||
-      primeKeyList.some(value => typeof value !== 'string')
-    ) {
-      this.snackbarService.openI18N('msg.spiderPrimeKeyListError');
-      return null;
-    }
+    const formValue = this.form().value();
+    const primeKeyList = this.parsePrimeKeyList(
+      formValue.testData.primeKeyListJson
+    );
+    if (!primeKeyList) return null;
 
     return {
       spiderId: formValue.spiderId,
@@ -282,11 +272,39 @@ export class SpiderEditComponent {
     };
   }
 
+  private parsePrimeKeyList(json: string): string[] | undefined {
+    try {
+      const value: unknown = JSON.parse(json.trim() || '[]');
+      if (Array.isArray(value) && value.every(item => typeof item === 'string'))
+        return value;
+    } catch {
+      // 語法錯誤與非字串陣列使用相同提示，避免送出無效的預覽請求。
+    }
+    this.snackbarService.openI18N('msg.spiderPrimeKeyListError');
+    return undefined;
+  }
+
+  private runOperation<T>(
+    operation: () => Observable<T>,
+    onSuccess?: (value: T) => void,
+    onError?: () => void
+  ) {
+    if (this.isProcessing()) return;
+    this.isProcessing.set(true);
+    defer(operation)
+      .pipe(
+        take(1),
+        finalize(() => this.isProcessing.set(false))
+      )
+      .subscribe({ next: onSuccess, error: () => onError?.() });
+  }
+
   onBack() {
     this.router.navigate(['spider-list']);
   }
 
   onAddItemTab() {
+    if (this.isProcessing()) return;
     if (!this.isEditMode) {
       this.snackbarService.openI18N('msg.spiderSaveFirst');
       return;
@@ -311,25 +329,22 @@ export class SpiderEditComponent {
   }
 
   onDeleteItemTab() {
-    this.messageBoxService
-      .openI18N('msg.sureDeleteSpiderItem')
-      .subscribe(result => {
-        if (result) {
-          const selectedIndex = this.selected();
-          if (selectedIndex <= 0 || selectedIndex > this.spiderItems().length) {
-            return;
-          }
-
-          const targetIndex = selectedIndex - 1;
-          const tabs = [...this.spiderItems()];
-          tabs.splice(targetIndex, 1);
-          this.spiderItems.set(tabs);
-
-          if (selectedIndex >= tabs.length) {
-            this.selected.set(tabs.length);
-          }
-        }
-      });
+    const selectedIndex = this.selected();
+    this.runOperation(
+      () => this.messageBoxService.openI18N('msg.sureDeleteSpiderItem'),
+      result => {
+        if (
+          !result ||
+          selectedIndex <= 0 ||
+          selectedIndex > this.spiderItems().length
+        )
+          return;
+        const tabs = [...this.spiderItems()];
+        tabs.splice(selectedIndex - 1, 1);
+        this.spiderItems.set(tabs);
+        if (selectedIndex >= tabs.length) this.selected.set(tabs.length);
+      }
+    );
   }
 
   onTabChange(index: number) {
@@ -342,7 +357,11 @@ export class SpiderEditComponent {
   }
 
   dropTab(event: CdkDragDrop<SpiderItem[]>) {
-    if (!this.canDragTabs && event.previousIndex === event.currentIndex) {
+    if (
+      this.isProcessing() ||
+      !this.canDragTabs ||
+      event.previousIndex === event.currentIndex
+    ) {
       return;
     }
 
@@ -366,18 +385,21 @@ export class SpiderEditComponent {
     this.spiderItems.set(tabs);
     this.mappings.set(reorderedMappings);
 
-    this.spiderMappingService.updateList(reorderedMappings).subscribe({
-      error: () => {
+    this.runOperation(
+      () => this.spiderMappingService.updateList(reorderedMappings),
+      undefined,
+      () => {
         this.spiderItems.set(previousTabs);
         this.mappings.set(previousMappings);
         this.selected.set(selectedIndex);
-      },
-    });
+      }
+    );
   }
 
   update() {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
+    if (this.isProcessing()) return;
+    if (this.form().invalid()) {
+      this.form().markAsTouched();
       return;
     }
 
@@ -386,53 +408,64 @@ export class SpiderEditComponent {
       return;
     }
 
-    this.spiderConfigService
-      .isInUse(data.spiderId)
-      .pipe(
-        switchMap(exist => {
-          if (this.isCreateMode && exist) {
-            this.snackbarService.openI18N('msg.spiderExist');
-            return EMPTY;
-          }
-          if (this.isEditMode && !exist) {
-            this.snackbarService.openI18N('msg.spiderNotExist');
-            return EMPTY;
-          }
-          return this.spiderConfigService.update(data);
-        })
-      )
-      .subscribe(() => {
+    this.runOperation(
+      () =>
+        this.spiderConfigService.isInUse(data.spiderId).pipe(
+          switchMap(exist => {
+            if (this.isCreateMode && exist) {
+              this.snackbarService.openI18N('msg.spiderExist');
+              return EMPTY;
+            }
+            if (this.isEditMode && !exist) {
+              this.snackbarService.openI18N('msg.spiderNotExist');
+              return EMPTY;
+            }
+            return this.spiderConfigService.update(data);
+          })
+        ),
+      () => {
         if (this.isCreateMode) {
           this.status.set(this.editMode.EDIT);
-          this.form.controls.spiderId.disable({ emitEvent: false });
+
           this.router.navigate(['spider-edit', data.spiderId], {
             replaceUrl: true,
           });
         }
         this.snackbarService.openI18N('msg.saveSuccess');
-      });
+      }
+    );
   }
 
   onPreviewByPrimeKeyList() {
-    this.resultJson.setValue('{}');
+    if (this.isProcessing()) return;
+    const primeKeyList = this.parsePrimeKeyList(this.testDataPrimeKeyListJson);
+    if (!primeKeyList) return;
     const data: SpiderReq = {
-      spiderId: this.spiderIdControl.value,
-      primeKeyList: JSON.parse(this.testDataPrimeKeyListJson) as string[],
+      spiderId: this.spiderIdControl().value(),
+      primeKeyList,
     };
-    this.spiderService.executeByPrimeKeyList(data).subscribe(x => {
-      this.resultJson.setValue(JSON.stringify(x, undefined, 2));
-    });
+    this.resultJson().value.set('{}');
+    this.runOperation(
+      () => this.spiderService.executeByPrimeKeyList(data),
+      result => {
+        this.resultJson().value.set(JSON.stringify(result, undefined, 2));
+      }
+    );
   }
 
   onPreviewByUrl() {
-    this.resultJson.setValue('{}');
+    if (this.isProcessing()) return;
     const data: SpiderReq = {
-      spiderId: this.spiderIdControl.value,
+      spiderId: this.spiderIdControl().value(),
       url: this.testDataUrl,
     };
-    this.spiderService.executeByUrl(data).subscribe(x => {
-      this.resultJson.setValue(JSON.stringify(x, undefined, 2));
-    });
+    this.resultJson().value.set('{}');
+    this.runOperation(
+      () => this.spiderService.executeByUrl(data),
+      result => {
+        this.resultJson().value.set(JSON.stringify(result, undefined, 2));
+      }
+    );
   }
 
   private buildReorderedMappings(

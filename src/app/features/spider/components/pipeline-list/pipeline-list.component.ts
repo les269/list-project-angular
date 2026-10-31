@@ -1,35 +1,35 @@
-import { CommonModule, KeyValue } from '@angular/common';
-import { Component, inject, input } from '@angular/core';
-import { FormArray, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
-import {
-  ChineseConvertType,
-  ZhConverterUtilType,
-  ConvertToCaseType,
-  PositionType,
-  Timezones,
-  ValuePipelineType,
-} from '../../model';
+import { CommonModule } from '@angular/common';
+import { Component, computed, inject, input } from '@angular/core';
+
+import { SignalCodeEditorComponent } from '../../../../core/components/signal-code-editor/signal-code-editor.component';
 import {
   CdkDragDrop,
   DragDropModule,
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
-import { MatIconModule } from '@angular/material/icon';
-import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
+import { FieldTree, FormField } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
-import { SelectTableService } from '../../../../core/services/select-table.service';
-import { ReplaceValueMapService } from '../../../replace-value-map/service/replace-value-map.service';
-import { switchMap } from 'rxjs';
-import { ChipSelectButtonComponent } from '../../../../core/components/chip-select-button/chip-select-button.component';
-import { ReplaceValueMap } from '../../../replace-value-map/model';
+import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { EnumKeysPipe } from '../../../../shared/util/util.pipe';
-import { ChipInputComponent } from '../../../../core/components/chip-input/chip-input.component';
-import { CodeEditor } from '@acrodata/code-editor';
 import { languages } from '@codemirror/language-data';
+import { TranslateModule } from '@ngx-translate/core';
+import { switchMap } from 'rxjs';
 import { ChipInputMapComponent } from '../../../../core/components';
-import { form, FormField, required } from '@angular/forms/signals';
+import { ChipInputComponent } from '../../../../core/components/chip-input/chip-input.component';
+import { SelectTableService } from '../../../../core/services/select-table.service';
+import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
+import { EnumKeysPipe } from '../../../../shared/util/util.pipe';
+import { ReplaceValueMap } from '../../../replace-value-map/model';
+import { ReplaceValueMapService } from '../../../replace-value-map/service/replace-value-map.service';
+import {
+  ChineseConvertType,
+  ConvertToCaseType,
+  PositionType,
+  Timezones,
+  ValuePipeline,
+  ValuePipelineType,
+  ZhConverterUtilType,
+} from '../../model';
 import { ValuePipelineFormService } from '../../services';
 
 @Component({
@@ -37,7 +37,7 @@ import { ValuePipelineFormService } from '../../services';
 
   imports: [
     CommonModule,
-    ReactiveFormsModule,
+    FormField,
     TranslateModule,
     DragDropModule,
     MatIconModule,
@@ -46,7 +46,7 @@ import { ValuePipelineFormService } from '../../services';
     MatTooltipModule,
     EnumKeysPipe,
     ChipInputComponent,
-    CodeEditor,
+    SignalCodeEditorComponent,
     MatTooltipModule,
     ChipInputMapComponent,
   ],
@@ -58,9 +58,10 @@ export class PipelineListComponent {
   readonly replaceValueMapService = inject(ReplaceValueMapService);
   readonly valuePipelineFormService = inject(ValuePipelineFormService);
 
-  readonly formArray = input.required<FormArray<FormGroup>>();
+  readonly fields = input.required<FieldTree<ValuePipeline[]>>();
   readonly replaceValueMapList = input<ReplaceValueMap[]>([]);
 
+  readonly rows = computed(() => Array.from(this.fields()));
   readonly CodeEditorLanguages = languages;
   readonly eValuePipelineType = ValuePipelineType;
   readonly eConvertToCaseType = ConvertToCaseType;
@@ -68,30 +69,32 @@ export class PipelineListComponent {
   readonly eChineseConvertType = ChineseConvertType;
   readonly eZhConverterUtilType = ZhConverterUtilType;
   readonly ePositionType = PositionType;
-  onAdd() {
-    const arr = this.formArray();
-    const nextSeq = arr.length;
-    arr.push(
-      this.valuePipelineFormService.createValuePipelineGroup({ seq: nextSeq })
+  private updateRows(update: (rows: ValuePipeline[]) => ValuePipeline[]) {
+    const state = this.fields()();
+    if (state.disabled()) return;
+    state.value.update(rows =>
+      update(rows).map((row, seq) => ({ ...row, seq }))
     );
+    state.markAsDirty();
   }
-
+  onAdd() {
+    this.updateRows(rows => [
+      ...rows,
+      this.valuePipelineFormService.createValuePipeline(),
+    ]);
+  }
   onDelete(index: number) {
-    const arr = this.formArray();
-    arr.removeAt(index);
-    this.updateSeq();
+    this.updateRows(rows => rows.filter((_, i) => i !== index));
   }
-
-  dropPipeline(event: CdkDragDrop<FormGroup[]>) {
-    if (event.previousIndex === event.currentIndex) {
-      return;
-    }
-
-    const arr = this.formArray();
-    const controls = arr.controls;
-    moveItemInArray(controls, event.previousIndex, event.currentIndex);
-    this.updateSeq();
-    arr.updateValueAndValidity();
+  dropPipeline(
+    event: CdkDragDrop<FieldTree<ValuePipeline, number, 'writable'>[]>
+  ) {
+    if (event.previousIndex === event.currentIndex) return;
+    this.updateRows(rows => {
+      const next = [...rows];
+      moveItemInArray(next, event.previousIndex, event.currentIndex);
+      return next;
+    });
   }
 
   selectReplaceValueMap = () =>
@@ -105,11 +108,5 @@ export class PipelineListComponent {
 
   getReplaceValueMapLabel(item: ReplaceValueMap) {
     return item.name;
-  }
-
-  private updateSeq() {
-    this.formArray().controls.forEach((ctrl, i) => {
-      ctrl.get('seq')?.setValue(i, { emitEvent: false });
-    });
   }
 }

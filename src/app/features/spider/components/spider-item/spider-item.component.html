@@ -1,16 +1,16 @@
-<div [formGroup]="form">
+<div>
   <div class="input-group my-2">
     <label class="input-group-text">{{
       'spider.spiderItemId' | translate
     }}</label>
     <input
       class="form-control"
-      [formControl]="spiderItemId"
-      [class.is-invalid]="spiderItemId.invalid && spiderItemId.touched"
+      [formField]="spiderItemId"
+      [class.is-invalid]="spiderItemId().invalid() && spiderItemId().touched()"
       trimOnBlur />
-    @if (spiderItemId.invalid && spiderItemId.touched) {
+    @if (spiderItemId().invalid() && spiderItemId().touched()) {
       <div class="invalid-feedback d-block">
-        @if (spiderItemId.hasError('required')) {
+        @if (hasError(spiderItemId, 'required')) {
           {{
             'msg.blank'
               | translate: { name: ('spider.spiderItemId' | translate) }
@@ -21,15 +21,15 @@
   </div>
   <div class="input-group my-2">
     <label class="input-group-text">{{ 'g.description' | translate }}</label>
-    <input class="form-control" [formControl]="description" trimOnBlur />
+    <input class="form-control" [formField]="description" trimOnBlur />
   </div>
   <div class="input-group my-2">
     <label class="input-group-text">{{
       'spider.urlType.name' | translate
     }}</label>
-    <select class="form-control form-select" [formControl]="urlType">
+    <select class="form-control form-select" [formField]="urlType">
       @for (urlType of eUrlType | keyvalue; track urlType) {
-        <option [ngValue]="urlType.key">
+        <option [value]="urlType.key">
           {{ 'spider.urlType.' + urlType.key | translate }}
         </option>
       }
@@ -46,22 +46,22 @@
     ></label>
   }
   <div class="d-flex">
-    <mat-checkbox [formControl]="skipWhenUsingUrl">{{
+    <mat-checkbox [formField]="skipWhenUsingUrl">{{
       'spider.skipWhenUsingUrl' | translate
     }}</mat-checkbox>
   </div>
   <div class="input-group my-2">
     <label class="input-group-text">{{ 'spider.url' | translate }}</label>
-    <input class="form-control" [formControl]="url" trimOnBlur />
+    <input class="form-control" [formField]="url" trimOnBlur />
   </div>
 
   <div class="input-group my-2">
     <label class="input-group-text">{{
       'spider.extractionRule' | translate
     }}</label>
-    <select class="form-control form-select" [formControl]="extractionRuleMode">
+    <select class="form-control form-select" [formField]="extractionRuleMode">
       @for (type of eExtractionRuleMode | keyvalue; track type) {
-        <option [ngValue]="type.key">
+        <option [value]="type.key">
           {{ 'spider.extractionRuleMode.' + type.key | translate }}
         </option>
       }
@@ -78,10 +78,18 @@
     ></label>
   }
   <div class="d-flex gap-2">
-    <button type="button" class="btn btn-primary" (click)="onHeadersDialog()">
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="onHeadersDialog()"
+      [disabled]="isProcessing()">
       {{ 'spider.settingHeaders' | translate }}
     </button>
-    <button type="button" class="btn btn-primary" (click)="onCookiesDialog()">
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="onCookiesDialog()"
+      [disabled]="isProcessing()">
       {{ 'spider.settingCookies' | translate }}
     </button>
   </div>
@@ -89,13 +97,12 @@
   <div class="card-body">
     <div class="card mb-3">
       <app-generic-table
-        [class.table-invalid]="extractionRuleList.invalid"
-        [formArray]="extractionRuleList"
-        [initData]="extractionRuleListData()"
-        [createGroup]="createExtractionRule"
+        [class.table-invalid]="extractionRuleList().invalid()"
+        [fields]="extractionRuleList"
+        [createRow]="createExtractionRule"
         [cols]="cols"
         [displayedColumns]="
-          extractionRuleMode.value === eExtractionRuleMode.JSON_PATH
+          extractionRuleMode().value() === eExtractionRuleMode.JSON_PATH
             ? jsonPathDisplayedColumns
             : selectorDisplayedColumns
         "
@@ -106,13 +113,16 @@
   <div class="form-group mb-2">
     @if (useSelector) {
       <label>{{ 'spider.testHtml' | translate }}</label>
-      <code-editor
+      <app-signal-code-editor
         [style.height]="'300px'"
-        [formControl]="htmlData"
+        [formField]="htmlData"
         [language]="'html'"
-        [indentWithTab]="true"
-        [languages]="CodeEditorLanguages" />
-      <button type="button" class="btn btn-primary" (click)="onTestParse()">
+        [indentWithTab]="true" />
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="onTestParse()"
+        [disabled]="isProcessing()">
         {{ 'spider.test' | translate }}
       </button>
       <div class="my-2">
@@ -120,14 +130,15 @@
           <button
             type="button"
             class="btn btn-outline-secondary"
-            (click)="htmlFile.click()">
+            (click)="htmlFile.click()"
+            [disabled]="isProcessing()">
             {{ 'spider.uploadHtml' | translate }}
           </button>
           <button
             type="button"
             class="btn btn-primary"
             (click)="onTestParseWithFile(selectedHtmlFile())"
-            [disabled]="!selectedHtmlFile()">
+            [disabled]="!selectedHtmlFile() || isProcessing()">
             {{ 'spider.test' | translate }}
           </button>
         </div>
@@ -148,20 +159,24 @@
     }
     @if (useJsonPath) {
       <label>{{ 'spider.testJson' | translate }}</label>
-      <code-editor
+      <app-signal-code-editor
         [style.height]="'300px'"
-        [formControl]="jsonData"
+        [formField]="jsonData"
         [language]="'json'"
-        [indentWithTab]="true"
-        [languages]="CodeEditorLanguages" />
+        [indentWithTab]="true" />
       <div class="my-2 btn-group">
         <button
           type="button"
           class="btn btn-outline-secondary"
-          (click)="onFormatJson()">
+          (click)="onFormatJson()"
+          [disabled]="isProcessing()">
           {{ 'g.format' | translate }}
         </button>
-        <button type="button" class="btn btn-primary" (click)="onTestParse()">
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="onTestParse()"
+          [disabled]="isProcessing()">
           {{ 'spider.test' | translate }}
         </button>
       </div>
@@ -170,14 +185,15 @@
           <button
             type="button"
             class="btn btn-outline-secondary"
-            (click)="jsonFile.click()">
+            (click)="jsonFile.click()"
+            [disabled]="isProcessing()">
             {{ 'spider.uploadJson' | translate }}
           </button>
           <button
             type="button"
             class="btn btn-primary"
             (click)="onTestParseWithFile(selectedJsonFile())"
-            [disabled]="!selectedJsonFile()">
+            [disabled]="!selectedJsonFile() || isProcessing()">
             {{ 'spider.test' | translate }}
           </button>
         </div>
@@ -197,12 +213,11 @@
     }
   </div>
   <label>{{ 'spider.testResult' | translate }}</label>
-  <code-editor
+  <app-signal-code-editor
     class="mb-4"
-    [formControl]="resultJsonData"
+    [formField]="resultJsonData"
     [language]="'json'"
-    [indentWithTab]="true"
-    [languages]="CodeEditorLanguages" />
+    [indentWithTab]="true" />
 </div>
 
 <ng-template #buttonTmpl>
@@ -211,7 +226,8 @@
       <button
         type="button"
         class="btn btn-outline-primary"
-        (click)="onReadItems()">
+        (click)="onReadItems()"
+        [disabled]="isProcessing()">
         {{ 'g.read' | translate }}
       </button>
     }
@@ -219,7 +235,8 @@
       <button
         type="button"
         class="btn btn-outline-primary"
-        (click)="onAddItem()">
+        (click)="onAddItem()"
+        [disabled]="isProcessing()">
         {{ 'g.add' | translate }}
       </button>
     }
@@ -227,7 +244,8 @@
       <button
         type="button"
         class="btn btn-outline-primary"
-        (click)="onSaveItem()">
+        (click)="onSaveItem()"
+        [disabled]="isProcessing()">
         {{ 'g.save' | translate }}
       </button>
     }
@@ -236,12 +254,17 @@
       <button
         type="button"
         class="btn btn-outline-primary"
-        (click)="toggleBind()">
+        (click)="toggleBind()"
+        [disabled]="isProcessing()">
         {{ (isBinding() ? 'g.unbind' : 'g.bind') | translate }}
       </button>
     }
     @if (!isBinding()) {
-      <button type="button" class="btn btn-danger" (click)="onClear()">
+      <button
+        type="button"
+        class="btn btn-danger"
+        (click)="onClear()"
+        [disabled]="isProcessing()">
         {{ 'g.clear' | translate }}
       </button>
     }
@@ -249,7 +272,7 @@
       <button
         type="button"
         class="btn btn-danger"
-        [disabled]="isBinding()"
+        [disabled]="isBinding() || isProcessing()"
         (click)="onDeleteItem()">
         {{ 'g.delete' | translate }}
       </button>
@@ -257,27 +280,25 @@
   </div>
 </ng-template>
 <ng-template #expandedTmpl let-element>
-  <div class="d-flex flex-column my-2" [formGroup]="element">
-    <div
-      class="d-flex input-group input-group-sm mb-2"
-      formGroupName="conditionValue">
+  <div class="d-flex flex-column my-2">
+    <div class="d-flex input-group input-group-sm mb-2">
       <select
         class="form-select"
-        [formControl]="element.get('conditionValue.conditionType')">
+        [formField]="element.conditionValue.conditionType">
         @for (type of eExtractionStepCondition | keyvalue; track type) {
-          <option [ngValue]="type.key">
+          <option [value]="type.key">
             {{ 'spider.condition.' + type.key | translate }}
           </option>
         }
       </select>
-      @let conditionType = element.get('conditionValue.conditionType').value;
+      @let conditionType = element.conditionValue.conditionType().value();
       @if (conditionType && conditionType !== eExtractionStepCondition.ALWAYS) {
         @if (shouldShowIgnoreCase(conditionType)) {
           <div class="input-group-text">
             <input
               type="checkbox"
               class="form-check-input"
-              formControlName="ignoreCase"
+              [formField]="element.conditionValue.ignoreCase"
               [matTooltip]="'spider.ignoreCaseTip' | translate" />
           </div>
         }
@@ -286,7 +307,7 @@
         }}</span>
         <input
           class="form-control"
-          formControlName="key"
+          [formField]="element.conditionValue.key"
           [placeholder]="'spider.conditionKeyPH' | translate"
           [matTooltip]="'spider.conditionKeyPH' | translate"
           trimOnBlur />
@@ -296,7 +317,7 @@
           >
           <input
             class="form-control"
-            formControlName="value"
+            [formField]="element.conditionValue.value"
             [placeholder]="'spider.conditionValuePH' | translate"
             [matTooltip]="'spider.conditionValuePH' | translate"
             trimOnBlur />
@@ -304,7 +325,6 @@
       }
     </div>
 
-    <app-pipeline-list
-      [formArray]="element.get('pipelines')"></app-pipeline-list>
+    <app-pipeline-list [fields]="element.pipelines"></app-pipeline-list>
   </div>
 </ng-template>
