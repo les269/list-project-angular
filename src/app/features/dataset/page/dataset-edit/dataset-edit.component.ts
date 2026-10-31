@@ -1,62 +1,52 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { SignalCodeEditorComponent } from '../../../../core/components/signal-code-editor/signal-code-editor.component';
+import { createDatasetField } from '../../util/dataset-field';
 import { CommonModule } from '@angular/common';
-import { Router, ActivatedRoute } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
-import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { DatasetService } from '../../service/dataset.service';
-import { EMPTY, filter, map, startWith, switchMap } from 'rxjs';
-import { isNotBlank } from '../../../../shared/util/helper';
-import { CodeEditorModule } from '@acrodata/code-editor';
+import { Component, effect, inject, signal, untracked } from '@angular/core';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import {
-  AbstractControl,
-  FormBuilder,
-  ReactiveFormsModule,
-  FormControl,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+  applyEach,
+  disabled,
+  form,
+  FormField,
+  required,
+} from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
-import {
-  Dataset,
-  DatasetConfigType,
-  DatasetEditMode,
-  DatasetField,
-  DatasetFieldType,
-} from '../../model';
-import { DatasetFieldTableComponent } from '../../components/dataset-field-table/dataset-field-table.component';
-import { MatChipsModule } from '@angular/material/chips';
+import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
+import { EMPTY, filter, map, switchMap } from 'rxjs';
 import { SelectTableService } from '../../../../core/services/select-table.service';
-import { GroupDatasetService } from '../../service/group-dataset.service';
-import { languages } from '@codemirror/language-data';
+import { SnackbarService } from '../../../../core/services/snackbar.service';
+import { isNotBlank } from '../../../../shared/util/helper';
+import { hasFieldError } from '../../../../shared/util/signal-form';
 import { ScrapyPaginationService } from '../../../spider/services/scrapy-pagination.service';
-import { ControlsOf, ToFormArray } from '../../../../core/model/generic-table';
-import {
-  rxResource,
-  takeUntilDestroyed,
-  toSignal,
-} from '@angular/core/rxjs-interop';
+import { DatasetFieldTableComponent } from '../../components/dataset-field-table/dataset-field-table.component';
+import { Dataset, DatasetConfigType, DatasetEditMode } from '../../model';
+import { DatasetService } from '../../service/dataset.service';
+import { GroupDatasetService } from '../../service/group-dataset.service';
 
 @Component({
   selector: 'app-dataset-edit',
 
   imports: [
     MatTableModule,
-    ReactiveFormsModule,
+    FormField,
     MatButtonModule,
     TranslateModule,
     CommonModule,
     MatIconModule,
     MatCheckboxModule,
     MatChipsModule,
-    CodeEditorModule,
+    SignalCodeEditorComponent,
     DatasetFieldTableComponent,
   ],
   templateUrl: './dataset-edit.component.html',
 })
 export class DatasetEditComponent {
+  readonly hasError = hasFieldError;
   // inject
   readonly router = inject(Router);
   readonly route = inject(ActivatedRoute);
@@ -65,10 +55,8 @@ export class DatasetEditComponent {
   readonly selectTableService = inject(SelectTableService);
   readonly groupDatasetService = inject(GroupDatasetService);
   readonly scrapyPaginationService = inject(ScrapyPaginationService);
-  readonly fb = inject(FormBuilder);
   // enum and constant
   readonly eDatasetConfigType = DatasetConfigType;
-  readonly codeEditorLanguages = languages;
   // signal
   readonly status = signal(DatasetEditMode.create);
   readonly datasetName = toSignal<string | null>(
@@ -88,28 +76,55 @@ export class DatasetEditComponent {
     },
     defaultValue: undefined,
   });
-  readonly fieldList = computed(() => {
-    const dataset = this.dataset.value();
-    return dataset?.config.fieldList ?? [];
-  });
 
   // form
-  readonly form = this.fb.nonNullable.group({
-    name: ['', [Validators.required]],
-    config: this.fb.nonNullable.group({
-      type: [DatasetConfigType.all],
-      groupName: ['', [Validators.required]],
-      filePath: [''],
-      fileExtension: [''],
-      folderPath: [''],
-      filing: [false],
-      filingRegular: [''],
-      fieldList: this.fb.array<FormGroup<ControlsOf<DatasetField>>>([]),
-      autoImageDownload: [false],
-      imageByKey: [''],
-      scrapyText: [''],
-      scrapyPagination: [''],
-    }),
+  readonly formModel = signal({
+    name: '',
+    config: {
+      type: DatasetConfigType.all,
+      groupName: '',
+      filePath: '',
+      fileExtension: '',
+      folderPath: '',
+      filing: false,
+      filingRegular: '',
+      fieldList: [] as ReturnType<typeof createDatasetField>[],
+      autoImageDownload: false,
+      imageByKey: '',
+      scrapyText: '',
+      scrapyPagination: '',
+    },
+  });
+  private readonly initialFormValue = structuredClone(this.formModel());
+  readonly form = form(this.formModel, p => {
+    disabled(p.name, { when: () => this.isEditMode });
+    applyEach(p.config.fieldList, row => {
+      required(row.key);
+      required(row.label);
+    });
+    required(p.config.filePath, {
+      when: ({ valueOf }) => valueOf(p.config.type) === DatasetConfigType.file,
+    });
+    required(p.config.folderPath, {
+      when: ({ valueOf }) =>
+        valueOf(p.config.type) === DatasetConfigType.folder,
+    });
+    required(p.config.scrapyPagination, {
+      when: ({ valueOf }) =>
+        valueOf(p.config.type) === DatasetConfigType.pagination,
+    });
+    required(p.config.filingRegular, {
+      when: ({ valueOf }) =>
+        valueOf(p.config.filing) &&
+        [DatasetConfigType.file, DatasetConfigType.folder].includes(
+          valueOf(p.config.type)
+        ),
+    });
+    required(p.config.imageByKey, {
+      when: ({ valueOf }) => valueOf(p.config.autoImageDownload),
+    });
+    required(p.name);
+    required(p.config.groupName);
   });
 
   get isCreateMode() {
@@ -121,56 +136,54 @@ export class DatasetEditComponent {
   }
 
   get configForm() {
-    return this.form.controls.config;
+    return this.form.config;
   }
 
-  get nameControl(): FormControl<string> {
-    return this.form.controls.name;
+  get nameControl() {
+    return this.form.name;
   }
 
-  get fieldListControl(): ToFormArray<DatasetField> {
-    return this.configForm.controls.fieldList;
+  get fieldListControl() {
+    return this.configForm.fieldList;
   }
 
   get configType(): DatasetConfigType {
-    return this.configForm.controls.type.value;
+    return this.configForm.type().value();
   }
 
-  get groupNameControl(): FormControl<string> {
-    return this.configForm.controls.groupName;
+  get groupNameControl() {
+    return this.configForm.groupName;
   }
 
-  get filePathControl(): FormControl<string> {
-    return this.configForm.controls.filePath;
+  get filePathControl() {
+    return this.configForm.filePath;
   }
 
-  get folderPathControl(): FormControl<string> {
-    return this.configForm.controls.folderPath;
+  get folderPathControl() {
+    return this.configForm.folderPath;
   }
 
-  get filingRegularControl(): FormControl<string> {
-    return this.configForm.controls.filingRegular;
+  get filingRegularControl() {
+    return this.configForm.filingRegular;
   }
 
-  get scrapyPaginationControl(): FormControl<string> {
-    return this.configForm.controls.scrapyPagination;
+  get scrapyPaginationControl() {
+    return this.configForm.scrapyPagination;
   }
 
-  get filingControl(): FormControl<boolean> {
-    return this.configForm.controls.filing;
+  get filingControl() {
+    return this.configForm.filing;
   }
 
-  get autoImageDownloadControl(): FormControl<boolean> {
-    return this.configForm.controls.autoImageDownload;
+  get autoImageDownloadControl() {
+    return this.configForm.autoImageDownload;
   }
 
-  get imageByKeyControl(): FormControl<string> {
-    return this.configForm.controls.imageByKey;
+  get imageByKeyControl() {
+    return this.configForm.imageByKey;
   }
 
   constructor() {
-    this.initConditionalValidation();
-
     effect(() => {
       const name = this.datasetName();
       const dataset = this.dataset.value();
@@ -183,73 +196,22 @@ export class DatasetEditComponent {
         return;
       }
 
-      this.patchForm(dataset);
-      this.updateConditionalValidators();
-      this.status.set(DatasetEditMode.edit);
-      this.form.controls.name.disable({ emitEvent: false });
+      untracked(() => {
+        this.patchForm(dataset);
+        this.status.set(DatasetEditMode.edit);
+      });
     });
   }
 
-  private initConditionalValidation() {
-    this.configForm.controls.type.valueChanges
-      .pipe(
-        startWith(this.configForm.controls.type.value),
-        takeUntilDestroyed()
-      )
-      .subscribe(() => this.updateConditionalValidators());
-
-    this.filingControl.valueChanges
-      .pipe(startWith(this.filingControl.value), takeUntilDestroyed())
-      .subscribe(() => this.updateConditionalValidators());
-
-    this.autoImageDownloadControl.valueChanges
-      .pipe(
-        startWith(this.autoImageDownloadControl.value),
-        takeUntilDestroyed()
-      )
-      .subscribe(() => this.updateConditionalValidators());
-  }
-
-  private setRequired(control: AbstractControl, required: boolean) {
-    if (required) {
-      control.setValidators([Validators.required]);
-    } else {
-      control.clearValidators();
-    }
-    control.updateValueAndValidity({ emitEvent: false });
-  }
-
-  private updateConditionalValidators() {
-    this.setRequired(
-      this.filePathControl,
-      this.configType === DatasetConfigType.file
-    );
-    this.setRequired(
-      this.folderPathControl,
-      this.configType === DatasetConfigType.folder
-    );
-    this.setRequired(
-      this.scrapyPaginationControl,
-      this.configType === DatasetConfigType.pagination
-    );
-    this.setRequired(
-      this.filingRegularControl,
-      this.filingControl.value &&
-        (this.configType === DatasetConfigType.file ||
-          this.configType === DatasetConfigType.folder)
-    );
-    this.setRequired(
-      this.imageByKeyControl,
-      this.autoImageDownloadControl.value
-    );
-  }
-
   private patchForm(dataset: Dataset) {
-    const { fieldList, ...configValues } = dataset.config;
-    this.form.patchValue(
-      { name: dataset.name, config: configValues },
-      { emitEvent: false }
-    );
+    this.form().reset({
+      name: dataset.name,
+      config: {
+        ...structuredClone(this.initialFormValue.config),
+        ...structuredClone(dataset.config),
+        fieldList: (dataset.config.fieldList ?? []).map(createDatasetField),
+      },
+    });
   }
 
   onBack() {
@@ -259,12 +221,11 @@ export class DatasetEditComponent {
   }
 
   update(back: boolean, type: 'save' | 'commit') {
-    this.updateConditionalValidators();
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
+    if (this.form().invalid()) {
+      this.form().markAsTouched();
       return;
     }
-    const data = this.form.getRawValue();
+    const data = this.form().value();
 
     this.datasetService
       .existDataset(data.name)
@@ -299,7 +260,7 @@ export class DatasetEditComponent {
       )
       .subscribe(res => {
         if (res) {
-          this.groupNameControl.setValue(res.groupName);
+          this.groupNameControl().value.set(res.groupName);
         }
       });
   }
@@ -317,7 +278,7 @@ export class DatasetEditComponent {
     const reader = new FileReader();
     reader.onload = () => {
       try {
-        this.configForm.controls.scrapyText.setValue(reader.result as string);
+        this.configForm.scrapyText().value.set(reader.result as string);
       } catch (error) {
         console.error('Invalid JSON file', error);
       }
@@ -333,8 +294,8 @@ export class DatasetEditComponent {
       this.configType !== DatasetConfigType.file &&
       this.configType !== DatasetConfigType.folder
     ) {
-      this.filingControl.setValue(false);
-      this.configForm.controls.filingRegular.setValue('');
+      this.filingControl().value.set(false);
+      this.configForm.filingRegular().value.set('');
     }
   }
 
@@ -348,7 +309,7 @@ export class DatasetEditComponent {
       )
       .subscribe(res => {
         if (res) {
-          this.scrapyPaginationControl.setValue(res.name);
+          this.scrapyPaginationControl().value.set(res.name);
         }
       });
   }

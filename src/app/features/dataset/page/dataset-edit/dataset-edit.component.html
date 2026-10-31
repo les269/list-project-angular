@@ -1,6 +1,6 @@
 <div class="container d-flex">
   <div class="col-md-10 offset-md-1 col-xs-12 mt-2">
-    <form [formGroup]="form">
+    <form (submit)="$event.preventDefault()">
       <button
         type="button"
         class="d-flex align-content-center"
@@ -14,23 +14,24 @@
         }}</label>
         <input
           class="form-control"
-          formControlName="name"
-          [class.is-invalid]="nameControl.invalid && nameControl.touched"
-          [disabled]="isEditMode" />
-        @if (nameControl.hasError('required') && nameControl.touched) {
+          [formField]="form.name"
+          [class.is-invalid]="
+            nameControl().invalid() && nameControl().touched()
+          " />
+        @if (hasError(nameControl, 'required') && nameControl().touched()) {
           <div class="invalid-feedback d-block">
             {{ 'msg.required' | translate }}
           </div>
         }
       </div>
-      <div formGroupName="config">
+      <div>
         <div class="form-group mb-2">
           <label class="form-label">{{
             'dataset.filterType' | translate
           }}</label>
           <select
             class="form-control form-select"
-            formControlName="type"
+            [formField]="form.config.type"
             (change)="changeType()">
             @for (type of eDatasetConfigType | keyvalue; track type) {
               <option [value]="type.key">
@@ -44,12 +45,11 @@
         </div>
         @if (configType === 'text') {
           <div class="form-group mb-2">
-            <code-editor
+            <app-signal-code-editor
               [style.height]="'400px'"
-              formControlName="scrapyText"
+              [formField]="form.config.scrapyText"
               [language]="'textile'"
-              [indentWithTab]="true"
-              [languages]="codeEditorLanguages" />
+              [indentWithTab]="true" />
           </div>
           <input
             type="file"
@@ -72,12 +72,14 @@
           <div
             class="mt-1 d-flex flex-wrap gap-3 align-items-center"
             [class.is-invalid]="
-              groupNameControl.invalid && groupNameControl.touched
+              groupNameControl().invalid() && groupNameControl().touched()
             ">
-            @if (groupNameControl.value) {
+            @if (groupNameControl().value()) {
               <mat-chip
-                >{{ groupNameControl.value }}
-                <button matChipRemove (click)="groupNameControl.setValue('')">
+                >{{ groupNameControl().value() }}
+                <button
+                  matChipRemove
+                  (click)="groupNameControl().value.set('')">
                   <mat-icon>cancel</mat-icon>
                 </button>
               </mat-chip>
@@ -94,7 +96,8 @@
             </button>
           </div>
           @if (
-            groupNameControl.hasError('required') && groupNameControl.touched
+            hasError(groupNameControl, 'required') &&
+            groupNameControl().touched()
           ) {
             <div class="invalid-feedback d-block">
               {{ 'msg.required' | translate }}
@@ -112,15 +115,15 @@
             <div
               class="mt-1 d-flex flex-wrap gap-3 align-items-center"
               [class.is-invalid]="
-                scrapyPaginationControl.invalid &&
-                scrapyPaginationControl.touched
+                scrapyPaginationControl().invalid() &&
+                scrapyPaginationControl().touched()
               ">
-              @if (scrapyPaginationControl.value) {
+              @if (scrapyPaginationControl().value()) {
                 <mat-chip
-                  >{{ scrapyPaginationControl.value }}
+                  >{{ scrapyPaginationControl().value() }}
                   <button
                     matChipRemove
-                    (click)="scrapyPaginationControl.setValue('')">
+                    (click)="scrapyPaginationControl().value.set('')">
                     <mat-icon>cancel</mat-icon>
                   </button>
                 </mat-chip>
@@ -137,8 +140,8 @@
               </button>
             </div>
             @if (
-              scrapyPaginationControl.hasError('required') &&
-              scrapyPaginationControl.touched
+              hasError(scrapyPaginationControl, 'required') &&
+              scrapyPaginationControl().touched()
             ) {
               <div class="invalid-feedback d-block">
                 {{ 'msg.required' | translate }}
@@ -151,12 +154,13 @@
             <label>{{ 'dataset.filePath' | translate }}</label>
             <input
               class="form-control"
-              formControlName="filePath"
+              [formField]="form.config.filePath"
               [class.is-invalid]="
-                filePathControl.invalid && filePathControl.touched
+                filePathControl().invalid() && filePathControl().touched()
               " />
             @if (
-              filePathControl.hasError('required') && filePathControl.touched
+              hasError(filePathControl, 'required') &&
+              filePathControl().touched()
             ) {
               <div class="invalid-feedback d-block">
                 {{ 'msg.required' | translate }}
@@ -165,7 +169,9 @@
           </div>
           <div class="form-group mb-2">
             <label>{{ 'dataset.fileExtension' | translate }}</label>
-            <input class="form-control" formControlName="fileExtension" />
+            <input
+              class="form-control"
+              [formField]="form.config.fileExtension" />
           </div>
         }
         @if (configType === 'folder') {
@@ -173,13 +179,13 @@
             <label>{{ 'dataset.folderPath' | translate }}</label>
             <input
               class="form-control"
-              formControlName="folderPath"
+              [formField]="form.config.folderPath"
               [class.is-invalid]="
-                folderPathControl.invalid && folderPathControl.touched
+                folderPathControl().invalid() && folderPathControl().touched()
               " />
             @if (
-              folderPathControl.hasError('required') &&
-              folderPathControl.touched
+              hasError(folderPathControl, 'required') &&
+              folderPathControl().touched()
             ) {
               <div class="invalid-feedback d-block">
                 {{ 'msg.required' | translate }}
@@ -189,7 +195,7 @@
         }
         @if (configType === 'file' || configType === 'folder') {
           <div class="form-group mb-2">
-            <mat-checkbox formControlName="filing">
+            <mat-checkbox [formField]="form.config.filing">
               {{ 'dataset.filing' | translate }}
             </mat-checkbox>
             <br />
@@ -197,18 +203,19 @@
               'dataset.filingDesc' | translate
             }}</label>
           </div>
-          @if (filingControl.value) {
+          @if (filingControl().value()) {
             <div class="form-group mb-2">
               <label>{{ 'dataset.filingRegular' | translate }}</label>
               <input
                 class="form-control"
-                formControlName="filingRegular"
+                [formField]="form.config.filingRegular"
                 [class.is-invalid]="
-                  filingRegularControl.invalid && filingRegularControl.touched
+                  filingRegularControl().invalid() &&
+                  filingRegularControl().touched()
                 " />
               @if (
-                filingRegularControl.hasError('required') &&
-                filingRegularControl.touched
+                hasError(filingRegularControl, 'required') &&
+                filingRegularControl().touched()
               ) {
                 <div class="invalid-feedback d-block">
                   {{ 'msg.required' | translate }}
@@ -219,7 +226,7 @@
         }
 
         <div class="form-group mb-2">
-          <mat-checkbox formControlName="autoImageDownload">
+          <mat-checkbox [formField]="form.config.autoImageDownload">
             {{ 'dataset.autoImageDownload' | translate }}
           </mat-checkbox>
           <br />
@@ -227,18 +234,18 @@
             'dataset.autoImageDownloadDesc' | translate
           }}</label>
         </div>
-        @if (autoImageDownloadControl.value) {
+        @if (autoImageDownloadControl().value()) {
           <div class="form-group mb-2">
             <label>{{ 'dataset.imageByKey' | translate }}</label>
             <input
               class="form-control"
-              formControlName="imageByKey"
+              [formField]="form.config.imageByKey"
               [class.is-invalid]="
-                imageByKeyControl.invalid && imageByKeyControl.touched
+                imageByKeyControl().invalid() && imageByKeyControl().touched()
               " />
             @if (
-              imageByKeyControl.hasError('required') &&
-              imageByKeyControl.touched
+              hasError(imageByKeyControl, 'required') &&
+              imageByKeyControl().touched()
             ) {
               <div class="invalid-feedback d-block">
                 {{ 'msg.required' | translate }}
@@ -251,13 +258,12 @@
         {{ 'dataset.fixedFieldTable' | translate }}
       </div>
       <app-dataset-field-table
-        [formArray]="fieldListControl"
-        [initData]="fieldList()"></app-dataset-field-table>
+        [fields]="fieldListControl"></app-dataset-field-table>
       @if (isEditMode) {
         <div class="my-4">
           <button
             type="submit"
-            [disabled]="form.invalid"
+            [disabled]="form().invalid()"
             class="btn btn-success w-100"
             (click)="update(false, 'save')">
             {{ 'g.save' | translate }}
@@ -267,7 +273,7 @@
       <div class="my-4">
         <button
           type="submit"
-          [disabled]="form.invalid"
+          [disabled]="form().invalid()"
           class="btn btn-success w-100"
           (click)="update(true, 'commit')">
           {{ 'g.submit' | translate }}

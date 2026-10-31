@@ -1,28 +1,29 @@
-import { Component, inject } from '@angular/core';
+import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
+import { Component, inject, signal } from '@angular/core';
+import { form, FormField, required } from '@angular/forms/signals';
 
-import { Dataset } from '../../model';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import {
+  MAT_DIALOG_DATA,
   MatDialogActions,
   MatDialogClose,
-  MatDialogTitle,
   MatDialogContent,
   MatDialogRef,
-  MAT_DIALOG_DATA,
+  MatDialogTitle,
 } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
-import { switchMap, EMPTY } from 'rxjs';
+import { EMPTY, switchMap } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { isBlank } from '../../../../shared/util/helper';
+import { Dataset } from '../../model';
 import { DatasetService } from '../../service/dataset.service';
 
 @Component({
   selector: 'app-copy-dataset',
 
   imports: [
-    ReactiveFormsModule,
-    FormsModule,
+    TrimOnBlurDirective,
+    FormField,
     MatButtonModule,
     MatDialogActions,
     MatDialogClose,
@@ -35,26 +36,37 @@ import { DatasetService } from '../../service/dataset.service';
 export class CopyDatasetComponent {
   readonly dialogRef = inject(MatDialogRef<CopyDatasetComponent>);
   readonly data = inject<{ source: Dataset }>(MAT_DIALOG_DATA);
-  source: Dataset = JSON.parse(JSON.stringify(this.data.source));
-  constructor(
-    private datasetService: DatasetService,
-    private snackbarService: SnackbarService
-  ) {}
+  readonly sourceModel = signal<Dataset>(
+    JSON.parse(JSON.stringify(this.data.source))
+  );
+  readonly sourceForm = form(this.sourceModel, p => {
+    required(p.name);
+  });
+  get source() {
+    return this.sourceModel();
+  }
+  set source(value: Dataset) {
+    this.sourceModel.set(value);
+  }
+  private readonly datasetService = inject(DatasetService);
+  private readonly snackbarService = inject(SnackbarService);
 
   ok() {
-    if (isBlank(this.source.name)) {
-      this.snackbarService.isBlankMessage('scrapy.name');
+    const source = structuredClone(this.sourceForm().value());
+    source.name = source.name.trim();
+    if (isBlank(source.name)) {
+      this.snackbarService.isBlankMessage('dataset.name');
       return;
     }
     this.datasetService
-      .existDataset(this.source.name)
+      .existDataset(source.name)
       .pipe(
         switchMap(res => {
           if (res) {
-            this.snackbarService.openI18N('msg.scrapyExist');
+            this.snackbarService.openI18N('msg.datasetExist');
             return EMPTY;
           }
-          return this.datasetService.updateDataset(this.source);
+          return this.datasetService.updateDataset(source);
         })
       )
       .subscribe(() => {

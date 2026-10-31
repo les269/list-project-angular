@@ -1,15 +1,14 @@
 <div class="card">
   <app-generic-table
-    [formArray]="formArray()"
-    [initData]="initData()"
+    [fields]="fields()"
     [cols]="cols"
     [displayedColumns]="displayedColumns"
-    [createGroup]="createGroup"
+    [createRow]="createRow"
     [expandedTmpl]="expandedTmpl"></app-generic-table>
 </div>
 <ng-template #expandedTmpl let-element>
   <div class="d-flex flex-column">
-    @if (element.type === 'fixedString') {
+    @if (element.type().value() === 'fixedString') {
       <div class="d-flex input-group my-1 align-items-center">
         <label class="input-group-text">{{
           'dataset.fixedString' | translate
@@ -17,7 +16,7 @@
         <input
           class="form-control"
           [placeholder]="'dataset.fixedStringPH' | translate"
-          [(ngModel)]="element.fixedString" />
+          [formField]="element.fixedString" />
       </div>
     }
     <div class="d-flex input-group my-1 align-items-center">
@@ -27,11 +26,11 @@
       <input
         class="form-control"
         [placeholder]="'dataset.replaceRegular' | translate"
-        [(ngModel)]="element.replaceRegular" />
+        [formField]="element.replaceRegular" />
       <input
         class="form-control"
         [placeholder]="'dataset.replaceRegularTo' | translate"
-        [(ngModel)]="element.replaceRegularTo" />
+        [formField]="element.replaceRegularTo" />
     </div>
   </div>
 </ng-template>

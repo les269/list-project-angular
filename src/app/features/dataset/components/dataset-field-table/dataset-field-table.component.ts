@@ -1,12 +1,7 @@
-import { Component, inject, input } from '@angular/core';
+import { createDatasetField } from '../../util/dataset-field';
 import { CommonModule } from '@angular/common';
-import { DatasetField, DatasetFieldType } from '../../model';
-import {
-  ReactiveFormsModule,
-  FormsModule,
-  FormBuilder,
-  Validators,
-} from '@angular/forms';
+import { Component, input } from '@angular/core';
+import { FieldTree, FormField } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,17 +12,16 @@ import {
   GenericColumnType,
   GenericTableColumn,
   SelectColumn,
-  ToFormArray,
 } from '../../../../core/model/generic-table';
 import { toKeyValueArray } from '../../../../shared/util/helper';
+import { DatasetField, DatasetFieldType } from '../../model';
 
 @Component({
   selector: 'app-dataset-field-table',
 
   imports: [
     MatTableModule,
-    ReactiveFormsModule,
-    FormsModule,
+    FormField,
     MatButtonModule,
     TranslateModule,
     CommonModule,
@@ -39,10 +33,8 @@ import { toKeyValueArray } from '../../../../shared/util/helper';
 })
 export class DatasetFieldTableComponent {
   // inject
-  readonly fb = inject(FormBuilder);
   // input
-  readonly formArray = input.required<ToFormArray<DatasetField>>();
-  readonly initData = input<DatasetField[]>();
+  readonly fields = input.required<FieldTree<DatasetField[]>>();
   readonly eDatasetFieldType = DatasetFieldType;
   readonly displayedColumns = ['key', 'label', 'type'];
   readonly typeColumn = {
@@ -67,15 +59,5 @@ export class DatasetFieldTableComponent {
     this.typeColumn,
   ];
 
-  readonly createGroup = () => {
-    return this.fb.group({
-      seq: [0],
-      type: [DatasetFieldType.path],
-      key: ['', [Validators.required]],
-      label: ['', [Validators.required]],
-      fixedString: [''],
-      replaceRegular: [''],
-      replaceRegularTo: [''],
-    });
-  };
+  readonly createRow = createDatasetField;
 }
