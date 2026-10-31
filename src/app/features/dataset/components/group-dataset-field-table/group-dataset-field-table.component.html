@@ -1,10 +1,9 @@
 <div class="card">
   <app-generic-table
-    [formArray]="formArray()"
-    [initData]="initData()"
+    [fields]="fields()"
     [cols]="cols"
     [displayedColumns]="displayedColumns"
-    [createGroup]="createGroup"></app-generic-table>
+    [createRow]="createRow"></app-generic-table>
 </div>
 <ng-template #expandedTmpl let-element>
   <div class="d-flex flex-column">

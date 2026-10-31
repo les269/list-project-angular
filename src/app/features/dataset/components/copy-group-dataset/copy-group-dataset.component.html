@@ -4,7 +4,10 @@
     <label for="name" class="form-label">{{
       'dataset.name' | translate
     }}</label>
-    <input type="text" class="form-control" [(ngModel)]="source.groupName" />
+    <input
+      type="text"
+      class="form-control"
+      [formField]="sourceForm.groupName" />
   </div>
 </mat-dialog-content>
 <mat-dialog-actions>

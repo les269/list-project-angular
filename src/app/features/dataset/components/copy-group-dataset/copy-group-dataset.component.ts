@@ -1,28 +1,27 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { form, FormField, required } from '@angular/forms/signals';
 
-import { GroupDataset } from '../../model';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import {
+  MAT_DIALOG_DATA,
   MatDialogActions,
   MatDialogClose,
-  MatDialogTitle,
   MatDialogContent,
   MatDialogRef,
-  MAT_DIALOG_DATA,
+  MatDialogTitle,
 } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
-import { switchMap, EMPTY } from 'rxjs';
+import { EMPTY, switchMap } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { isBlank } from '../../../../shared/util/helper';
+import { GroupDataset } from '../../model';
 import { GroupDatasetService } from '../../service/group-dataset.service';
 
 @Component({
   selector: 'app-copy-group-dataset',
 
   imports: [
-    ReactiveFormsModule,
-    FormsModule,
+    FormField,
     MatButtonModule,
     MatDialogActions,
     MatDialogClose,
@@ -35,11 +34,20 @@ import { GroupDatasetService } from '../../service/group-dataset.service';
 export class CopyGroupDatasetComponent {
   readonly dialogRef = inject(MatDialogRef<CopyGroupDatasetComponent>);
   readonly data = inject<{ source: GroupDataset }>(MAT_DIALOG_DATA);
-  source: GroupDataset = JSON.parse(JSON.stringify(this.data.source));
-  constructor(
-    private groupDatasetService: GroupDatasetService,
-    private snackbarService: SnackbarService
-  ) {}
+  readonly sourceModel = signal<GroupDataset>(
+    JSON.parse(JSON.stringify(this.data.source))
+  );
+  readonly sourceForm = form(this.sourceModel, p => {
+    required(p.groupName);
+  });
+  get source() {
+    return this.sourceModel();
+  }
+  set source(value: GroupDataset) {
+    this.sourceModel.set(value);
+  }
+  private readonly groupDatasetService = inject(GroupDatasetService);
+  private readonly snackbarService = inject(SnackbarService);
 
   ok() {
     if (isBlank(this.source.groupName)) {

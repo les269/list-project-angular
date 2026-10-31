@@ -1,26 +1,25 @@
-import { Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, viewChild } from '@angular/core';
 
-import { TranslateModule } from '@ngx-translate/core';
-import {
-  MatDialogClose,
-  MatDialogTitle,
-  MatDialogContent,
-  MAT_DIALOG_DATA,
-  MatDialogRef,
-} from '@angular/material/dialog';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-import { GroupDatasetDataService } from '../../service/group-dataset-data.service';
-import { EMPTY, filter, map, switchMap } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogClose,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle,
+} from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { TranslateModule } from '@ngx-translate/core';
+import { EMPTY, filter, map, switchMap } from 'rxjs';
+import { MessageBoxService } from '../../../../core/services/message-box.service';
+import { SnackbarService } from '../../../../core/services/snackbar.service';
 import {
   downloadJsonFile,
   isNotBlank,
   readJsonFile,
 } from '../../../../shared/util/helper';
-import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { GroupDatasetData } from '../../model';
+import { GroupDatasetDataService } from '../../service/group-dataset-data.service';
 
 @Component({
   selector: 'app-group-dataset-import-export',
@@ -30,8 +29,6 @@ import { GroupDatasetData } from '../../model';
     MatDialogClose,
     MatDialogTitle,
     MatDialogContent,
-    ReactiveFormsModule,
-    FormsModule,
     MatIconModule,
     MatButtonModule,
   ],
@@ -42,13 +39,12 @@ export class GroupDatasetImportExportComponent {
   readonly data = inject<{ groupName: string; byKey: string }>(MAT_DIALOG_DATA);
   groupName = this.data.groupName;
   byKey: string = this.data.byKey;
-  @ViewChild('importJsonInput') importJsonInput!: ElementRef<HTMLInputElement>;
+  readonly importJsonInput =
+    viewChild<ElementRef<HTMLInputElement>>('importJsonInput');
 
-  constructor(
-    private groupDatasetDataService: GroupDatasetDataService,
-    private snackbarService: SnackbarService,
-    private messageBoxService: MessageBoxService
-  ) {}
+  private readonly groupDatasetDataService = inject(GroupDatasetDataService);
+  private readonly snackbarService = inject(SnackbarService);
+  private readonly messageBoxService = inject(MessageBoxService);
 
   export(onlyJson?: boolean) {
     const currentTime = new Date().toISOString().replace(/[:.]/g, '-'); // 例如: 2024-11-17T12-34-56-789Z

@@ -1,6 +1,6 @@
 <div class="container d-flex">
   <div class="col-md-10 offset-md-1 col-xs-12 mt-2">
-    <form [formGroup]="form">
+    <form (submit)="$event.preventDefault()">
       <button
         type="button"
         mat-icon-button
@@ -14,28 +14,30 @@
         }}</label>
         <input
           class="form-control"
-          formControlName="groupName"
+          [formField]="form.groupName"
           [class.is-invalid]="
-            groupNameControl.invalid && groupNameControl.touched
+            groupNameControl().invalid() && groupNameControl().touched()
           " />
         @if (
-          groupNameControl.hasError('required') && groupNameControl.touched
+          hasError(groupNameControl, 'required') && groupNameControl().touched()
         ) {
           <div class="invalid-feedback d-block">
             {{ 'msg.required' | translate }}
           </div>
         }
       </div>
-      <div formGroupName="config">
+      <div>
         <div class="form-group mb-2">
           <label class="form-label require">{{
             'dataset.byKey' | translate
           }}</label>
           <input
             class="form-control"
-            formControlName="byKey"
-            [class.is-invalid]="byKeyControl.invalid && byKeyControl.touched" />
-          @if (byKeyControl.hasError('required') && byKeyControl.touched) {
+            [formField]="form.config.byKey"
+            [class.is-invalid]="
+              byKeyControl().invalid() && byKeyControl().touched()
+            " />
+          @if (hasError(byKeyControl, 'required') && byKeyControl().touched()) {
             <div class="invalid-feedback d-block">
               {{ 'msg.required' | translate }}
             </div>
@@ -45,39 +47,37 @@
           <label class="form-label">{{
             'dataset.imageSaveFolder' | translate
           }}</label>
-          <input class="form-control" formControlName="imageSaveFolder" />
+          <input
+            class="form-control"
+            [formField]="form.config.imageSaveFolder" />
         </div>
         <div class="h4 fw-bold">
           {{ 'dataset.fieldTable' | translate }}
         </div>
-        <app-group-dataset-field-table
-          [formArray]="fieldListControl"
-          [initData]="fieldListInitData()">
+        <app-group-dataset-field-table [fields]="fieldListControl">
         </app-group-dataset-field-table>
 
         <div class="form-group mb-2">
           <label class="form-label">{{
             'dataset.getDataType' | translate
           }}</label>
-          <select class="form-control form-select" formControlName="type">
+          <select
+            class="form-control form-select"
+            [formField]="form.config.type">
             @for (type of eGroupDatasetConfigType | keyvalue; track type) {
-              <option [ngValue]="type.key">
+              <option [value]="type.key">
                 {{ 'dataset.' + type.key | translate }}
               </option>
             }
           </select>
         </div>
-        @switch (configForm.controls.type.value) {
+        @switch (configForm.type().value()) {
           @case ('scrapy') {
-            <app-group-dataset-scrapy-table
-              [formArray]="scrapyListControl"
-              [initData]="scrapyListInitData()">
+            <app-group-dataset-scrapy-table [fields]="scrapyListControl">
             </app-group-dataset-scrapy-table>
           }
           @case ('api') {
-            <app-group-dataset-api-table
-              [formArray]="apiListControl"
-              [initData]="apiListInitData()">
+            <app-group-dataset-api-table [fields]="apiListControl">
             </app-group-dataset-api-table>
           }
         }
@@ -86,7 +86,7 @@
         <div class="my-4">
           <button
             type="submit"
-            [disabled]="form.invalid"
+            [disabled]="form().invalid()"
             class="btn btn-success w-100"
             (click)="update(false, 'save')">
             {{ 'g.save' | translate }}
@@ -96,7 +96,7 @@
       <div class="my-4">
         <button
           type="submit"
-          [disabled]="form.invalid"
+          [disabled]="form().invalid()"
           class="btn btn-success w-100"
           (click)="update(true, 'commit')">
           {{ 'g.submit' | translate }}

@@ -1,54 +1,30 @@
-import {
-  Component,
-  computed,
-  EventEmitter,
-  inject,
-  Injector,
-  input,
-  Input,
-  OnInit,
-  Output,
-} from '@angular/core';
+import { createGroupDatasetApi } from '../../util/group-dataset-rows';
+import { Component, computed, inject, input } from '@angular/core';
+import { FieldTree } from '@angular/forms/signals';
 
-import {
-  ReactiveFormsModule,
-  FormsModule,
-  FormBuilder,
-  Validators,
-} from '@angular/forms';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { TranslateModule } from '@ngx-translate/core';
-import { DatasetField, GroupDatasetApi } from '../../model';
-import { MatChipsModule } from '@angular/material/chips';
-import { SelectTableService } from '../../../../core/services/select-table.service';
-import { ApiConfigService } from '../../../api-config/service/api-config.service';
-import { ApiConfig } from '../../../api-config/model';
-import { filter, Observable, switchMap } from 'rxjs';
-import {
-  CdkDropList,
-  CdkDrag,
-  CdkDragDrop,
-  moveItemInArray,
-} from '@angular/cdk/drag-drop';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
-import { rxResource } from '@angular/core/rxjs-interop';
 import {
   ChipSelectColumn,
   GenericColumnType,
   GenericTableColumn,
-  ToFormArray,
 } from '../../../../core/model/generic-table';
+import { SelectTableService } from '../../../../core/services/select-table.service';
+import { ApiConfig } from '../../../api-config/model';
+import { ApiConfigService } from '../../../api-config/service/api-config.service';
+import { GroupDatasetApi } from '../../model';
 
 @Component({
   selector: 'app-group-dataset-api-table',
 
   imports: [
     MatTableModule,
-    ReactiveFormsModule,
-    FormsModule,
     MatButtonModule,
     TranslateModule,
     MatIconModule,
@@ -59,9 +35,7 @@ import {
   templateUrl: './group-dataset-api-table.component.html',
 })
 export class GroupDatasetApiTableComponent {
-  readonly formArray = input.required<ToFormArray<GroupDatasetApi>>();
-  readonly initData = input<GroupDatasetApi[]>();
-  readonly fb = inject(FormBuilder);
+  readonly fields = input.required<FieldTree<GroupDatasetApi[]>>();
   readonly displayedColumns = ['apiName', 'label'];
   readonly item: GroupDatasetApi = {
     seq: 0,
@@ -95,13 +69,7 @@ export class GroupDatasetApiTableComponent {
       columnType: GenericColumnType.input,
     },
   ];
-  readonly createGroup = () => {
-    return this.fb.group({
-      seq: [0],
-      apiName: ['', [Validators.required]],
-      label: ['', [Validators.required]],
-    });
-  };
+  readonly createRow = createGroupDatasetApi;
 
   selectApi(e: GroupDatasetApi) {
     this.selectTableService.selectSingleApi(this.apis.value()).subscribe(x => {

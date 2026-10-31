@@ -1,5 +1,12 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { disabled, form, FormField } from '@angular/forms/signals';
 
+import { MatButtonModule } from '@angular/material/button';
+import {
+  MatChipEditedEvent,
+  MatChipInputEvent,
+  MatChipsModule,
+} from '@angular/material/chips';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -8,30 +15,23 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { EMPTY, filter, switchMap, tap } from 'rxjs';
+import { MessageBoxService } from '../../../../core/services/message-box.service';
+import { SelectTableService } from '../../../../core/services/select-table.service';
+import { SnackbarService } from '../../../../core/services/snackbar.service';
+import { isBlank, isNotBlank } from '../../../../shared/util/helper';
+import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
+import { ScrapyService } from '../../../spider/services/scrapy.service';
 import {
   GroupDatasetConfig,
   GroupDatasetData,
   GroupDatasetScrapy,
 } from '../../model';
-import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { GroupDatasetService } from '../../service/group-dataset.service';
 import { GroupDatasetDataService } from '../../service/group-dataset-data.service';
-import { ScrapyService } from '../../../spider/services/scrapy.service';
-import { isBlank, isNotBlank } from '../../../../shared/util/helper';
-import { MatIconModule } from '@angular/material/icon';
-import { SelectTableService } from '../../../../core/services/select-table.service';
-import { EMPTY, filter, switchMap, tap } from 'rxjs';
-import {
-  MatChipEditedEvent,
-  MatChipInputEvent,
-  MatChipsModule,
-} from '@angular/material/chips';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MessageBoxService } from '../../../../core/services/message-box.service';
-import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
+import { GroupDatasetService } from '../../service/group-dataset.service';
 
 export interface EditGroupDatasetDataType {
   groupName: string;
@@ -41,8 +41,7 @@ export interface EditGroupDatasetDataType {
   selector: 'app-edit-group-dataset-data',
 
   imports: [
-    ReactiveFormsModule,
-    FormsModule,
+    FormField,
     MatButtonModule,
     MatDialogActions,
     MatDialogClose,
@@ -59,30 +58,58 @@ export interface EditGroupDatasetDataType {
 export class EditGroupDatasetDataComponent implements OnInit {
   readonly dialogRef = inject(MatDialogRef<EditGroupDatasetDataComponent>);
   readonly data = inject<EditGroupDatasetDataType>(MAT_DIALOG_DATA);
-  groupName = this.data.groupName;
-  primeValue = this.data.primeValue;
+  readonly groupNameModel = signal(this.data.groupName);
+  readonly groupNameForm = form(this.groupNameModel, p => disabled(p));
+  get groupName() {
+    return this.groupNameModel();
+  }
+  set groupName(value) {
+    this.groupNameModel.set(value);
+  }
+  readonly primeValueModel = signal(this.data.primeValue);
+  readonly primeValueForm = form(this.primeValueModel);
+  get primeValue() {
+    return this.primeValueModel();
+  }
+  set primeValue(value) {
+    this.primeValueModel.set(value);
+  }
   groupDatasetConfig!: GroupDatasetConfig;
-  json: any = {};
+  readonly jsonModel = signal<Record<string, any>>({});
+  readonly jsonForm = form(this.jsonModel);
+  get json() {
+    return this.jsonModel();
+  }
+  set json(value: Record<string, any>) {
+    this.jsonModel.set(value);
+  }
   scrapySize: { [key in string]: number } = {};
-  scrapyInput: { [key in string]: { url: string; json: string[] } } = {};
+  readonly scrapyInputModel = signal<{
+    [key in string]: { url: string; json: string[] };
+  }>({});
+  readonly scrapyInputForm = form(this.scrapyInputModel);
+  get scrapyInput() {
+    return this.scrapyInputModel();
+  }
+  set scrapyInput(value: { [key in string]: { url: string; json: string[] } }) {
+    this.scrapyInputModel.set(value);
+  }
 
-  constructor(
-    private snackbarService: SnackbarService,
-    private groupDatasetDataService: GroupDatasetDataService,
-    private groupDatasetService: GroupDatasetService,
-    private scrapyService: ScrapyService,
-    private selectTableService: SelectTableService,
-    private messageBoxService: MessageBoxService,
-    private translateService: TranslateService
-  ) {}
+  private readonly snackbarService = inject(SnackbarService);
+  private readonly groupDatasetDataService = inject(GroupDatasetDataService);
+  private readonly groupDatasetService = inject(GroupDatasetService);
+  private readonly scrapyService = inject(ScrapyService);
+  private readonly selectTableService = inject(SelectTableService);
+  private readonly messageBoxService = inject(MessageBoxService);
+  private readonly translateService = inject(TranslateService);
   ngOnInit(): void {
     this.groupDatasetService.getGroupDataset(this.groupName).subscribe(res => {
       this.groupDatasetConfig = res.config;
       for (var field of res.config.groupDatasetFieldList) {
         if (field.type === 'string') {
-          this.json[field.key] = '';
+          this.json = { ...this.json, [field.key]: '' };
         } else if (field.type === 'stringArray') {
-          this.json[field.key] = [];
+          this.json = { ...this.json, [field.key]: [] };
         }
       }
       this.getScrapyList();
@@ -157,9 +184,12 @@ export class EditGroupDatasetDataComponent implements OnInit {
       this.scrapyService.getByNameList(nameList).subscribe(res => {
         for (var x of res) {
           this.scrapySize[x.name] = x.paramSize;
-          this.scrapyInput[x.name] = {
-            url: '',
-            json: [].constructor(x.paramSize).map(() => ''),
+          this.scrapyInput = {
+            ...this.scrapyInput,
+            [x.name]: {
+              url: '',
+              json: Array.from({ length: x.paramSize }, () => ''),
+            },
           };
         }
       });
@@ -189,7 +219,7 @@ export class EditGroupDatasetDataComponent implements OnInit {
         .filter((value, i, arr) => arr.indexOf(value) === i)
         .sort((a, b) => (a > b ? 1 : -1));
     }
-    this.json = this.json;
+    this.json = { ...this.json };
     event.chipInput!.clear();
   }
 
@@ -201,12 +231,12 @@ export class EditGroupDatasetDataComponent implements OnInit {
     this.json[key] = [...this.json[key], after]
       .filter(x => x !== before)
       .sort((a, b) => (a > b ? 1 : -1));
-    this.json = this.json;
+    this.json = { ...this.json };
   }
 
   removeChip(value: string, key: string) {
     this.json[key] = this.json[key].filter((x: string) => x !== value);
-    this.json = this.json;
+    this.json = { ...this.json };
   }
 
   onUpdate(): void {
@@ -277,9 +307,9 @@ export class EditGroupDatasetDataComponent implements OnInit {
   clearField() {
     for (var field of this.groupDatasetConfig.groupDatasetFieldList) {
       if (field.type === 'string') {
-        this.json[field.key] = '';
+        this.json = { ...this.json, [field.key]: '' };
       } else if (field.type === 'stringArray') {
-        this.json[field.key] = [];
+        this.json = { ...this.json, [field.key]: [] };
       }
     }
   }

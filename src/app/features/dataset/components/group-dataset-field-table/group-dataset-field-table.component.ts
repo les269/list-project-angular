@@ -1,37 +1,30 @@
-import { Component, inject, input } from '@angular/core';
+import { createGroupDatasetField } from '../../util/group-dataset-rows';
 import { CommonModule } from '@angular/common';
-import { GroupDatasetField, GroupDatasetFieldType } from '../../model';
-import {
-  ReactiveFormsModule,
-  FormsModule,
-  FormBuilder,
-  Validators,
-} from '@angular/forms';
+import { Component, inject, input } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { FieldTree } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { TranslateModule } from '@ngx-translate/core';
-import { MatChipsModule } from '@angular/material/chips';
-import { ReplaceValueMapService } from '../../../replace-value-map/service/replace-value-map.service';
-import { rxResource } from '@angular/core/rxjs-interop';
-import { SelectTableService } from '../../../../core/services/select-table.service';
+import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 import {
   GenericColumnType,
   GenericTableColumn,
   SelectColumn,
-  ToFormArray,
 } from '../../../../core/model/generic-table';
-import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
+import { SelectTableService } from '../../../../core/services/select-table.service';
 import { toKeyValueArray } from '../../../../shared/util/helper';
+import { ReplaceValueMapService } from '../../../replace-value-map/service/replace-value-map.service';
+import { GroupDatasetField, GroupDatasetFieldType } from '../../model';
 
 @Component({
   selector: 'app-group-dataset-field-table',
 
   imports: [
     MatTableModule,
-    ReactiveFormsModule,
-    FormsModule,
     MatButtonModule,
     TranslateModule,
     CommonModule,
@@ -43,9 +36,7 @@ import { toKeyValueArray } from '../../../../shared/util/helper';
   templateUrl: './group-dataset-field-table.component.html',
 })
 export class GroupDatasetFieldTableComponent {
-  readonly formArray = input.required<ToFormArray<GroupDatasetField>>();
-  readonly initData = input<GroupDatasetField[]>();
-  readonly fb = inject(FormBuilder);
+  readonly fields = input.required<FieldTree<GroupDatasetField[]>>();
   readonly eGroupDatasetFieldType = GroupDatasetFieldType;
   readonly displayedColumns = ['key', 'label', 'type'];
   readonly replaceValueMapService = inject(ReplaceValueMapService);
@@ -75,15 +66,7 @@ export class GroupDatasetFieldTableComponent {
     } satisfies SelectColumn<{ key: string; value: string }>,
   ];
 
-  readonly createGroup = () => {
-    return this.fb.group({
-      seq: [0],
-      type: [GroupDatasetFieldType.string],
-      key: ['', [Validators.required]],
-      label: ['', [Validators.required]],
-      replaceValueMapName: [''],
-    });
-  };
+  readonly createRow = createGroupDatasetField;
 
   selectReplaceValueMap(element: GroupDatasetField) {
     this.selectTableService

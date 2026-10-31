@@ -12,11 +12,7 @@
     <label class="input-group-text">{{
       'dataset.groupName' | translate
     }}</label>
-    <input
-      class="form-control"
-      trimOnBlur
-      [(ngModel)]="groupName"
-      [disabled]="true" />
+    <input class="form-control" trimOnBlur [formField]="groupNameForm" />
   </div>
   <div class="input-group mb-2">
     <label class="input-group-text">{{
@@ -25,7 +21,7 @@
     <input
       class="form-control"
       trimOnBlur
-      [(ngModel)]="primeValue"
+      [formField]="primeValueForm"
       (keydown.enter)="searchByPrimeValue()" />
     <button
       class="btn btn-outline-secondary d-flex"
@@ -76,7 +72,7 @@
             <input
               class="form-control"
               trimOnBlur
-              [(ngModel)]="scrapyInput[scrapy.name].json[index]"
+              [formField]="scrapyInputForm[scrapy.name].json[index]"
               (keydown.enter)="
                 scrapyByJson(scrapy.name, scrapyInput[scrapy.name].json)
               " />
@@ -105,7 +101,7 @@
           <input
             class="form-control"
             trimOnBlur
-            [(ngModel)]="scrapyInput[scrapy.name].url"
+            [formField]="scrapyInputForm[scrapy.name].url"
             (keydown.enter)="scrapyByUrl(scrapy)" />
           <button
             class="btn btn-outline-secondary"
@@ -125,7 +121,7 @@
             <input
               class="form-control"
               trimOnBlur
-              [(ngModel)]="json[field.key]" />
+              [formField]="jsonForm[field.key]" />
           </div>
         }
         @case ('stringArray') {
