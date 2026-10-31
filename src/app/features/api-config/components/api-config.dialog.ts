@@ -1,22 +1,21 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { CodeEditor } from '@acrodata/code-editor';
+import { CommonModule } from '@angular/common';
+import { Component, inject, signal } from '@angular/core';
+import { disabled, form, FormField, required } from '@angular/forms/signals';
+import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
-  MatDialogClose,
   MatDialogContent,
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { ApiConfig, HttpMethodType } from '../model';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
+import { languages } from '@codemirror/language-data';
 import { TranslateModule } from '@ngx-translate/core';
 import { SnackbarService } from '../../../core/services/snackbar.service';
 import { isBlank, isNotJson, jsonFormat } from '../../../shared/util/helper';
+import { ApiConfig, HttpMethodType } from '../model';
 import { ApiConfigService } from '../service/api-config.service';
-import { languages } from '@codemirror/language-data';
-import { CodeEditor } from '@acrodata/code-editor';
 
 export interface ApiConfigDialogData {
   value: ApiConfig;
@@ -25,8 +24,7 @@ export interface ApiConfigDialogData {
 }
 @Component({
   imports: [
-    ReactiveFormsModule,
-    FormsModule,
+    FormField,
     MatButtonModule,
     MatDialogActions,
     MatDialogTitle,
@@ -41,7 +39,27 @@ export interface ApiConfigDialogData {
 export class ApiConfigDialog {
   readonly dialogRef = inject(MatDialogRef<ApiConfigDialog>);
   readonly data = inject<ApiConfigDialogData>(MAT_DIALOG_DATA);
-  value = JSON.parse(JSON.stringify(this.data.value));
+  readonly valueModel = signal({
+    apiName: this.data.value.apiName ?? '',
+    httpMethod: this.data.value.httpMethod,
+    endpointUrl: this.data.value.endpointUrl ?? '',
+    requestBody: this.data.value.requestBody ?? '',
+    httpParams: this.data.value.httpParams ?? '',
+    httpHeaders: this.data.value.httpHeaders ?? '',
+    successMessage: this.data.value.successMessage ?? '',
+    updatedTime: this.data.value.updatedTime ?? 0,
+  });
+  readonly valueForm = form(this.valueModel, p => {
+    disabled(p.apiName, { when: () => this.data.type === 'edit' });
+    required(p.apiName);
+    required(p.endpointUrl);
+  });
+  get value() {
+    return this.valueModel();
+  }
+  set value(value) {
+    this.valueModel.set(value);
+  }
   list = this.data.list;
   type = this.data.type;
   eHttpMethodType = HttpMethodType;
