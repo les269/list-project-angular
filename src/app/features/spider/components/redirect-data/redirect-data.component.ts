@@ -1,27 +1,23 @@
-import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import {
-  MatDialogActions,
-  MatDialogClose,
-  MatDialogTitle,
-  MatDialogContent,
   MAT_DIALOG_DATA,
+  MatDialogActions,
+  MatDialogContent,
   MatDialogRef,
+  MatDialogTitle,
 } from '@angular/material/dialog';
+import { MatListModule } from '@angular/material/list';
 import { TranslateModule } from '@ngx-translate/core';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { ScrapyPagination } from '../../model';
 import { ScrapyPaginationService } from '../../services/scrapy-pagination.service';
-import { MatListModule } from '@angular/material/list';
 
 @Component({
   selector: 'app-redirect-data',
 
   imports: [
-    ReactiveFormsModule,
-    FormsModule,
     MatButtonModule,
     MatDialogActions,
     MatDialogTitle,
