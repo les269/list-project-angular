@@ -16,7 +16,6 @@ import {
   FormField,
   required,
   readonly,
-  SchemaFn,
 } from '@angular/forms/signals';
 
 import { rxResource } from '@angular/core/rxjs-interop';
@@ -57,12 +56,6 @@ import { PipelineListComponent } from '../pipeline-list/pipeline-list.component'
   templateUrl: './cookie-table.component.html',
 })
 export class CookieTableComponent {
-  static readonly rowSchema: SchemaFn<
-    ReturnType<CookieTableComponent['createCookie']>
-  > = p => {
-    required(p.name);
-    required(p.value);
-  };
   // inject
   readonly cookieListService = inject(CookieListService);
   readonly cookieListMapService = inject(CookieListMapService);
@@ -128,7 +121,10 @@ export class CookieTableComponent {
     readonly(p, { when: () => this.isProcessing() });
     disabled(p.list, { when: () => this.isProcessing() });
     disabled(p.cookieId, { when: () => this.isEditMode() });
-    applyEach(p.list, CookieTableComponent.rowSchema);
+    applyEach(p.list, row => {
+      required(row.name);
+      required(row.value);
+    });
     required(p.cookieId);
   });
 

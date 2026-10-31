@@ -16,7 +16,6 @@ import {
   FormField,
   required,
   readonly,
-  SchemaFn,
 } from '@angular/forms/signals';
 
 import { rxResource } from '@angular/core/rxjs-interop';
@@ -58,12 +57,6 @@ import { PipelineListComponent } from '../pipeline-list/pipeline-list.component'
   templateUrl: './headers-table.component.html',
 })
 export class HeadersTableComponent {
-  static readonly rowSchema: SchemaFn<
-    ReturnType<HeadersTableComponent['createHeader']>
-  > = p => {
-    required(p.name);
-    required(p.value);
-  };
   readonly headersService = inject(HeadersService);
   readonly headersMapService = inject(HeadersMapService);
   readonly selectTableService = inject(SelectTableService);
@@ -127,7 +120,10 @@ export class HeadersTableComponent {
     readonly(p, { when: () => this.isProcessing() });
     disabled(p.list, { when: () => this.isProcessing() });
     disabled(p.headersId, { when: () => this.isEditMode() });
-    applyEach(p.list, HeadersTableComponent.rowSchema);
+    applyEach(p.list, row => {
+      required(row.name);
+      required(row.value);
+    });
     required(p.headersId);
   });
 
