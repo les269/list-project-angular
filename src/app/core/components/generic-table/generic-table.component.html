@@ -51,6 +51,7 @@
           @case (eGenericColumnType.textarea) {
             <textarea
               class="form-control"
+              trimOnBlur
               [formField]="field"
               [attr.aria-label]="fieldLabel"
               [class.is-invalid]="showError"></textarea>
