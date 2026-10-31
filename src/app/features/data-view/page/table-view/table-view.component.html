@@ -4,12 +4,17 @@
       @if (store.themeDatasetList().length > 1) {
         <select
           class="form-select"
-          [compareWith]="store.compareDataset"
-          [ngModel]="store.useDataset()"
+          #datasetSelect
           [matTooltip]="'themeDataset.selectDataset' | translate"
-          (ngModelChange)="store.changeDataset($event)">
+          (change)="
+            store.changeDataset(
+              store.themeDatasetList()[datasetSelect.selectedIndex]
+            )
+          ">
           @for (dataset of store.themeDatasetList(); track $index) {
-            <option [ngValue]="dataset">
+            <option
+              [value]="dataset.seq"
+              [selected]="store.useDataset().seq === dataset.seq">
               {{ dataset.label }}
             </option>
           }
@@ -21,12 +26,17 @@
       ) {
         <select
           class="form-select"
-          [compareWith]="store.compareShareTag"
-          [ngModel]="store.useShareTag()"
+          #tagSelect
           [matTooltip]="'themeTag.selectTag' | translate"
-          (ngModelChange)="store.changeShareTag($event)">
+          (change)="
+            store.changeShareTag(
+              store.themeTagListForSelect()[tagSelect.selectedIndex]
+            )
+          ">
           @for (tag of store.themeTagListForSelect(); track tag.shareTagId) {
-            <option [ngValue]="tag">
+            <option
+              [value]="tag.shareTagId"
+              [selected]="store.useShareTag().shareTagId === tag.shareTagId">
               {{ store.shareTagNameMap()[tag.shareTagId] || tag.shareTagId }}
               {{
                 tag.seq === -1
@@ -50,8 +60,9 @@
         type="text"
         class="form-control"
         [matAutocomplete]="auto"
-        [ngModel]="store.searchValue()"
-        (ngModelChange)="store.searchValue.set($event)"
+        #searchInput
+        [value]="store.searchValue()"
+        (input)="store.searchValue.set(searchInput.value)"
         (keydown.enter)="store.onSearch(store.searchValue())" />
       <mat-autocomplete
         #auto="matAutocomplete"

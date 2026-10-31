@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import {
   Component,
   computed,
@@ -6,34 +7,26 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import {
-  getWidth,
-  isBlank,
-  isNotBlank,
-  isValidWidth,
-} from '../../../../shared/util/helper';
-import { ThemeLabel } from '../../../theme/models';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatTableModule } from '@angular/material/table';
-import { ScrollTopComponent } from '../../../../core/components/scroll-top/scroll-top.component';
-import { FileSizePipe } from '../../../../shared/util/util.pipe';
-import { TranslateModule } from '@ngx-translate/core';
-import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import {
   MatPaginatorIntl,
   MatPaginatorModule,
   PageEvent,
 } from '@angular/material/paginator';
-import { CustomMatPaginatorIntl } from '../../../../core/components/custom-mat-paginatorIntl/custom-mat-paginatorIntl';
-import { MatIconModule } from '@angular/material/icon';
-import { ListItemValueComponent } from '../../components/list-item-value/list-item-value.component';
+import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
+import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatButtonModule } from '@angular/material/button';
+import { TranslateModule } from '@ngx-translate/core';
+import { CustomMatPaginatorIntl } from '../../../../core/components/custom-mat-paginatorIntl/custom-mat-paginatorIntl';
+import { ScrollTopComponent } from '../../../../core/components/scroll-top/scroll-top.component';
+import { getWidth, isBlank, isNotBlank } from '../../../../shared/util/helper';
+import { FileSizePipe } from '../../../../shared/util/util.pipe';
 import { CustomButtonsComponent } from '../../components/custom-buttons/custom-buttons.component';
-import { TopCustomButtonsComponent } from '../../components/top-custom-buttons/top-custom-buttons.component';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { ItemTagButtonsComponent } from '../../components/item-tag-buttons/item-tag-buttons.component';
+import { ListItemValueComponent } from '../../components/list-item-value/list-item-value.component';
+import { TopCustomButtonsComponent } from '../../components/top-custom-buttons/top-custom-buttons.component';
 import {
   DataStore,
   FilterStore,
@@ -49,8 +42,6 @@ import {
 
   imports: [
     CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
     MatTableModule,
     ScrollTopComponent,
     FileSizePipe,

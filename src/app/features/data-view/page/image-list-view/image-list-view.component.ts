@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import {
   Component,
   effect,
@@ -6,6 +7,13 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslateModule } from '@ngx-translate/core';
+import { FixedImageComponent } from '../../../../core/components/fixed-image/fixed-image.component';
+import { ScrollTopComponent } from '../../../../core/components/scroll-top/scroll-top.component';
 import { API_BASE_URL } from '../../../../core/tokens/api-base-url.token';
 import {
   isBlank,
@@ -13,20 +21,11 @@ import {
   replaceValue,
 } from '../../../../shared/util/helper';
 import { QueryActionType, SortType } from '../../../theme/models';
-import { NgTemplateOutlet } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
-import { TranslateModule } from '@ngx-translate/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ScrollTopComponent } from '../../../../core/components/scroll-top/scroll-top.component';
-import { MatButtonModule } from '@angular/material/button';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { ListItemValueComponent } from '../../components/list-item-value/list-item-value.component';
 import { CustomButtonsComponent } from '../../components/custom-buttons/custom-buttons.component';
-import { TopCustomButtonsComponent } from '../../components/top-custom-buttons/top-custom-buttons.component';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { FixedImageComponent } from '../../../../core/components/fixed-image/fixed-image.component';
-import { ItemTagButtonsComponent } from '../../components/item-tag-buttons/item-tag-buttons.component';
 import { ImgContentComponent } from '../../components/img-content/img-content.component';
+import { ItemTagButtonsComponent } from '../../components/item-tag-buttons/item-tag-buttons.component';
+import { ListItemValueComponent } from '../../components/list-item-value/list-item-value.component';
+import { TopCustomButtonsComponent } from '../../components/top-custom-buttons/top-custom-buttons.component';
 import {
   DataStore,
   FilterStore,
@@ -41,8 +40,6 @@ import {
   imports: [
     MatIconModule,
     TranslateModule,
-    FormsModule,
-    ReactiveFormsModule,
     ScrollTopComponent,
     MatButtonModule,
     MatTooltipModule,

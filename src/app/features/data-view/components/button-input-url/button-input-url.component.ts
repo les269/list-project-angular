@@ -1,21 +1,18 @@
 import { Component, inject, model } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 import {
-  MatDialogRef,
   MAT_DIALOG_DATA,
   MatDialogActions,
   MatDialogClose,
   MatDialogContent,
+  MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-button-input-url',
   imports: [
-    ReactiveFormsModule,
-    FormsModule,
     MatButtonModule,
     MatDialogActions,
     MatDialogClose,

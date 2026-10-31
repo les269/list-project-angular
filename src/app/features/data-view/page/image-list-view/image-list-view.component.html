@@ -4,12 +4,17 @@
       @if (store.themeDatasetList() && store.themeDatasetList().length > 1) {
         <select
           class="list-select"
-          [compareWith]="store.compareDataset"
-          [ngModel]="store.useDataset()"
+          #datasetSelect
           [matTooltip]="'themeDataset.selectDataset' | translate"
-          (ngModelChange)="store.changeDataset($event)">
+          (change)="
+            store.changeDataset(
+              store.themeDatasetList()[datasetSelect.selectedIndex]
+            )
+          ">
           @for (dataset of store.themeDatasetList(); track dataset.seq) {
-            <option [ngValue]="dataset">
+            <option
+              [value]="dataset.seq"
+              [selected]="store.useDataset().seq === dataset.seq">
               {{ dataset.label }}
             </option>
           }
@@ -21,12 +26,17 @@
       ) {
         <select
           class="list-select"
-          [compareWith]="store.compareShareTag"
-          [ngModel]="store.useShareTag()"
+          #tagSelect
           [matTooltip]="'themeTag.selectTag' | translate"
-          (ngModelChange)="store.changeShareTag($event)">
+          (change)="
+            store.changeShareTag(
+              store.themeTagListForSelect()[tagSelect.selectedIndex]
+            )
+          ">
           @for (tag of store.themeTagListForSelect(); track tag.shareTagId) {
-            <option [ngValue]="tag">
+            <option
+              [value]="tag.shareTagId"
+              [selected]="store.useShareTag().shareTagId === tag.shareTagId">
               {{ store.shareTagNameMap()[tag.shareTagId] || tag.shareTagId }}
               {{
                 tag.seq === -1
@@ -51,8 +61,9 @@
           type="text"
           class="form-control"
           [matAutocomplete]="auto"
-          [ngModel]="store.searchValue()"
-          (ngModelChange)="store.searchValue.set($event)"
+          #searchInput
+          [value]="store.searchValue()"
+          (input)="store.searchValue.set(searchInput.value)"
           (keydown.enter)="store.onSearch(store.searchValue())" />
         <mat-autocomplete
           #auto="matAutocomplete"
@@ -131,12 +142,13 @@
   @if (store.sortArray().length > 0) {
     <select
       class="list-select"
+      #sortSelect
       [matTooltip]="'g.sort' | translate"
-      [compareWith]="store.compareSort"
-      [ngModel]="store.sortValue()"
-      (ngModelChange)="changeSort($event)">
+      (change)="changeSort(store.sortArray()[sortSelect.selectedIndex])">
       @for (sort of store.sortArray(); track sort.key) {
-        <option [ngValue]="sort">
+        <option
+          [value]="sort.key"
+          [selected]="store.sortValue()?.key === sort.key">
           {{ sort.label }}
         </option>
       }
@@ -150,10 +162,11 @@
   @if (store.pages().length > 1) {
     <select
       class="list-select"
-      [ngModel]="store.currentPage()"
-      (ngModelChange)="changePage($event)">
+      #pageSelect
+      [value]="store.currentPage()"
+      (change)="changePage(+pageSelect.value)">
       @for (page of store.pages(); track page) {
-        <option [ngValue]="page">{{ page }} {{ 'g.page' | translate }}</option>
+        <option [value]="page">{{ page }} {{ 'g.page' | translate }}</option>
       }
     </select>
     <div class="d-flex flex-column justify-content-center" style="height: 34px">
