@@ -1,3 +1,5 @@
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { CommonModule } from '@angular/common';
 import {
   AfterViewInit,
   Component,
@@ -6,31 +8,27 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
-import { SettingService } from '../../services/setting.service';
-import { CommonModule } from '@angular/common';
-import { MatAnchor, MatButtonModule } from '@angular/material/button';
-import { DatabaseConfig, DatabaseType, Setting } from '../../model';
-import { DragDropModule } from '@angular/cdk/drag-drop';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { DatabaseConfigService } from '../../services/database-config.service';
-import { MatDialog } from '@angular/material/dialog';
-import { DatabaseEditComponent } from '../../components/database-edit/database-edit.component';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
+import { filter, switchMap, tap } from 'rxjs';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
+import { SnackbarService } from '../../../../core/services/snackbar.service';
+import { LayoutStore } from '../../../../core/stores/layout.store';
 import {
   CURRENT_DYNAMIC_DB_SETTING_NAME,
   DEFAULT_DYNAMIC_DB_KEY,
 } from '../../../../shared/util/global';
-import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { MatSort, MatSortModule } from '@angular/material/sort';
-import { SelectTableService } from '../../../../core/services/select-table.service';
-import { filter, switchMap, tap } from 'rxjs';
 import { ThemeService } from '../../../theme/services/theme.service';
-import { LayoutStore } from '../../../../core/stores/layout.store';
+import { DatabaseEditComponent } from '../../components/database-edit/database-edit.component';
+import { DatabaseConfig, DatabaseType, Setting } from '../../model';
+import { DatabaseConfigService } from '../../services/database-config.service';
+import { SettingService } from '../../services/setting.service';
 
 @Component({
   selector: 'app-setting-database',
