@@ -117,10 +117,7 @@
               ><div [innerHTML]="'scrapy.cssSelectRemind' | translate"></div
             ></label>
             <app-css-select-table
-              [fields]="dataGroup.cssSelectList"
-              [initData]="
-                dataInit()[index]?.cssSelectList
-              "></app-css-select-table>
+              [fields]="dataGroup.cssSelectList"></app-css-select-table>
             <div class="form-group mb-2">
               <label>{{ 'scrapy.testHtml' | translate }}</label>
               <code-editor

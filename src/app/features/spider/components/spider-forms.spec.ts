@@ -391,6 +391,38 @@ it('SpiderItem 逐列驗證 key，並隨 mode 切換 selector 與 jsonPath 的�
   expect(state.items.update).toHaveBeenCalledTimes(1);
 });
 
+it.each([ExtractionRuleMode.SELECT, ExtractionRuleMode.JSON_PATH])(
+  '擷取模式 %s 的 textarea 失焦後清除前後空白並重新驗證',
+  async mode => {
+    const state = await setup();
+    const fixture = TestBed.createComponent(SpiderItemComponent);
+    await fixture.whenStable();
+    const component = fixture.componentInstance;
+    component.form.spiderItemId().value.set('item');
+    component.extractionRuleMode().value.set(mode);
+    component
+      .extractionRuleList()
+      .reset([component.createExtractionRule({ key: 'key' })]);
+    await fixture.whenStable();
+    const textarea: HTMLTextAreaElement =
+      fixture.nativeElement.querySelector('textarea');
+    textarea.value = '  value  ';
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    textarea.dispatchEvent(new Event('blur'));
+    await fixture.whenStable();
+    expect(textarea.value).toBe('value');
+    expect(component.form().valid()).toBe(true);
+    textarea.value = '   ';
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    textarea.dispatchEvent(new Event('blur'));
+    await fixture.whenStable();
+    expect(textarea.value).toBe('');
+    expect(component.form().invalid()).toBe(true);
+    component.onSaveItem();
+    expect(state.items.update).not.toHaveBeenCalled();
+  }
+);
+
 it('SpiderItem 儲存與綁定不會重複送出，失敗後會解鎖', async () => {
   const state = await setup();
   const fixture = TestBed.createComponent(SpiderItemComponent);
