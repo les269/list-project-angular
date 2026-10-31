@@ -638,6 +638,7 @@
     "pagination": "分頁獲取"
   },
   "replaceValueMap": {
+    "swap": "翻轉",
     "searchName": "搜尋名稱",
     "match": "被替換值",
     "replaceValue": "替換值",

@@ -1,38 +1,34 @@
-import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { Component, effect, inject, viewChild } from '@angular/core';
 
-import { ReplaceValueMapService } from '../../service/replace-value-map.service';
-import { ReplaceValueList, ReplaceValueMap } from '../../model';
-import { SelectTableService } from '../../../../core/services/select-table.service';
-import { filter, switchMap } from 'rxjs';
-import {
-  downloadJsonFile,
-  isBlank,
-  isNotBlank,
-  isNotNull,
-} from '../../../../shared/util/helper';
-import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   MatPaginator,
   MatPaginatorIntl,
   MatPaginatorModule,
 } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { TranslateModule } from '@ngx-translate/core';
+import { filter, switchMap } from 'rxjs';
 import { CustomMatPaginatorIntl } from '../../../../core/components/custom-mat-paginatorIntl/custom-mat-paginatorIntl';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDialog } from '@angular/material/dialog';
 import { ScrollTopComponent } from '../../../../core/components/scroll-top/scroll-top.component';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
+import { SelectTableService } from '../../../../core/services/select-table.service';
+import { SnackbarService } from '../../../../core/services/snackbar.service';
+import {
+  downloadJsonFile,
+  isBlank,
+  isNotBlank,
+  isNotNull,
+} from '../../../../shared/util/helper';
+import { ReplaceValueList, ReplaceValueMap } from '../../model';
+import { ReplaceValueMapService } from '../../service/replace-value-map.service';
 
 @Component({
   selector: 'app-replace-value-map',
 
   imports: [
-    FormsModule,
-    ReactiveFormsModule,
     MatTableModule,
     TranslateModule,
     MatIconModule,
@@ -44,35 +40,37 @@ import { MessageBoxService } from '../../../../core/services/message-box.service
   providers: [{ provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl }],
   templateUrl: './replace-value-map.component.html',
 })
-export class ReplaceValueMapComponent implements AfterViewInit {
-  searchName: string = '';
+export class ReplaceValueMapComponent {
+  searchName = '';
   displayedColumns = ['match', 'replaceValue', 'other'];
-  dataSource = new MatTableDataSource<ReplaceValueList>([]);
+  readonly dataSource = new MatTableDataSource<ReplaceValueList>([]);
 
-  @ViewChild(MatSort) sort!: MatSort;
-  @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
+  private readonly replaceValueMapService = inject(ReplaceValueMapService);
+  private readonly selectTableService = inject(SelectTableService);
+  private readonly snackbarService = inject(SnackbarService);
+  private readonly messageBoxService = inject(MessageBoxService);
+  readonly sort = viewChild(MatSort);
+  readonly paginator = viewChild(MatPaginator);
 
-  constructor(
-    private replaceValueMapService: ReplaceValueMapService,
-    private selectTableService: SelectTableService,
-    private snackbarService: SnackbarService,
-    private matDialog: MatDialog,
-    private translateService: TranslateService,
-    private messageBoxService: MessageBoxService
-  ) {}
+  constructor() {
+    effect(() => {
+      this.dataSource.sort = this.sort() ?? null;
+      this.dataSource.paginator = this.paginator() ?? null;
+    });
+  }
 
-  ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
+  swap() {
+    this.dataSource.data = this.dataSource.data.map(row => ({
+      ...row,
+      match: row.replaceValue,
+      replaceValue: row.match,
+    }));
   }
 
   add() {
     this.dataSource.data = [
       ...this.dataSource.data,
-      {
-        match: '',
-        replaceValue: '',
-      },
+      { match: '', replaceValue: '' },
     ];
   }
 
@@ -84,7 +82,7 @@ export class ReplaceValueMapComponent implements AfterViewInit {
 
     this.replaceValueMapService.getByName(this.searchName).subscribe(res => {
       if (res) {
-        this.dataSource.data = Object.entries(res.map).flatMap(x => ({
+        this.dataSource.data = Object.entries(res.map).map(x => ({
           match: x[0],
           replaceValue: x[1],
         }));
@@ -109,7 +107,7 @@ export class ReplaceValueMapComponent implements AfterViewInit {
       )
       .subscribe(res => {
         if (res) {
-          this.dataSource.data = Object.entries(res.map).flatMap(x => ({
+          this.dataSource.data = Object.entries(res.map).map(x => ({
             match: x[0],
             replaceValue: x[1],
           }));
@@ -176,7 +174,7 @@ export class ReplaceValueMapComponent implements AfterViewInit {
     reader.onload = () => {
       try {
         const data = JSON.parse(reader.result as string);
-        this.dataSource.data = Object.entries(data).flatMap(x => ({
+        this.dataSource.data = Object.entries(data).map(x => ({
           match: x[0],
           replaceValue: x[1] + '',
         }));
@@ -191,11 +189,7 @@ export class ReplaceValueMapComponent implements AfterViewInit {
   }
 
   onDelete(element: ReplaceValueList) {
-    const index = this.dataSource.data.indexOf(element);
-    if (index > -1) {
-      this.dataSource.data.splice(index, 1);
-      this.dataSource.data = [...this.dataSource.data];
-    }
+    this.dataSource.data = this.dataSource.data.filter(row => row !== element);
   }
 
   applyFilter(event: Event) {

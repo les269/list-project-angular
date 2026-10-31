@@ -30,6 +30,17 @@
 - 後端契約、重構目標與舊資料相容性若無明確依據，不自行杜撰；整合問題再取得相關契約、範例資料或後端位置。
 - 修改相關功能時，若發現 spec 與實作不符，明確指出差異；需要更新文件時以核對後的內容為準，不全面重寫或複製程式碼型別清單。
 
+## Angular 寫法優先順序
+
+- 新增或修改相關程式碼時，優先使用目前專案 Angular 版本支援的現代 API；此規則優先於沿用模組中的舊寫法，不為此進行無關的全域遷移。
+- Dependency Injection 優先使用欄位 `inject()`，不新增 constructor parameter injection；constructor 可保留必要的初始化邏輯。
+- 查詢優先使用 Signal API：`viewChild()`、`viewChildren()`、`contentChild()`、`contentChildren()`；只有確定必定存在的查詢才使用 `.required()`。
+- 元件介面優先使用 `input()`、`output()`；需要雙向綁定時使用 `model()`。
+- 表單優先使用 Signal Forms，資料維持單一來源；在初始化的 injection context 建立 `form()`，不要在 template 呼叫的方法或其他 reactive context 中動態建立 form 或 effect。
+- 狀態與衍生值優先使用 `signal()`、`computed()`；確有相依且可編輯的狀態才使用 `linkedSignal()`。`effect()` 用於必要的副作用，不用來複製可直接衍生的狀態。
+- template 優先使用 `@if`、`@for`、`@switch`。非同步流程依需求使用 RxJS、`toSignal()` 或 resource，不為採用新 API 強行改寫。
+- 遇到相容性或生命週期限制時，採用可驗證正確的做法，並說明原因，不只因 API 較新就使用。
+
 ## 開發與驗證
 
 - 安裝依賴：`npm ci`；啟動開發伺服器：`npm start`。
