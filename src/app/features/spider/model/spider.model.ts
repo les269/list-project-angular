@@ -1,5 +1,4 @@
 import { ExtractionRule, ExtractionRuleMode } from './extraction.model';
-import { ValuePipeline } from './value-pipeline.model';
 
 export interface SpiderConfig {
   spiderId: string; //pk
@@ -8,6 +7,7 @@ export interface SpiderConfig {
   testData: SpiderConfigTestData; //測試區使用的資料
   isUrlBased: boolean; //僅只有URL的爬蟲，沒有使用primeKey爬蟲
   updatedTime?: Date;
+  requestIntervalMs?: number; // TODO上一筆請求完成後的等待時間
 }
 
 export interface SpiderConfigTestData {

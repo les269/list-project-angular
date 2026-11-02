@@ -13,14 +13,18 @@ export interface SpiderPaginationData {
   data: Record<string, any>;
   createdTime?: Date;
   updatedTime?: Date;
+  lastSuccessTime?: Date;
 }
 
 export interface SpiderPaginationConfig {
+  dataIdTemplate: string; // 使用起始參數替換標記，產生結果分組識別碼 ex: anidb-{year}
   perStartParams: ParamSetting[];
   startUrl: string;
   nextPageUrlKey: string; // 當資料為空時即終止
   extractionRuleMode: ExtractionRuleMode;
   extractionRuleList: ExtractionRule[];
+  updateControl: UpdateControl;
+  requestIntervalMs: number; // 上一筆請求完成後的等待時間
 }
 
 export interface ParamSetting {
@@ -42,6 +46,26 @@ export interface ParamSetting {
   timeInterval?: number; // 間隔數量，例如 1、2、7
   timeUnit?: TimeStepUnit; // YEAR, WEEK, DAY, HOUR, MINUTE, SECOND
   endTimeConfig?: EndTimeConfig; // 終止時間設定
+}
+
+export interface UpdateControl {
+  lastUpdateMode: 'NONE' | 'FIXED' | 'USE_PARAM'; // 使用最後更新時間或建立時間
+  lastUpdateDate: Date; // 當 lastUpdateMode == 'FIXED' 時使用
+  lastUpdateParamKey: string; // 當 lastUpdateMode == 'USE_PARAM' 時使用，對應 ParamSetting.paramKey
+  updateIntervalMode: 'NONE' | 'FIXED' | 'USE_PARAM'; // 使用固定間隔或使用參數設定
+  updateInterval: number; // 當 updateIntervalMode == 'FIXED' 時使用
+  updateIntervalUnit: updateIntervalUnit; // 當 updateIntervalMode == 'FIXED' 時使用
+  updateIntervalParamKey: string; // 當 updateIntervalMode == 'USE_PARAM' 時使用，對應 ParamSetting.paramKey
+}
+
+export enum updateIntervalUnit {
+  year = 'year',
+  month = 'month',
+  day = 'day',
+  hour = 'hour',
+  minute = 'minute',
+  second = 'second',
+  millisecond = 'millisecond',
 }
 
 export interface EndTimeConfig {
