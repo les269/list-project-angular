@@ -31,6 +31,7 @@ import {
   ExtractionRuleMode,
   HeadersMapType,
   SpiderPagination,
+  UpdateIntervalUnit,
 } from '../../model';
 import { SpiderPaginationService } from '../../services';
 
@@ -88,6 +89,17 @@ export class SpiderPaginationEditComponent {
         nextPageUrlKey: '',
         extractionRuleMode: ExtractionRuleMode.SELECT,
         extractionRuleList: [],
+        dataIdTemplate: '',
+        updateControl: {
+          lastUpdateMode: 'NONE',
+          lastUpdateDate: new Date(),
+          lastUpdateParamKey: '',
+          updateIntervalMode: 'NONE',
+          updateInterval: 0,
+          updateIntervalUnit: UpdateIntervalUnit.year,
+          updateIntervalParamKey: '',
+        },
+        requestIntervalMs: 0,
       },
     } satisfies SpiderPagination;
   });

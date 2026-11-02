@@ -54,11 +54,11 @@ export interface UpdateControl {
   lastUpdateParamKey: string; // 當 lastUpdateMode == 'USE_PARAM' 時使用，對應 ParamSetting.paramKey
   updateIntervalMode: 'NONE' | 'FIXED' | 'USE_PARAM'; // 使用固定間隔或使用參數設定
   updateInterval: number; // 當 updateIntervalMode == 'FIXED' 時使用
-  updateIntervalUnit: updateIntervalUnit; // 當 updateIntervalMode == 'FIXED' 時使用
+  updateIntervalUnit: UpdateIntervalUnit; // 當 updateIntervalMode == 'FIXED' 時使用
   updateIntervalParamKey: string; // 當 updateIntervalMode == 'USE_PARAM' 時使用，對應 ParamSetting.paramKey
 }
 
-export enum updateIntervalUnit {
+export enum UpdateIntervalUnit {
   year = 'year',
   month = 'month',
   day = 'day',

@@ -1,38 +1,30 @@
+@use '../../../../../styles/action-button';
+
 .custom-button-group {
   display: flex;
   flex-direction: row;
 
-  > .custom-icon {
-    min-width: 0px !important;
-    width: 30px !important;
-    padding: 0px !important;
-  }
   > .custom-button {
-    display: flex;
-    justify-content: center;
+    @include action-button.base;
+
     height: 24px;
     min-width: 120px;
-    background-color: #f0f7f9;
-    color: #000;
-    border: 1px solid #6b90da;
     border-left: none;
-    padding: 0px 12px;
     font-size: 0.875rem;
-    align-items: center;
     &:first-child {
-      border-left: 1px solid #6b90da; // <<<<< 第一個按鈕需要手動補上左邊邊框
-      border-top-left-radius: 0.125rem;
-      border-bottom-left-radius: 0.125rem;
+      border-left: 1px solid var(--app-action-border);
+      border-top-left-radius: var(--app-radius-sm);
+      border-bottom-left-radius: var(--app-radius-sm);
     }
     &:first-child:not(:last-child) {
       border-top-right-radius: 0;
       border-bottom-right-radius: 0;
-      border-right: 1px solid #6b90da;
+      border-right: 1px solid var(--app-action-border);
     }
 
     &:last-child {
-      border-top-right-radius: 0.125rem;
-      border-bottom-right-radius: 0.125rem;
+      border-top-right-radius: var(--app-radius-sm);
+      border-bottom-right-radius: var(--app-radius-sm);
     }
     &:last-child:not(:first-child) {
       border-top-left-radius: 0;
@@ -40,26 +32,14 @@
       border-left: 0px;
     }
 
-    &:hover:not([disabled]) {
-      background-color: #c3e6ff;
-    }
-
-    &:active:not([disabled]) {
-      background-color: #c3e6ff;
-      box-shadow:
-        0px 5px 5px -3px rgba(0, 0, 0, 0.2),
-        0px 8px 10px 1px rgba(0, 0, 0, 0.14),
-        0px 3px 14px 2px rgba(0, 0, 0, 0.12);
-    }
-
-    &[disabled] {
-      background-color: #d5d5d5;
-      border-color: #949494;
-    }
-
     > label {
       width: max-content;
-      cursor: pointer;
     }
+
+    @include action-button.states;
+  }
+
+  > .custom-button.custom-icon {
+    @include action-button.icon;
   }
 }

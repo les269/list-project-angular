@@ -1,0 +1,35 @@
+@mixin base {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--app-action-bg);
+  color: var(--app-action-color);
+  border: 1px solid var(--app-action-border);
+  padding: 0px var(--app-action-padding-inline);
+
+  > label {
+    cursor: pointer;
+  }
+}
+
+@mixin states {
+  &:hover:not([disabled]) {
+    background-color: var(--app-action-hover-bg);
+  }
+
+  &:active:not([disabled]) {
+    background-color: var(--app-action-hover-bg);
+    box-shadow: var(--app-action-active-shadow);
+  }
+
+  &[disabled] {
+    background-color: var(--app-action-disabled-bg);
+    border-color: var(--app-action-disabled-border);
+  }
+}
+
+@mixin icon {
+  min-width: 0;
+  width: var(--app-action-icon-width);
+  padding: 0;
+}
