@@ -27,7 +27,6 @@ type Row = { seq: number; name: string; selected: boolean; note: string };
       [cols]="cols()"
       [displayedColumns]="displayedColumns()"
       [createRow]="createRow"
-      [initData]="initial()"
       [expandedTmpl]="detail"
       [customColTmpls]="{ custom: custom }" />
     <ng-template #detail let-row>
@@ -41,13 +40,18 @@ type Row = { seq: number; name: string; selected: boolean; note: string };
   `,
 })
 class TableHost {
-  readonly model = signal<Row[]>([]);
+  readonly createRow = (data: Partial<Row> = {}): Row => ({
+    seq: 0,
+    name: '',
+    selected: false,
+    note: '',
+    ...data,
+  });
+  readonly model = signal<Row[]>(
+    ['first', 'second'].map(name => this.createRow({ name }))
+  );
   readonly locked = signal(false);
   readonly lockedRadioName = signal<string | undefined>(undefined);
-  readonly initial = signal<Partial<Row>[]>([
-    { name: 'first' },
-    { name: 'second' },
-  ]);
   readonly fields = form(this.model, p => {
     disabled(p, { when: () => this.locked() });
     applyEach(p, row => {
@@ -62,13 +66,6 @@ class TableHost {
     { key: 'name', label: 'Name', columnType: GenericColumnType.input },
     { key: 'selected', label: 'Selected', columnType: GenericColumnType.radio },
   ]);
-  readonly createRow = (data: Partial<Row> = {}): Row => ({
-    seq: 0,
-    name: '',
-    selected: false,
-    note: '',
-    ...data,
-  });
   readonly table = viewChild.required(GenericTableComponent);
 }
 
@@ -85,7 +82,7 @@ describe('GenericTableComponent with Signal Forms', () => {
     await fixture.whenStable();
   });
 
-  it('loads defaults and propagates edits from normal and expanded cells into the parent signal', async () => {
+  it('直接使用父層表單資料，主列與詳細列編輯皆回寫父層 signal', async () => {
     expect(host.model().map(row => row.name)).toEqual(['first', 'second']);
     const input: HTMLInputElement =
       fixture.nativeElement.querySelector('input.form-control');
@@ -129,10 +126,10 @@ describe('GenericTableComponent with Signal Forms', () => {
     );
   });
 
-  it('resets loaded data and interaction state and disables edits from the parent schema', async () => {
+  it('父層重設資料時同步清除互動狀態，並依 schema 停用編輯', async () => {
     host.fields[0].name().markAsTouched();
     host.table().onAdd();
-    host.initial.set([{ name: 'replacement' }]);
+    host.fields().reset([host.createRow({ name: 'replacement' })]);
     await fixture.whenStable();
     expect(host.model()).toMatchObject([
       { seq: 0, name: 'replacement', selected: false, note: '' },
@@ -172,10 +169,12 @@ describe('GenericTableComponent with Signal Forms', () => {
   });
 
   it('preserves existing row references when adding or deleting the last row', async () => {
-    host.initial.set([
-      { seq: 1, name: 'first' },
-      { seq: 2, name: 'second' },
-    ]);
+    host
+      .fields()
+      .reset([
+        host.createRow({ seq: 1, name: 'first' }),
+        host.createRow({ seq: 2, name: 'second' }),
+      ]);
     await fixture.whenStable();
     const [first, second] = host.model();
     host.table().onAdd();

@@ -6,15 +6,7 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  computed,
-  effect,
-  inject,
-  input,
-  TemplateRef,
-  untracked,
-} from '@angular/core';
+import { Component, computed, inject, input, TemplateRef } from '@angular/core';
 import { FormField, ValidationError } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -66,8 +58,6 @@ export class GenericTableComponent {
   readonly cols = input.required<GenericTableColumn[]>();
   readonly displayedColumns = input.required<string[]>();
   readonly createRow = input.required<GenericTableRowFactory>();
-  // TODO deprecated
-  readonly initData = input<readonly object[]>();
   readonly customColTmpls =
     input<Record<string, TemplateRef<GenericTableCellContext>>>();
   readonly expandedTmpl = input<TemplateRef<GenericTableRowContext>>();
@@ -95,21 +85,6 @@ export class GenericTableComponent {
 
   readonly eGenericColumnType = GenericColumnType;
   readonly getWidth = getWidth;
-
-  constructor() {
-    // TODO deprecated
-    effect(() => {
-      const data = this.initData();
-      if (!data) return;
-      untracked(() => {
-        this.setData(data);
-      });
-    });
-  }
-  // TODO deprecated
-  setData(data: readonly object[]) {
-    this.fields()().reset(data.map(item => this.createRow()(item)));
-  }
 
   private updateRows(update: (rows: GenericTableRow[]) => GenericTableRow[]) {
     const state = this.fields()();
