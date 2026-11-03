@@ -12,7 +12,6 @@ import {
   WritableSignal,
 } from '@angular/core';
 import {
-  applyEach,
   disabled,
   form,
   FormField,
@@ -21,12 +20,9 @@ import {
 } from '@angular/forms/signals';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { languages } from '@codemirror/language-data';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { defer, EMPTY, finalize, Observable, switchMap, take } from 'rxjs';
-import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
-import { GenericColumnType, GenericTableColumn } from '../../../../core/model';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -37,7 +33,6 @@ import {
   CookieListMapType,
   ExtractionRule,
   ExtractionRuleMode,
-  ExtractionStepCondition,
   HeadersMapType,
   SpiderItem,
   SpiderItemMode,
@@ -48,7 +43,7 @@ import { CookieListService } from '../../services/cookie-list.service';
 import { SpiderItemService } from '../../services/spider-item.service';
 import { SpiderMappingService } from '../../services/spider-mapping.service';
 import { SpiderService } from '../../services/spider.service';
-import { ValuePipelineFormService } from '../../services/value-pipeline-form.service';
+import { ExtractionRuleFormService } from '../../services/extraction-rule-form.service';
 import {
   CookieTableDialogComponent,
   CookieTableDialogData,
@@ -57,7 +52,9 @@ import {
   HeadersTableDialogComponent,
   HeadersTableDialogData,
 } from '../headers-table-dialog/headers-table-dialog.component';
-import { PipelineListComponent } from '../pipeline-list/pipeline-list.component';
+import { ExtractionRulesComponent } from '../extraction-rules/extraction-rules.component';
+
+import { applyExtractionRulesSchema } from '../../schema/extraction-rules.schema';
 
 @Component({
   selector: 'app-spider-item',
@@ -66,12 +63,10 @@ import { PipelineListComponent } from '../pipeline-list/pipeline-list.component'
     CommonModule,
     TranslateModule,
     FormField,
-    GenericTableComponent,
     MatCheckbox,
     SignalCodeEditorComponent,
-    PipelineListComponent,
+    ExtractionRulesComponent,
     TrimOnBlurDirective,
-    MatTooltipModule,
   ],
   templateUrl: './spider-item.component.html',
 })
@@ -86,7 +81,7 @@ export class SpiderItemComponent {
   readonly messageBoxService = inject(MessageBoxService);
   readonly cookieListService = inject(CookieListService);
   readonly spiderService = inject(SpiderService);
-  readonly valuePipelineFormService = inject(ValuePipelineFormService);
+  private readonly extractionRuleForm = inject(ExtractionRuleFormService);
   readonly matDialog = inject(MatDialog);
   // input
   readonly initData = input<SpiderItem>();
@@ -142,47 +137,16 @@ export class SpiderItemComponent {
     });
     disabled(p.spiderItemId, { when: () => this.isEditMode() });
     required(p.spiderItemId);
-    applyEach(p.itemSetting.extractionRuleList, row => {
-      required(row.key);
-      required(row.selector, {
-        when: ({ valueOf }) =>
-          valueOf(p.itemSetting.mode) === ExtractionRuleMode.SELECT,
-      });
-      required(row.jsonPath, {
-        when: ({ valueOf }) =>
-          valueOf(p.itemSetting.mode) === ExtractionRuleMode.JSON_PATH,
-      });
-    });
+    applyExtractionRulesSchema(
+      p.itemSetting.extractionRuleList,
+      p.itemSetting.mode
+    );
   });
   // constants
   readonly eUrlType = UrlType;
   readonly CodeEditorLanguages = languages;
-  readonly eExtractionRuleMode = ExtractionRuleMode;
-  readonly eExtractionStepCondition = ExtractionStepCondition;
   readonly eCookieListMapType = CookieListMapType;
   readonly eHeadersMapType = HeadersMapType;
-  readonly selectorDisplayedColumns = ['key', 'selector'];
-  readonly jsonPathDisplayedColumns = ['key', 'jsonPath'];
-  readonly cols: GenericTableColumn[] = [
-    {
-      key: 'key',
-      label: 'spider.key',
-      columnType: GenericColumnType.input,
-    },
-    {
-      key: 'selector',
-      label: 'spider.selector',
-      columnType: GenericColumnType.textarea,
-      width: '70%',
-    },
-    {
-      key: 'jsonPath',
-      label: 'spider.jsonPath',
-      columnType: GenericColumnType.textarea,
-      width: '70%',
-    },
-  ];
-
   get spiderItemId() {
     return this.form.spiderItemId;
   }
@@ -499,43 +463,6 @@ export class SpiderItemComponent {
     });
   }
 
-  shouldShowValueInput(condition: ExtractionStepCondition): boolean {
-    const valueConditions = [
-      ExtractionStepCondition.CONTAINS,
-      ExtractionStepCondition.NOT_CONTAINS,
-      ExtractionStepCondition.EQUALS,
-      ExtractionStepCondition.NOT_EQUALS,
-      ExtractionStepCondition.MATCHES,
-      ExtractionStepCondition.NOT_MATCHES,
-    ];
-    return valueConditions.includes(condition);
-  }
-  shouldShowIgnoreCase(condition: ExtractionStepCondition): boolean {
-    const patternConditions = [
-      ExtractionStepCondition.CONTAINS,
-      ExtractionStepCondition.NOT_CONTAINS,
-      ExtractionStepCondition.EQUALS,
-      ExtractionStepCondition.NOT_EQUALS,
-    ];
-    return patternConditions.includes(condition);
-  }
-
-  readonly createExtractionRule = (data?: Partial<ExtractionRule>) => {
-    return {
-      seq: data?.seq ?? 0,
-      key: data?.key ?? '',
-      selector: data?.selector ?? '',
-      jsonPath: data?.jsonPath ?? '',
-      pipelines: (data?.pipelines ?? []).map(pipeline =>
-        this.valuePipelineFormService.createValuePipeline(pipeline)
-      ),
-      conditionValue: {
-        conditionType:
-          data?.conditionValue?.conditionType ?? ExtractionStepCondition.ALWAYS,
-        key: data?.conditionValue?.key ?? '',
-        value: data?.conditionValue?.value ?? '',
-        ignoreCase: data?.conditionValue?.ignoreCase ?? false,
-      },
-    };
-  };
+  readonly createExtractionRule = (data?: Partial<ExtractionRule>) =>
+    this.extractionRuleForm.createRule(data);
 }

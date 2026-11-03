@@ -224,6 +224,12 @@
     "table": "Table表格",
     "seq": "順序"
   },
+  "formField": {
+    "validation": {
+      "required": "請填寫必填欄位。",
+      "min": "數值不得小於允許的最小值。"
+    }
+  },
   "spider": {
     "createSpider": "新增爬蟲設定",
     "createSpiderItem": "建立爬蟲項目",
@@ -286,15 +292,107 @@
     "testResult": "測試結果",
     "testHtml": "測試HTML",
     "testJson": "測試JSON",
-    "uploadJson": "上傳JSON檔案測試"
+    "uploadJson": "上傳JSON檔案測試",
+    "extractionRules": "擷取規則",
+    "conditionType": "執行條件",
+    "ignoreCase": "忽略大小寫"
   },
   "spiderPagination": {
     "createSpiderPagination": "新增爬蟲處理分頁",
-    "spiderPaginationId": "爬蟲處理分頁ID",
-    "spiderPaginationName": "爬蟲處理分頁名稱",
+    "spiderPaginationId": "爬蟲分頁ID",
+    "dataIdTemplate": "資料識別碼",
+    "dataIdTemplateDesc": "資料識別碼 ex: anime-{{$.year}}",
     "startUrl": "起始網址",
     "nextPageUrlKey": "下一頁網址鍵",
-    "extractionRuleMode": "提取方法模式"
+    "extractionRuleMode": "提取方法模式",
+    "back": "返回",
+    "loading": "載入中…",
+    "loadFailed": "載入失敗，請重試。",
+    "reload": "重新載入",
+    "requestIntervalMs": "請求完成後的等待時間（ms）",
+    "paramSettings": "參數設定",
+    "paramSettingsDesc": "設定起始網址與結果分組使用的替換參數。",
+    "addParam": "新增參數",
+    "paramKey": "參數鍵值",
+    "paramType": "參數類型",
+    "addStaticValue": "新增固定值",
+    "staticValue": "固定值",
+    "removeStaticValue": "刪除固定值",
+    "startNumStr": "起始數字",
+    "endNumStr": "結束數字",
+    "numStep": "步長",
+    "padZeros": "保持起始數字長度補零",
+    "startTime": "起始時間",
+    "timeFormat": "時間格式",
+    "timeInterval": "時間間隔",
+    "timeUnit": "時間單位",
+    "endTimeType": "結束時間類型",
+    "endTime": "結束時間",
+    "endTimeFormat": "結束時間格式",
+    "offsetInterval": "偏移量（可為負數）",
+    "offsetUnit": "偏移單位",
+    "removeParam": "刪除參數",
+    "updateControl": "更新設定",
+    "lastUpdateMode": "最後更新時間模式",
+    "lastUpdateDate": "最後更新日期",
+    "paramReference": "引用起始參數",
+    "selectParam": "請選擇參數",
+    "updateIntervalMode": "更新間隔模式",
+    "updateInterval": "更新間隔",
+    "updateIntervalUnit": "更新間隔單位",
+    "extractionRules": "擷取規則",
+    "extractionMode": "擷取模式",
+    "addRule": "新增擷取規則",
+    "seq": "順序",
+    "resultKey": "結果 key path",
+    "selector": "jsoup selector",
+    "jsonPath": "JSONPath",
+    "conditionType": "執行條件",
+    "conditionKey": "條件 key",
+    "conditionValue": "條件值",
+    "ignoreCase": "忽略大小寫",
+    "removeRule": "刪除擷取規則",
+    "formInvalid": "請確認必填欄位與設定內容。",
+    "validation": {
+      "staticListRequired": "請至少填寫一個非空白固定值",
+      "numberRange": "數字範圍須為整數、起點不得大於終點，步長須為正整數",
+      "duplicateParam": "參數標記不可重複",
+      "missingParam": "更新控制引用的參數不存在，請重新選擇",
+      "invalidDate": "請填寫有效的最後更新日期",
+      "required": "請填寫必填欄位。",
+      "min": "數值不得小於允許的最小值。"
+    },
+    "paramTypes": {
+      "STATIC_LIST": "固定字串清單",
+      "NUMBER_RANGE": "數字範圍",
+      "TIME_RANGE": "時間範圍"
+    },
+    "timeUnits": {
+      "YEAR": "年",
+      "MONTH": "月",
+      "WEEK": "週",
+      "DAY": "日",
+      "HOUR": "時",
+      "MINUTE": "分",
+      "SECOND": "秒",
+      "MILLI_SECOND": "毫秒"
+    },
+    "endTimeTypes": {
+      "FIXED": "固定結束時間點",
+      "CURRENT_DATE": "超過當前時間",
+      "END_CURRENT_YEAR": "在今年結束",
+      "RELATIVE_OFFSET": "偏移當前時間"
+    },
+    "lastUpdateModes": {
+      "FIXED": "固定時間",
+      "NONE": "不使用",
+      "USE_PARAM": "使用參數"
+    },
+    "updateIntervalModes": {
+      "FIXED": "固定間隔",
+      "NONE": "不使用",
+      "USE_PARAM": "使用參數"
+    }
   },
   "pipeline": {
     "addPipeline": "新增處理步驟",

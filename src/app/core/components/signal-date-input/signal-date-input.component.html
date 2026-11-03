@@ -1,0 +1,18 @@
+<input
+  #picker
+  class="form-control"
+  type="datetime-local"
+  step="1"
+  [id]="controlId()"
+  [attr.aria-label]="label()"
+  [value]="localValue()"
+  [disabled]="disabled()"
+  [class.is-invalid]="showError()"
+  [attr.aria-invalid]="showError()"
+  (click)="pickerOnly() && picker.showPicker()"
+  (keydown)="keydown($event, picker)"
+  (beforeinput)="pickerOnly() && $event.preventDefault()"
+  (paste)="pickerOnly() && $event.preventDefault()"
+  (drop)="pickerOnly() && $event.preventDefault()"
+  (change)="change(picker.value)"
+  (blur)="touch.emit()" />

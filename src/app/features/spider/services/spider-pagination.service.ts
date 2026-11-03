@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { SpiderPagination } from '../model';
 
 @Service()
@@ -13,9 +13,23 @@ export class SpiderPaginationService {
   }
 
   getById(spiderPaginationId: string): Observable<SpiderPagination> {
-    return this.http.get<SpiderPagination>(
-      `${this.prefix}?spiderPaginationId=${encodeURIComponent(spiderPaginationId)}`
-    );
+    return this.http
+      .get<SpiderPagination>(
+        `${this.prefix}?spiderPaginationId=${encodeURIComponent(spiderPaginationId)}`
+      )
+      .pipe(
+        map(value => {
+          // JSON 回傳的日期字串須在進入 Date 表單前還原。
+          value.paginationConfig.paramSettings.forEach(param => {
+            param.startTime = new Date(param.startTime);
+            param.endTimeConfig.endTime = new Date(param.endTimeConfig.endTime);
+          });
+          value.paginationConfig.updateControl.lastUpdateDate = new Date(
+            value.paginationConfig.updateControl.lastUpdateDate
+          );
+          return value;
+        })
+      );
   }
 
   update(req: SpiderPagination): Observable<void> {

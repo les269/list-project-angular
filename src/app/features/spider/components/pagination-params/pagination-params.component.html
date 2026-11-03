@@ -1,0 +1,111 @@
+<fieldset class="border rounded p-3 my-3" [disabled]="fields()().disabled()">
+  <legend class="float-none w-auto fs-5">
+    {{ 'spiderPagination.paramSettings' | translate }}
+  </legend>
+  <p class="form-text">
+    {{ 'spiderPagination.paramSettingsDesc' | translate }}
+  </p>
+  <app-generic-table
+    [fields]="fields()"
+    [cols]="paramColumns"
+    [displayedColumns]="paramDisplayedColumns"
+    [createRow]="createParam"
+    [expandedTmpl]="detail"
+    [class.table-invalid]="fields()().invalid()" />
+  <app-form-invalids [control]="fields()" />
+  <ng-template #detail let-p>
+    <div class="p-3">
+      @switch (p.type().value()) {
+        @case (paramType.STATIC_LIST) {
+          <app-signal-field
+            [field]="p.staticList"
+            label="spiderPagination.staticValue"
+            [type]="fieldType.CHIPS" />
+        }
+        @case (paramType.NUMBER_RANGE) {
+          <div class="input-group flex-nowrap">
+            <app-signal-field
+              [field]="p.startNumStr"
+              label="spiderPagination.startNumStr"
+              [inline]="true" />
+            <app-signal-field
+              [field]="p.endNumStr"
+              label="spiderPagination.endNumStr"
+              [inline]="true" />
+            <app-signal-field
+              [field]="p.numStep"
+              label="spiderPagination.numStep"
+              [type]="fieldType.NUMBER"
+              [inline]="true" />
+            <app-signal-field
+              [field]="p.padZeros"
+              label="spiderPagination.padZeros"
+              [type]="fieldType.CHECKBOX"
+              [inline]="true" />
+          </div>
+        }
+        @case (paramType.TIME_RANGE) {
+          <div class="input-group flex-nowrap mb-2">
+            <app-signal-field
+              [field]="p.startTime"
+              label="spiderPagination.startTime"
+              [type]="fieldType.DATE"
+              [inline]="true" />
+            <app-signal-field
+              [field]="p.timeFormat"
+              label="spiderPagination.timeFormat"
+              [inline]="true" />
+          </div>
+          <div class="input-group flex-nowrap mb-2">
+            <app-signal-field
+              [field]="p.timeInterval"
+              label="spiderPagination.timeInterval"
+              [type]="fieldType.NUMBER"
+              [inline]="true" />
+            <app-signal-field
+              [field]="p.timeIntervalUnit"
+              label="spiderPagination.timeUnit"
+              [type]="fieldType.SELECT"
+              [inline]="true"
+              [options]="timeOptions" />
+          </div>
+          <div class="input-group flex-nowrap">
+            <app-signal-field
+              [field]="p.endTimeConfig.endTimeType"
+              label="spiderPagination.endTimeType"
+              [type]="fieldType.SELECT"
+              [inline]="true"
+              [options]="endOptions" />
+            @if (p.endTimeConfig.endTimeType().value() === endTimeType.FIXED) {
+              <app-signal-field
+                [field]="p.endTimeConfig.endTime"
+                label="spiderPagination.endTime"
+                [type]="fieldType.DATE"
+                [inline]="true" />
+            }
+            <app-signal-field
+              [field]="p.endTimeConfig.timeFormat"
+              label="spiderPagination.endTimeFormat"
+              [inline]="true" />
+            @if (
+              p.endTimeConfig.endTimeType().value() ===
+              endTimeType.RELATIVE_OFFSET
+            ) {
+              <app-signal-field
+                [field]="p.endTimeConfig.offsetInterval"
+                label="spiderPagination.offsetInterval"
+                [type]="fieldType.NUMBER"
+                [inline]="true" />
+              <app-signal-field
+                [field]="p.endTimeConfig.offsetUnit"
+                label="spiderPagination.offsetUnit"
+                [type]="fieldType.SELECT"
+                [inline]="true"
+                [options]="timeOptions" />
+            }
+          </div>
+        }
+      }
+    </div>
+  </ng-template>
+</fieldset>

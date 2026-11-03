@@ -1,0 +1,61 @@
+@let control = fields();
+<fieldset class="border rounded p-3 my-3" [disabled]="control().disabled()">
+  <legend class="float-none w-auto fs-5">
+    {{ 'spiderPagination.updateControl' | translate }}
+  </legend>
+  <div class="input-group flex-nowrap mb-2">
+    <app-signal-field
+      [field]="control.lastUpdateMode"
+      label="spiderPagination.lastUpdateMode"
+      [type]="fieldType.SELECT"
+      [inline]="true"
+      [options]="lastOptions" />
+    @if (control.lastUpdateMode().value() === lastMode.FIXED) {
+      <app-signal-field
+        [field]="control.lastUpdateDate"
+        label="spiderPagination.lastUpdateDate"
+        [type]="fieldType.DATE"
+        [inline]="true"
+        [pickerOnly]="false" />
+    }
+    @if (control.lastUpdateMode().value() === lastMode.USE_PARAM) {
+      <app-signal-field
+        [field]="control.lastUpdateParamKey"
+        label="spiderPagination.paramReference"
+        [type]="fieldType.SELECT"
+        [inline]="true"
+        [options]="paramOptions()"
+        emptyOption="spiderPagination.selectParam" />
+    }
+  </div>
+  <div class="input-group flex-nowrap">
+    <app-signal-field
+      [field]="control.updateIntervalMode"
+      label="spiderPagination.updateIntervalMode"
+      [type]="fieldType.SELECT"
+      [inline]="true"
+      [options]="intervalOptions" />
+    @if (control.updateIntervalMode().value() === intervalMode.FIXED) {
+      <app-signal-field
+        [field]="control.updateInterval"
+        label="spiderPagination.updateInterval"
+        [type]="fieldType.NUMBER"
+        [inline]="true" />
+      <app-signal-field
+        [field]="control.updateIntervalUnit"
+        label="spiderPagination.updateIntervalUnit"
+        [type]="fieldType.SELECT"
+        [inline]="true"
+        [options]="timeOptions" />
+    }
+    @if (control.updateIntervalMode().value() === intervalMode.USE_PARAM) {
+      <app-signal-field
+        [field]="control.updateIntervalParamKey"
+        label="spiderPagination.paramReference"
+        [type]="fieldType.SELECT"
+        [inline]="true"
+        [options]="paramOptions()"
+        emptyOption="spiderPagination.selectParam" />
+    }
+  </div>
+</fieldset>

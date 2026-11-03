@@ -1,0 +1,66 @@
+<fieldset class="border rounded p-3 my-3" [disabled]="fields()().disabled()">
+  <legend class="float-none w-auto fs-5">
+    {{ 'spider.extractionRules' | translate }}
+  </legend>
+  <app-signal-field
+    class="mb-2"
+    [field]="mode()"
+    label="spider.extractionRule"
+    [type]="fieldType.SELECT"
+    [options]="modeOptions"
+    [inline]="true" />
+  @if (showHelp()) {
+    <div
+      class="form-text mb-2"
+      [innerHTML]="
+        (mode()().value() === extractionRuleMode.JSON_PATH
+          ? 'spider.jsonPathPH'
+          : 'spider.selectorPH'
+        ) | translate
+      "></div>
+  }
+  <app-generic-table
+    [fields]="fields()"
+    [createRow]="createRule"
+    [cols]="ruleColumns"
+    [displayedColumns]="displayedColumns()"
+    [expandedTmpl]="detail"
+    [class.table-invalid]="fields()().invalid()" />
+  <ng-template #detail let-element>
+    <div class="my-2">
+      <div class="input-group flex-nowrap input-group-sm mb-2">
+        <app-signal-field
+          [field]="element.conditionValue.conditionType"
+          label="spider.conditionType"
+          [type]="fieldType.SELECT"
+          [options]="conditionOptions"
+          [inline]="true" />
+        @let condition = element.conditionValue.conditionType().value();
+        @if (condition !== extractionStepCondition.ALWAYS) {
+          @if (shouldShowIgnoreCase(condition)) {
+            <app-signal-field
+              [field]="element.conditionValue.ignoreCase"
+              label="spider.ignoreCase"
+              hint="spider.ignoreCaseTip"
+              [type]="fieldType.CHECKBOX" />
+          }
+          <app-signal-field
+            [field]="element.conditionValue.key"
+            label="spider.conditionKey"
+            hint="spider.conditionKeyPH"
+            [trim]="true"
+            [inline]="true" />
+          @if (shouldShowValueInput(condition)) {
+            <app-signal-field
+              [field]="element.conditionValue.value"
+              label="spider.conditionValue"
+              hint="spider.conditionValuePH"
+              [trim]="true"
+              [inline]="true" />
+          }
+        }
+      </div>
+      <app-pipeline-list [fields]="element.pipelines" />
+    </div>
+  </ng-template>
+</fieldset>

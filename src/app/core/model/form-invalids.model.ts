@@ -1,4 +1,3 @@
-export type FormInvalid = {
-  errorId: string;
-  msg: string;
-};
+import { FormAlert } from './form-alerts';
+
+export type FormInvalid = FormAlert;

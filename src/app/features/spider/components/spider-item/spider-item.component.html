@@ -55,28 +55,6 @@
     <input class="form-control" [formField]="url" trimOnBlur />
   </div>
 
-  <div class="input-group my-2">
-    <label class="input-group-text">{{
-      'spider.extractionRule' | translate
-    }}</label>
-    <select class="form-control form-select" [formField]="extractionRuleMode">
-      @for (type of eExtractionRuleMode | keyvalue; track type) {
-        <option [value]="type.key">
-          {{ 'spider.extractionRuleMode.' + type.key | translate }}
-        </option>
-      }
-    </select>
-  </div>
-  @if (useJsonPath) {
-    <label class="form-text"
-      ><div [innerHTML]="'spider.jsonPathPH' | translate"></div
-    ></label>
-  }
-  @if (useSelector) {
-    <label class="form-text"
-      ><div [innerHTML]="'spider.selectorPH' | translate"></div
-    ></label>
-  }
   <div class="d-flex gap-2">
     <button
       type="button"
@@ -94,21 +72,10 @@
     </button>
   </div>
   <ng-container [ngTemplateOutlet]="buttonTmpl"></ng-container>
-  <div class="card-body">
-    <div class="card mb-3">
-      <app-generic-table
-        [class.table-invalid]="extractionRuleList().invalid()"
-        [fields]="extractionRuleList"
-        [createRow]="createExtractionRule"
-        [cols]="cols"
-        [displayedColumns]="
-          extractionRuleMode().value() === eExtractionRuleMode.JSON_PATH
-            ? jsonPathDisplayedColumns
-            : selectorDisplayedColumns
-        "
-        [expandedTmpl]="expandedTmpl"></app-generic-table>
-    </div>
-  </div>
+  <app-extraction-rules
+    [fields]="extractionRuleList"
+    [mode]="extractionRuleMode"
+    [showHelp]="true" />
   <ng-container [ngTemplateOutlet]="buttonTmpl"></ng-container>
   <div class="form-group mb-2">
     @if (useSelector) {
@@ -277,54 +244,5 @@
         {{ 'g.delete' | translate }}
       </button>
     }
-  </div>
-</ng-template>
-<ng-template #expandedTmpl let-element>
-  <div class="d-flex flex-column my-2">
-    <div class="d-flex input-group input-group-sm mb-2">
-      <select
-        class="form-select"
-        [formField]="element.conditionValue.conditionType">
-        @for (type of eExtractionStepCondition | keyvalue; track type) {
-          <option [value]="type.key">
-            {{ 'spider.condition.' + type.key | translate }}
-          </option>
-        }
-      </select>
-      @let conditionType = element.conditionValue.conditionType().value();
-      @if (conditionType && conditionType !== eExtractionStepCondition.ALWAYS) {
-        @if (shouldShowIgnoreCase(conditionType)) {
-          <div class="input-group-text">
-            <input
-              type="checkbox"
-              class="form-check-input"
-              [formField]="element.conditionValue.ignoreCase"
-              [matTooltip]="'spider.ignoreCaseTip' | translate" />
-          </div>
-        }
-        <span class="input-group-text">{{
-          'spider.conditionKey' | translate
-        }}</span>
-        <input
-          class="form-control"
-          [formField]="element.conditionValue.key"
-          [placeholder]="'spider.conditionKeyPH' | translate"
-          [matTooltip]="'spider.conditionKeyPH' | translate"
-          trimOnBlur />
-        @if (shouldShowValueInput(conditionType)) {
-          <span class="input-group-text">
-            {{ 'spider.conditionValue' | translate }}</span
-          >
-          <input
-            class="form-control"
-            [formField]="element.conditionValue.value"
-            [placeholder]="'spider.conditionValuePH' | translate"
-            [matTooltip]="'spider.conditionValuePH' | translate"
-            trimOnBlur />
-        }
-      }
-    </div>
-
-    <app-pipeline-list [fields]="element.pipelines"></app-pipeline-list>
   </div>
 </ng-template>

@@ -17,8 +17,8 @@ export interface SpiderPaginationData {
 }
 
 export interface SpiderPaginationConfig {
-  dataIdTemplate: string; // 使用起始參數替換標記，產生結果分組識別碼 ex: anidb-{year}
-  perStartParams: ParamSetting[];
+  dataIdTemplate: string; // 爬蟲分頁識別碼 ex: anime-{{$.year}}
+  paramSettings: ParamSetting[];
   startUrl: string;
   nextPageUrlKey: string; // 當資料為空時即終止
   extractionRuleMode: ExtractionRuleMode;
@@ -28,56 +28,59 @@ export interface SpiderPaginationConfig {
 }
 
 export interface ParamSetting {
+  seq: number;
   paramKey: string; // 置換的標記，如 {code}, {time}
   type: ParamType; // STATIC_LIST, NUMBER_RANGE, TIME_RANGE
 
   // --- 1. 固定字串列表 ---
-  staticList?: string[];
+  staticList: string[];
 
-  // --- 2. 數字推進 (全字串化，支援間隔與補零) ---
-  startNumStr?: string; // 例如 "001" 或 "0"
-  endNumStr?: string; // 例如 "999" 或 "100"
-  numStep?: number; // 步長間隔，例如 1 或 10
-  padZeros?: boolean; // 是否保持與 startNumStr 同樣的長度補零
+  // --- 2. 數字 (全字串化，支援間隔與補零) ---
+  startNumStr: string; // 例如 "001" 或 "0"
+  endNumStr: string; // 例如 "999" 或 "100"
+  numStep: number; // 步長間隔，例如 1 或 10
+  padZeros: boolean; // 是否保持與 startNumStr 同樣的長度補零
 
   // --- 3. 時間推進 (自由定義起點、終點與間隔單位) ---
-  startTimeStr?: string; // 例如 "2026-07-01 00:00:00"
-  timeFormat?: string; // 時間格式，例如 "yyyy-MM-dd HH:mm:ss"
-  timeInterval?: number; // 間隔數量，例如 1、2、7
-  timeUnit?: TimeStepUnit; // YEAR, WEEK, DAY, HOUR, MINUTE, SECOND
-  endTimeConfig?: EndTimeConfig; // 終止時間設定
+  startTime: Date;
+  timeFormat: string; // 時間格式，例如 "yyyy-MM-dd HH:mm:ss"
+  timeInterval: number; // 間隔數量，例如 1、2、7
+  timeIntervalUnit: TimeUnit; // YEAR, WEEK, DAY, HOUR, MINUTE, SECOND
+  endTimeConfig: EndTimeConfig; // 終止時間設定
 }
 
 export interface UpdateControl {
-  lastUpdateMode: 'NONE' | 'FIXED' | 'USE_PARAM'; // 使用最後更新時間或建立時間
+  lastUpdateMode: LastUpdateMode; // 使用最後更新時間或建立時間
   lastUpdateDate: Date; // 當 lastUpdateMode == 'FIXED' 時使用
   lastUpdateParamKey: string; // 當 lastUpdateMode == 'USE_PARAM' 時使用，對應 ParamSetting.paramKey
-  updateIntervalMode: 'NONE' | 'FIXED' | 'USE_PARAM'; // 使用固定間隔或使用參數設定
+  updateIntervalMode: UpdateIntervalMode; // 使用固定間隔或使用參數設定
   updateInterval: number; // 當 updateIntervalMode == 'FIXED' 時使用
-  updateIntervalUnit: UpdateIntervalUnit; // 當 updateIntervalMode == 'FIXED' 時使用
+  updateIntervalUnit: TimeUnit; // 當 updateIntervalMode == 'FIXED' 時使用
   updateIntervalParamKey: string; // 當 updateIntervalMode == 'USE_PARAM' 時使用，對應 ParamSetting.paramKey
 }
 
-export enum UpdateIntervalUnit {
-  year = 'year',
-  month = 'month',
-  day = 'day',
-  hour = 'hour',
-  minute = 'minute',
-  second = 'second',
-  millisecond = 'millisecond',
+export enum LastUpdateMode {
+  NONE = 'NONE',
+  FIXED = 'FIXED',
+  USE_PARAM = 'USE_PARAM',
+}
+
+export enum UpdateIntervalMode {
+  NONE = 'NONE',
+  FIXED = 'FIXED',
+  USE_PARAM = 'USE_PARAM',
 }
 
 export interface EndTimeConfig {
   endTimeType: EndTimeType; // FIXED, CURRENT_DATE, END_CURRENT_YEAR, RELATIVE_OFFSET
-  timeFormat?: string;
+  timeFormat: string;
 
   // 當 endTimeType == FIXED 時使用
-  endTimeStr?: string;
+  endTime: Date;
 
   // 當 endTimeType == RELATIVE_OFFSET 時使用
-  offsetInterval?: number; // 可以是負數或正數，例如 -7
-  offsetUnit?: TimeStepUnit; // DAY, WEEK, MONTH...
+  offsetInterval: number; // 可以是負數或正數，例如 -7
+  offsetUnit: TimeUnit; // DAY, WEEK, MONTH...
 }
 
 export enum ParamType {
@@ -86,13 +89,15 @@ export enum ParamType {
   TIME_RANGE = 'TIME_RANGE',
 }
 
-export enum TimeStepUnit {
+export enum TimeUnit {
   YEAR = 'YEAR',
+  MONTH = 'MONTH',
   WEEK = 'WEEK',
   DAY = 'DAY',
   HOUR = 'HOUR',
   MINUTE = 'MINUTE',
   SECOND = 'SECOND',
+  MILLI_SECOND = 'MILLI_SECOND',
 }
 
 export enum EndTimeType {

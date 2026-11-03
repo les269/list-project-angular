@@ -1,0 +1,87 @@
+@if (
+  label() &&
+  !inline() &&
+  type() !== fieldType.CHECKBOX &&
+  type() !== fieldType.CHIPS
+) {
+  <label [for]="controlId">{{ label() | translate }}</label>
+}
+<div [class.input-group]="inline()" [class.flex-nowrap]="inline()">
+  @if (label() && inline() && type() !== fieldType.CHECKBOX) {
+    <label class="input-group-text" [for]="controlId">{{
+      label() | translate
+    }}</label>
+  }
+  @switch (type()) {
+    @case (fieldType.SELECT) {
+      <select
+        class="form-select"
+        [id]="controlId"
+        [formField]="textField()"
+        [attr.aria-label]="label() | translate"
+        [class.is-invalid]="invalid()"
+        [attr.aria-invalid]="invalid()">
+        @if (emptyOption()) {
+          <option value="">{{ emptyOption() | translate }}</option>
+        }
+        @for (option of options(); track option.value) {
+          <option [value]="option.value">{{ option.label | translate }}</option>
+        }
+      </select>
+    }
+    @case (fieldType.CHECKBOX) {
+      <label class="input-group-text gap-2" [for]="controlId">
+        <input
+          class="form-check-input mt-0"
+          type="checkbox"
+          [matTooltip]="hint() | translate"
+          [id]="controlId"
+          [formField]="checkboxField()"
+          [class.is-invalid]="invalid()"
+          [attr.aria-invalid]="invalid()" />
+        {{ label() | translate }}
+      </label>
+    }
+    @case (fieldType.CHIPS) {
+      <app-chip-input
+        class="d-block w-100"
+        [formField]="chipsField()"
+        [label]="label() | translate"
+        [class.border]="invalid()"
+        [class.border-danger]="invalid()"
+        [class.rounded]="invalid()" />
+    }
+    @case (fieldType.DATE) {
+      <app-signal-date-input
+        [formField]="dateField()"
+        [controlId]="controlId"
+        [label]="label() | translate"
+        [showError]="invalid()"
+        [pickerOnly]="pickerOnly()" />
+    }
+    @case (fieldType.TEXT) {
+      <input
+        class="form-control"
+        type="text"
+        [placeholder]="hint() | translate"
+        [matTooltip]="hint() | translate"
+        (blur)="trimText()"
+        [id]="controlId"
+        [formField]="textField()"
+        [attr.aria-label]="label() | translate"
+        [class.is-invalid]="invalid()"
+        [attr.aria-invalid]="invalid()" />
+    }
+    @case (fieldType.NUMBER) {
+      <input
+        class="form-control"
+        type="number"
+        [id]="controlId"
+        [formField]="numberField()"
+        [attr.aria-label]="label() | translate"
+        [class.is-invalid]="invalid()"
+        [attr.aria-invalid]="invalid()" />
+    }
+  }
+</div>
+<app-form-invalids [control]="field()" />

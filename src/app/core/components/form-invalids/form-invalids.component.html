@@ -1,8 +1,8 @@
-@for (item of formAlerts(); track $index) {
-  @if (hasError(control(), item.errorId) && control()().touched()) {
-    <div class="invalid-feedback d-flex align-items-center">
+@for (item of messages(); track $index) {
+  <div class="invalid-feedback d-flex align-items-center" role="alert">
+    @if (item.custom) {
       <mat-icon>error</mat-icon>
-      {{ item.msg }}
-    </div>
-  }
+    }
+    {{ item.custom ? item.message : (item.message | translate) }}
+  </div>
 }

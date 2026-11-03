@@ -1,11 +1,18 @@
-import { CommonModule } from '@angular/common';
-import { Component, computed, inject, linkedSignal } from '@angular/core';
+import { SignalFieldType } from '../../../../core/model/signal-field.model';
+import {
+  Component,
+  computed,
+  inject,
+  linkedSignal,
+  signal,
+} from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import {
+  apply,
+  min,
   debounce,
   disabled,
   form,
-  FormField,
   required,
 } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,11 +20,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { EMPTY, filter, map, switchMap } from 'rxjs';
+import { EMPTY, finalize, map, switchMap } from 'rxjs';
 import { EditMode } from '../../../../core/model';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { isNotBlank } from '../../../../shared/util/helper';
-import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 import {
   CookieTableDialogComponent,
   CookieTableDialogData,
@@ -28,41 +33,53 @@ import {
 } from '../../components/headers-table-dialog/headers-table-dialog.component';
 import {
   CookieListMapType,
-  ExtractionRuleMode,
   HeadersMapType,
   SpiderPagination,
-  UpdateIntervalUnit,
+  ExtractionRuleMode,
+  TimeUnit,
+  LastUpdateMode,
+  UpdateIntervalMode,
 } from '../../model';
 import { SpiderPaginationService } from '../../services';
+import { SignalFieldComponent } from '../../../../core/components/signal-field/signal-field.component';
+import { PaginationParamsComponent } from '../../components/pagination-params/pagination-params.component';
+import { PaginationUpdateControlComponent } from '../../components/pagination-update-control/pagination-update-control.component';
+import { ExtractionRulesComponent } from '../../components/extraction-rules/extraction-rules.component';
+
+import { paramSettingsSchema } from '../../schema/param-settings.schema';
+import { paginationUpdateSchema } from '../../schema/pagination-update.schema';
+import { applyExtractionRulesSchema } from '../../schema/extraction-rules.schema';
 
 @Component({
   imports: [
-    CommonModule,
     TranslateModule,
     MatIconModule,
     MatButtonModule,
-    FormField,
-    TrimOnBlurDirective,
+    SignalFieldComponent,
+    PaginationParamsComponent,
+    PaginationUpdateControlComponent,
+    ExtractionRulesComponent,
   ],
   selector: 'app-spider-pagination-edit',
   templateUrl: './spider-pagination-edit.component.html',
 })
 export class SpiderPaginationEditComponent {
-  //inject
+  readonly fieldType = SignalFieldType;
+  readonly saving = signal(false);
+  // 注入服務
   readonly router = inject(Router);
   readonly route = inject(ActivatedRoute);
   readonly spiderPaginationService = inject(SpiderPaginationService);
   readonly matDialog = inject(MatDialog);
   readonly snackbarService = inject(SnackbarService);
 
-  //signal
+  // 狀態
   readonly status = computed<EditMode>(() =>
     this.spiderPaginationId() ? this.editMode.EDIT : this.editMode.CREATE
   );
   readonly spiderPaginationId = toSignal(
     this.route.paramMap.pipe(
-      map(params => params.get('spiderPaginationId')),
-      filter(spiderPaginationId => isNotBlank(spiderPaginationId))
+      map(params => params.get('spiderPaginationId') ?? undefined)
     ),
     { initialValue: undefined }
   );
@@ -74,44 +91,53 @@ export class SpiderPaginationEditComponent {
       }
       return this.spiderPaginationService.getById(params);
     },
-    defaultValue: undefined,
-  });
-  readonly model = linkedSignal(() => {
-    const value = this.spiderPagination.value();
-    if (value) {
-      return value;
-    }
-    return {
+    defaultValue: {
       spiderPaginationId: '',
       paginationConfig: {
-        perStartParams: [],
+        paramSettings: [],
         startUrl: '',
         nextPageUrlKey: '',
         extractionRuleMode: ExtractionRuleMode.SELECT,
         extractionRuleList: [],
         dataIdTemplate: '',
         updateControl: {
-          lastUpdateMode: 'NONE',
+          lastUpdateMode: LastUpdateMode.NONE,
           lastUpdateDate: new Date(),
           lastUpdateParamKey: '',
-          updateIntervalMode: 'NONE',
+          updateIntervalMode: UpdateIntervalMode.NONE,
           updateInterval: 0,
-          updateIntervalUnit: UpdateIntervalUnit.year,
+          updateIntervalUnit: TimeUnit.DAY,
           updateIntervalParamKey: '',
         },
         requestIntervalMs: 0,
       },
-    } satisfies SpiderPagination;
+    } satisfies SpiderPagination,
   });
+  readonly model = linkedSignal(() => this.spiderPagination.value());
   readonly form = form(this.model, schemaPath => {
+    const config = schemaPath.paginationConfig;
+    disabled(schemaPath, {
+      when: () =>
+        this.saving() ||
+        this.spiderPagination.isLoading() ||
+        !!this.spiderPagination.error(),
+    });
     required(schemaPath.spiderPaginationId);
+    required(config.startUrl);
+    required(config.dataIdTemplate);
+    min(config.requestIntervalMs, 0);
+    apply(config.paramSettings, paramSettingsSchema);
+    apply(config, paginationUpdateSchema);
+    applyExtractionRulesSchema(
+      config.extractionRuleList,
+      config.extractionRuleMode
+    );
     debounce(schemaPath.paginationConfig.startUrl, 300);
     debounce(schemaPath.paginationConfig.nextPageUrlKey, 300);
     disabled(schemaPath.spiderPaginationId, { when: () => this.isEditMode });
   });
-  // constants
+  // 常數
   readonly editMode = EditMode;
-  readonly extractionRuleMode = ExtractionRuleMode;
 
   get isCreateMode() {
     return this.status() === this.editMode.CREATE;
@@ -145,12 +171,21 @@ export class SpiderPaginationEditComponent {
   }
 
   update() {
+    if (
+      this.saving() ||
+      this.spiderPagination.isLoading() ||
+      this.spiderPagination.error()
+    )
+      return;
     const formState = this.form();
     if (formState.invalid()) {
       formState.markAsTouched();
+      this.snackbarService.openI18N('msg.formInvalid');
       return;
     }
     const id = this.form.spiderPaginationId().value();
+    const request = structuredClone(this.model());
+    this.saving.set(true);
     this.spiderPaginationService
       .isInUse(id ?? '')
       .pipe(
@@ -163,8 +198,9 @@ export class SpiderPaginationEditComponent {
             this.snackbarService.openI18N('msg.spiderNotExist');
             return EMPTY;
           }
-          return this.spiderPaginationService.update(this.model());
-        })
+          return this.spiderPaginationService.update(request);
+        }),
+        finalize(() => this.saving.set(false))
       )
       .subscribe(() => {
         if (this.isCreateMode) {
