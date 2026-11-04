@@ -31,7 +31,7 @@ export class ExtractionRulesComponent {
   readonly fieldType = SignalFieldType;
   readonly fields = input.required<FieldTree<ExtractionRule[]>>();
   readonly mode = input.required<FieldTree<ExtractionRuleMode>>();
-  readonly showHelp = input(false);
+  readonly showHelp = input(true);
   private readonly ruleForm = inject(ExtractionRuleFormService);
   readonly modeOptions = toSignalFieldOptions(
     ExtractionRuleMode,
