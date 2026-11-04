@@ -9,7 +9,8 @@ export interface SpiderPagination {
 
 export interface SpiderPaginationData {
   spiderPaginationId: string;
-  dataId: string;
+  groupId: string; // 分組識別碼，例如 anime-2026
+  dataId: string; // 從擷取結果取得的單筆資料識別碼
   data: Record<string, any>;
   createdTime?: Date;
   updatedTime?: Date;
@@ -17,7 +18,8 @@ export interface SpiderPaginationData {
 }
 
 export interface SpiderPaginationConfig {
-  dataIdTemplate: string; // 爬蟲分頁識別碼 ex: anime-{{$.year}}
+  groupIdTemplate: string; // 分組識別碼範本，例如 anime-{{$.year}}
+  dataIdKey: string; // 從每筆擷取結果讀取資料識別碼的 key
   paramSettings: ParamSetting[];
   startUrl: string;
   nextPageUrlKey: string; // 當資料為空時即終止

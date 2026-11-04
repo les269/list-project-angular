@@ -300,8 +300,10 @@
   "spiderPagination": {
     "createSpiderPagination": "新增爬蟲處理分頁",
     "spiderPaginationId": "爬蟲分頁ID",
-    "dataIdTemplate": "資料識別碼",
-    "dataIdTemplateDesc": "資料識別碼 ex: anime-{{$.year}}",
+    "groupIdTemplate": "分組識別碼範本",
+    "groupIdTemplateDesc": "由參數產生分組識別碼，例如 anime-{{$.year}}。",
+    "dataIdKey": "單筆資料識別碼的 key",
+    "dataIdKeyDesc": "從每筆擷取結果的指定key，例如id 或 data.id。",
     "startUrl": "起始網址",
     "nextPageUrlKey": "下一頁網址鍵",
     "extractionRuleMode": "提取方法模式",

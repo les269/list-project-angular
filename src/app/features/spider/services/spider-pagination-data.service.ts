@@ -22,10 +22,11 @@ export class SpiderPaginationDataService {
 
   getById(
     spiderPaginationId: string,
+    groupId: string,
     dataId: string
   ): Observable<SpiderPaginationData> {
     return this.http.get<SpiderPaginationData>(
-      `${this.prefix}?spiderPaginationId=${encodeURIComponent(spiderPaginationId)}&dataId=${encodeURIComponent(dataId)}`
+      `${this.prefix}?spiderPaginationId=${encodeURIComponent(spiderPaginationId)}&groupId=${encodeURIComponent(groupId)}&dataId=${encodeURIComponent(dataId)}`
     );
   }
 
@@ -33,9 +34,13 @@ export class SpiderPaginationDataService {
     return this.http.post<void>(`${this.prefix}/update`, req);
   }
 
-  delete(spiderPaginationId: string, dataId: string): Observable<void> {
+  delete(
+    spiderPaginationId: string,
+    groupId: string,
+    dataId: string
+  ): Observable<void> {
     return this.http.delete<void>(
-      `${this.prefix}/delete?spiderPaginationId=${encodeURIComponent(spiderPaginationId)}&dataId=${encodeURIComponent(dataId)}`
+      `${this.prefix}/delete?spiderPaginationId=${encodeURIComponent(spiderPaginationId)}&groupId=${encodeURIComponent(groupId)}&dataId=${encodeURIComponent(dataId)}`
     );
   }
 
@@ -45,9 +50,13 @@ export class SpiderPaginationDataService {
     );
   }
 
-  isInUse(spiderPaginationId: string, dataId: string): Observable<boolean> {
+  isInUse(
+    spiderPaginationId: string,
+    groupId: string,
+    dataId: string
+  ): Observable<boolean> {
     return this.http.get<boolean>(
-      `${this.prefix}/in-use?spiderPaginationId=${encodeURIComponent(spiderPaginationId)}&dataId=${encodeURIComponent(dataId)}`
+      `${this.prefix}/in-use?spiderPaginationId=${encodeURIComponent(spiderPaginationId)}&groupId=${encodeURIComponent(groupId)}&dataId=${encodeURIComponent(dataId)}`
     );
   }
 }

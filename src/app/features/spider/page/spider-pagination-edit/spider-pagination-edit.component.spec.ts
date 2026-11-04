@@ -49,7 +49,8 @@ async function setup() {
     paginationConfig: {
       ...v.paginationConfig,
       startUrl: 'https://example.com/{year}',
-      dataIdTemplate: 'anidb-{year}',
+      groupIdTemplate: 'anidb-{year}',
+      dataIdKey: 'id',
     },
   }));
   return { fixture, component, service, router, pending };
@@ -310,6 +311,29 @@ describe('SpiderPaginationEditComponent', () => {
     expect(date.value).not.toBe('');
   });
 
+  it('分組範本與單筆 ID 來源各自驗證必填，儲存時送出兩個欄位', async () => {
+    const { component: c, fixture, service } = await setup();
+    const config = c.form.paginationConfig;
+    config.dataIdKey().value.set('');
+    c.update();
+    await fixture.whenStable();
+    expect(service.update).not.toHaveBeenCalled();
+    expect(
+      fixture.nativeElement.querySelector(
+        'input[aria-label="spiderPagination.dataIdKey"].is-invalid'
+      )
+    ).toBeTruthy();
+    config.dataIdKey().value.set('id');
+    config.groupIdTemplate().value.set('');
+    expect(c.form().invalid()).toBe(true);
+    config.groupIdTemplate().value.set('anime-{{$.year}}');
+    c.update();
+    const saved = service.update.mock.calls[0][0].paginationConfig;
+    expect(saved.groupIdTemplate).toBe('anime-{{$.year}}');
+    expect(saved.dataIdKey).toBe('id');
+    expect(saved).not.toHaveProperty('dataIdTemplate');
+  });
+
   it('儲存完整設定並阻止重複送出，成功後導向編輯頁', async () => {
     const { component: c, service, router, pending } = await setup();
     c.form.paginationConfig.requestIntervalMs().value.set(1500);
@@ -319,7 +343,8 @@ describe('SpiderPaginationEditComponent', () => {
     expect(service.update.mock.calls[0][0]).toMatchObject({
       spiderPaginationId: 'anidb',
       paginationConfig: {
-        dataIdTemplate: 'anidb-{year}',
+        groupIdTemplate: 'anidb-{year}',
+        dataIdKey: 'id',
         requestIntervalMs: 1500,
         updateControl: { lastUpdateMode: LastUpdateMode.NONE },
       },

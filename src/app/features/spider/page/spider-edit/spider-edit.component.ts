@@ -167,6 +167,7 @@ export class SpiderEditComponent {
     spiderId: '',
     description: '',
     primeKeySize: 1,
+    requestIntervalMs: 0,
     isUrlBased: false,
     testData: {
       primeKeyListJson: '[]',
@@ -179,6 +180,8 @@ export class SpiderEditComponent {
     disabled(p.spiderId, { when: () => this.isEditMode });
     required(p.spiderId);
     required(p.primeKeySize);
+    required(p.requestIntervalMs);
+    min(p.requestIntervalMs, 0);
     min(p.primeKeySize, ({ valueOf }) => (valueOf(p.isUrlBased) ? 0 : 1));
   });
 
@@ -239,6 +242,7 @@ export class SpiderEditComponent {
       spiderId: config.spiderId,
       description: config.description ?? '',
       primeKeySize: config.primeKeySize ?? 1,
+      requestIntervalMs: config.requestIntervalMs ?? 0,
       isUrlBased: config.isUrlBased ?? false,
       testData: {
         primeKeyListJson: JSON.stringify(
@@ -263,6 +267,7 @@ export class SpiderEditComponent {
       spiderId: formValue.spiderId,
       description: formValue.description,
       primeKeySize: formValue.primeKeySize,
+      requestIntervalMs: formValue.requestIntervalMs,
       isUrlBased: formValue.isUrlBased,
       testData: {
         primeKeyList,

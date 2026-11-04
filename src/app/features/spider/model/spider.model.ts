@@ -7,7 +7,7 @@ export interface SpiderConfig {
   testData: SpiderConfigTestData; //測試區使用的資料
   isUrlBased: boolean; //僅只有URL的爬蟲，沒有使用primeKey爬蟲
   updatedTime?: Date;
-  requestIntervalMs?: number; // TODO上一筆請求完成後的等待時間
+  requestIntervalMs: number;
 }
 
 export interface SpiderConfigTestData {

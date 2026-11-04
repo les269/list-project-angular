@@ -26,11 +26,16 @@
     label="spiderPagination.spiderPaginationId" />
   <app-signal-field
     class="mb-2"
-    [field]="form.paginationConfig.dataIdTemplate"
-    label="spiderPagination.dataIdTemplate" />
+    [field]="form.paginationConfig.groupIdTemplate"
+    label="spiderPagination.groupIdTemplate" />
   <p class="form-text">
-    {{ 'spiderPagination.dataIdTemplateDesc' | translate }}
+    {{ 'spiderPagination.groupIdTemplateDesc' | translate }}
   </p>
+  <app-signal-field
+    class="mb-2"
+    [field]="form.paginationConfig.dataIdKey"
+    label="spiderPagination.dataIdKey" />
+  <p class="form-text">{{ 'spiderPagination.dataIdKeyDesc' | translate }}</p>
   <app-signal-field
     class="mb-2"
     [field]="form.paginationConfig.startUrl"

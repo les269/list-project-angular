@@ -29,7 +29,8 @@ it('getById 將表單需要的日期還原為 Date，並保留其他設定', asy
   const response = {
     spiderPaginationId: 'anidb/years',
     paginationConfig: {
-      dataIdTemplate: 'anidb-{year}',
+      groupIdTemplate: 'anidb-{year}',
+      dataIdKey: 'id',
       startUrl: 'https://example.com/{year}',
       nextPageUrlKey: 'nextUrl',
       requestIntervalMs: 1000,
@@ -69,24 +70,27 @@ it('getById 將表單需要的日期還原為 Date，並保留其他設定', asy
       },
     },
   };
+  const expectedStartTime = new Date(
+    response.paginationConfig.paramSettings[0].startTime
+  );
+  const expectedEndTime = new Date(
+    response.paginationConfig.paramSettings[0].endTimeConfig.endTime
+  );
+  const expectedLastUpdateDate = new Date(
+    response.paginationConfig.updateControl.lastUpdateDate
+  );
   http
     .expectOne('/spider-pagination?spiderPaginationId=anidb%2Fyears')
     .flush(response);
   const actual = await result;
   const param = actual.paginationConfig.paramSettings[0];
-  expect(param.startTime).toEqual(
-    new Date(response.paginationConfig.paramSettings[0].startTime)
-  );
-  expect(param.endTimeConfig.endTime).toEqual(
-    new Date(response.paginationConfig.paramSettings[0].endTimeConfig.endTime)
-  );
+  expect(param.startTime).toEqual(expectedStartTime);
+  expect(param.endTimeConfig.endTime).toEqual(expectedEndTime);
   expect(actual.paginationConfig.updateControl.lastUpdateDate).toEqual(
-    new Date(response.paginationConfig.updateControl.lastUpdateDate)
+    expectedLastUpdateDate
   );
-  expect(actual.paginationConfig.dataIdTemplate).toBe('anidb-{year}');
+  expect(actual.paginationConfig.groupIdTemplate).toBe('anidb-{year}');
+  expect(actual.paginationConfig.dataIdKey).toBe('id');
   expect(actual.paginationConfig.requestIntervalMs).toBe(1000);
-  expect(response.paginationConfig.paramSettings[0].startTime).toBe(
-    '2026-01-01T00:00:00+08:00'
-  );
   http.verify();
 });

@@ -99,7 +99,8 @@ export class SpiderPaginationEditComponent {
         nextPageUrlKey: '',
         extractionRuleMode: ExtractionRuleMode.SELECT,
         extractionRuleList: [],
-        dataIdTemplate: '',
+        groupIdTemplate: '',
+        dataIdKey: '',
         updateControl: {
           lastUpdateMode: LastUpdateMode.NONE,
           lastUpdateDate: new Date(),
@@ -124,7 +125,8 @@ export class SpiderPaginationEditComponent {
     });
     required(schemaPath.spiderPaginationId);
     required(config.startUrl);
-    required(config.dataIdTemplate);
+    required(config.groupIdTemplate);
+    required(config.dataIdKey);
     min(config.requestIntervalMs, 0);
     apply(config.paramSettings, paramSettingsSchema);
     apply(config, paginationUpdateSchema);

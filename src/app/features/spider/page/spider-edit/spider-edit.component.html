@@ -30,6 +30,17 @@
         }}</label>
       </div>
 
+      <div class="form-group mb-2">
+        <label for="requestIntervalMs">{{
+          'spiderPagination.requestIntervalMs' | translate
+        }}</label>
+        <input
+          id="requestIntervalMs"
+          class="form-control"
+          type="number"
+          [formField]="form.requestIntervalMs" />
+      </div>
+
       <div class="my-3">
         <mat-checkbox [formField]="form.isUrlBased">
           {{ 'spider.isUrlBased' | translate }}
