@@ -16,11 +16,18 @@ textarea.form-control {
   cursor: grab;
 }
 
-:host ::ng-deep .cdk-drag-preview {
+.generic-table-drag-preview {
   box-sizing: border-box;
+  // CDK 的 matchSize 只量到主列，高度改由包含詳細列的預覽內容決定。
+  height: auto !important;
+  overflow: visible;
   background: #fff;
   border-radius: 6px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.cdk-drag-placeholder + .generic-table-detail-row {
+  visibility: hidden;
 }
 
 :host ::ng-deep .cdk-drag-placeholder {

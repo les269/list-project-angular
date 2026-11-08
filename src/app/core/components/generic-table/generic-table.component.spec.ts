@@ -195,6 +195,105 @@ describe('GenericTableComponent with Signal Forms', () => {
     expect(host.model()[1]).toBe(second);
   });
 
+  it('拖曳預覽保留欄寬、輸入值及完整詳細列，不重複註冊表單控制項', async () => {
+    host.fields[0].note().value.set('detail value');
+    host.table().onRadioChange(0, 'selected');
+    await fixture.whenStable();
+    const table: HTMLTableElement =
+      fixture.nativeElement.querySelector('table');
+    const row = table.querySelector<HTMLTableRowElement>('tr.cdk-drag')!;
+    expect(
+      row.nextElementSibling?.classList.contains('generic-table-detail-row')
+    ).toBe(true);
+    const widths = [80, 360, 280, 80];
+    vi.spyOn(row, 'getBoundingClientRect').mockReturnValue({
+      x: 0,
+      y: 100,
+      top: 100,
+      left: 0,
+      right: 800,
+      bottom: 150,
+      width: 800,
+      height: 50,
+      toJSON: () => ({}),
+    });
+    Array.from(row.cells).forEach((cell, index) => {
+      vi.spyOn(cell, 'getBoundingClientRect').mockReturnValue({
+        x: 0,
+        y: 100,
+        top: 100,
+        left: 0,
+        right: widths[index],
+        bottom: 150,
+        width: widths[index],
+        height: 50,
+        toJSON: () => ({}),
+      });
+    });
+    const controls = fixture.debugElement.queryAll(
+      By.directive(FormField)
+    ).length;
+    const handle = row.querySelector('[cdkDragHandle]')!;
+    handle.dispatchEvent(
+      new MouseEvent('mousedown', {
+        bubbles: true,
+        button: 0,
+        buttons: 1,
+        detail: 1,
+        clientX: 20,
+        clientY: 120,
+      })
+    );
+    document.dispatchEvent(
+      new MouseEvent('mousemove', {
+        bubbles: true,
+        buttons: 1,
+        clientX: 40,
+        clientY: 140,
+      })
+    );
+    await fixture.whenStable();
+    const preview = document.querySelector<HTMLElement>(
+      '.generic-table-drag-preview'
+    );
+    try {
+      expect(preview).not.toBeNull();
+      const previewTable = preview!.querySelector('table')!;
+      expect(previewTable.style.width).toBe('800px');
+      expect(previewTable.rows).toHaveLength(2);
+      expect(
+        Array.from(previewTable.rows[0].cells, cell => cell.style.width)
+      ).toEqual(widths.map(width => `${width}px`));
+      expect(
+        previewTable.querySelector<HTMLInputElement>('input.form-control')!
+          .value
+      ).toBe('first');
+      expect(
+        previewTable.querySelector<HTMLInputElement>('input.note')!.value
+      ).toBe('detail value');
+      expect(
+        previewTable.querySelector<HTMLInputElement>('input[type=radio]')!
+          .checked
+      ).toBe(true);
+      expect(
+        fixture.debugElement.queryAll(By.directive(FormField))
+      ).toHaveLength(controls);
+      expect(host.model()[0].selected).toBe(true);
+      expect(preview!.querySelectorAll('[id], [name]')).toHaveLength(0);
+    } finally {
+      document.dispatchEvent(
+        new MouseEvent('mouseup', {
+          bubbles: true,
+          button: 0,
+          clientX: 40,
+          clientY: 140,
+        })
+      );
+      await fixture.whenStable();
+    }
+    expect(document.querySelector('.generic-table-drag-preview')).toBeNull();
+  });
+
   it('marks the selected radio touched and dirty and respects disabled radio values', async () => {
     host.table().onRadioChange(0, 'selected');
     expect(host.fields[0].selected().touched()).toBe(true);

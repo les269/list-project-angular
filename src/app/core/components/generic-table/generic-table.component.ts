@@ -3,6 +3,7 @@ import {
   CDK_DRAG_PARENT,
   CdkDragDrop,
   CdkDragHandle,
+  CdkDragPreview,
   CdkDropList,
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
@@ -29,6 +30,7 @@ import {
 } from '../../model/generic-table';
 import { ChipSelectButtonComponent } from '../chip-select-button/chip-select-button.component';
 import { ChipSelectMultipleButtonComponent } from '../chip-select-multiple-button/chip-select-multiple-button.component';
+import { TableDragPreviewDirective } from './table-drag-preview.directive';
 
 @Component({
   selector: 'app-generic-table',
@@ -41,6 +43,8 @@ import { ChipSelectMultipleButtonComponent } from '../chip-select-multiple-butto
     CdkDropList,
     CdkDrag,
     CdkDragHandle,
+    CdkDragPreview,
+    TableDragPreviewDirective,
     MatIcon,
     FormField,
     MatButtonModule,

@@ -189,15 +189,23 @@
   <tr mat-header-row *matHeaderRowDef="displayedColumnsWith()"></tr>
   <tr
     mat-row
+    #drag="cdkDrag"
     *matRowDef="let row; columns: displayedColumnsWith()"
     class="expand-row"
     cdkDrag
     [cdkDragData]="row"
-    [cdkDragDisabled]="fields()().disabled()"></tr>
+    [cdkDragDisabled]="fields()().disabled()">
+    <ng-template cdkDragPreview [matchSize]="true">
+      <div
+        appTableDragPreview
+        [sourceRow]="drag.getRootElement()"
+        class="generic-table-drag-preview"></div>
+    </ng-template>
+  </tr>
   @if (expandedTmpl()) {
     <tr
       mat-row
-      class="h-auto"
+      class="h-auto generic-table-detail-row"
       *matRowDef="let row; columns: ['expandedDetail']"></tr>
   }
   <tr mat-footer-row *matFooterRowDef="['add']"></tr>
