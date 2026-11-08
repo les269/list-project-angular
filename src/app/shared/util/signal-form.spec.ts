@@ -12,8 +12,14 @@ import { DatabaseEditComponent } from '../../features/setting/components/databas
 import { DatabaseConfig, DatabaseType } from '../../features/setting/model';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { PipelineListComponent } from '../../features/spider/components/pipeline-list/pipeline-list.component';
+import { GenericTableComponent } from '../../core/components/generic-table/generic-table.component';
+import { By } from '@angular/platform-browser';
 import { ValuePipelineFormService } from '../../features/spider/services/value-pipeline-form.service';
-import { PositionType, ValuePipelineType } from '../../features/spider/model';
+import {
+  ExtractionRuleMode,
+  PositionType,
+  ValuePipelineType,
+} from '../../features/spider/model';
 import { ThemeCustomTableComponent } from '../../features/theme/components/theme-custom-table/theme-custom-table.component';
 import { ThemeCustomType } from '../../features/theme/models';
 import { patchField } from './signal-form';
@@ -132,6 +138,42 @@ describe('Signal form migration regressions', () => {
     await fixture.whenStable();
     expect(host.model()).toHaveLength(1);
     expect(host.model()[0].seq).toBe(0);
+  });
+
+  it('新增物件提取欄位並在切換模式後保留巢狀 pipeline', async () => {
+    const fixture = TestBed.createComponent(PipelineHost);
+    const host = fixture.componentInstance;
+    host.fields[0].type().value.set(ValuePipelineType.EXTRACT_OBJECTS);
+    await fixture.whenStable();
+    const table = fixture.debugElement.query(
+      By.directive(GenericTableComponent)
+    ).componentInstance as GenericTableComponent;
+    table.onAdd();
+    const config = host.fields[0].extractObjectsConfig;
+    config.fields[0].key().value.set('url');
+    config.fields[0].selector().value.set('a');
+    config.fields[0]
+      .pipelines()
+      .value.set([
+        host.factory.createValuePipeline({
+          type: ValuePipelineType.EXTRACT_ATTR,
+          attributeName: 'href',
+        }),
+      ]);
+    await fixture.whenStable();
+    expect(
+      fixture.nativeElement.querySelectorAll('app-pipeline-list').length
+    ).toBe(2);
+    config.mode().value.set(ExtractionRuleMode.JSON_PATH);
+    await fixture.whenStable();
+    expect(table.displayedColumns()).toEqual(['key', 'jsonPath']);
+    expect(config.fields[0].selector().value()).toBe('a');
+    expect(config.fields[0].pipelines[0].attributeName().value()).toBe('href');
+    expect(fixture.nativeElement.querySelector('[role="alert"]')).toBeTruthy();
+    const loaded = host.factory.createValuePipeline(host.model()[0]);
+    expect(
+      loaded.extractObjectsConfig.fields[0].pipelines[0].attributeName
+    ).toBe('href');
   });
 
   it('updates chip labels after external changes, selection and reset', async () => {

@@ -20,15 +20,18 @@ import { GenericTableComponent } from './generic-table.component';
 type Row = { seq: number; name: string; selected: boolean; note: string };
 
 @Component({
-  imports: [GenericTableComponent, FormField],
+  imports: [GenericTableComponent, FormField, CdkDrag, CdkDragHandle],
   template: `
-    <app-generic-table
-      [fields]="fields"
-      [cols]="cols()"
-      [displayedColumns]="displayedColumns()"
-      [createRow]="createRow"
-      [expandedTmpl]="detail"
-      [customColTmpls]="{ custom: custom }" />
+    <div cdkDrag>
+      <span cdkDragHandle class="outer-handle">reorder</span>
+      <app-generic-table
+        [fields]="fields"
+        [cols]="cols()"
+        [displayedColumns]="displayedColumns()"
+        [createRow]="createRow"
+        [expandedTmpl]="detail"
+        [customColTmpls]="{ custom: custom }" />
+    </div>
     <ng-template #detail let-row>
       <input class="note" [formField]="row.note" />
     </ng-template>
@@ -155,13 +158,20 @@ describe('GenericTableComponent with Signal Forms', () => {
   });
 
   it('registers a drag handle on each reorder icon and disables dragging with the form', async () => {
-    const handles = fixture.debugElement.queryAll(By.directive(CdkDragHandle));
-    const drags = fixture.debugElement.queryAll(By.directive(CdkDrag));
+    const table = fixture.debugElement.query(
+      By.directive(GenericTableComponent)
+    );
+    const handles = table.queryAll(By.directive(CdkDragHandle));
+    const drags = table.queryAll(By.directive(CdkDrag));
     expect(handles).toHaveLength(2);
     expect(drags).toHaveLength(2);
     for (const drag of drags) {
       expect(drag.queryAll(By.directive(CdkDragHandle))).toHaveLength(1);
       expect(drag.injector.get(CdkDrag).disabled).toBe(false);
+      const handle = drag
+        .query(By.directive(CdkDragHandle))
+        .injector.get(CdkDragHandle);
+      expect(handle['_parentDrag']).toBe(drag.injector.get(CdkDrag));
     }
     host.locked.set(true);
     await fixture.whenStable();

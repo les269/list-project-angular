@@ -65,6 +65,14 @@
     [field]="form.paginationConfig.requestIntervalMs"
     label="spiderPagination.requestIntervalMs"
     [type]="fieldType.NUMBER" />
+  <app-signal-field
+    class="mb-2"
+    [field]="form.paginationConfig.retainHistory"
+    label="spiderPagination.retainHistory"
+    [type]="fieldType.CHECKBOX" />
+  <p class="form-text">
+    {{ 'spiderPagination.retainHistoryDesc' | translate }}
+  </p>
 
   <app-pagination-params [fields]="form.paginationConfig.paramSettings" />
   <app-pagination-update-control

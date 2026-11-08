@@ -57,6 +57,20 @@ async function setup() {
 }
 
 describe('SpiderPaginationEditComponent', () => {
+  it('預設保留歷史資料，取消勾選後儲存 false', async () => {
+    const { component: c, fixture, service } = await setup();
+    const checkbox = fixture.nativeElement.querySelector(
+      'input[type="checkbox"]'
+    ) as HTMLInputElement;
+    expect(checkbox.checked).toBe(true);
+    checkbox.click();
+    await fixture.whenStable();
+    c.update();
+    expect(service.update.mock.calls[0][0].paginationConfig.retainHistory).toBe(
+      false
+    );
+  });
+
   it('依參數模式驗證作用中的欄位，並顯示對應輸入', async () => {
     const { component: c, fixture } = await setup();
     fixture.debugElement

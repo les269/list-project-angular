@@ -23,6 +23,7 @@ import { ReplaceValueMap } from '../../../replace-value-map/model';
 import { ReplaceValueMapService } from '../../../replace-value-map/service/replace-value-map.service';
 import {
   ChineseConvertType,
+  ExtractionRuleMode,
   ConvertToCaseType,
   PositionType,
   Timezones,
@@ -31,6 +32,15 @@ import {
   ZhConverterUtilType,
 } from '../../model';
 import { ValuePipelineFormService } from '../../services';
+import { isPipelineCompatible } from '../../model/pipeline-mode';
+import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
+import {
+  GenericColumnType,
+  GenericTableColumn,
+} from '../../../../core/model/generic-table';
+import { SignalFieldComponent } from '../../../../core/components/signal-field/signal-field.component';
+import { SignalFieldType } from '../../../../core/model/signal-field.model';
+import { toSignalFieldOptions } from '../../../../shared/util/signal-field';
 
 @Component({
   selector: 'app-pipeline-list',
@@ -49,16 +59,47 @@ import { ValuePipelineFormService } from '../../services';
     SignalCodeEditorComponent,
     MatTooltipModule,
     ChipInputMapComponent,
+    GenericTableComponent,
+    SignalFieldComponent,
   ],
   templateUrl: './pipeline-list.component.html',
   styleUrls: ['./pipeline-list.component.scss'],
 })
 export class PipelineListComponent {
+  readonly fieldType = SignalFieldType;
+  readonly extractionRuleMode = ExtractionRuleMode;
+  readonly modeOptions = toSignalFieldOptions(
+    ExtractionRuleMode,
+    'spider.extractionRuleMode'
+  );
+  readonly objectColumns: GenericTableColumn[] = [
+    { key: 'key', label: 'spider.key', columnType: GenericColumnType.input },
+    {
+      key: 'selector',
+      label: 'spider.selector',
+      columnType: GenericColumnType.textarea,
+    },
+    {
+      key: 'jsonPath',
+      label: 'spider.jsonPath',
+      columnType: GenericColumnType.textarea,
+    },
+  ];
+  readonly createObjectField = () => ({
+    ...this.valuePipelineFormService.createExtractObjectField(),
+  });
   readonly selectTableService = inject(SelectTableService);
   readonly replaceValueMapService = inject(ReplaceValueMapService);
   readonly valuePipelineFormService = inject(ValuePipelineFormService);
 
   readonly fields = input.required<FieldTree<ValuePipeline[]>>();
+  readonly mode = input<ExtractionRuleMode>();
+  readonly typeOptions = computed(() =>
+    Object.values(ValuePipelineType).filter(type =>
+      isPipelineCompatible(type, this.mode())
+    )
+  );
+  readonly isPipelineCompatible = isPipelineCompatible;
   readonly replaceValueMapList = input<ReplaceValueMap[]>([]);
 
   readonly rows = computed(() => Array.from(this.fields()));

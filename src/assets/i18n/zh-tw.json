@@ -302,7 +302,7 @@
     "spiderPaginationId": "爬蟲分頁ID",
     "groupIdTemplate": "分組識別碼範本",
     "groupIdTemplateDesc": "由參數產生分組識別碼，例如 anime-{{$.year}}。",
-    "dataIdKey": "單筆資料識別碼的 key",
+    "dataIdKey": "資料識別碼的 key",
     "dataIdKeyDesc": "從每筆擷取結果的指定key，例如id 或 data.id。",
     "startUrl": "起始網址",
     "nextPageUrlKey": "下一頁網址鍵",
@@ -312,6 +312,8 @@
     "loadFailed": "載入失敗，請重試。",
     "reload": "重新載入",
     "requestIntervalMs": "請求完成後的等待時間（ms）",
+    "retainHistory": "保留歷史資料",
+    "retainHistoryDesc": "取消勾選時，同步移除成功抓取的參數組中已不存在的資料。",
     "paramSettings": "參數設定",
     "paramSettingsDesc": "設定起始網址與結果分組使用的替換參數。",
     "addParam": "新增參數",
@@ -397,6 +399,9 @@
     }
   },
   "pipeline": {
+    "EXTRACT_OBJECTS": "重組或提取陣列資料成物件陣列",
+    "extractObjectsHint": "對輸入陣列的每筆資料設定輸出欄位；selector／jsonPath 相對於該筆資料。可展開欄位設定後續 pipeline，空白路徑表示目前資料。",
+    "incompatibleMode": "不適用目前提取模式，請修改或刪除此步驟",
     "addPipeline": "新增處理步驟",
     "FIXED_VALUE": "固定值",
     "FIXED_JSON_VALUE": "固定JSON值",

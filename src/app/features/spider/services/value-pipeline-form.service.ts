@@ -7,6 +7,9 @@ import {
   ChineseConvertType,
   ConvertToCaseType,
   DeleteConfig,
+  ExtractObjectField,
+  ExtractObjectsConfig,
+  ExtractionRuleMode,
   InsertConfig,
   MoveCharConfig,
   PositionType,
@@ -39,7 +42,7 @@ export class ValuePipelineFormService {
     return Timezones[key] ?? Timezones.GMT_P00;
   });
 
-  createValuePipeline(data?: Partial<ValuePipeline>) {
+  createValuePipeline(data?: Partial<ValuePipeline>): ValuePipeline {
     return {
       seq: data?.seq ?? 0,
       type: data?.type ?? ValuePipelineType.FIXED_VALUE,
@@ -48,6 +51,9 @@ export class ValuePipelineFormService {
       fixedJsonValue: data?.fixedJsonValue ?? '',
       currentDataKey: data?.currentDataKey ?? '',
       attributeName: data?.attributeName ?? '',
+      extractObjectsConfig: this.createExtractObjectsConfig(
+        data?.extractObjectsConfig
+      ),
       pattern: data?.pattern ?? '',
       replacement: data?.replacement ?? '',
       separator: data?.separator ?? '',
@@ -70,6 +76,27 @@ export class ValuePipelineFormService {
       fetchCookieName: data?.fetchCookieName ?? '',
       fetchHeaderName: data?.fetchHeaderName ?? '',
       fetchCurrentDataKey: data?.fetchCurrentDataKey ?? '',
+    };
+  }
+
+  createExtractObjectsConfig(data?: Partial<ExtractObjectsConfig>) {
+    return {
+      mode: data?.mode ?? ExtractionRuleMode.SELECT,
+      fields: (data?.fields ?? []).map(field =>
+        this.createExtractObjectField(field)
+      ),
+    };
+  }
+
+  createExtractObjectField(
+    data?: Partial<ExtractObjectField>
+  ): ExtractObjectField {
+    return {
+      seq: data?.seq ?? 0,
+      key: data?.key ?? '',
+      selector: data?.selector ?? '',
+      jsonPath: data?.jsonPath ?? '',
+      pipelines: (data?.pipelines ?? []).map(p => this.createValuePipeline(p)),
     };
   }
 

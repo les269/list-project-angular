@@ -1,4 +1,5 @@
 import { ChipsMapValue } from '../../../core/model';
+import { ExtractionRuleMode } from './extraction.model';
 
 export enum ValuePipelineType {
   FIXED_VALUE = 'FIXED_VALUE', // 固定值
@@ -6,6 +7,7 @@ export enum ValuePipelineType {
   CURRENT_DATA_KEY = 'CURRENT_DATA_KEY', // 當前資料鍵值
   EXTRACT_ATTR = 'EXTRACT_ATTR', // 提取屬性 (原本的 attr)
   EXTRACT_OWN_TEXT = 'EXTRACT_OWN_TEXT', // 僅提取自身文本 (原本的 onlyOwn)
+  EXTRACT_OBJECTS = 'EXTRACT_OBJECTS', // 將每筆資料提取為物件
   REPLACE_REGULAR = 'REPLACE_REGULAR', // 正則替換
   SPLIT_TEXT = 'SPLIT_TEXT', // 分割字串
   JOIN_ARRAY_TO_STRING = 'JOIN_ARRAY_TO_STRING', // 將陣列元素合併為字串
@@ -37,6 +39,7 @@ export interface ValuePipeline {
   fixedJsonValue: string; // 當 type 是 FIXED_JSON_VALUE 時使用，會嘗試解析成 JSON 後使用
   currentDataKey: string; // 當 type 是 CURRENT_DATA_KEY 時使用，指定要使用的當前資料鍵值
   attributeName: string; // 當 type 是 EXTRACT_ATTR 時使用
+  extractObjectsConfig: ExtractObjectsConfig; // 當 type 是 EXTRACT_OBJECTS 時使用，指定提取物件的配置
   pattern: string; // 當 type 是 REPLACE_REGULAR 時使用
   replacement: string; // 當 type 是 REPLACE_REGULAR 時使用
   separator: string; // 當 type 是 SPLIT_TEXT 時使用
@@ -57,6 +60,19 @@ export interface ValuePipeline {
   fetchCookieName: string; // 當 type 是 FETCH_COOKIE 時使用，指定要取得的cookie名稱
   fetchHeaderName: string; // 當 type 是 FETCH_HEADER 時使用，指定要取得的header名稱
   fetchCurrentDataKey: string; // 當 type 是 FETCH_CURRENT_DATA 時使用，指定要取得的當前資料鍵值
+}
+
+export interface ExtractObjectsConfig {
+  mode: ExtractionRuleMode;
+  fields: ExtractObjectField[];
+}
+
+export interface ExtractObjectField {
+  seq: number;
+  key: string;
+  selector: string;
+  jsonPath: string;
+  pipelines: ValuePipeline[];
 }
 
 export interface TimeFormatOption {

@@ -60,7 +60,9 @@
           }
         }
       </div>
-      <app-pipeline-list [fields]="element.pipelines" />
+      <app-pipeline-list
+        [fields]="element.pipelines"
+        [mode]="mode()().value()" />
     </div>
   </ng-template>
 </fieldset>

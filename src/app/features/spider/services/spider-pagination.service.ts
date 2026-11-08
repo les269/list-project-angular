@@ -19,6 +19,7 @@ export class SpiderPaginationService {
       )
       .pipe(
         map(value => {
+          value.paginationConfig.retainHistory ??= true;
           // JSON 回傳的日期字串須在進入 Date 表單前還原。
           value.paginationConfig.paramSettings.forEach(param => {
             param.startTime = new Date(param.startTime);

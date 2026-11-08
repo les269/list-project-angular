@@ -15,7 +15,9 @@
       cdkDrag
       [cdkDragDisabled]="fields()().disabled()"
       class="card mb-2 p-2 bg-light">
-      <div class="d-flex align-items-center gap-2">
+      <div
+        class="d-flex align-items-center gap-2"
+        [class.flex-wrap]="pipelineType === eValuePipelineType.EXTRACT_OBJECTS">
         <div class="d-flex">
           <mat-icon cdkDragHandle class="drag-cursor">reorder</mat-icon>
         </div>
@@ -28,15 +30,59 @@
             [matTooltipShowDelay]="500" />
         </div>
         <div class="d-flex gap-2">
-          <select [formField]="pipeline.type" class="form-select">
-            @for (type of eValuePipelineType | enumKeys; track type) {
+          <select
+            [formField]="pipeline.type"
+            class="form-select"
+            [class.is-invalid]="!isPipelineCompatible(pipelineType, mode())"
+            [attr.aria-invalid]="!isPipelineCompatible(pipelineType, mode())">
+            @if (!isPipelineCompatible(pipelineType, mode())) {
+              <option [value]="pipelineType" disabled>
+                {{ 'pipeline.' + pipelineType | translate }}
+              </option>
+            }
+            @for (type of typeOptions(); track type) {
               <option [value]="type">
                 {{ 'pipeline.' + type | translate }}
               </option>
             }
           </select>
+          @if (!isPipelineCompatible(pipelineType, mode())) {
+            <div class="text-danger" role="alert">
+              {{ 'pipeline.incompatibleMode' | translate }}
+            </div>
+          }
         </div>
         @switch (pipelineType) {
+          @case (eValuePipelineType.EXTRACT_OBJECTS) {
+            <div class="w-100">
+              <app-signal-field
+                [field]="pipeline.extractObjectsConfig.mode"
+                label="spider.extractionRule"
+                [type]="fieldType.SELECT"
+                [options]="modeOptions"
+                [inline]="true" />
+              <div class="form-text mb-2">
+                {{ 'pipeline.extractObjectsHint' | translate }}
+              </div>
+              <app-generic-table
+                [fields]="pipeline.extractObjectsConfig.fields"
+                [createRow]="createObjectField"
+                [cols]="objectColumns"
+                [displayedColumns]="
+                  pipeline.extractObjectsConfig.mode().value() ===
+                  extractionRuleMode.SELECT
+                    ? ['key', 'selector']
+                    : ['key', 'jsonPath']
+                "
+                [expandedTmpl]="objectPipelines" />
+              <ng-template #objectPipelines let-element>
+                <app-pipeline-list
+                  [fields]="element.pipelines"
+                  [mode]="pipeline.extractObjectsConfig.mode().value()"
+                  [replaceValueMapList]="replaceValueMapList()" />
+              </ng-template>
+            </div>
+          }
           <!-- 固定值 -->
           @case (eValuePipelineType.FIXED_VALUE) {
             <div class="d-flex input-group">

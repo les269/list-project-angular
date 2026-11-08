@@ -15,6 +15,34 @@ import {
 } from '../model';
 import { SpiderPaginationService } from './spider-pagination.service';
 
+it.each([
+  [undefined, true],
+  [null, true],
+  [true, true],
+  [false, false],
+])('getById 將 retainHistory %s 正規化為 %s', async (value, expected) => {
+  TestBed.configureTestingModule({
+    providers: [
+      provideHttpClient(),
+      provideHttpClientTesting(),
+      SpiderPaginationService,
+    ],
+  });
+  const service = TestBed.inject(SpiderPaginationService);
+  const http = TestBed.inject(HttpTestingController);
+  const result = firstValueFrom(service.getById('history'));
+  http.expectOne('/spider-pagination?spiderPaginationId=history').flush({
+    spiderPaginationId: 'history',
+    paginationConfig: {
+      ...(value === undefined ? {} : { retainHistory: value }),
+      paramSettings: [],
+      updateControl: { lastUpdateDate: '2026-11-08T00:00:00+08:00' },
+    },
+  });
+  expect((await result).paginationConfig.retainHistory).toBe(expected);
+  http.verify();
+});
+
 it('getById 將表單需要的日期還原為 Date，並保留其他設定', async () => {
   TestBed.configureTestingModule({
     providers: [

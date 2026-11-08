@@ -27,6 +27,7 @@ export interface SpiderPaginationConfig {
   extractionRuleList: ExtractionRule[];
   updateControl: UpdateControl;
   requestIntervalMs: number; // 上一筆請求完成後的等待時間
+  retainHistory: boolean; // 保留歷史資料；後端回傳 null 或缺漏時視為 true
 }
 
 export interface ParamSetting {

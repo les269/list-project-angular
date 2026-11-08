@@ -111,6 +111,7 @@ export class SpiderPaginationEditComponent {
           updateIntervalParamKey: '',
         },
         requestIntervalMs: 0,
+        retainHistory: true,
       },
     } satisfies SpiderPagination,
   });
