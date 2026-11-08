@@ -13,6 +13,8 @@ import {
   debounce,
   disabled,
   form,
+  FormField,
+  readonly,
   required,
 } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,7 +22,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { EMPTY, finalize, map, switchMap } from 'rxjs';
+import { EMPTY, finalize, map, switchMap, take } from 'rxjs';
 import { EditMode } from '../../../../core/model';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import {
@@ -39,8 +41,11 @@ import {
   TimeUnit,
   LastUpdateMode,
   UpdateIntervalMode,
+  SpiderItem,
+  UrlType,
 } from '../../model';
-import { SpiderPaginationService } from '../../services';
+import { SpiderPaginationService, SpiderService } from '../../services';
+import { SignalCodeEditorComponent } from '../../../../core/components/signal-code-editor/signal-code-editor.component';
 import { SignalFieldComponent } from '../../../../core/components/signal-field/signal-field.component';
 import { PaginationParamsComponent } from '../../components/pagination-params/pagination-params.component';
 import { PaginationUpdateControlComponent } from '../../components/pagination-update-control/pagination-update-control.component';
@@ -59,6 +64,8 @@ import { applyExtractionRulesSchema } from '../../schema/extraction-rules.schema
     PaginationParamsComponent,
     PaginationUpdateControlComponent,
     ExtractionRulesComponent,
+    FormField,
+    SignalCodeEditorComponent,
   ],
   selector: 'app-spider-pagination-edit',
   templateUrl: './spider-pagination-edit.component.html',
@@ -66,10 +73,12 @@ import { applyExtractionRulesSchema } from '../../schema/extraction-rules.schema
 export class SpiderPaginationEditComponent {
   readonly fieldType = SignalFieldType;
   readonly saving = signal(false);
+  readonly testing = signal(false);
   // 注入服務
   readonly router = inject(Router);
   readonly route = inject(ActivatedRoute);
   readonly spiderPaginationService = inject(SpiderPaginationService);
+  readonly spiderService = inject(SpiderService);
   readonly matDialog = inject(MatDialog);
   readonly snackbarService = inject(SnackbarService);
 
@@ -121,6 +130,7 @@ export class SpiderPaginationEditComponent {
     disabled(schemaPath, {
       when: () =>
         this.saving() ||
+        this.testing() ||
         this.spiderPagination.isLoading() ||
         !!this.spiderPagination.error(),
     });
@@ -138,6 +148,16 @@ export class SpiderPaginationEditComponent {
     debounce(schemaPath.paginationConfig.startUrl, 300);
     debounce(schemaPath.paginationConfig.nextPageUrlKey, 300);
     disabled(schemaPath.spiderPaginationId, { when: () => this.isEditMode });
+  });
+  readonly useJsonPath = computed(
+    () =>
+      this.form.paginationConfig.extractionRuleMode().value() ===
+      ExtractionRuleMode.JSON_PATH
+  );
+  readonly testModel = signal({ html: '', json: '', resultJson: '' });
+  readonly testForm = form(this.testModel, path => {
+    disabled(path, { when: () => this.form().disabled() });
+    readonly(path.resultJson);
   });
   // 常數
   readonly editMode = EditMode;
@@ -173,9 +193,76 @@ export class SpiderPaginationEditComponent {
     });
   }
 
+  onFormatJson() {
+    if (this.testForm().disabled()) return;
+    const json = this.testModel().json;
+    if (!json.trim()) return;
+    try {
+      this.testForm.json().value.set(JSON.stringify(JSON.parse(json), null, 2));
+    } catch {
+      this.snackbarService.openI18N('msg.invalidJson');
+    }
+  }
+
+  onTestParse() {
+    if (this.form().disabled()) return;
+    const config = this.form.paginationConfig;
+    if (config.extractionRuleList().invalid()) {
+      config.extractionRuleList().markAsTouched();
+      this.snackbarService.openI18N('msg.formInvalid');
+      return;
+    }
+    if (this.useJsonPath()) {
+      try {
+        JSON.parse(this.testModel().json);
+      } catch {
+        this.snackbarService.openI18N('msg.invalidJson');
+        return;
+      }
+    }
+    // 沿用擷取預覽契約，只測試目前規則與貼上的資料。
+    const request: SpiderItem = {
+      spiderItemId: this.model().spiderPaginationId,
+      description: '',
+      itemSetting: {
+        url: this.model().paginationConfig.startUrl,
+        urlType: UrlType.BY_PARAMS,
+        mode: config.extractionRuleMode().value(),
+        extractionRuleList: structuredClone(
+          config.extractionRuleList().value()
+        ),
+        testData: { ...this.testModel(), resultJson: '' },
+        skipWhenUsingUrl: false,
+      },
+    };
+    this.testForm.resultJson().value.set('');
+    this.testing.set(true);
+    this.spiderService
+      .previewExtraction(request)
+      .pipe(
+        take(1),
+        finalize(() => this.testing.set(false))
+      )
+      .subscribe({
+        next: result => {
+          this.testForm.resultJson().value.set(JSON.stringify(result, null, 2));
+          this.snackbarService.openI18N('msg.extractSuccess');
+        },
+        error: (error: unknown) => {
+          this.snackbarService.openI18N('msg.extractFailed', {
+            message:
+              error && typeof error === 'object' && 'message' in error
+                ? String(error.message ?? '')
+                : '',
+          });
+        },
+      });
+  }
+
   update() {
     if (
       this.saving() ||
+      this.testing() ||
       this.spiderPagination.isLoading() ||
       this.spiderPagination.error()
     )

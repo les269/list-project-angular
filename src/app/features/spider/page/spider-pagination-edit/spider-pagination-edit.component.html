@@ -81,9 +81,52 @@
   <app-extraction-rules
     [fields]="form.paginationConfig.extractionRuleList"
     [mode]="form.paginationConfig.extractionRuleMode" />
+  <section class="my-3" aria-labelledby="extraction-test-label">
+    <h2 id="extraction-test-label" class="fs-5">
+      {{ (useJsonPath() ? 'spider.testJson' : 'spider.testHtml') | translate }}
+    </h2>
+    @if (useJsonPath()) {
+      <app-signal-code-editor
+        style="height: 300px"
+        [formField]="testForm.json"
+        language="json"
+        [indentWithTab]="true" />
+    } @else {
+      <app-signal-code-editor
+        style="height: 300px"
+        [formField]="testForm.html"
+        language="html"
+        [indentWithTab]="true" />
+    }
+    <div class="d-flex gap-2 my-2">
+      @if (useJsonPath()) {
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          [disabled]="testForm().disabled()"
+          (click)="onFormatJson()">
+          {{ 'g.format' | translate }}
+        </button>
+      }
+      <button
+        type="button"
+        class="btn btn-primary"
+        [disabled]="form().disabled()"
+        [attr.aria-busy]="testing()"
+        (click)="onTestParse()">
+        {{ 'spider.test' | translate }}
+      </button>
+    </div>
+    <h3 class="fs-5">{{ 'spider.testResult' | translate }}</h3>
+    <app-signal-code-editor
+      style="height: 300px"
+      [formField]="testForm.resultJson"
+      language="json"
+      [indentWithTab]="true" />
+  </section>
   <button
     type="button"
-    class="btn btn-success"
+    class="btn btn-success mb-3"
     [disabled]="form().disabled()"
     (click)="update()">
     {{ (isEditMode ? 'g.update' : 'g.save') | translate }}

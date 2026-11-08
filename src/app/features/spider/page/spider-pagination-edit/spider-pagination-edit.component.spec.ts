@@ -3,6 +3,9 @@ import { By } from '@angular/platform-browser';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 import { provideHttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
+import { Component, input, model } from '@angular/core';
+import { FormValueControl } from '@angular/forms/signals';
+import { SignalCodeEditorComponent } from '../../../../core/components/signal-code-editor/signal-code-editor.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
@@ -14,12 +17,29 @@ import {
   SpiderPagination,
   EndTimeType,
   ExtractionRuleMode,
+  SpiderItem,
+  UrlType,
 } from '../../model';
-import { SpiderPaginationService } from '../../services';
+import { SpiderPaginationService, SpiderService } from '../../services';
 import { SpiderPaginationEditComponent } from './spider-pagination-edit.component';
+
+// 保留表單綁定，隔離第三方編輯器對瀏覽器排版 API 的依賴。
+@Component({ selector: 'app-signal-code-editor', template: '' })
+class TestCodeEditor implements FormValueControl<string> {
+  readonly value = model('');
+  readonly disabled = input(false);
+  readonly readonly = input(false);
+  readonly language = input('');
+  readonly indentWithTab = input(false);
+}
 
 async function setup() {
   const pending = new Subject<void>();
+  const previewPending = new Subject<unknown>();
+  const spiderService = {
+    previewExtraction: vi.fn((_request: SpiderItem) => previewPending),
+  };
+  const snackbar = { openI18N: vi.fn() };
   const service = {
     getById: vi.fn(),
     isInUse: vi.fn(() => of(false)),
@@ -36,10 +56,16 @@ async function setup() {
       },
       { provide: Router, useValue: router },
       { provide: SpiderPaginationService, useValue: service },
+      { provide: SpiderService, useValue: spiderService },
       { provide: MatDialog, useValue: { open: vi.fn() } },
-      { provide: SnackbarService, useValue: { openI18N: vi.fn() } },
+      { provide: SnackbarService, useValue: snackbar },
     ],
-  }).compileComponents();
+  })
+    .overrideComponent(SpiderPaginationEditComponent, {
+      remove: { imports: [SignalCodeEditorComponent] },
+      add: { imports: [TestCodeEditor] },
+    })
+    .compileComponents();
   const fixture = TestBed.createComponent(SpiderPaginationEditComponent);
   await fixture.whenStable();
   const component = fixture.componentInstance;
@@ -53,10 +79,139 @@ async function setup() {
       dataIdKey: 'id',
     },
   }));
-  return { fixture, component, service, router, pending };
+  return {
+    fixture,
+    component,
+    service,
+    router,
+    pending,
+    spiderService,
+    previewPending,
+    snackbar,
+  };
 }
 
 describe('SpiderPaginationEditComponent', () => {
+  it('切換擷取模式時切換 code 區並保留各自輸入，結果區唯讀', async () => {
+    const { component: c, fixture } = await setup();
+    const editors = () =>
+      fixture.debugElement
+        .queryAll(By.directive(TestCodeEditor))
+        .map(element => element.componentInstance as TestCodeEditor);
+    expect(editors()[0].language()).toBe('html');
+    editors()[0].value.set('<p>sample</p>');
+    await fixture.whenStable();
+    expect(c.testModel().html).toBe('<p>sample</p>');
+    c.form.paginationConfig
+      .extractionRuleMode()
+      .value.set(ExtractionRuleMode.JSON_PATH);
+    await fixture.whenStable();
+    expect(editors()[0].language()).toBe('json');
+    editors()[0].value.set('{"id":1}');
+    await fixture.whenStable();
+    c.onFormatJson();
+    expect(c.testModel().json).toBe('{\n  "id": 1\n}');
+    c.form.paginationConfig
+      .extractionRuleMode()
+      .value.set(ExtractionRuleMode.SELECT);
+    await fixture.whenStable();
+    expect(editors()[0].value()).toBe('<p>sample</p>');
+    expect(editors()[1].readonly()).toBe(true);
+  });
+
+  it.each([ExtractionRuleMode.SELECT, ExtractionRuleMode.JSON_PATH])(
+    '以 %s 模式及未儲存規則預覽，阻止重複送出並顯示結果',
+    async mode => {
+      const {
+        component: c,
+        fixture,
+        spiderService,
+        previewPending,
+        service,
+      } = await setup();
+      fixture.debugElement
+        .queryAll(By.directive(GenericTableComponent))[1]
+        .componentInstance.onAdd();
+      const config = c.form.paginationConfig;
+      const rule = config.extractionRuleList[0];
+      rule.key().value.set('id');
+      rule.selector().value.set('p');
+      rule.jsonPath().value.set('$.id');
+      config.extractionRuleMode().value.set(mode);
+      c.testForm.html().value.set('<p>sample</p>');
+      c.testForm.json().value.set('{"id":"sample"}');
+      // 預覽擷取不需完成其他儲存用的必填欄位。
+      c.form.paginationConfig.groupIdTemplate().value.set('');
+      await fixture.whenStable();
+      (
+        fixture.nativeElement.querySelector(
+          'button[aria-busy]'
+        ) as HTMLButtonElement
+      ).click();
+      c.onTestParse();
+      c.update();
+      expect(spiderService.previewExtraction).toHaveBeenCalledTimes(1);
+      expect(service.update).not.toHaveBeenCalled();
+      expect(spiderService.previewExtraction.mock.calls[0][0]).toMatchObject({
+        spiderItemId: 'anidb',
+        itemSetting: {
+          mode,
+          urlType: UrlType.BY_PARAMS,
+          extractionRuleList: [{ key: 'id', selector: 'p', jsonPath: '$.id' }],
+          testData: {
+            html: '<p>sample</p>',
+            json: '{"id":"sample"}',
+            resultJson: '',
+          },
+        },
+      });
+      expect(c.testing()).toBe(true);
+      expect(c.testForm.html().disabled()).toBe(true);
+      previewPending.next({ id: 'sample' });
+      expect(c.testing()).toBe(false);
+      expect(c.testModel().resultJson).toBe('{\n  "id": "sample"\n}');
+    }
+  );
+
+  it('無效規則或 JSON 不送出預覽，JSON 格式化失敗保留原始資料', async () => {
+    const { component: c, fixture, spiderService, snackbar } = await setup();
+    fixture.debugElement
+      .queryAll(By.directive(GenericTableComponent))[1]
+      .componentInstance.onAdd();
+    c.onTestParse();
+    expect(snackbar.openI18N).toHaveBeenCalledWith('msg.formInvalid');
+    expect(c.form.paginationConfig.extractionRuleList().touched()).toBe(true);
+    const config = c.form.paginationConfig;
+    config.extractionRuleMode().value.set(ExtractionRuleMode.JSON_PATH);
+    config.extractionRuleList[0].key().value.set('id');
+    config.extractionRuleList[0].jsonPath().value.set('$.id');
+    c.testForm.json().value.set('invalid');
+    c.onFormatJson();
+    c.onTestParse();
+    expect(c.testModel().json).toBe('invalid');
+    expect(snackbar.openI18N).toHaveBeenCalledWith('msg.invalidJson');
+    expect(spiderService.previewExtraction).not.toHaveBeenCalled();
+  });
+
+  it('預覽失敗清除舊結果並恢復操作，測試資料不寫入儲存契約', async () => {
+    const { component: c, previewPending, service, snackbar } = await setup();
+    c.testForm.html().value.set('<p>sample</p>');
+    c.testForm.resultJson().value.set('old');
+    c.onTestParse();
+    expect(c.testModel().resultJson).toBe('');
+    previewPending.error(new Error('Preview failed'));
+    expect(c.testing()).toBe(false);
+    expect(c.testForm.html().disabled()).toBe(false);
+    expect(snackbar.openI18N).toHaveBeenCalledWith('msg.extractFailed', {
+      message: 'Preview failed',
+    });
+    c.update();
+    expect(service.update.mock.calls[0][0]).not.toHaveProperty('testData');
+    expect(service.update.mock.calls[0][0].paginationConfig).not.toHaveProperty(
+      'testData'
+    );
+  });
+
   it('預設保留歷史資料，取消勾選後儲存 false', async () => {
     const { component: c, fixture, service } = await setup();
     const checkbox = fixture.nativeElement.querySelector(
