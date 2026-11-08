@@ -493,6 +493,7 @@ it('Spider resource 載入資料後可使用真正編輯器，儲存鎖能切換
       description: '',
       primeKeySize: 1,
       isUrlBased: false,
+      requestIntervalMs: 0,
       testData: {
         primeKeyList: ['loaded'],
         url: '',

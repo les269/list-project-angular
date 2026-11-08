@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import {
   SpiderItem,
   SpiderItemSetting,
+  SpiderPaginationData,
   SpiderReq,
   SpiderTestReq,
 } from '../model';
@@ -12,6 +13,17 @@ import {
 export class SpiderService {
   readonly prefix = '/spider';
   readonly http = inject(HttpClient);
+
+  // 回傳本次成功寫入的資料；force 可略過更新期限與間隔限制。
+  executePagination(
+    spiderPaginationId: string,
+    force = false
+  ): Observable<SpiderPaginationData[]> {
+    return this.http.post<SpiderPaginationData[]>(
+      `${this.prefix}/execute-pagination?spiderPaginationId=${encodeURIComponent(spiderPaginationId)}&force=${force}`,
+      null
+    );
+  }
 
   executeByUrl(req: SpiderReq): Observable<any> {
     return this.http.post<string>(`${this.prefix}/use-url`, req);
