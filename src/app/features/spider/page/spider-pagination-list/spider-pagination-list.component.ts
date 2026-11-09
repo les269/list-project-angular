@@ -19,7 +19,9 @@ import { TranslateModule } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
 import { map } from 'rxjs';
+import { CopySpiderPaginationComponent } from '../../components/copy-spider-pagination/copy-spider-pagination.component';
 
 @Component({
   selector: 'app-spider-pagination-list',
@@ -46,6 +48,7 @@ export class SpiderPaginationListComponent {
   readonly spiderPaginationService = inject(SpiderPaginationService);
   readonly snackbarService = inject(SnackbarService);
   readonly messageBoxService = inject(MessageBoxService);
+  readonly matDialog = inject(MatDialog);
 
   readonly sort = viewChild(MatSort);
 
@@ -101,7 +104,19 @@ export class SpiderPaginationListComponent {
   }
 
   onRedirectData(e: SpiderPagination) {}
-  onCopy(e: SpiderPagination) {}
+  onCopy(e: SpiderPagination) {
+    this.matDialog
+      .open(CopySpiderPaginationComponent, {
+        data: { source: e },
+      })
+      .afterClosed()
+      .subscribe(result => {
+        if (result === 'ok') {
+          this.snackbarService.openI18N('msg.copySuccess');
+          this.list.reload();
+        }
+      });
+  }
 
   onSortChange(event: Sort) {
     const sort = event.active;

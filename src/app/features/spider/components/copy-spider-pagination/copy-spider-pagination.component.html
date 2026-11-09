@@ -1,0 +1,16 @@
+<h2 mat-dialog-title>{{ 'title.copyScrapy' | translate }}</h2>
+<mat-dialog-content>
+  <app-signal-field
+    class="my-1"
+    [field]="form.spiderPaginationId"
+    label="spiderPagination.spiderPaginationId"
+    [trim]="true" />
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close [disabled]="saving()">
+    {{ 'g.no' | translate }}
+  </button>
+  <button mat-button [disabled]="saving()" (click)="ok()">
+    {{ 'g.ok' | translate }}
+  </button>
+</mat-dialog-actions>
