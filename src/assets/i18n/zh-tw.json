@@ -126,7 +126,7 @@
     "random": "隨機",
     "sort": "排序",
     "prePage": "上一頁",
-    "nextPage": "上一頁",
+    "nextPage": "下一頁",
     "everyPage": "每頁顯示數量",
     "firstPage": "第一頁",
     "lastPage": "最後一頁",
@@ -298,6 +298,14 @@
     "ignoreCase": "忽略大小寫"
   },
   "spiderPagination": {
+    "dataList": "分頁爬蟲資料",
+    "groupId": "群組Id",
+    "dataId": "資料Id",
+    "allGroups": "全部 群組Id",
+    "forceRefresh": "強制刷新",
+    "refreshing": "刷新中…",
+    "lastSuccessTime": "最後成功時間",
+    "dataJson": "資料 JSON",
     "createSpiderPagination": "新增爬蟲處理分頁",
     "spiderPaginationId": "爬蟲分頁ID",
     "groupIdTemplate": "分組識別碼範本",

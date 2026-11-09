@@ -58,7 +58,11 @@
             <button mat-icon-button (click)="onEdit(element)">
               <mat-icon>edit</mat-icon>
             </button>
-            <button mat-icon-button (click)="onRedirectData(element)">
+            <button
+              mat-icon-button
+              [attr.aria-label]="'spiderPagination.dataList' | translate"
+              [title]="'spiderPagination.dataList' | translate"
+              (click)="onRedirectData(element)">
               <mat-icon>reorder</mat-icon>
             </button>
             <button mat-icon-button (click)="onCopy(element)">

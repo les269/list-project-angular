@@ -1,0 +1,116 @@
+<h2 mat-dialog-title>
+  {{ 'spiderPagination.dataList' | translate }}：{{ data.spiderPaginationId }}
+</h2>
+<mat-dialog-content>
+  <div class="d-flex flex-wrap align-items-end gap-3 mb-3">
+    <button
+      type="button"
+      mat-flat-button
+      [disabled]="refreshing() || records.isLoading()"
+      (click)="onForceRefresh()">
+      {{
+        (refreshing()
+          ? 'spiderPagination.refreshing'
+          : 'spiderPagination.forceRefresh'
+        ) | translate
+      }}
+    </button>
+    <div>
+      <select
+        id="spider-pagination-group-filter"
+        class="form-select"
+        [attr.aria-label]="'spiderPagination.groupId' | translate"
+        [formField]="filterForm.groupId">
+        <option value="">{{ 'spiderPagination.allGroups' | translate }}</option>
+        @for (groupId of groupIds(); track groupId) {
+          <option [value]="groupId">{{ groupId }}</option>
+        }
+      </select>
+    </div>
+  </div>
+  @if (records.isLoading()) {
+    <p role="status">{{ 'spiderPagination.loading' | translate }}</p>
+  } @else if (records.error()) {
+    <div role="alert">
+      <p>{{ 'spiderPagination.loadFailed' | translate }}</p>
+      <button type="button" mat-button (click)="records.reload()">
+        {{ 'spiderPagination.reload' | translate }}
+      </button>
+    </div>
+  } @else {
+    <div class="table-responsive">
+      <table
+        mat-table
+        [dataSource]="pagedRows()"
+        class="w-100"
+        style="min-width: 760px">
+        <ng-container matColumnDef="groupId">
+          <th mat-header-cell *matHeaderCellDef>
+            {{ 'spiderPagination.groupId' | translate }}
+          </th>
+          <td mat-cell *matCellDef="let row" class="text-break">
+            {{ row.groupId }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="dataId">
+          <th mat-header-cell *matHeaderCellDef>
+            {{ 'spiderPagination.dataId' | translate }}
+          </th>
+          <td mat-cell *matCellDef="let row">
+            <button
+              type="button"
+              mat-button
+              class="text-start text-break"
+              (click)="onOpenData(row)">
+              {{ row.dataId }}
+            </button>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="createdTime">
+          <th mat-header-cell *matHeaderCellDef>
+            {{ 'g.createdTime' | translate }}
+          </th>
+          <td mat-cell *matCellDef="let row">
+            {{ (row.createdTime | date: 'yyyy-MM-dd HH:mm:ss') ?? '—' }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="updatedTime">
+          <th mat-header-cell *matHeaderCellDef>
+            {{ 'g.updatedTime' | translate }}
+          </th>
+          <td mat-cell *matCellDef="let row">
+            {{ (row.updatedTime | date: 'yyyy-MM-dd HH:mm:ss') ?? '—' }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="lastSuccessTime">
+          <th mat-header-cell *matHeaderCellDef>
+            {{ 'spiderPagination.lastSuccessTime' | translate }}
+          </th>
+          <td mat-cell *matCellDef="let row">
+            {{ (row.lastSuccessTime | date: 'yyyy-MM-dd HH:mm:ss') ?? '—' }}
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        <tr *matNoDataRow>
+          <td [attr.colspan]="displayedColumns.length" class="text-center p-3">
+            {{ 'g.noData' | translate }}
+          </td>
+        </tr>
+      </table>
+    </div>
+    <mat-paginator
+      [length]="filteredRows().length"
+      [pageIndex]="pageIndex()"
+      [pageSize]="pageSize()"
+      [pageSizeOptions]="[25, 50, 100]"
+      [showFirstLastButtons]="true"
+      [attr.aria-label]="'spiderPagination.dataList' | translate"
+      (page)="onPageChange($event)" />
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button type="button" mat-button mat-dialog-close>
+    {{ 'g.close' | translate }}
+  </button>
+</mat-dialog-actions>

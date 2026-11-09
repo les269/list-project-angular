@@ -1,0 +1,21 @@
+<h2 mat-dialog-title>
+  {{ 'spiderPagination.dataJson' | translate }}：{{ record.dataId }}
+</h2>
+<mat-dialog-content>
+  <dl>
+    <dt>{{ 'spiderPagination.spiderPaginationId' | translate }}</dt>
+    <dd class="text-break">{{ record.spiderPaginationId }}</dd>
+    <dt>{{ 'spiderPagination.groupId' | translate }}</dt>
+    <dd class="text-break">{{ record.groupId }}</dd>
+  </dl>
+  <pre
+    class="border rounded p-3 mb-0"
+    style="white-space: pre-wrap; overflow-wrap: anywhere"
+    >{{ record.data | json }}</pre
+  >
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button type="button" mat-button mat-dialog-close>
+    {{ 'g.close' | translate }}
+  </button>
+</mat-dialog-actions>

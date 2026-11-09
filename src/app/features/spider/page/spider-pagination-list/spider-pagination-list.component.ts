@@ -22,6 +22,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { map } from 'rxjs';
 import { CopySpiderPaginationComponent } from '../../components/copy-spider-pagination/copy-spider-pagination.component';
+import { SpiderPaginationDataComponent } from '../../components/spider-pagination-data/spider-pagination-data.component';
 
 @Component({
   selector: 'app-spider-pagination-list',
@@ -103,7 +104,13 @@ export class SpiderPaginationListComponent {
       });
   }
 
-  onRedirectData(e: SpiderPagination) {}
+  onRedirectData(e: SpiderPagination) {
+    this.matDialog.open(SpiderPaginationDataComponent, {
+      data: { spiderPaginationId: e.spiderPaginationId },
+      width: '1100px',
+      maxWidth: '95vw',
+    });
+  }
   onCopy(e: SpiderPagination) {
     this.matDialog
       .open(CopySpiderPaginationComponent, {
