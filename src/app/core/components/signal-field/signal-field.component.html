@@ -16,9 +16,9 @@
     @case (fieldType.SELECT) {
       <select
         class="form-select"
+        (change)="changeEvent.emit($event)"
         [id]="controlId"
         [formField]="textField()"
-        [attr.aria-label]="label() | translate"
         [class.is-invalid]="invalid()"
         [attr.aria-invalid]="invalid()">
         @if (emptyOption()) {
@@ -30,17 +30,30 @@
       </select>
     }
     @case (fieldType.CHECKBOX) {
-      <label class="input-group-text gap-2" [for]="controlId">
+      @if (label()) {
+        <label class="input-group-text gap-2" [for]="controlId">
+          <input
+            class="form-check-input mt-0"
+            type="checkbox"
+            (change)="changeEvent.emit($event)"
+            [matTooltip]="hint() | translate"
+            [id]="controlId"
+            [formField]="checkboxField()"
+            [class.is-invalid]="invalid()"
+            [attr.aria-invalid]="invalid()" />
+          {{ label() | translate }}
+        </label>
+      } @else {
         <input
           class="form-check-input mt-0"
           type="checkbox"
+          (change)="changeEvent.emit($event)"
           [matTooltip]="hint() | translate"
           [id]="controlId"
           [formField]="checkboxField()"
           [class.is-invalid]="invalid()"
           [attr.aria-invalid]="invalid()" />
-        {{ label() | translate }}
-      </label>
+      }
     }
     @case (fieldType.CHIPS) {
       <app-chip-input
@@ -65,10 +78,12 @@
         type="text"
         [placeholder]="hint() | translate"
         [matTooltip]="hint() | translate"
+        (input)="inputEvent.emit($event)"
+        (change)="changeEvent.emit($event)"
         (blur)="trimText()"
         [id]="controlId"
         [formField]="textField()"
-        [attr.aria-label]="label() | translate"
+        [attr.aria-describedby]="describedBy() || null"
         [class.is-invalid]="invalid()"
         [attr.aria-invalid]="invalid()" />
     }
@@ -76,9 +91,10 @@
       <input
         class="form-control"
         type="number"
+        (input)="inputEvent.emit($event)"
+        (change)="changeEvent.emit($event)"
         [id]="controlId"
         [formField]="numberField()"
-        [attr.aria-label]="label() | translate"
         [class.is-invalid]="invalid()"
         [attr.aria-invalid]="invalid()" />
     }

@@ -1,4 +1,3 @@
-import { Theme } from '@acrodata/code-editor';
 import {
   ThemeDatasetItem,
   ThemeHeader,
@@ -18,14 +17,3 @@ export interface LayoutState {
   themeLabelItemMapList: ThemeItemMap[];
   themeDatasetItemMapList: ThemeItemMap[];
 }
-
-export const myRoutes: { path: string; title: string }[] = [
-  {
-    path: '',
-    title: 'title.home',
-  },
-  {
-    path: 'api-config-list',
-    title: 'title.apiConfigList',
-  },
-];

@@ -1,3 +1,4 @@
+import { TranslateModule } from '@ngx-translate/core';
 import {
   Component,
   computed,
@@ -22,7 +23,6 @@ import {
 import { ThemeService } from '../../../theme/services/theme.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ThemeNoteComponent } from '../theme-note/theme-note.component';
-import { ApiConfigService } from '../../../api-config/service/api-config.service';
 import { CopyDirective } from '../../../../shared/util/util.directive';
 import { FileService } from '../../../../core/services/file.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -31,14 +31,13 @@ import { ButtonInputUrlComponent } from '../button-input-url/button-input-url.co
 @Component({
   selector: 'app-custom-buttons',
 
-  imports: [MatIconModule, CopyDirective],
+  imports: [MatIconModule, CopyDirective, TranslateModule],
   templateUrl: './custom-buttons.component.html',
   styleUrl: './custom-buttons.component.scss',
 })
 export class CustomButtonsComponent {
   private readonly themeService = inject(ThemeService);
   private readonly matDialog = inject(MatDialog);
-  private readonly apiConfigService = inject(ApiConfigService);
   private readonly fileService = inject(FileService);
   private readonly snackbarService = inject(SnackbarService);
 
@@ -169,12 +168,6 @@ export class CustomButtonsComponent {
           this.changeCustomValue(custom, result);
         }
       });
-  }
-
-  callApi(custom: ThemeCustom) {
-    if (custom.apiConfig) {
-      this.apiConfigService.callSingleApi(custom.apiConfig, this.data());
-    }
   }
 
   deleteFile(custom: ThemeCustom) {

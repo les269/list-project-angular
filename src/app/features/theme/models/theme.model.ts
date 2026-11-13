@@ -1,4 +1,3 @@
-import { ApiConfig } from '../../api-config/model';
 import { QuickRefreshType } from '../../dataset/model';
 
 export interface ThemeHeader {
@@ -87,7 +86,7 @@ export interface ThemeCustom {
   byKey: string; //對應客製化數值的key
   label: string; //顯示的按鈕名稱
   seq: number; //顯示順序
-  apiName: string;
+  apiId: string;
   //用於windows.open
   openUrl: string;
   //複製對應data的資料
@@ -98,7 +97,6 @@ export interface ThemeCustom {
   //按鈕false跟true的圖案
   buttonIconTrue: string;
   buttonIconFalse: string;
-  apiConfig?: ApiConfig;
   moveTo: string;
   filePathForMoveTo: string;
   deleteFile: string;
@@ -134,8 +132,7 @@ export interface ThemeTopCustom {
   seq: number; //顯示順序
   openUrl: string;
   openWindowsTarget: OpenWindowTargetType;
-  apiName: string;
-  apiConfig?: ApiConfig;
+  apiId: string;
 }
 
 export enum ThemeTopCustomType {

@@ -27,6 +27,7 @@
 
 - 先觀察相關功能的實作與測試，沿用所在模組的模式。專案含有不同階段的寫法，不因單次任務進行全域遷移。
 - 保持修改聚焦，不順手重構無關功能、變更 API 契約或升級依賴。
+- 新增或修改新增／編輯模式相關程式碼時，統一使用 `src/app/core/model/global.model.ts` 的 `EditMode.CREATE` 與 `EditMode.EDIT`，不另建 `'add' | 'edit'` 等字串聯集或重複 enum；僅調整任務相關範圍，不進行無關的全域遷移。
 - 格式遵循 `.prettierrc.json`，維持 TypeScript strict 與 Angular strictTemplates 設定。
 - 後端契約、重構目標與舊資料相容性若無明確依據，不自行杜撰；整合問題再取得相關契約、範例資料或後端位置。
 - 修改相關功能時，若發現 spec 與實作不符，明確指出差異；需要更新文件時以核對後的內容為準，不全面重寫或複製程式碼型別清單。
@@ -35,9 +36,12 @@
 
 - 新增或修改相關程式碼時，優先使用目前專案 Angular 版本支援的現代 API；此規則優先於沿用模組中的舊寫法，不為此進行無關的全域遷移。
 - Dependency Injection 優先使用欄位 `inject()`，不新增 constructor parameter injection；constructor 可保留必要的初始化邏輯。
+- component 內的成員盡量依 `inject()` → 一般物件（obj）與 enum 參照 → signal 狀態與衍生值 → method 的順序排列；若有欄位初始化相依，優先確保初始化順序正確。
 - 查詢優先使用 Signal API：`viewChild()`、`viewChildren()`、`contentChild()`、`contentChildren()`；只有確定必定存在的查詢才使用 `.required()`。
 - 元件介面優先使用 `input()`、`output()`；需要雙向綁定時使用 `model()`。
-- 表單優先使用 Signal Forms，資料維持單一來源；在初始化的 injection context 建立 `form()`，不要在 template 呼叫的方法或其他 reactive context 中動態建立 form 或 effect。
+- 依需求選擇輸入資料的管理方式：需要欄位驗證、表單狀態（如 `dirty`、`touched`）或多欄位協作時，優先使用 Signal Forms；單純搜尋、篩選或單一值輸入，若只需同步數值，使用 `signal()` 與 template 綁定即可，不為使用 Signal Forms 額外建立 `form()`。
+- 使用 Signal Forms 時，資料維持單一來源；在初始化的 injection context 建立 `form()`，不要在 template 呼叫的方法或其他 reactive context 中動態建立 form 或 effect。
+- 使用 Signal Forms 的欄位，若 `app-signal-field` 已支援所需控制項與互動，優先使用該共用元件，統一 label、驗證訊息與樣式，避免重複撰寫。程式碼編輯器等特殊控制項使用對應元件；需要自訂事件或版面時先確認共用元件能否保留既有行為，再決定是否使用原生控制項，不為此進行無關的全域替換。
 - 狀態與衍生值優先使用 `signal()`、`computed()`；確有相依且可編輯的狀態才使用 `linkedSignal()`。`effect()` 用於必要的副作用，不用來複製可直接衍生的狀態。
 - template 優先使用 `@if`、`@for`、`@switch`。非同步流程依需求使用 RxJS、`toSignal()` 或 resource，不為採用新 API 強行改寫。
 - 遇到相容性或生命週期限制時，採用可驗證正確的做法，並說明原因，不只因 API 較新就使用。

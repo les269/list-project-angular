@@ -1,4 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import { SignalFieldOption } from '../../core/model/signal-field.model';
 
 @Pipe({
   name: 'fileSize',
@@ -38,5 +39,25 @@ export class ReplaceValuePipe implements PipeTransform {
 export class EnumKeysPipe implements PipeTransform {
   transform(value: object): string[] {
     return Object.keys(value);
+  }
+}
+
+@Pipe({
+  name: 'enumOptions',
+})
+export class EnumOptionsPipe implements PipeTransform {
+  transform(
+    values: Record<string, string>,
+    prefix = '',
+    uppercase = false
+  ): SignalFieldOption[] {
+    return Object.values(values).map(value => ({
+      value,
+      label: prefix
+        ? `${prefix}.${value}`
+        : uppercase
+          ? value.toUpperCase()
+          : value,
+    }));
   }
 }

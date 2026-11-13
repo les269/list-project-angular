@@ -27,7 +27,10 @@
         </div>
       }
       @case ('apiConfig') {
-        <button class="btn btn-outline-primary" (click)="callApi(custom)">
+        <button
+          class="btn btn-outline-primary"
+          [disabled]="true"
+          [title]="'apiRequestConfig.executionUnavailable' | translate">
           <label class="px-2">{{ custom.label }}</label>
         </button>
       }

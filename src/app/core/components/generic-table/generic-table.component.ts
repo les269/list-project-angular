@@ -8,7 +8,14 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, input, TemplateRef } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  output,
+  TemplateRef,
+} from '@angular/core';
 import { FormField, ValidationError } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -68,6 +75,8 @@ export class GenericTableComponent {
   readonly customColTmpls =
     input<Record<string, TemplateRef<GenericTableCellContext>>>();
   readonly expandedTmpl = input<TemplateRef<GenericTableRowContext>>();
+  /** 新增、刪除或排序完成後，通知呼叫端同步相關資料。 */
+  readonly rowsChange = output<void>();
   // signals
   readonly rows = computed(() => Array.from(this.fields()));
   readonly selectOptions = computed(
@@ -102,6 +111,7 @@ export class GenericTableComponent {
       )
     );
     state.markAsDirty();
+    this.rowsChange.emit();
   }
 
   onAdd() {

@@ -1,6 +1,6 @@
 import { inject, Service } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ApiConfig } from '../../features/api-config/model';
+import { ApiRequestConfig } from '../../features/api-request-config/model';
 import { SelectTableDialog } from '../components/select-table/select-table.dialog';
 import {
   CookieListTO,
@@ -27,17 +27,20 @@ export class SelectTableService {
   matDialog = inject(MatDialog);
   translateService = inject(TranslateService);
 
-  selectSingleApi(dataSource: ApiConfig[]) {
-    const data: BaseSelectTableData<ApiConfig> = {
-      displayedColumns: ['apiName', 'apiLabel', 'httpMethod', 'endpointUrl'],
+  selectSingleApi(dataSource: ApiRequestConfig[]) {
+    const data: BaseSelectTableData<ApiRequestConfig> = {
+      displayedColumns: ['apiId', 'description', 'date'],
       labels: [
-        'apiConfig.apiName',
-        'apiConfig.apiLabel',
-        'apiConfig.httpMethod',
-        'apiConfig.endpointUrl',
+        'apiRequestConfig.apiId',
+        'g.description',
+        'apiRequestConfig.date',
       ],
       dataSource,
       selectType: 'single',
+      enableFilter: true,
+      columnFormats: {
+        date: value => (value == null ? '' : this.dateTransform(value)),
+      },
     };
     return this.openSelectDialog(data);
   }

@@ -43,7 +43,7 @@ export enum GroupDatasetFieldType {
 }
 export interface GroupDatasetApi {
   seq: number;
-  apiName: string;
+  apiId: string;
   label: string;
 }
 

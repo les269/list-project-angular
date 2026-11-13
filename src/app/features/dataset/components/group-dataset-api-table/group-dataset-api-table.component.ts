@@ -1,13 +1,6 @@
-import { createGroupDatasetApi } from '../../util/group-dataset-rows';
 import { Component, computed, inject, input } from '@angular/core';
-import { FieldTree } from '@angular/forms/signals';
-
 import { rxResource } from '@angular/core/rxjs-interop';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
+import { FieldTree } from '@angular/forms/signals';
 import { TranslateModule } from '@ngx-translate/core';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 import {
@@ -16,64 +9,46 @@ import {
   GenericTableColumn,
 } from '../../../../core/model/generic-table';
 import { SelectTableService } from '../../../../core/services/select-table.service';
-import { ApiConfig } from '../../../api-config/model';
-import { ApiConfigService } from '../../../api-config/service/api-config.service';
+import {
+  ApiRequestConfig,
+  getApiRequestLabel,
+} from '../../../api-request-config/model';
+import { ApiRequestConfigService } from '../../../api-request-config/service/api-request-config.service';
 import { GroupDatasetApi } from '../../model';
+import { createGroupDatasetApi } from '../../util/group-dataset-rows';
 
 @Component({
   selector: 'app-group-dataset-api-table',
-
-  imports: [
-    MatTableModule,
-    MatButtonModule,
-    TranslateModule,
-    MatIconModule,
-    MatCheckboxModule,
-    MatChipsModule,
-    GenericTableComponent,
-  ],
+  imports: [TranslateModule, GenericTableComponent],
   templateUrl: './group-dataset-api-table.component.html',
 })
 export class GroupDatasetApiTableComponent {
   readonly fields = input.required<FieldTree<GroupDatasetApi[]>>();
-  readonly displayedColumns = ['apiName', 'label'];
-  readonly item: GroupDatasetApi = {
-    seq: 0,
-    apiName: '',
-    label: '',
-  };
-  readonly apiConfigService = inject(ApiConfigService);
+  readonly displayedColumns = ['apiId', 'label'];
+  private readonly service = inject(ApiRequestConfigService);
+  private readonly selectTable = inject(SelectTableService);
   readonly apis = rxResource({
-    stream: () => this.apiConfigService.getAll(),
+    stream: () => this.service.getAll(),
     defaultValue: [],
   });
-  readonly selectTableService = inject(SelectTableService);
-  readonly apiNameColumn = computed(
+  readonly cols = computed(
     () =>
-      ({
-        key: 'apiName',
-        label: 'dataset.apiName',
-        columnType: GenericColumnType.chipSelect,
-        data: this.apis.value(),
-        dataValue: 'apiName',
-        dataLabel: item => item.apiName,
-        openDialog: () =>
-          this.selectTableService.selectSingleApi(this.apis.value()),
-      }) satisfies ChipSelectColumn<ApiConfig>
+      [
+        {
+          key: 'apiId',
+          label: 'dataset.apiId',
+          columnType: GenericColumnType.chipSelect,
+          data: this.apis.value(),
+          dataValue: 'apiId',
+          dataLabel: getApiRequestLabel,
+          openDialog: () => this.selectTable.selectSingleApi(this.apis.value()),
+        } satisfies ChipSelectColumn<ApiRequestConfig>,
+        {
+          key: 'label',
+          label: 'dataset.apiLabel',
+          columnType: GenericColumnType.input,
+        },
+      ] satisfies GenericTableColumn[]
   );
-  readonly cols: GenericTableColumn[] = [
-    this.apiNameColumn(),
-    {
-      key: 'label',
-      label: 'dataset.apiLabel',
-      columnType: GenericColumnType.input,
-    },
-  ];
   readonly createRow = createGroupDatasetApi;
-
-  selectApi(e: GroupDatasetApi) {
-    this.selectTableService.selectSingleApi(this.apis.value()).subscribe(x => {
-      e.apiName = x.apiName;
-    });
-  }
 }

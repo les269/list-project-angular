@@ -41,8 +41,8 @@ import {
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import { isDuplicate, toKeyValueArray } from '../../../../shared/util/helper';
 import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
-import { ApiConfig } from '../../../api-config/model';
-import { ApiConfigService } from '../../../api-config/service/api-config.service';
+import { getApiRequestLabel } from '../../../api-request-config/model';
+import { ApiRequestConfigService } from '../../../api-request-config/service/api-request-config.service';
 import {
   OpenWindowTargetType,
   ThemeCustomItem,
@@ -75,7 +75,7 @@ import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage
 export class ThemeCustomTableComponent {
   // injects
   readonly translateService = inject(TranslateService);
-  readonly apiConfigService = inject(ApiConfigService);
+  readonly apiRequestConfigService = inject(ApiRequestConfigService);
   readonly selectTableService = inject(SelectTableService);
   // inputs
   readonly headerId = input<string>();
@@ -100,7 +100,7 @@ export class ThemeCustomTableComponent {
       required(row.openUrl, {
         when: ({ valueOf }) => valueOf(row.type) === ThemeCustomType.openUrl,
       });
-      required(row.apiName, {
+      required(row.apiId, {
         when: ({ valueOf }) => valueOf(row.type) === ThemeCustomType.apiConfig,
       });
       required(row.copyValue, {
@@ -149,7 +149,7 @@ export class ThemeCustomTableComponent {
   //signals
   readonly defaultBinding = computed(() => (this.customItem() ? true : false));
   readonly apis = rxResource({
-    stream: () => this.apiConfigService.getAll(),
+    stream: () => this.apiRequestConfigService.getAll(),
     defaultValue: [],
   });
   private readonly validationMessages = toSignal(
@@ -294,7 +294,7 @@ export class ThemeCustomTableComponent {
   readonly selectApi = () =>
     this.selectTableService.selectSingleApi(this.apis.value());
 
-  readonly getApiLabelName = (item: ApiConfig) => item.apiName;
+  readonly getApiLabelName = getApiRequestLabel;
 
   loadItem(data: ThemeItem) {
     if (data.type !== ThemeItemType.CUSTOM) return;

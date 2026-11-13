@@ -21,7 +21,7 @@ export const createGroupDatasetField = (
 export const createGroupDatasetApi = (data: Partial<GroupDatasetApi> = {}) => {
   return {
     seq: 0,
-    apiName: '',
+    apiId: '',
     label: '',
     ...data,
   };

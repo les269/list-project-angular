@@ -1,3 +1,4 @@
+import { TranslateModule } from '@ngx-translate/core';
 import { Component, inject, input } from '@angular/core';
 
 import {
@@ -9,7 +10,6 @@ import {
 import { MatIconModule } from '@angular/material/icon';
 import { isNotBlank, isNotNull } from '../../../../shared/util/helper';
 import { MatDialog } from '@angular/material/dialog';
-import { ApiConfigService } from '../../../api-config/service/api-config.service';
 import { ThemeService } from '../../../theme/services/theme.service';
 import { ThemeNoteComponent } from '../theme-note/theme-note.component';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -17,7 +17,7 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
 @Component({
   selector: 'app-top-custom-buttons',
 
-  imports: [MatIconModule],
+  imports: [MatIconModule, TranslateModule],
   templateUrl: './top-custom-buttons.component.html',
   styleUrl: './top-custom-buttons.component.scss',
 })
@@ -29,17 +29,10 @@ export class TopCustomButtonsComponent {
 
   themeService = inject(ThemeService);
   matDialog = inject(MatDialog);
-  apiConfigService = inject(ApiConfigService);
   snackbarService = inject(SnackbarService);
 
   openNewPage(text: string) {
     window.open(text, '_blank');
-  }
-
-  callApi(custom: ThemeTopCustom) {
-    if (custom.apiConfig) {
-      this.apiConfigService.callSingleApi(custom.apiConfig, null);
-    }
   }
 
   openNoteDialog(custom: ThemeTopCustom, type: 'read' | 'write') {

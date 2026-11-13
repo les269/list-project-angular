@@ -101,6 +101,12 @@ describe('GenericTableComponent with Signal Forms', () => {
   });
 
   it('keeps values, sequence, radio exclusivity and validation correct after add, move and delete', async () => {
+    const changes: number[][] = [];
+    host
+      .table()
+      .rowsChange.subscribe(() =>
+        changes.push(host.model().map(row => row.seq))
+      );
     host.table().onAdd();
     await fixture.whenStable();
     expect(host.fields().invalid()).toBe(true);
@@ -127,6 +133,21 @@ describe('GenericTableComponent with Signal Forms', () => {
     expect(fixture.nativeElement.querySelectorAll('input.note')).toHaveLength(
       2
     );
+    expect(changes).toEqual([
+      [1, 2, 3],
+      [1, 2, 3],
+      [1, 2],
+    ]);
+    host
+      .table()
+      .drop({ previousIndex: 0, currentIndex: 0 } as CdkDragDrop<any>);
+    host.locked.set(true);
+    host.table().onAdd();
+    host.table().onDelete(0);
+    host
+      .table()
+      .drop({ previousIndex: 0, currentIndex: 1 } as CdkDragDrop<any>);
+    expect(changes).toHaveLength(3);
   });
 
   it('父層重設資料時同步清除互動狀態，並依 schema 停用編輯', async () => {

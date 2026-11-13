@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
@@ -53,6 +53,9 @@ export class SignalFieldComponent<T> {
   );
   readonly label = input('');
   readonly hint = input('');
+  readonly describedBy = input('');
+  readonly inputEvent = output<Event>();
+  readonly changeEvent = output<Event>();
   readonly trim = input(false);
   readonly type = input<SignalFieldType>(SignalFieldType.TEXT);
   readonly fieldType = SignalFieldType;

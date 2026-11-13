@@ -105,7 +105,7 @@ export class GroupDatasetEditComponent {
       required(row.label);
     });
     applyEach(p.config.groupDatasetApiList, row => {
-      required(row.apiName);
+      required(row.apiId);
       required(row.label);
     });
     required(p.groupName);

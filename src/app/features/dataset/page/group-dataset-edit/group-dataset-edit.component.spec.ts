@@ -9,7 +9,7 @@ import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { SelectTableService } from '../../../../core/services/select-table.service';
-import { ApiConfigService } from '../../../api-config/service/api-config.service';
+import { ApiRequestConfigService } from '../../../api-request-config/service/api-request-config.service';
 import { ReplaceValueMapService } from '../../../replace-value-map/service/replace-value-map.service';
 import { ScrapyService } from '../../../spider/services/scrapy.service';
 import { GroupDatasetService } from '../../service/group-dataset.service';
@@ -44,7 +44,7 @@ it('完整載入隱藏清單，切換資料來源保留編輯，儲存包含所�
           visibleUrl: false,
         },
       ],
-      groupDatasetApiList: [{ seq: 1, apiName: 'api', label: 'API' }],
+      groupDatasetApiList: [{ seq: 1, apiId: 'api', label: 'API' }],
     },
   };
   const service = {
@@ -63,7 +63,7 @@ it('完整載入隱藏清單，切換資料來源保留編輯，儲存包含所�
       { provide: GroupDatasetService, useValue: service },
       { provide: SnackbarService, useValue: { openI18N: vi.fn() } },
       { provide: SelectTableService, useValue: {} },
-      { provide: ApiConfigService, useValue: { getAll: () => of([]) } },
+      { provide: ApiRequestConfigService, useValue: { getAll: () => of([]) } },
       { provide: ScrapyService, useValue: { getAllConfig: () => of([]) } },
       {
         provide: ReplaceValueMapService,

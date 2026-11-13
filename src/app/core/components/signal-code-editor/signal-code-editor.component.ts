@@ -1,10 +1,12 @@
 import { CodeEditor } from '@acrodata/code-editor';
 import {
   ChangeDetectionStrategy,
+  afterRenderEffect,
   Component,
   input,
   model,
   output,
+  viewChild,
 } from '@angular/core';
 import { FormValueControl } from '@angular/forms/signals';
 import { languages } from '@codemirror/language-data';
@@ -24,7 +26,6 @@ import { languages } from '@codemirror/language-data';
   `,
   template: `
     <code-editor
-      [value]="value()"
       [disabled]="disabled()"
       [readonly]="readonly()"
       [language]="language()"
@@ -42,4 +43,16 @@ export class SignalCodeEditorComponent implements FormValueControl<string> {
   readonly language = input('');
   readonly indentWithTab = input(false);
   readonly CodeEditorLanguages = languages;
+  private readonly editor = viewChild.required(CodeEditor);
+
+  constructor() {
+    afterRenderEffect(() => {
+      const editor = this.editor();
+      const value = this.value();
+      // 使用者輸入已在 Editor 內生效，只有外部值不同時才替換文件，保留游標與復原紀錄。
+      if (editor.view.state.doc.toString() !== value) {
+        editor.setValue(value);
+      }
+    });
+  }
 }

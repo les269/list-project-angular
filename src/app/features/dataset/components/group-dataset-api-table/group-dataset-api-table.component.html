@@ -1,36 +1,8 @@
-<div class="h4 fw-bold">
-  {{ 'dataset.apiTable' | translate }}
-</div>
+<div class="h4 fw-bold">{{ 'dataset.apiTable' | translate }}</div>
 <div class="card">
   <app-generic-table
     [fields]="fields()"
-    [cols]="cols"
+    [cols]="cols()"
     [displayedColumns]="displayedColumns"
-    [createRow]="createRow"></app-generic-table>
+    [createRow]="createRow" />
 </div>
-<ng-container matColumnDef="apiName">
-  <th mat-header-cell *matHeaderCellDef>
-    {{ 'dataset.apiName' | translate }}
-  </th>
-  <td mat-cell *matCellDef="let element">
-    <div class="mt-1 d-flex flex-wrap gap-3 align-items-center">
-      @if (element.apiName) {
-        <mat-chip
-          >{{ element.apiName }}
-          <button matChipRemove (click)="element.apiName = ''">
-            <mat-icon>cancel</mat-icon>
-          </button>
-        </mat-chip>
-      }
-      <button
-        class="btn btn-outline-primary d-flex"
-        (click)="selectApi(element)">
-        <mat-icon class="material-icons-outlined"
-          ><span class="material-symbols-outlined">
-            select_window_2
-          </span></mat-icon
-        >
-      </button>
-    </div>
-  </td>
-</ng-container>

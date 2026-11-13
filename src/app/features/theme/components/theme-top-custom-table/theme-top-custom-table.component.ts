@@ -37,8 +37,8 @@ import {
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import { toKeyValueArray } from '../../../../shared/util/helper';
 import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
-import { ApiConfig } from '../../../api-config/model';
-import { ApiConfigService } from '../../../api-config/service/api-config.service';
+import { getApiRequestLabel } from '../../../api-request-config/model';
+import { ApiRequestConfigService } from '../../../api-request-config/service/api-request-config.service';
 import {
   OpenWindowTargetType,
   ThemeItem,
@@ -70,7 +70,7 @@ import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage
 })
 export class ThemeTopCustomTableComponent {
   //inject
-  readonly apiConfigService = inject(ApiConfigService);
+  readonly apiRequestConfigService = inject(ApiRequestConfigService);
   readonly selectTableService = inject(SelectTableService);
   readonly translateService = inject(TranslateService);
   //inputs
@@ -93,7 +93,7 @@ export class ThemeTopCustomTableComponent {
       required(row.openUrl, {
         when: ({ valueOf }) => valueOf(row.type) === ThemeTopCustomType.openUrl,
       });
-      required(row.apiName, {
+      required(row.apiId, {
         when: ({ valueOf }) =>
           valueOf(row.type) === ThemeTopCustomType.apiConfig,
       });
@@ -108,7 +108,7 @@ export class ThemeTopCustomTableComponent {
     this.topCustomItem() ? true : false
   );
   readonly apis = rxResource({
-    stream: () => this.apiConfigService.getAll(),
+    stream: () => this.apiRequestConfigService.getAll(),
     defaultValue: [],
   });
   private readonly validationMessages = toSignal(
@@ -172,11 +172,7 @@ export class ThemeTopCustomTableComponent {
   readonly selectApi = () =>
     this.selectTableService.selectSingleApi(this.apis.value());
 
-  readonly getApiLabelName = (item: ApiConfig) => item.apiName;
-
-  removeApi(element: ThemeTopCustom) {
-    element.apiConfig = undefined;
-  }
+  readonly getApiLabelName = getApiRequestLabel;
 
   loadItem(data: ThemeItem) {
     if (data.type !== ThemeItemType.TOPCUSTOM) return;

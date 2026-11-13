@@ -1,0 +1,92 @@
+<h2 mat-dialog-title>
+  {{ 'apiRequestConfig.callApi.title' | translate: { id: data.apiId } }}
+</h2>
+<mat-dialog-content class="scrollbar-primary">
+  @if (data.description) {
+    <p class="text-muted">{{ data.description }}</p>
+  }
+  <form id="call-api-form" (submit)="onExecute($event)">
+    <label id="call-api-parameters-label" class="form-label">
+      {{ 'apiRequestConfig.callApi.parameters' | translate }}
+    </label>
+    <p id="call-api-parameters-help" class="text-muted small">
+      {{ 'apiRequestConfig.callApi.parametersHint' | translate }}
+    </p>
+    <app-signal-code-editor
+      class="parameters-editor"
+      [formField]="valueForm.parameters"
+      language="json"
+      [indentWithTab]="true" />
+    @if (valueForm.parameters().touched() && valueForm.parameters().invalid()) {
+      <div id="call-api-parameters-error" class="text-danger mt-2" role="alert">
+        {{ 'apiRequestConfig.callApi.invalidParameters' | translate }}
+      </div>
+    }
+  </form>
+  @if (isRunning()) {
+    <p class="text-muted mt-3" role="status">
+      {{ 'apiRequestConfig.callApi.running' | translate }}
+    </p>
+  }
+  @if (executionFailed()) {
+    <div class="alert alert-danger mt-3" role="alert">
+      {{ 'apiRequestConfig.callApi.failed' | translate }}
+    </div>
+  }
+  @if (result(); as response) {
+    <p class="mt-3" role="status">HTTP {{ response.status }}</p>
+  }
+  <div class="response-grid mt-3" [attr.aria-busy]="isRunning()">
+    <section aria-labelledby="call-api-headers-label">
+      <h3 id="call-api-headers-label" class="fs-6">Headers</h3>
+      <app-signal-code-editor
+        class="response-editor"
+        [value]="result()?.headers ?? ''"
+        [readonly]="true"
+        language="json"
+        aria-labelledby="call-api-headers-label"
+        aria-describedby="call-api-headers-help" />
+      <p id="call-api-headers-help" class="text-muted small mt-2">
+        {{ 'apiRequestConfig.callApi.headersHint' | translate }}
+      </p>
+    </section>
+    <section aria-labelledby="call-api-body-label">
+      <h3 id="call-api-body-label" class="fs-6">Body</h3>
+      <app-signal-code-editor
+        class="response-editor"
+        [value]="result()?.body ?? ''"
+        [readonly]="true"
+        [language]="result()?.bodyLanguage ?? ''"
+        aria-labelledby="call-api-body-label" />
+    </section>
+  </div>
+  @if (data.config.enabled === false) {
+    <p class="text-muted small mt-3" role="status">
+      {{ 'apiRequestConfig.callApi.disabled' | translate }}
+    </p>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="start">
+  <button
+    type="submit"
+    form="call-api-form"
+    mat-flat-button
+    [disabled]="
+      isRunning() || data.config.enabled === false || valueForm().invalid()
+    ">
+    {{
+      (isRunning()
+        ? 'apiRequestConfig.callApi.running'
+        : 'apiRequestConfig.callApi.execute'
+      ) | translate
+    }}
+  </button>
+  <button
+    type="button"
+    mat-button
+    class="ms-auto"
+    (click)="onClose()"
+    [disabled]="isRunning()">
+    {{ 'apiRequestConfig.callApi.close' | translate }}
+  </button>
+</mat-dialog-actions>

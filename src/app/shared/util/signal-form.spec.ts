@@ -7,7 +7,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { API_BASE_URL } from '../../core/tokens/api-base-url.token';
 import { ChipSelectButtonComponent } from '../../core/components/chip-select-button/chip-select-button.component';
-import { ApiConfigService } from '../../features/api-config/service/api-config.service';
+import { ApiRequestConfigService } from '../../features/api-request-config/service/api-request-config.service';
 import { DatabaseEditComponent } from '../../features/setting/components/database-edit/database-edit.component';
 import { DatabaseConfig, DatabaseType } from '../../features/setting/model';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -78,7 +78,10 @@ describe('Signal form migration regressions', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: API_BASE_URL, useValue: 'http://localhost' },
-        { provide: ApiConfigService, useValue: { getAll: () => of([]) } },
+        {
+          provide: ApiRequestConfigService,
+          useValue: { getAll: () => of([]) },
+        },
         {
           provide: MAT_DIALOG_DATA,
           useValue: {
@@ -152,14 +155,12 @@ describe('Signal form migration regressions', () => {
     const config = host.fields[0].extractObjectsConfig;
     config.fields[0].key().value.set('url');
     config.fields[0].selector().value.set('a');
-    config.fields[0]
-      .pipelines()
-      .value.set([
-        host.factory.createValuePipeline({
-          type: ValuePipelineType.EXTRACT_ATTR,
-          attributeName: 'href',
-        }),
-      ]);
+    config.fields[0].pipelines().value.set([
+      host.factory.createValuePipeline({
+        type: ValuePipelineType.EXTRACT_ATTR,
+        attributeName: 'href',
+      }),
+    ]);
     await fixture.whenStable();
     expect(
       fixture.nativeElement.querySelectorAll('app-pipeline-list').length

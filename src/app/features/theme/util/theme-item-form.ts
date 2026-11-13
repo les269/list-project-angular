@@ -56,7 +56,7 @@ export const createThemeCustomRow = (data: Partial<ThemeCustom> = {}) => {
     type: ThemeCustomType.openUrl,
     byKey: '',
     label: '',
-    apiName: '',
+    apiId: '',
     openUrl: '',
     copyValue: '',
     buttonIconFill: '',
@@ -68,7 +68,6 @@ export const createThemeCustomRow = (data: Partial<ThemeCustom> = {}) => {
     deleteFile: '',
     openWindowsTarget: OpenWindowTargetType._self,
     openFolder: '',
-    apiConfig: undefined,
     visibleDatasetNameList: [] as string[],
     ...data,
   } satisfies ThemeCustom;
@@ -93,7 +92,7 @@ export const createThemeTopCustomRow = (data: Partial<ThemeTopCustom> = {}) => {
     byKey: '',
     openUrl: '',
     openWindowsTarget: OpenWindowTargetType._blank,
-    apiName: '',
+    apiId: '',
     ...data,
   };
   return group;

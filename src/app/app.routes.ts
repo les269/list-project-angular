@@ -19,12 +19,12 @@ export const routes: Routes = [
     data: { title: 'title.editTheme' },
   },
   {
-    path: 'api-config-list',
+    path: 'api-request-config-list',
     loadComponent: () =>
-      import('./features/api-config/page/api-config-list/api-config-list.component').then(
-        mod => mod.ApiConfigListComponent
+      import('./features/api-request-config/page/api-request-config-list/api-request-config-list.component').then(
+        mod => mod.ApiRequestConfigListComponent
       ),
-    data: { title: 'title.apiConfigList', sidenav: true },
+    data: { title: 'title.apiRequestConfigList', sidenav: true },
   },
   {
     path: 'scrapy-list',

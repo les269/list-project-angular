@@ -10,7 +10,7 @@ import { MessageBoxService } from '../../../core/services/message-box.service';
 import { SelectTableService } from '../../../core/services/select-table.service';
 import { SnackbarService } from '../../../core/services/snackbar.service';
 import { LayoutStore } from '../../../core/stores/layout.store';
-import { ApiConfigService } from '../../api-config/service/api-config.service';
+import { ApiRequestConfigService } from '../../api-request-config/service/api-request-config.service';
 import { DatasetService } from '../../dataset/service/dataset.service';
 import { ScrapyService } from '../../spider/services/scrapy.service';
 import { ThemeItem, ThemeItemType } from '../models';
@@ -102,7 +102,10 @@ describe.each(cases)('$type table loading', config => {
         { provide: MatDialog, useValue: {} },
         { provide: LayoutStore, useValue: {} },
         { provide: DatasetService, useValue: { getAllDataset: () => of([]) } },
-        { provide: ApiConfigService, useValue: { getAll: () => of([]) } },
+        {
+          provide: ApiRequestConfigService,
+          useValue: { getAll: () => of([]) },
+        },
         { provide: ShareTagService, useValue: { getAllTag: () => of([]) } },
       ],
     }).compileComponents();

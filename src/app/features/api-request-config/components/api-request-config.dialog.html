@@ -1,0 +1,227 @@
+<h2 mat-dialog-title>
+  {{
+    (data.type === editMode.CREATE
+      ? 'apiRequestConfig.add'
+      : 'apiRequestConfig.edit'
+    ) | translate
+  }}
+</h2>
+<mat-dialog-content class="scrollbar-primary">
+  <div class="g-3 mb-3">
+    <div class="col-md-5">
+      <app-signal-field
+        id="apiId"
+        [field]="valueForm.apiId"
+        label="apiRequestConfig.apiId"
+        [trim]="true" />
+    </div>
+    <div class="col">
+      <app-signal-field
+        id="apiDescription"
+        [field]="valueForm.description"
+        label="g.description"
+        [trim]="true" />
+    </div>
+  </div>
+  <div class="row g-3 align-items-start mb-3">
+    <div class="col-md-3">
+      <app-signal-field
+        id="request-method"
+        [field]="valueForm.config.httpMethod"
+        label="apiRequestConfig.httpMethod"
+        [type]="fieldType.SELECT"
+        [options]="eHttpMethod | enumOptions: '' : true" />
+    </div>
+    <div class="col-md-9">
+      <app-signal-field
+        id="request-url"
+        [field]="valueForm.config.endpointUrl"
+        label="apiRequestConfig.endpointUrl"
+        describedBy="request-config-help"
+        (inputEvent)="onEndpointUrlInput($event)" />
+    </div>
+  </div>
+  <p id="request-config-help" class="text-muted small">
+    {{ 'apiRequestConfig.configHint' | translate }}
+  </p>
+  <mat-tab-group animationDuration="100ms" [preserveContent]="true">
+    <mat-tab label="Params">
+      <p class="text-muted small mt-3">
+        {{ 'apiRequestConfig.paramsHint' | translate }}
+      </p>
+      <ng-template #queryEnabled let-row let-i="index">
+        <app-signal-field
+          [field]="row.enabled"
+          [type]="fieldType.CHECKBOX"
+          (changeEvent)="onParamEnabledChange(i, $event)" />
+      </ng-template>
+      <ng-template #queryText let-row let-i="index" let-col="col">
+        <app-signal-field
+          [field]="row[col.key]"
+          (inputEvent)="onParamTextInput(i, col.key, $event)" />
+      </ng-template>
+      <div class="table-responsive">
+        <app-generic-table
+          [fields]="valueForm.config.httpParams"
+          [cols]="entryColumns"
+          [displayedColumns]="displayedEntryColumns"
+          [createRow]="createQueryRow"
+          [customColTmpls]="{
+            enabled: queryEnabled,
+            name: queryText,
+            value: queryText,
+          }"
+          (rowsChange)="syncQueryUrl()" />
+      </div>
+    </mat-tab>
+    <mat-tab label="Body">
+      <div class="my-3">
+        <app-signal-field
+          id="request-body-type"
+          [field]="valueForm.config.bodyType"
+          label="apiRequestConfig.bodyType"
+          [type]="fieldType.SELECT"
+          [options]="eBodyType | enumOptions: 'apiRequestConfig.bodyTypes'" />
+      </div>
+      @switch (valueModel().config.bodyType) {
+        @case (eBodyType.none) {
+          <p class="text-muted">
+            {{ 'apiRequestConfig.noBodyHint' | translate }}
+          </p>
+        }
+        @case (eBodyType.formData)
+        @case (eBodyType.formUrlEncoded) {
+          <p class="text-muted small">
+            {{ 'apiRequestConfig.formBodyHint' | translate }}
+          </p>
+          <ng-template #bodyEnabled let-row let-i="index">
+            <app-signal-field
+              [field]="row.enabled"
+              [type]="fieldType.CHECKBOX" />
+          </ng-template>
+          <ng-template #bodyText let-row let-i="index" let-col="col">
+            <app-signal-field [field]="row[col.key]" />
+          </ng-template>
+          <div class="table-responsive">
+            <app-generic-table
+              [fields]="valueForm.config.bodyFormFields"
+              [cols]="entryColumns"
+              [displayedColumns]="displayedEntryColumns"
+              [createRow]="createBodyRow"
+              [customColTmpls]="{
+                enabled: bodyEnabled,
+                name: bodyText,
+                value: bodyText,
+              }" />
+          </div>
+        }
+        @default {
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <label id="request-body-label" class="form-label mb-0">{{
+              'apiRequestConfig.requestBody' | translate
+            }}</label>
+            @if (valueModel().config.bodyType === eBodyType.json) {
+              <button
+                type="button"
+                mat-button
+                (click)="formatBody()"
+                [disabled]="
+                  isSaving() || !valueModel().config.requestBody.trim()
+                ">
+                {{ 'g.format' | translate }}
+              </button>
+            }
+          </div>
+          <p id="request-body-help" class="text-muted small">
+            {{ 'apiRequestConfig.requestBodyHint' | translate }}
+          </p>
+          <app-signal-code-editor
+            style="height: 280px"
+            [formField]="valueForm.config.requestBody"
+            [language]="codeLanguage()"
+            [indentWithTab]="true" />
+          @if (
+            bodyFormatFailed() &&
+            valueModel().config.bodyType === eBodyType.json
+          ) {
+            <div class="text-warning mt-2" role="alert">
+              {{ 'apiRequestConfig.bodyFormatFailed' | translate }}
+            </div>
+          }
+        }
+      }
+    </mat-tab>
+    <mat-tab label="Authorization">
+      <div class="py-3">
+        <p>{{ 'apiRequestConfig.authorizationHint' | translate }}</p>
+        @if (data.type === editMode.CREATE) {
+          <p class="text-muted">
+            {{ 'apiRequestConfig.bindingHint' | translate }}
+          </p>
+        } @else {
+          <p class="text-muted small">
+            {{ 'apiRequestConfig.bindingImmediateHint' | translate }}
+          </p>
+        }
+        <div class="d-flex flex-wrap gap-2">
+          <button
+            type="button"
+            mat-stroked-button
+            (click)="openCookies()"
+            [disabled]="isSaving() || data.type === editMode.CREATE">
+            {{ 'spider.settingCookies' | translate }}
+          </button>
+          <button
+            type="button"
+            mat-stroked-button
+            (click)="openHeaders()"
+            [disabled]="isSaving() || data.type === editMode.CREATE">
+            {{ 'spider.settingHeaders' | translate }}
+          </button>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+  <div class="row g-3 align-items-start mt-2 mb-3">
+    <div class="col-md-4">
+      <app-signal-field
+        id="request-timeout"
+        [field]="valueForm.config.timeoutMs"
+        label="apiRequestConfig.timeoutMs"
+        [type]="fieldType.NUMBER" />
+      <small class="text-muted">{{
+        'apiRequestConfig.timeoutHint' | translate
+      }}</small>
+    </div>
+    <div class="col-md-8">
+      <app-signal-field
+        id="request-success-message"
+        [field]="valueForm.config.successMessage"
+        label="apiRequestConfig.successMessage" />
+    </div>
+  </div>
+  <div class="mb-3">
+    <app-signal-field
+      id="request-enabled"
+      [field]="valueForm.config.enabled"
+      label="apiRequestConfig.enabled"
+      [type]="fieldType.CHECKBOX" />
+  </div>
+  @if (saveFailed()) {
+    <div class="alert alert-danger" role="alert">
+      {{ 'apiRequestConfig.saveFailed' | translate }}
+    </div>
+  }
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button type="button" mat-button (click)="onCancel()" [disabled]="isSaving()">
+    {{ 'g.no' | translate }}
+  </button>
+  <button
+    mat-flat-button
+    form="api-request-config-form"
+    [disabled]="isSaving()"
+    (click)="onSave()">
+    {{ (isSaving() ? 'apiRequestConfig.saving' : 'g.save') | translate }}
+  </button>
+</mat-dialog-actions>

@@ -423,7 +423,7 @@ describe('SpiderPaginationEditComponent', () => {
     param.type().value.set(ParamType.TIME_RANGE);
     await fixture.whenStable();
     const mode = fixture.nativeElement.querySelector(
-      'select[aria-label="spiderPagination.lastUpdateMode"]'
+      'app-signal-field[label="spiderPagination.lastUpdateMode"] select'
     ) as HTMLSelectElement;
     mode.value = LastUpdateMode.USE_PARAM;
     mode.dispatchEvent(new Event('input', { bubbles: true }));
@@ -433,7 +433,7 @@ describe('SpiderPaginationEditComponent', () => {
     );
     await fixture.whenStable();
     const reference = fixture.nativeElement.querySelector(
-      'select[aria-label="spiderPagination.paramReference"]'
+      'app-signal-field[label="spiderPagination.paramReference"] select'
     ) as HTMLSelectElement;
     reference.value = '{year}';
     reference.dispatchEvent(new Event('input', { bubbles: true }));
@@ -489,7 +489,7 @@ describe('SpiderPaginationEditComponent', () => {
     expect(service.update).not.toHaveBeenCalled();
     expect(
       fixture.nativeElement.querySelector(
-        'input[aria-label="spiderPagination.dataIdKey"].is-invalid'
+        'app-signal-field[label="spiderPagination.dataIdKey"] input.is-invalid'
       )
     ).toBeTruthy();
     config.dataIdKey().value.set('id');
