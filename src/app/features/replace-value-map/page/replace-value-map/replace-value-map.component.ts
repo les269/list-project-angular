@@ -9,7 +9,7 @@ import {
 } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { filter, switchMap } from 'rxjs';
 import { CustomMatPaginatorIntl } from '../../../../core/components/custom-mat-paginatorIntl/custom-mat-paginatorIntl';
 import { ScrollTopComponent } from '../../../../core/components/scroll-top/scroll-top.component';
@@ -30,7 +30,7 @@ import { ReplaceValueMapService } from '../../service/replace-value-map.service'
 
   imports: [
     MatTableModule,
-    TranslateModule,
+    TranslatePipe,
     MatIconModule,
     MatPaginatorModule,
     MatSortModule,

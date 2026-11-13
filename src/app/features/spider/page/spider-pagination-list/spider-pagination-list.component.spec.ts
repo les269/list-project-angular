@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import { of, Subject } from 'rxjs';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -16,8 +16,9 @@ async function setup() {
   const service = { getAll: vi.fn(() => of([])) };
   const snackbar = { openI18N: vi.fn() };
   await TestBed.configureTestingModule({
-    imports: [SpiderPaginationListComponent, TranslateModule.forRoot()],
+    imports: [SpiderPaginationListComponent],
     providers: [
+      provideTranslateService(),
       { provide: MatDialog, useValue: dialog },
       { provide: Router, useValue: { navigate: vi.fn() } },
       {

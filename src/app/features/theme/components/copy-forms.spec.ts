@@ -1,7 +1,7 @@
 import { Signal, Type } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom, Observable, of, Subject } from 'rxjs';
 import { SnackbarService } from '../../../core/services/snackbar.service';
 import { ThemeNoteComponent } from '../../data-view/components/theme-note/theme-note.component';
@@ -40,13 +40,9 @@ async function setup() {
     save: vi.fn(),
   };
   await TestBed.configureTestingModule({
-    imports: [
-      CopyThemeComponent,
-      CopyThemeItemComponent,
-      ThemeNoteComponent,
-      TranslateModule.forRoot(),
-    ],
+    imports: [CopyThemeComponent, CopyThemeItemComponent, ThemeNoteComponent],
     providers: [
+      provideTranslateService(),
       { provide: ThemeService, useValue: themeService },
       { provide: ThemeItemService, useValue: itemService },
       { provide: MatDialogRef, useValue: dialogRef },

@@ -25,7 +25,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ChipSelectButtonComponent } from '../../../../core/components/chip-select-button/chip-select-button.component';
 import { FormInvalidsComponent } from '../../../../core/components/form-invalids/form-invalids.component';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
@@ -53,7 +53,7 @@ import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage
   selector: 'app-theme-top-custom-table',
 
   imports: [
-    TranslateModule,
+    TranslatePipe,
     FormField,
     MatIconModule,
     CommonModule,

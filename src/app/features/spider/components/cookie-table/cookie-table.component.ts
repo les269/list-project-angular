@@ -22,7 +22,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { defer, EMPTY, finalize, Observable, switchMap, take, tap } from 'rxjs';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 import {
@@ -46,7 +46,7 @@ import { PipelineListComponent } from '../pipeline-list/pipeline-list.component'
   imports: [
     MatTableModule,
     FormField,
-    TranslateModule,
+    TranslatePipe,
     MatIconModule,
     MatButtonModule,
     GenericTableComponent,

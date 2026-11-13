@@ -21,7 +21,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { EMPTY, finalize, map, switchMap, take } from 'rxjs';
 import { EditMode } from '../../../../core/model';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -57,7 +57,7 @@ import { applyExtractionRulesSchema } from '../../schema/extraction-rules.schema
 
 @Component({
   imports: [
-    TranslateModule,
+    TranslatePipe,
     MatIconModule,
     MatButtonModule,
     SignalFieldComponent,

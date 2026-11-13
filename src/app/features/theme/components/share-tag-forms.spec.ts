@@ -4,7 +4,7 @@ import {
   MatDialog,
   MatDialogRef,
 } from '@angular/material/dialog';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom, Observable, of, Subject } from 'rxjs';
 import { MessageBoxService } from '../../../core/services/message-box.service';
 import { SnackbarService } from '../../../core/services/snackbar.service';
@@ -38,12 +38,9 @@ describe('Share tag forms', () => {
     };
     const snackbar = { openI18N: vi.fn(), isBlankMessage: vi.fn() };
     await TestBed.configureTestingModule({
-      imports: [
-        ShareTagListComponent,
-        ShareTagValueListComponent,
-        TranslateModule.forRoot(),
-      ],
+      imports: [ShareTagListComponent, ShareTagValueListComponent],
       providers: [
+        provideTranslateService(),
         { provide: ShareTagService, useValue: service },
         { provide: SnackbarService, useValue: snackbar },
         { provide: MessageBoxService, useValue: messages },

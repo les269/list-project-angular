@@ -1,7 +1,7 @@
 import { SignalFieldType } from '../../../../core/model/signal-field.model';
 import { Component, computed, inject, input } from '@angular/core';
 import { FieldTree } from '@angular/forms/signals';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 import {
   GenericColumnType,
@@ -20,7 +20,7 @@ import { toSignalFieldOptions } from '../../../../shared/util/signal-field';
 @Component({
   selector: 'app-extraction-rules',
   imports: [
-    TranslateModule,
+    TranslatePipe,
     GenericTableComponent,
     PipelineListComponent,
     SignalFieldComponent,

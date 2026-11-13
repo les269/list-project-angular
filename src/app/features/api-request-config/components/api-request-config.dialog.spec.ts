@@ -12,7 +12,7 @@ import {
   MatDialogRef,
 } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { EMPTY, firstValueFrom, of, Subject } from 'rxjs';
 import { GenericTableComponent } from '../../../core/components/generic-table/generic-table.component';
 import { GenericTableRowField } from '../../../core/model/generic-table';
@@ -69,8 +69,9 @@ async function setup(
     type,
   };
   await TestBed.configureTestingModule({
-    imports: [ApiRequestConfigDialog, TranslateModule.forRoot()],
+    imports: [ApiRequestConfigDialog],
     providers: [
+      provideTranslateService(),
       { provide: MATERIAL_ANIMATIONS, useValue: { animationsDisabled: true } },
       { provide: ApiRequestConfigService, useValue: service },
       { provide: MAT_DIALOG_DATA, useValue: data },

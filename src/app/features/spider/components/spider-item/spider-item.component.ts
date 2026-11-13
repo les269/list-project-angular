@@ -21,7 +21,7 @@ import {
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { languages } from '@codemirror/language-data';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { defer, EMPTY, finalize, Observable, switchMap, take } from 'rxjs';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { SelectTableService } from '../../../../core/services/select-table.service';
@@ -61,7 +61,7 @@ import { applyExtractionRulesSchema } from '../../schema/extraction-rules.schema
 
   imports: [
     CommonModule,
-    TranslateModule,
+    TranslatePipe,
     FormField,
     MatCheckbox,
     SignalCodeEditorComponent,

@@ -1,12 +1,12 @@
 import { Component, computed, input } from '@angular/core';
 import { FieldState } from '@angular/forms/signals';
 import { MatIconModule } from '@angular/material/icon';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { FormInvalid } from '../../model/form-invalids.model';
 
 @Component({
   selector: 'app-form-invalids',
-  imports: [MatIconModule, TranslateModule],
+  imports: [MatIconModule, TranslatePipe],
   templateUrl: './form-invalids.component.html',
 })
 export class FormInvalidsComponent {

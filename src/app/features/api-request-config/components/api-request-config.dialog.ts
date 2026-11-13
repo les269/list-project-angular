@@ -20,7 +20,7 @@ import {
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { MatTabsModule } from '@angular/material/tabs';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { EMPTY, finalize, of, switchMap } from 'rxjs';
 import { GenericTableComponent } from '../../../core/components/generic-table/generic-table.component';
 import { SignalFieldComponent } from '../../../core/components/signal-field/signal-field.component';
@@ -67,7 +67,7 @@ import {
     MatDialogTitle,
     MatDialogContent,
     MatTabsModule,
-    TranslateModule,
+    TranslatePipe,
     SignalCodeEditorComponent,
     SignalFieldComponent,
     GenericTableComponent,

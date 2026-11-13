@@ -24,7 +24,7 @@ import {
 } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { BaseSelectTableData } from '../../model';
 import { CustomMatPaginatorIntl } from '../custom-mat-paginatorIntl/custom-mat-paginatorIntl';
 
@@ -36,7 +36,7 @@ import { CustomMatPaginatorIntl } from '../custom-mat-paginatorIntl/custom-mat-p
     MatDialogActions,
     MatDialogContent,
     MatDialogTitle,
-    TranslateModule,
+    TranslatePipe,
     MatCheckboxModule,
     MatSortModule,
     ScrollingModule,

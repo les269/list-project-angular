@@ -16,7 +16,7 @@ import {
   required,
   validate,
 } from '@angular/forms/signals';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { FormAlertsComponent } from '../../../../core/components/form-alerts/form-alerts.component';
 import { FormAlert } from '../../../../core/model';
 import { isBlank } from '../../../../shared/util/helper';
@@ -33,7 +33,7 @@ import { normalizeThemeItem } from '../../util/theme-item-form';
 @Component({
   selector: 'app-theme-image',
   imports: [
-    TranslateModule,
+    TranslatePipe,
     FormField,
     FormAlertsComponent,
     ThemeItemManageComponent,

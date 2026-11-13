@@ -29,7 +29,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { languages } from '@codemirror/language-data';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   defer,
   EMPTY,
@@ -70,7 +70,7 @@ import { SpiderMappingService } from '../../services/spider-mapping.service';
     MatIconModule,
     MatTabsModule,
     DragDropModule,
-    TranslateModule,
+    TranslatePipe,
     SpiderItemComponent,
     SignalCodeEditorComponent,
     TrimOnBlurDirective,

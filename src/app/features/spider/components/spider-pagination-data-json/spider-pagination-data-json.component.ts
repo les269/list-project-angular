@@ -8,7 +8,7 @@ import {
   MatDialogContent,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { SpiderPaginationData } from '../../model';
 
 @Component({
@@ -19,7 +19,7 @@ import { SpiderPaginationData } from '../../model';
     MatDialogClose,
     MatDialogContent,
     MatDialogTitle,
-    TranslateModule,
+    TranslatePipe,
   ],
   selector: 'app-spider-pagination-data-json',
   templateUrl: './spider-pagination-data-json.component.html',

@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import { Observable, of, Subject, throwError } from 'rxjs';
 import { SnackbarService } from '../../../core/services/snackbar.service';
 import { ApiRequestConfig, createApiRequestSettings } from '../model';
@@ -30,8 +30,9 @@ async function setup() {
   const dialog = { close: vi.fn(), disableClose: false };
   const data = structuredClone(source);
   await TestBed.configureTestingModule({
-    imports: [CopyApiRequestConfigDialog, TranslateModule.forRoot()],
+    imports: [CopyApiRequestConfigDialog],
     providers: [
+      provideTranslateService(),
       { provide: MAT_DIALOG_DATA, useValue: data },
       { provide: MatDialogRef, useValue: dialog },
       { provide: ApiRequestConfigService, useValue: service },

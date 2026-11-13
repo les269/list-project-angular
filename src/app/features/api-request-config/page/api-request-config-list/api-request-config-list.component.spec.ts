@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import { EMPTY, of, Subject } from 'rxjs';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -42,8 +42,9 @@ async function setup() {
     })),
   };
   await TestBed.configureTestingModule({
-    imports: [ApiRequestConfigListComponent, TranslateModule.forRoot()],
+    imports: [ApiRequestConfigListComponent],
     providers: [
+      provideTranslateService(),
       { provide: ApiRequestConfigService, useValue: service },
       { provide: MatDialog, useValue: dialog },
       {

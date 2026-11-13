@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { FormValueControl } from '@angular/forms/signals';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { SignalCodeEditorComponent } from '../../../core/components/signal-code-editor/signal-code-editor.component';
 import {
@@ -34,8 +34,9 @@ async function setup(enabled = true) {
   };
   const dialog = { close: vi.fn(), disableClose: false };
   await TestBed.configureTestingModule({
-    imports: [CallApiDialogComponent, TranslateModule.forRoot()],
+    imports: [CallApiDialogComponent],
     providers: [
+      provideTranslateService(),
       { provide: MAT_DIALOG_DATA, useValue: data },
       { provide: MatDialogRef, useValue: dialog },
       { provide: ApiRequestConfigService, useValue: service },

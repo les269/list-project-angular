@@ -10,7 +10,7 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 
 export interface MessageBoxData {
   message: string;
@@ -23,7 +23,7 @@ export interface MessageBoxData {
     MatDialogActions,
     MatDialogClose,
     MatDialogContent,
-    TranslateModule,
+    TranslatePipe,
     CommonModule,
   ],
   selector: 'app-message-box',

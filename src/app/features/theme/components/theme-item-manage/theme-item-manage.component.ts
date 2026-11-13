@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { MatDialog } from '@angular/material/dialog';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { EMPTY, finalize, Observable, switchMap, tap } from 'rxjs';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { SelectTableService } from '../../../../core/services/select-table.service';
@@ -28,7 +28,7 @@ import { CopyThemeItemComponent } from '../copy-theme-item/copy-theme-item.compo
 
 @Component({
   selector: 'app-theme-item-manage',
-  imports: [TranslateModule, TrimOnBlurDirective, FormField],
+  imports: [TranslatePipe, TrimOnBlurDirective, FormField],
   templateUrl: './theme-item-manage.component.html',
 })
 export class ThemeItemManageComponent {

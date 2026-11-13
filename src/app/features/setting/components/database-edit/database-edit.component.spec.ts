@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import { Subject, of } from 'rxjs';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -26,8 +26,9 @@ async function setup() {
     databaseConfigList: [] as DatabaseConfig[],
   };
   await TestBed.configureTestingModule({
-    imports: [DatabaseEditComponent, TranslateModule.forRoot()],
+    imports: [DatabaseEditComponent],
     providers: [
+      provideTranslateService(),
       { provide: MAT_DIALOG_DATA, useValue: data },
       { provide: MatDialogRef, useValue: { close: vi.fn() } },
       { provide: DatabaseConfigService, useValue: service },

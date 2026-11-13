@@ -10,7 +10,7 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { EMPTY, finalize, switchMap } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { isBlank } from '../../../../shared/util/helper';
@@ -27,7 +27,7 @@ import { ThemeItemService } from '../../services';
     MatDialogClose,
     MatDialogTitle,
     MatDialogContent,
-    TranslateModule,
+    TranslatePipe,
     CommonModule,
   ],
   templateUrl: './copy-theme-item.component.html',

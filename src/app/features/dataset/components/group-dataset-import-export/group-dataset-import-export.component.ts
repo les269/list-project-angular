@@ -9,7 +9,7 @@ import {
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { EMPTY, filter, map, switchMap } from 'rxjs';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -25,7 +25,7 @@ import { GroupDatasetDataService } from '../../service/group-dataset-data.servic
   selector: 'app-group-dataset-import-export',
 
   imports: [
-    TranslateModule,
+    TranslatePipe,
     MatDialogClose,
     MatDialogTitle,
     MatDialogContent,

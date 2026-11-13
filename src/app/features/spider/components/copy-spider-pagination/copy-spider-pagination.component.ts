@@ -9,7 +9,7 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { catchError, EMPTY, finalize, switchMap } from 'rxjs';
 import { SignalFieldComponent } from '../../../../core/components/signal-field/signal-field.component';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -24,7 +24,7 @@ import { SpiderPaginationService } from '../../services';
     MatDialogContent,
     MatDialogTitle,
     SignalFieldComponent,
-    TranslateModule,
+    TranslatePipe,
   ],
   selector: 'app-copy-spider-pagination',
   templateUrl: './copy-spider-pagination.component.html',

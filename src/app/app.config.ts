@@ -10,13 +10,9 @@ import {
 } from '@angular/router';
 
 import { routes } from './app.routes';
-import {
-  HttpClient,
-  provideHttpClient,
-  withInterceptors,
-} from '@angular/common/http';
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { apiInterceptor } from './core/interceptors/api.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
@@ -24,9 +20,6 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { api } from '../environments/environment';
 import { API_BASE_URL } from './core/tokens/api-base-url.token';
 
-export function HttpLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
-}
 export const appConfig: ApplicationConfig = {
   providers: [
     { provide: API_BASE_URL, useValue: api },
@@ -39,17 +32,14 @@ export const appConfig: ApplicationConfig = {
       withComponentInputBinding()
     ),
     provideHttpClient(withInterceptors([apiInterceptor, errorInterceptor])),
-    importProvidersFrom(
-      TranslateModule.forRoot({
-        defaultLanguage: 'zh-tw',
-        loader: {
-          provide: TranslateLoader,
-          useFactory: HttpLoaderFactory,
-          deps: [HttpClient],
-        },
+    provideTranslateService({
+      fallbackLang: 'zh-tw',
+      loader: provideTranslateHttpLoader({
+        prefix: './assets/i18n/',
+        suffix: '.json',
+        failOnError: true,
       }),
-      MatNativeDateModule,
-      MatSnackBarModule
-    ),
+    }),
+    importProvidersFrom(MatNativeDateModule, MatSnackBarModule),
   ],
 };

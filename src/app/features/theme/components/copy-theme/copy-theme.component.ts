@@ -11,7 +11,7 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { EMPTY, finalize, switchMap, take } from 'rxjs';
 import { FormInvalidsComponent } from '../../../../core/components/form-invalids/form-invalids.component';
 import { FormAlert } from '../../../../core/model';
@@ -29,7 +29,7 @@ import { ThemeService } from '../../services/theme.service';
     MatDialogClose,
     MatDialogTitle,
     MatDialogContent,
-    TranslateModule,
+    TranslatePipe,
     CommonModule,
     TrimOnBlurDirective,
     FormInvalidsComponent,

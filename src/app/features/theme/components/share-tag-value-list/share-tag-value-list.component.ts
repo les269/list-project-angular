@@ -27,7 +27,7 @@ import {
 } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { EMPTY, finalize, map, switchMap, take } from 'rxjs';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { CustomMatPaginatorIntl } from '../../../../core/components/custom-mat-paginatorIntl/custom-mat-paginatorIntl';
@@ -49,7 +49,7 @@ import { ShareTagService } from '../../services/share-tag.service';
     MatIconModule,
     MatButtonModule,
     MatCheckboxModule,
-    TranslateModule,
+    TranslatePipe,
   ],
   templateUrl: './share-tag-value-list.component.html',
   styleUrl: './share-tag-value-list.component.scss',

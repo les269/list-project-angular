@@ -1,11 +1,11 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { SettingLinkComponent } from '../setting-link/setting-link.component';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-setting-sidebar',
-  imports: [SettingLinkComponent, TranslateModule],
+  imports: [SettingLinkComponent, TranslatePipe],
   templateUrl: './setting-sidebar.component.html',
   styleUrls: ['./setting-sidebar.component.scss'],
 })

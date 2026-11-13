@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import { SpiderPaginationDataJsonComponent } from './spider-pagination-data-json.component';
 
 it('顯示所選資料的分組與格式化 JSON，內容保持唯讀且不解析為 HTML', async () => {
@@ -15,8 +15,9 @@ it('顯示所選資料的分組與格式化 JSON，內容保持唯讀且不解�
   };
   const close = vi.fn();
   await TestBed.configureTestingModule({
-    imports: [SpiderPaginationDataJsonComponent, TranslateModule.forRoot()],
+    imports: [SpiderPaginationDataJsonComponent],
     providers: [
+      provideTranslateService(),
       { provide: MAT_DIALOG_DATA, useValue: record },
       { provide: MatDialogRef, useValue: { close } },
     ],

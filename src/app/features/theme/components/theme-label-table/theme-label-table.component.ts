@@ -27,7 +27,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatTableModule } from '@angular/material/table';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ChipInputComponent } from '../../../../core/components/chip-input/chip-input.component';
 import { FormAlertsComponent } from '../../../../core/components/form-alerts/form-alerts.component';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
@@ -63,7 +63,7 @@ import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage
     MatCheckboxModule,
     CommonModule,
     MatListModule,
-    TranslateModule,
+    TranslatePipe,
     GenericTableComponent,
     ChipInputComponent,
     FormAlertsComponent,

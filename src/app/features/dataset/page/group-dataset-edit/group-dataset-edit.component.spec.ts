@@ -4,7 +4,7 @@ import {
   convertToParamMap,
   provideRouter,
 } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -53,8 +53,9 @@ it('完整載入隱藏清單，切換資料來源保留編輯，儲存包含所�
     updateGroupDataset: vi.fn(() => of(undefined)),
   };
   await TestBed.configureTestingModule({
-    imports: [GroupDatasetEditComponent, TranslateModule.forRoot()],
+    imports: [GroupDatasetEditComponent],
     providers: [
+      provideTranslateService(),
       provideRouter([]),
       {
         provide: ActivatedRoute,

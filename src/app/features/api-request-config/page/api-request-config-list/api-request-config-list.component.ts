@@ -15,7 +15,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { EMPTY, finalize, switchMap } from 'rxjs';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -40,7 +40,7 @@ import { ApiRequestConfigService } from '../../service/api-request-config.servic
     MatSortModule,
     MatIconModule,
     MatButtonModule,
-    TranslateModule,
+    TranslatePipe,
   ],
 })
 export class ApiRequestConfigListComponent {

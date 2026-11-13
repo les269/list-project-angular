@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import { Subject, of } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { DatasetService } from '../../service/dataset.service';
@@ -18,8 +18,9 @@ it('複製以正規化後的名稱查重，儲存使用相同資料快照', asyn
     config: { type: DatasetConfigType.all, groupName: 'group', fieldList: [] },
   };
   await TestBed.configureTestingModule({
-    imports: [CopyDatasetComponent, TranslateModule.forRoot()],
+    imports: [CopyDatasetComponent],
     providers: [
+      provideTranslateService(),
       { provide: MAT_DIALOG_DATA, useValue: { source } },
       { provide: MatDialogRef, useValue: { close: vi.fn() } },
       { provide: DatasetService, useValue: service },

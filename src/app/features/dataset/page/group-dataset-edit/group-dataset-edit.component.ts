@@ -18,7 +18,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { EMPTY, filter, map, switchMap } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { isNotBlank } from '../../../../shared/util/helper';
@@ -41,7 +41,7 @@ import { GroupDatasetService } from '../../service/group-dataset.service';
     MatTableModule,
     FormField,
     MatButtonModule,
-    TranslateModule,
+    TranslatePipe,
     CommonModule,
     MatIconModule,
     MatCheckboxModule,

@@ -19,7 +19,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { ActivatedRoute, Router } from '@angular/router';
 import { languages } from '@codemirror/language-data';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import dayjs from 'dayjs';
 import { debounceTime, EMPTY, filter, switchMap } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -38,7 +38,7 @@ import { ScrapyPaginationService } from '../../services/scrapy-pagination.servic
     FormField,
     CommonModule,
     MatIconModule,
-    TranslateModule,
+    TranslatePipe,
     MatButtonModule,
     CodeEditorModule,
     MatFormFieldModule,

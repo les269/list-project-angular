@@ -6,7 +6,7 @@ import {
   MatDialogRef,
 } from '@angular/material/dialog';
 import { MatPaginatorHarness } from '@angular/material/paginator/testing';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import { Observable, of, Subject, throwError } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { SpiderPaginationData } from '../../model';
@@ -57,8 +57,9 @@ async function setup(
   const dialog = { open: vi.fn() };
   const snackbar = { openI18N: vi.fn() };
   await TestBed.configureTestingModule({
-    imports: [SpiderPaginationDataComponent, TranslateModule.forRoot()],
+    imports: [SpiderPaginationDataComponent],
     providers: [
+      provideTranslateService(),
       { provide: MAT_DIALOG_DATA, useValue: { spiderPaginationId: 'anime' } },
       { provide: MatDialogRef, useValue: { close: vi.fn() } },
       { provide: MatDialog, useValue: dialog },

@@ -16,7 +16,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { DiskService } from '../../services/disk.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { Disk } from '../../model/disk.model';
@@ -38,7 +38,7 @@ import { filter, switchMap } from 'rxjs';
     MatDialogModule,
     MatFormFieldModule,
     MatSelectModule,
-    TranslateModule,
+    TranslatePipe,
   ],
   templateUrl: './disk-management.component.html',
   styleUrl: './disk-management.component.scss',

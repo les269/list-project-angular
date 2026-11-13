@@ -1,7 +1,7 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FieldTree } from '@angular/forms/signals';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 import {
   ChipSelectColumn,
@@ -19,7 +19,7 @@ import { createGroupDatasetApi } from '../../util/group-dataset-rows';
 
 @Component({
   selector: 'app-group-dataset-api-table',
-  imports: [TranslateModule, GenericTableComponent],
+  imports: [TranslatePipe, GenericTableComponent],
   templateUrl: './group-dataset-api-table.component.html',
 })
 export class GroupDatasetApiTableComponent {

@@ -2,7 +2,7 @@ import { Signal, Type } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom, of } from 'rxjs';
 import { FormAlert } from '../../../core/model';
 import { GenericTableComponent } from '../../../core/components/generic-table/generic-table.component';
@@ -84,8 +84,9 @@ describe.each(cases)('$type table loading', config => {
       getThemeItem: vi.fn(() => of(storedItem('selected'))),
     };
     await TestBed.configureTestingModule({
-      imports: [config.componentType, TranslateModule.forRoot()],
+      imports: [config.componentType],
       providers: [
+        provideTranslateService(),
         { provide: ThemeItemService, useValue: service },
         { provide: ThemeItemMapService, useValue: {} },
         { provide: MessageBoxService, useValue: { openI18N: () => of(true) } },
@@ -275,8 +276,9 @@ describe.each(objectCases)('$type object loading', config => {
 
   it('切換輸入與讀取舊資料時使用預設值，清除只重設一次表單', async () => {
     await TestBed.configureTestingModule({
-      imports: [config.componentType, TranslateModule.forRoot()],
+      imports: [config.componentType],
       providers: [
+        provideTranslateService(),
         {
           provide: ThemeItemService,
           useValue: {

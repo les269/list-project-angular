@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import { Observable, of, Subject } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import {
@@ -48,8 +48,9 @@ async function setup() {
   const dialogRef = { close: vi.fn(), disableClose: false };
   const snackbar = { openI18N: vi.fn(), isBlankMessage: vi.fn() };
   await TestBed.configureTestingModule({
-    imports: [CopySpiderPaginationComponent, TranslateModule.forRoot()],
+    imports: [CopySpiderPaginationComponent],
     providers: [
+      provideTranslateService(),
       { provide: MAT_DIALOG_DATA, useValue: { source } },
       { provide: MatDialogRef, useValue: dialogRef },
       { provide: SpiderPaginationService, useValue: service },

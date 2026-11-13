@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { form } from '@angular/forms/signals';
 import { By } from '@angular/platform-browser';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 import { SelectTableService } from '../../../../core/services/select-table.service';
@@ -22,8 +22,9 @@ class TestHost {
 
 it('CssSelect 直接顯示表單資料，補齊欄位後可編輯、新增與重新載入', async () => {
   await TestBed.configureTestingModule({
-    imports: [TestHost, TranslateModule.forRoot()],
+    imports: [TestHost],
     providers: [
+      provideTranslateService(),
       { provide: SelectTableService, useValue: {} },
       {
         provide: ReplaceValueMapService,

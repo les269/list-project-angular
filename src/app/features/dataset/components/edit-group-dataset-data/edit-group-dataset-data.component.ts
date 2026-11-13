@@ -17,7 +17,7 @@ import {
 } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { EMPTY, filter, switchMap, tap } from 'rxjs';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { SelectTableService } from '../../../../core/services/select-table.service';
@@ -47,7 +47,7 @@ export interface EditGroupDatasetDataType {
     MatDialogClose,
     MatDialogTitle,
     MatDialogContent,
-    TranslateModule,
+    TranslatePipe,
     MatIconModule,
     MatChipsModule,
     MatFormFieldModule,

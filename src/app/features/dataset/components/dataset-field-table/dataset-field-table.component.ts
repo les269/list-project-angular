@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 import {
   GenericColumnType,
@@ -23,7 +23,7 @@ import { DatasetField, DatasetFieldType } from '../../model';
     MatTableModule,
     FormField,
     MatButtonModule,
-    TranslateModule,
+    TranslatePipe,
     CommonModule,
     MatIconModule,
     MatCheckboxModule,

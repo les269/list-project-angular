@@ -22,7 +22,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIcon } from '@angular/material/icon';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatTableModule } from '@angular/material/table';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { getWidth } from '../../../shared/util/helper';
 import { TrimOnBlurDirective } from '../../../shared/util/util.directive';
 import {
@@ -44,7 +44,7 @@ import { TableDragPreviewDirective } from './table-drag-preview.directive';
   // 表格的 cell template 透過 DOM 尋找所屬列，避免 handle 註冊到外層卡片。
   providers: [{ provide: CDK_DRAG_PARENT, useValue: null }],
   imports: [
-    TranslateModule,
+    TranslatePipe,
     CommonModule,
     MatTableModule,
     CdkDropList,

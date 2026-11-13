@@ -16,7 +16,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { EMPTY, filter, map, switchMap } from 'rxjs';
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -35,7 +35,7 @@ import { GroupDatasetService } from '../../service/group-dataset.service';
     MatTableModule,
     FormField,
     MatButtonModule,
-    TranslateModule,
+    TranslatePipe,
     CommonModule,
     MatIconModule,
     MatCheckboxModule,

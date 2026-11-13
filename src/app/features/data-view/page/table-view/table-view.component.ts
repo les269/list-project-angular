@@ -18,7 +18,7 @@ import {
 import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { CustomMatPaginatorIntl } from '../../../../core/components/custom-mat-paginatorIntl/custom-mat-paginatorIntl';
 import { ScrollTopComponent } from '../../../../core/components/scroll-top/scroll-top.component';
 import { getWidth, isBlank, isNotBlank } from '../../../../shared/util/helper';
@@ -45,7 +45,7 @@ import {
     MatTableModule,
     ScrollTopComponent,
     FileSizePipe,
-    TranslateModule,
+    TranslatePipe,
     MatSortModule,
     MatPaginatorModule,
     MatIconModule,

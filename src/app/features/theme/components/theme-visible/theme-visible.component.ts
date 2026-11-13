@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
 import { ThemeService } from '../../services/theme.service';
 import { ThemeHeader, ThemeHeaderType } from '../../models';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { MatIconModule } from '@angular/material/icon';
 import {
   MatDialogContent,
@@ -26,7 +26,7 @@ import { LayoutStore } from '../../../../core/stores/layout.store';
   imports: [
     CommonModule,
     MatListModule,
-    TranslateModule,
+    TranslatePipe,
     MatIconModule,
     MatDialogTitle,
     MatDialogContent,

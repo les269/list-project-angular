@@ -9,7 +9,7 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ScrapyConfig } from '../../model/scrapy.model';
 import { ScrapyService } from '../../services/scrapy.service';
 import { Router } from '@angular/router';
@@ -22,7 +22,7 @@ import { MessageBoxService } from '../../../../core/services/message-box.service
 
 @Component({
   imports: [
-    TranslateModule,
+    TranslatePipe,
     CommonModule,
     MatTableModule,
     MatButtonModule,

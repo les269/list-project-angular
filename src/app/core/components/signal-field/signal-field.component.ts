@@ -1,7 +1,7 @@
 import { Component, computed, input, output } from '@angular/core';
 import { FieldTree, FormField } from '@angular/forms/signals';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ChipInputComponent } from '../chip-input/chip-input.component';
 import { SignalDateInputComponent } from '../signal-date-input/signal-date-input.component';
 
@@ -19,7 +19,7 @@ let nextControlId = 0;
     MatTooltipModule,
     FormField,
     FormInvalidsComponent,
-    TranslateModule,
+    TranslatePipe,
     ChipInputComponent,
     SignalDateInputComponent,
   ],

@@ -21,7 +21,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatTableModule } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { EMPTY, filter, finalize, map, switchMap, tap } from 'rxjs';
 import { FormInvalidsComponent } from '../../../../core/components/form-invalids/form-invalids.component';
 import { FormAlert } from '../../../../core/model';
@@ -54,7 +54,7 @@ import { ThemeService } from '../../services/theme.service';
     MatCheckboxModule,
     CommonModule,
     MatListModule,
-    TranslateModule,
+    TranslatePipe,
     ThemeLabelTableComponent,
     ThemeDatasetTableComponent,
     ThemeTagTableComponent,

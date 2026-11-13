@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -21,7 +21,7 @@ import { MessageBoxService } from '../../../../core/services/message-box.service
   selector: 'app-scrapy-pagination-list',
 
   imports: [
-    TranslateModule,
+    TranslatePipe,
     CommonModule,
     MatTableModule,
     MatButtonModule,

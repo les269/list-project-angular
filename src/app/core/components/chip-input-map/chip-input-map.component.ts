@@ -12,7 +12,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ChipsMapValue } from '../../model';
 
 @Component({
@@ -28,7 +28,7 @@ import { ChipsMapValue } from '../../model';
     MatIconModule,
     MatButtonModule,
     MatInputModule,
-    TranslateModule,
+    TranslatePipe,
   ],
   templateUrl: './chip-input-map.component.html',
 })

@@ -15,7 +15,7 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { filter, switchMap, tap } from 'rxjs';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -33,7 +33,7 @@ import { SettingService } from '../../services/setting.service';
 @Component({
   selector: 'app-setting-database',
   imports: [
-    TranslateModule,
+    TranslatePipe,
     CommonModule,
     MatButtonModule,
     MatTableModule,

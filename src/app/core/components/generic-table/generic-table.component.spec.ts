@@ -10,7 +10,7 @@ import {
   FormField,
   required,
 } from '@angular/forms/signals';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import {
   GenericColumnType,
   GenericTableColumn,
@@ -78,7 +78,8 @@ describe('GenericTableComponent with Signal Forms', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TableHost, TranslateModule.forRoot()],
+      imports: [TableHost],
+      providers: [provideTranslateService()],
     }).compileComponents();
     fixture = TestBed.createComponent(TableHost);
     host = fixture.componentInstance;

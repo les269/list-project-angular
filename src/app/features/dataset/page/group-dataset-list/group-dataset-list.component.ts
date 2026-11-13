@@ -11,7 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { GroupDataset } from '../../model';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -30,7 +30,7 @@ import { MatInputModule } from '@angular/material/input';
   selector: 'app-group-dataset-list',
 
   imports: [
-    TranslateModule,
+    TranslatePipe,
     CommonModule,
     MatTableModule,
     MatButtonModule,

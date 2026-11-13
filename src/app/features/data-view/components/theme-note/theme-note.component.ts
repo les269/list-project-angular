@@ -10,7 +10,7 @@ import {
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
 
 @Component({
@@ -22,7 +22,7 @@ import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
     MatDialogActions,
     MatDialogTitle,
     MatDialogContent,
-    TranslateModule,
+    TranslatePipe,
     CommonModule,
     NgxEditorModule,
     MatIcon,

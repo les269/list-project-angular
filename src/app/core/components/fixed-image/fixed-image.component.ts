@@ -8,12 +8,12 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-fixed-image',
 
-  imports: [CommonModule, MatIconModule, TranslateModule],
+  imports: [CommonModule, MatIconModule, TranslatePipe],
   templateUrl: './fixed-image.component.html',
   styleUrl: './fixed-image.component.scss',
 })

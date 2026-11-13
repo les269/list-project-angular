@@ -15,7 +15,7 @@ import { SpiderPaginationService } from '../../services';
 import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { isNotBlank } from '../../../../shared/util/helper';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
@@ -27,7 +27,7 @@ import { SpiderPaginationDataComponent } from '../../components/spider-paginatio
 @Component({
   selector: 'app-spider-pagination-list',
   imports: [
-    TranslateModule,
+    TranslatePipe,
     CommonModule,
     MatTableModule,
     MatButtonModule,

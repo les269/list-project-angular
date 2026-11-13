@@ -5,7 +5,7 @@ import { FormValueControl } from '@angular/forms/signals';
 import { MatDialog } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import { Observable, of, Subject } from 'rxjs';
 import { GenericTableComponent } from '../../../core/components/generic-table/generic-table.component';
 import { MessageBoxService } from '../../../core/services/message-box.service';
@@ -134,9 +134,9 @@ async function setup(realEditors = false, spiderId?: string) {
       HeadersTableComponent,
       SpiderItemComponent,
       SpiderEditComponent,
-      TranslateModule.forRoot(),
     ],
     providers: [
+      provideTranslateService(),
       { provide: CookieListService, useValue: cookies },
       { provide: CookieListMapService, useValue: maps },
       { provide: HeadersService, useValue: headers },

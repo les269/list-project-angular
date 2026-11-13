@@ -3,7 +3,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { Component, inject, signal, viewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { form, FormField } from '@angular/forms/signals';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { API_BASE_URL } from '../../core/tokens/api-base-url.token';
 import { ChipSelectButtonComponent } from '../../core/components/chip-select-button/chip-select-button.component';
@@ -66,7 +66,6 @@ describe('Signal form migration regressions', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
-        TranslateModule.forRoot(),
         PipelineHost,
         ChipHost,
         ThemeCustomTableComponent,
@@ -75,6 +74,7 @@ describe('Signal form migration regressions', () => {
         EditGroupDatasetDataComponent,
       ],
       providers: [
+        provideTranslateService(),
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: API_BASE_URL, useValue: 'http://localhost' },

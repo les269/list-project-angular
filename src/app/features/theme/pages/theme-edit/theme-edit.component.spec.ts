@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import { of, Subject } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { LayoutStore } from '../../../../core/stores/layout.store';
@@ -16,8 +16,9 @@ describe('ThemeEditComponent saving', () => {
     };
     const items = { getItemsByHeaderId: vi.fn(() => of([])) };
     await TestBed.configureTestingModule({
-      imports: [ThemeEditComponent, TranslateModule.forRoot()],
+      imports: [ThemeEditComponent],
       providers: [
+        provideTranslateService(),
         provideRouter([]),
         { provide: ThemeService, useValue: service },
         { provide: ThemeItemService, useValue: items },

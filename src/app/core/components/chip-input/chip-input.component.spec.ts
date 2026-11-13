@@ -2,7 +2,7 @@ import { Component, input, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { form, FormField } from '@angular/forms/signals';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import { ChipInputComponent } from './chip-input.component';
 import { ChipInputColorComponent } from '../chip-input-color/chip-input-color.component';
 import { ChipInputMapComponent } from '../chip-input-map/chip-input-map.component';
@@ -104,7 +104,8 @@ describe.each([false, true])('chip input editing (color=%s)', color => {
 describe('chip map unchanged edits', () => {
   it('closes the editor without changing the array or marking the parent dirty', async () => {
     await TestBed.configureTestingModule({
-      imports: [ChipMapHost, TranslateModule.forRoot()],
+      imports: [ChipMapHost],
+      providers: [provideTranslateService()],
     }).compileComponents();
     const fixture = TestBed.createComponent(ChipMapHost);
     await fixture.whenStable();

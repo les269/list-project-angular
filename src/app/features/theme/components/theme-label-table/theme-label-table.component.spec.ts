@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom, of } from 'rxjs';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
@@ -28,8 +28,9 @@ describe('ThemeLabelTableComponent loading', () => {
       getThemeItem: vi.fn(() => of(storedItem('selected'))),
     };
     await TestBed.configureTestingModule({
-      imports: [ThemeLabelTableComponent, TranslateModule.forRoot()],
+      imports: [ThemeLabelTableComponent],
       providers: [
+        provideTranslateService(),
         { provide: ThemeItemService, useValue: service },
         { provide: ThemeItemMapService, useValue: {} },
         { provide: MessageBoxService, useValue: { openI18N: () => of(true) } },

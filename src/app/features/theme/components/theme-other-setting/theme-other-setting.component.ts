@@ -24,7 +24,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatTableModule } from '@angular/material/table';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ChipInputColorComponent } from '../../../../core/components/chip-input-color/chip-input-color.component';
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import { hasFieldError } from '../../../../shared/util/signal-form';
@@ -50,7 +50,7 @@ import { normalizeThemeItem } from '../../util/theme-item-form';
     MatButtonModule,
     MatCheckboxModule,
     MatListModule,
-    TranslateModule,
+    TranslatePipe,
     MatFormFieldModule,
     MatChipsModule,
     ChipInputColorComponent,

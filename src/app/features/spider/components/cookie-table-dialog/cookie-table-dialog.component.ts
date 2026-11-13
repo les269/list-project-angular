@@ -6,7 +6,7 @@ import {
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { CookieListMapType } from '../../model';
 import { CookieTableComponent } from '../cookie-table/cookie-table.component';
 import { MatIconModule } from '@angular/material/icon';
@@ -20,7 +20,7 @@ export interface CookieTableDialogData {
   selector: 'app-cookie-table-dialog',
 
   imports: [
-    TranslateModule,
+    TranslatePipe,
     MatButtonModule,
     MatDialogTitle,
     MatDialogContent,

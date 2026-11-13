@@ -11,7 +11,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { FixedImageComponent } from '../../../../core/components/fixed-image/fixed-image.component';
 import { ScrollTopComponent } from '../../../../core/components/scroll-top/scroll-top.component';
 import { API_BASE_URL } from '../../../../core/tokens/api-base-url.token';
@@ -39,7 +39,7 @@ import {
 @Component({
   imports: [
     MatIconModule,
-    TranslateModule,
+    TranslatePipe,
     ScrollTopComponent,
     MatButtonModule,
     MatTooltipModule,

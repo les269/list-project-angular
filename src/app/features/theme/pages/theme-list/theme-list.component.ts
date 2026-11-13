@@ -1,7 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { ThemeHeader, ThemeHeaderType } from '../../models';
 import { CommonModule } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { ThemeService } from '../../services/theme.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -14,7 +14,7 @@ import { CopyThemeComponent } from '../../components/copy-theme/copy-theme.compo
 import { LayoutStore } from '../../../../core/stores/layout.store';
 
 @Component({
-  imports: [CommonModule, TranslateModule],
+  imports: [CommonModule, TranslatePipe],
   selector: 'app-theme-list',
   templateUrl: 'theme-list.component.html',
   styleUrls: ['theme-list.component.scss'],

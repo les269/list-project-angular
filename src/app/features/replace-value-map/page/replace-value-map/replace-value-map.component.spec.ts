@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { SelectTableService } from '../../../../core/services/select-table.service';
@@ -15,8 +15,9 @@ async function setup() {
     update: vi.fn(() => of(undefined)),
   };
   await TestBed.configureTestingModule({
-    imports: [ReplaceValueMapComponent, TranslateModule.forRoot()],
+    imports: [ReplaceValueMapComponent],
     providers: [
+      provideTranslateService(),
       { provide: ReplaceValueMapService, useValue: service },
       { provide: SelectTableService, useValue: {} },
       { provide: SnackbarService, useValue: { openI18N: vi.fn() } },

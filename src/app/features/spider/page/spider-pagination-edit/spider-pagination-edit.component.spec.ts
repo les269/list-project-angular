@@ -8,7 +8,7 @@ import { FormValueControl } from '@angular/forms/signals';
 import { SignalCodeEditorComponent } from '../../../../core/components/signal-code-editor/signal-code-editor.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import { of, Subject } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import {
@@ -47,8 +47,9 @@ async function setup() {
   };
   const router = { navigate: vi.fn() };
   await TestBed.configureTestingModule({
-    imports: [SpiderPaginationEditComponent, TranslateModule.forRoot()],
+    imports: [SpiderPaginationEditComponent],
     providers: [
+      provideTranslateService(),
       provideHttpClient(),
       {
         provide: ActivatedRoute,

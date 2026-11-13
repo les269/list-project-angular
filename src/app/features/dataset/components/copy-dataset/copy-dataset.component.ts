@@ -11,7 +11,7 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { EMPTY, switchMap } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { isBlank } from '../../../../shared/util/helper';
@@ -29,7 +29,7 @@ import { DatasetService } from '../../service/dataset.service';
     MatDialogClose,
     MatDialogTitle,
     MatDialogContent,
-    TranslateModule,
+    TranslatePipe,
   ],
   templateUrl: './copy-dataset.component.html',
 })

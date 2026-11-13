@@ -21,7 +21,7 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { finalize } from 'rxjs';
 import { SignalCodeEditorComponent } from '../../../core/components/signal-code-editor/signal-code-editor.component';
 import { ApiRequestConfig, CallApiParameters, CallApiResult } from '../model';
@@ -35,7 +35,7 @@ import { ApiRequestConfigService } from '../service/api-request-config.service';
     MatDialogContent,
     MatDialogTitle,
     SignalCodeEditorComponent,
-    TranslateModule,
+    TranslatePipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-call-api-dialog',

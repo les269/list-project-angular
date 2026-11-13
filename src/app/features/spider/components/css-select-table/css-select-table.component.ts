@@ -8,7 +8,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 import {
   GenericColumnType,
@@ -25,7 +25,7 @@ import { createCssSelect } from '../../util/css-select';
   imports: [
     MatTableModule,
     FormField,
-    TranslateModule,
+    TranslatePipe,
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,

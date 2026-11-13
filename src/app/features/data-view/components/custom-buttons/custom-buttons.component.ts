@@ -1,4 +1,4 @@
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   Component,
   computed,
@@ -31,7 +31,7 @@ import { ButtonInputUrlComponent } from '../button-input-url/button-input-url.co
 @Component({
   selector: 'app-custom-buttons',
 
-  imports: [MatIconModule, CopyDirective, TranslateModule],
+  imports: [MatIconModule, CopyDirective, TranslatePipe],
   templateUrl: './custom-buttons.component.html',
   styleUrl: './custom-buttons.component.scss',
 })

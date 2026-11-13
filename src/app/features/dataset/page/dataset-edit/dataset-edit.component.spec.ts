@@ -6,7 +6,7 @@ import {
   convertToParamMap,
   provideRouter,
 } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import { API_BASE_URL } from '../../../../core/tokens/api-base-url.token';
 import { DatasetConfigType } from '../../model';
 import { DatasetFieldTableComponent } from '../../components/dataset-field-table/dataset-field-table.component';
@@ -17,8 +17,9 @@ import { of } from 'rxjs';
 describe('Dataset signal form validation', () => {
   it('reacts to configuration changes and includes nested table validation without subscriptions', async () => {
     await TestBed.configureTestingModule({
-      imports: [DatasetEditComponent, TranslateModule.forRoot()],
+      imports: [DatasetEditComponent],
       providers: [
+        provideTranslateService(),
         provideRouter([]),
         provideHttpClient(),
         provideHttpClientTesting(),
@@ -74,8 +75,9 @@ describe('Dataset signal form validation', () => {
 
 it('載入資料時一次初始化欄位，編輯不被覆寫，重新載入清除缺少的舊值', async () => {
   await TestBed.configureTestingModule({
-    imports: [DatasetEditComponent, TranslateModule.forRoot()],
+    imports: [DatasetEditComponent],
     providers: [
+      provideTranslateService(),
       provideRouter([]),
       provideHttpClient(),
       provideHttpClientTesting(),

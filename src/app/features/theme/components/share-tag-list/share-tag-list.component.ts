@@ -28,7 +28,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { EMPTY, filter, finalize, map, switchMap, take } from 'rxjs';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -44,7 +44,7 @@ import { ShareTagValueListComponent } from '../share-tag-value-list/share-tag-va
     FormField,
     CommonModule,
     MatListModule,
-    TranslateModule,
+    TranslatePipe,
     MatIconModule,
     MatDialogModule,
     MatDialogTitle,

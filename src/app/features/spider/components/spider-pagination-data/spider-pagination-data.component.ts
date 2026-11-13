@@ -24,7 +24,7 @@ import {
   PageEvent,
 } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { catchError, EMPTY, finalize } from 'rxjs';
 import { CustomMatPaginatorIntl } from '../../../../core/components/custom-mat-paginatorIntl/custom-mat-paginatorIntl';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -47,7 +47,7 @@ export interface SpiderPaginationDataDialogData {
     MatDialogTitle,
     MatPaginatorModule,
     MatTableModule,
-    TranslateModule,
+    TranslatePipe,
   ],
   providers: [{ provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl }],
   selector: 'app-spider-pagination-data',

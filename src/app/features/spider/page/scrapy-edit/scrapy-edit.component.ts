@@ -17,7 +17,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
 import { languages } from '@codemirror/language-data';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { EMPTY, filter, map, switchMap } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { isNotBlank, isNotJson } from '../../../../shared/util/helper';
@@ -37,7 +37,7 @@ import { createCssSelect } from '../../util/css-select';
     MatTableModule,
     FormField,
     MatButtonModule,
-    TranslateModule,
+    TranslatePipe,
     CommonModule,
     MatIconModule,
     CodeEditor,

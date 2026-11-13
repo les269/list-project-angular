@@ -8,7 +8,7 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-button-input-url',
@@ -18,7 +18,7 @@ import { TranslateModule } from '@ngx-translate/core';
     MatDialogClose,
     MatDialogTitle,
     MatDialogContent,
-    TranslateModule,
+    TranslatePipe,
   ],
   templateUrl: './button-input-url.component.html',
   styleUrl: './button-input-url.component.scss',

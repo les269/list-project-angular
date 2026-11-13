@@ -1,7 +1,7 @@
 import { SignalFieldType } from '../../../../core/model/signal-field.model';
 import { Component, computed, input } from '@angular/core';
 import { FieldTree } from '@angular/forms/signals';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   UpdateControl,
   ParamSetting,
@@ -14,7 +14,7 @@ import { toSignalFieldOptions } from '../../../../shared/util/signal-field';
 
 @Component({
   selector: 'app-pagination-update-control',
-  imports: [TranslateModule, SignalFieldComponent],
+  imports: [TranslatePipe, SignalFieldComponent],
   templateUrl: './pagination-update-control.component.html',
 })
 export class PaginationUpdateControlComponent {

@@ -2,7 +2,7 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { form, required } from '@angular/forms/signals';
 import { MatDialog } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 import { of, Subject } from 'rxjs';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { SelectTableService } from '../../../../core/services/select-table.service';
@@ -20,8 +20,9 @@ describe('ThemeItemManageComponent operations', () => {
     };
     const messages = { openI18N: vi.fn(() => of(true)) };
     await TestBed.configureTestingModule({
-      imports: [ThemeItemManageComponent, TranslateModule.forRoot()],
+      imports: [ThemeItemManageComponent],
       providers: [
+        provideTranslateService(),
         { provide: ThemeItemService, useValue: service },
         {
           provide: ThemeItemMapService,

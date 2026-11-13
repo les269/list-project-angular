@@ -9,7 +9,7 @@ import {
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { MatListModule } from '@angular/material/list';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { ScrapyPagination } from '../../model';
 import { ScrapyPaginationService } from '../../services/scrapy-pagination.service';
@@ -22,7 +22,7 @@ import { ScrapyPaginationService } from '../../services/scrapy-pagination.servic
     MatDialogActions,
     MatDialogTitle,
     MatDialogContent,
-    TranslateModule,
+    TranslatePipe,
     CommonModule,
     MatListModule,
   ],

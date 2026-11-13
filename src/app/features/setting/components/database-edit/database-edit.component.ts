@@ -15,7 +15,7 @@ import {
   MatDialogRef,
 } from '@angular/material/dialog';
 import { defer, finalize, Observable, take } from 'rxjs';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { DEFAULT_DYNAMIC_DB_KEY } from '../../../../shared/util/global';
@@ -33,7 +33,7 @@ import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
   imports: [
     FormField,
     CommonModule,
-    TranslateModule,
+    TranslatePipe,
     MatDialogModule,
     MatButtonModule,
     TrimOnBlurDirective,

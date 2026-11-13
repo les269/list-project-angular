@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { form, required, validate } from '@angular/forms/signals';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { FormInvalid } from '../../model/form-invalids.model';
 import { FormInvalidsComponent } from './form-invalids.component';
 
@@ -25,7 +25,8 @@ class TestHost {
 
 async function setup() {
   await TestBed.configureTestingModule({
-    imports: [TestHost, TranslateModule.forRoot()],
+    imports: [TestHost],
+    providers: [provideTranslateService()],
   }).compileComponents();
   const translate = TestBed.inject(TranslateService);
   translate.setTranslation('zh-tw', {

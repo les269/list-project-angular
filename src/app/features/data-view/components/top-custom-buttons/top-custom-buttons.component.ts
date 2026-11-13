@@ -1,4 +1,4 @@
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Component, inject, input } from '@angular/core';
 
 import {
@@ -17,7 +17,7 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
 @Component({
   selector: 'app-top-custom-buttons',
 
-  imports: [MatIconModule, TranslateModule],
+  imports: [MatIconModule, TranslatePipe],
   templateUrl: './top-custom-buttons.component.html',
   styleUrl: './top-custom-buttons.component.scss',
 })

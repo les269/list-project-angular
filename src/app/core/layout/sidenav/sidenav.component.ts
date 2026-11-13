@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ThemeService } from '../../../features/theme/services/theme.service';
 import { ThemeHeader, ThemeHeaderType } from '../../../features/theme/models';
 import { routes } from '../../../app.routes';
@@ -9,7 +9,7 @@ import { LayoutStore } from '../../stores/layout.store';
 import { ThemeHiddenService } from '../../../features/theme/services';
 
 @Component({
-  imports: [CommonModule, RouterModule, TranslateModule],
+  imports: [CommonModule, RouterModule, TranslatePipe],
   selector: 'app-sidenav',
   templateUrl: 'sidenav.component.html',
   styleUrls: ['sidenav.component.scss'],

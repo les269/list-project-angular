@@ -12,7 +12,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { languages } from '@codemirror/language-data';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { switchMap } from 'rxjs';
 import { ChipInputMapComponent } from '../../../../core/components';
 import { ChipInputComponent } from '../../../../core/components/chip-input/chip-input.component';
@@ -48,7 +48,7 @@ import { toSignalFieldOptions } from '../../../../shared/util/signal-field';
   imports: [
     CommonModule,
     FormField,
-    TranslateModule,
+    TranslatePipe,
     DragDropModule,
     MatIconModule,
     TrimOnBlurDirective,

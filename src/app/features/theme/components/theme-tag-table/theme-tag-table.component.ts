@@ -26,7 +26,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatTableModule } from '@angular/material/table';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { FormAlertsComponent } from '../../../../core/components/form-alerts/form-alerts.component';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 import { FormAlert } from '../../../../core/model';
@@ -49,7 +49,7 @@ import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage
     MatButtonModule,
     MatCheckboxModule,
     MatListModule,
-    TranslateModule,
+    TranslatePipe,
     MatChipsModule,
     GenericTableComponent,
     FormAlertsComponent,
