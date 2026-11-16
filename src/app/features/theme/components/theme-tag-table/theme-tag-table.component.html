@@ -1,6 +1,8 @@
-<label class="h3">{{ 'themeTag.title' | translate }}</label>
-<div class="card mb-3">
-  <div class="card-body">
+<section class="theme-section" aria-labelledby="theme-tag-title">
+  <h2 class="section-title" id="theme-tag-title">
+    {{ 'themeTag.title' | translate }}
+  </h2>
+  <div class="section-body">
     <app-theme-item-manage
       [headerId]="headerId()"
       [form]="form"
@@ -10,14 +12,13 @@
     <app-form-alerts
       [form]="fields"
       [formAlerts]="formAlerts()"></app-form-alerts>
-    <div class="card mb-3">
-      <app-generic-table
-        [class.table-invalid]="fields().invalid()"
-        [fields]="fields"
-        [createRow]="createRow"
-        [cols]="cols()"
-        [displayedColumns]="displayedColumns">
-      </app-generic-table>
-    </div>
+    <app-generic-table
+      appearance="outlined"
+      [class.table-invalid]="fields().invalid()"
+      [fields]="fields"
+      [createRow]="createRow"
+      [cols]="cols()"
+      [displayedColumns]="displayedColumns">
+    </app-generic-table>
   </div>
-</div>
+</section>

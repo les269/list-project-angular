@@ -13,7 +13,6 @@ import {
   readonly as readonlyField,
   validate,
 } from '@angular/forms/signals';
-import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -30,7 +29,6 @@ import { ApiRequestConfigService } from '../service/api-request-config.service';
 @Component({
   imports: [
     FormField,
-    MatButtonModule,
     MatDialogActions,
     MatDialogContent,
     MatDialogTitle,

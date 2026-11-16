@@ -9,14 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import {
-  disabled,
-  form,
-  FormField,
-  readonly,
-  required,
-} from '@angular/forms/signals';
-import { MatButtonModule } from '@angular/material/button';
+import { disabled, form, readonly, required } from '@angular/forms/signals';
 import {
   MatDialog,
   MatDialogContent,
@@ -25,11 +18,12 @@ import {
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatListModule } from '@angular/material/list';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { TranslatePipe } from '@ngx-translate/core';
 import { EMPTY, filter, finalize, map, switchMap, take } from 'rxjs';
+import { SignalFieldComponent } from '../../../../core/components/signal-field/signal-field.component';
+import { EditMode } from '../../../../core/model/global.model';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { isBlank } from '../../../../shared/util/helper';
@@ -41,15 +35,13 @@ import { ShareTagValueListComponent } from '../share-tag-value-list/share-tag-va
   selector: 'app-share-tag-list',
 
   imports: [
-    FormField,
+    SignalFieldComponent,
     CommonModule,
-    MatListModule,
     TranslatePipe,
     MatIconModule,
     MatDialogModule,
     MatDialogTitle,
     MatDialogContent,
-    MatButtonModule,
     MatTableModule,
     MatSortModule,
   ],
@@ -69,12 +61,13 @@ export class ShareTagListComponent {
     'updatedTime',
     'action',
   ];
+  readonly editMode = EditMode;
   readonly tagModel = signal({ shareTagId: '', shareTagName: '' });
   readonly initialTagValue = structuredClone(this.tagModel());
   readonly isSaving = signal(false);
   readonly isDeleting = signal(false);
   readonly filterValue = signal('');
-  isEdit = signal(false);
+  readonly mode = signal(EditMode.CREATE);
 
   addTagDialog = viewChild.required<TemplateRef<any>>('addTagDialog');
   sort = viewChild(MatSort);
@@ -92,7 +85,7 @@ export class ShareTagListComponent {
   readonly tagForm = form(this.tagModel, p => {
     required(p.shareTagId);
     required(p.shareTagName);
-    disabled(p.shareTagId, { when: () => this.isEdit() });
+    disabled(p.shareTagId, { when: () => this.mode() === EditMode.EDIT });
     readonly(p, { when: () => this.isSaving() });
   });
 
@@ -159,14 +152,17 @@ export class ShareTagListComponent {
       shareTagId: tag.shareTagId,
       shareTagName: tag.shareTagName,
     });
-    this.isEdit.set(true);
-    this.addDialogRef = this.matDialog.open(this.addTagDialog());
+    this.mode.set(EditMode.EDIT);
+    this.addDialogRef = this.matDialog.open(this.addTagDialog(), {
+      width: '480px',
+      maxWidth: 'calc(100vw - 32px)',
+    });
     this.addDialogRef
       .afterClosed()
       .pipe(take(1))
       .subscribe(() => {
         this.tagForm().reset(structuredClone(this.initialTagValue));
-        this.isEdit.set(false);
+        this.mode.set(EditMode.CREATE);
       });
   }
 
@@ -187,7 +183,7 @@ export class ShareTagListComponent {
       return;
     }
     if (
-      !this.isEdit() &&
+      this.mode() === EditMode.CREATE &&
       this.dataSource
         .value()
         .data.some(x => x.shareTagId === payload.shareTagId)
@@ -210,7 +206,7 @@ export class ShareTagListComponent {
       .subscribe({
         next: () => {
           this.dataSource.reload();
-          this.isEdit.set(false);
+          this.mode.set(EditMode.CREATE);
           dialogRef?.close();
           this.snackbarService.openI18N('msg.addSuccess');
         },
@@ -220,15 +216,18 @@ export class ShareTagListComponent {
 
   openAddDialog() {
     if (this.isSaving() || this.isDeleting()) return;
-    this.isEdit.set(false);
+    this.mode.set(EditMode.CREATE);
     this.tagForm().reset(structuredClone(this.initialTagValue));
-    this.addDialogRef = this.matDialog.open(this.addTagDialog());
+    this.addDialogRef = this.matDialog.open(this.addTagDialog(), {
+      width: '480px',
+      maxWidth: 'calc(100vw - 32px)',
+    });
     this.addDialogRef
       .afterClosed()
       .pipe(take(1))
       .subscribe(() => {
         this.tagForm().reset(structuredClone(this.initialTagValue));
-        this.isEdit.set(false);
+        this.mode.set(EditMode.CREATE);
       });
   }
 
@@ -242,7 +241,7 @@ export class ShareTagListComponent {
   onReorderTag(tag: ShareTag) {
     this.matDialog.open(ShareTagValueListComponent, {
       width: '700px',
-      maxWidth: '700px',
+      maxWidth: 'calc(100vw - 32px)',
       data: tag,
     });
   }

@@ -1,19 +1,92 @@
-:host {
-  display: block;
+@use '../../../../styles/editor-dialog' as dialog;
+
+@include dialog.layout;
+
+.dialog-title {
+  padding: var(--app-space-4) var(--app-space-6);
+  font-size: var(--app-font-size-body);
+  line-height: 24px;
+  overflow-wrap: anywhere;
+}
+
+.dialog-content {
+  display: grid;
+  gap: var(--app-space-2);
+  padding: var(--app-space-3) var(--app-space-4);
+}
+
+.dialog-title + .dialog-content {
+  padding-top: var(--app-space-3);
+}
+
+.request-fields {
+  display: grid;
+  gap: var(--app-space-2);
+  min-width: 0;
+}
+
+.field-hint {
+  margin: 0;
+  color: var(--app-text-secondary);
+  font-size: var(--app-font-size-sm);
+  line-height: var(--app-line-height-body);
+  overflow-wrap: anywhere;
+}
+
+.editor-group {
+  min-width: 0;
+  align-self: start;
+  overflow: hidden;
+  border: 1px solid var(--app-border-strong);
+  border-radius: var(--app-radius-sm);
+}
+
+.editor-label {
+  margin: 0;
+  padding: var(--app-space-1) var(--app-space-2);
+  background: var(--app-surface-muted);
+  border-bottom: 1px solid var(--app-border-strong);
+  font-size: var(--app-font-size-sm);
+  font-weight: 400;
+  line-height: var(--app-line-height-body);
 }
 
 .parameters-editor {
-  height: 200px;
+  height: 160px;
+}
+
+.response-status {
+  margin: 0;
+  color: var(--app-text-primary);
 }
 
 .response-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-  gap: 1rem;
+  align-items: start;
+  gap: var(--app-space-3);
+
+  section {
+    min-width: 0;
+  }
+
+  .field-hint {
+    margin-top: var(--app-space-1);
+  }
 }
 
 .response-editor {
-  height: 300px;
+  height: 240px;
+}
+
+.execution-error {
+  margin: 0;
+  padding: var(--app-space-2) var(--app-space-3);
+}
+
+.dialog-actions {
+  justify-content: space-between;
+  padding: var(--app-space-2) var(--app-space-4);
 }
 
 @media (max-width: 767.98px) {

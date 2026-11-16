@@ -1,0 +1,34 @@
+@use '../../styles/theme-section' as section;
+
+@include section.layout;
+
+app-generic-table {
+  --app-editor-table-min-width: 960px;
+}
+
+.top-custom-detail {
+  display: grid;
+  gap: var(--app-space-3);
+  padding: var(--app-space-3) 0 var(--app-space-4);
+
+  .form-control,
+  .form-select {
+    min-width: 0;
+    min-height: 40px;
+    font-size: var(--app-font-size-sm);
+    font-weight: 400;
+  }
+}
+
+.url-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(200px, 1fr);
+  gap: var(--app-space-3);
+}
+
+.api-selection {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--app-space-3);
+}

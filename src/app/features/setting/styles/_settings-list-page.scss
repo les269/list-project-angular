@@ -1,0 +1,21 @@
+@use '../../../../styles/management-list-page';
+
+@mixin layout($table-min-width) {
+  @include management-list-page.layout(
+    $table-min-width: $table-min-width,
+    $page-selector: '.settings-page'
+  );
+
+  .settings-page {
+    max-width: none;
+    padding: 0;
+  }
+
+  .page-title {
+    margin: 0 0 var(--app-space-6);
+    color: var(--app-text-primary);
+    font-size: var(--app-font-size-section);
+    font-weight: 400;
+    line-height: var(--app-line-height-heading);
+  }
+}

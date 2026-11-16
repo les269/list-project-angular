@@ -1,0 +1,18 @@
+@use '@angular/material' as mat;
+@use '../../styles/theme-section' as section;
+
+@include section.layout;
+
+:host {
+  @include mat.checkbox-overrides(
+    (
+      label-text-font: var(--app-font-family),
+      label-text-size: var(--app-font-size-sm),
+      label-text-weight: 400,
+    )
+  );
+}
+
+.dataset-detail {
+  padding: var(--app-space-2) 0;
+}

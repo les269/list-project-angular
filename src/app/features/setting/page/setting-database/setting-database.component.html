@@ -1,137 +1,178 @@
-<div class="expanded">
-  <div class="content">
-    <div class="text-container">
-      <div>{{ route.snapshot.data['subtitle'] | translate }}</div>
+<section class="settings-page" aria-labelledby="database-title">
+  <h2 id="database-title" class="page-title">
+    {{ route.snapshot.data['subtitle'] | translate }}
+  </h2>
+  <dl class="current-database">
+    <div>
+      <dt>{{ 'database.currentDatabaseId' | translate }}</dt>
+      <dd>{{ currentSetting().value || '—' }}</dd>
     </div>
-    <div class="cuurent-database-text">
-      {{ 'database.currentDatabaseId' | translate }}：{{
-        currentSetting().value
-      }}
+    <div>
+      <dt>{{ 'database.currentDatabaseName' | translate }}</dt>
+      <dd>{{ currentConfigName || '—' }}</dd>
     </div>
-    <div class="cuurent-database-text">
-      {{ 'database.currentDatabaseName' | translate }}：{{ currentConfigName }}
+    <div>
+      <dt>{{ 'g.updatedTime' | translate }}</dt>
+      <dd>
+        {{
+          (currentSetting().updatedTime | date: 'yyyy-MM-dd HH:mm:ss') || '—'
+        }}
+      </dd>
     </div>
-    <div class="cuurent-database-text">
-      {{ 'g.updatedTime' | translate }}：{{
-        currentSetting().updatedTime | date: 'yyyy-MM-dd HH:mm:ss'
-      }}
-    </div>
-    <div class="fs-4 mt-4">
-      <hr />
-      {{ 'database.databaseConfigList' | translate }}
-    </div>
-    <div class="d-flex">
-      <button class="btn btn-primary" (click)="onAdd()">
-        {{ 'g.add' | translate }}
-      </button>
-    </div>
-    <div class="card mt-3">
-      <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort>
-        <ng-container matColumnDef="configId">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>
-            {{ 'database.configId' | translate }}
-          </th>
-          <td mat-cell *matCellDef="let element">
-            {{ element.configId }}
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="configName">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>
-            {{ 'database.configName' | translate }}
-          </th>
-          <td mat-cell *matCellDef="let element">
-            {{ element.configName }}
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="databaseType">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>
-            {{ 'database.databaseType' | translate }}
-          </th>
-          <td mat-cell *matCellDef="let element">
-            {{ element.databaseType | lowercase }}
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="description">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>
-            {{ 'g.description' | translate }}
-          </th>
-          <td mat-cell *matCellDef="let element">
-            {{ element.description }}
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="createdTime">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>
-            {{ 'g.createdTime' | translate }}
-          </th>
-          <td mat-cell *matCellDef="let element">
-            {{ element.createdTime | date: 'yyyy-MM-dd HH:mm' }}
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="updatedTime">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>
-            {{ 'g.updatedTime' | translate }}
-          </th>
-          <td mat-cell *matCellDef="let element">
-            {{ element.updatedTime | date: 'yyyy-MM-dd HH:mm' }}
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="other">
-          <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
-          <td mat-cell *matCellDef="let element; let i = dataIndex">
-            <div class="row flex-nowrap">
-              @if (element.configId !== currentSetting().value) {
-                <button
-                  mat-icon-button
-                  [matTooltip]="'g.useThis' | translate"
-                  (click)="changeCurrent(element)">
-                  <mat-icon>done</mat-icon>
-                </button>
-              }
-
+  </dl>
+  <h3 class="section-title">{{ 'database.databaseConfigList' | translate }}</h3>
+  <div class="page-actions">
+    <button
+      type="button"
+      class="page-button page-button-primary"
+      (click)="onAdd()">
+      {{ 'g.add' | translate }}
+    </button>
+  </div>
+  <div
+    class="table-container scrollbar-primary"
+    role="region"
+    tabindex="0"
+    [attr.aria-label]="'database.databaseConfigList' | translate">
+    <table
+      mat-table
+      [attr.aria-label]="'database.databaseConfigList' | translate"
+      [dataSource]="dataSource"
+      multiTemplateDataRows
+      matSort>
+      <ng-container matColumnDef="configId">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ 'database.configId' | translate }}
+        </th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.configId }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="configName">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ 'database.configName' | translate }}
+        </th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.configName }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="databaseType">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ 'database.databaseType' | translate }}
+        </th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.databaseType | lowercase }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ 'g.description' | translate }}
+        </th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.description }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="createdTime">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ 'g.createdTime' | translate }}
+        </th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.createdTime | date: 'yyyy-MM-dd HH:mm' }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="updatedTime">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ 'g.updatedTime' | translate }}
+        </th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.updatedTime | date: 'yyyy-MM-dd HH:mm' }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="other">
+        <th mat-header-cell *matHeaderCellDef>{{ 'g.actions' | translate }}</th>
+        <td mat-cell *matCellDef="let element; let i = dataIndex">
+          <div class="row-actions">
+            @if (element.configId !== currentSetting().value) {
               <button
+                type="button"
                 mat-icon-button
-                [matTooltip]="'g.edit' | translate"
-                (click)="onEdit(element)">
-                <mat-icon>edit</mat-icon>
+                class="row-action"
+                [attr.aria-label]="
+                  ('g.useThis' | translate) + ' ' + element.configName
+                "
+                [matTooltip]="'g.useThis' | translate"
+                (click)="changeCurrent(element)">
+                <mat-icon>done</mat-icon>
               </button>
+            }
+
+            <button
+              type="button"
+              mat-icon-button
+              class="row-action"
+              [attr.aria-label]="
+                ('g.edit' | translate) + ' ' + element.configName
+              "
+              [matTooltip]="'g.edit' | translate"
+              (click)="onEdit(element)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              type="button"
+              mat-icon-button
+              class="row-action"
+              [attr.aria-label]="
+                ('database.testConnection' | translate) +
+                ' ' +
+                element.configName
+              "
+              [matTooltip]="'database.testConnection' | translate"
+              (click)="onTestConnection(element)">
+              <mat-icon fontSet="material-symbols-outlined"
+                >globe_2_question</mat-icon
+              >
+            </button>
+            @if (DEFAULT_DYNAMIC_DB_KEY !== element.configId) {
               <button
+                type="button"
                 mat-icon-button
-                [matTooltip]="'database.testConnection' | translate"
-                (click)="onTestConnection(element)">
+                class="row-action row-action-danger"
+                [attr.aria-label]="
+                  ('g.delete' | translate) + ' ' + element.configName
+                "
+                [matTooltip]="'g.delete' | translate"
+                (click)="onDelete(element)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            }
+            @if (element.databaseType === eDatabaseType.SQLITE) {
+              <button
+                type="button"
+                mat-icon-button
+                class="row-action"
+                [attr.aria-label]="
+                  ('database.openLocalFolder' | translate) +
+                  ' ' +
+                  element.configName
+                "
+                [matTooltip]="'database.openLocalFolder' | translate"
+                (click)="onOpenLocalFolder(element)">
                 <mat-icon fontSet="material-symbols-outlined"
-                  >globe_2_question</mat-icon
+                  >folder_open</mat-icon
                 >
               </button>
-              @if (DEFAULT_DYNAMIC_DB_KEY !== element.configId) {
-                <button
-                  mat-icon-button
-                  [matTooltip]="'g.delete' | translate"
-                  (click)="onDelete(element)">
-                  <mat-icon>delete</mat-icon>
-                </button>
-              }
-              @if (element.databaseType === eDatabaseType.SQLITE) {
-                <button
-                  mat-icon-button
-                  [matTooltip]="'database.openLocalFolder' | translate"
-                  (click)="onOpenLocalFolder(element)">
-                  <mat-icon fontSet="material-symbols-outlined"
-                    >folder_open</mat-icon
-                  >
-                </button>
-              }
-            </div>
-          </td>
-        </ng-container>
-        <tr
-          class="mat-header-row"
-          mat-header-row
-          *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-        <tr
-          class="mat-row"
-          mat-row
-          *matRowDef="let row; columns: displayedColumns"></tr>
-      </table>
-    </div>
+            }
+          </div>
+        </td>
+      </ng-container>
+      <tr
+        class="mat-header-row"
+        mat-header-row
+        *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr
+        class="mat-row"
+        mat-row
+        *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
   </div>
-</div>
+</section>

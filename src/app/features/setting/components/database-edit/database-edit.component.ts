@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import {
   disabled,
@@ -8,7 +7,6 @@ import {
   readonly,
   validate,
 } from '@angular/forms/signals';
-import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
   MatDialogModule,
@@ -16,6 +14,9 @@ import {
 } from '@angular/material/dialog';
 import { defer, finalize, Observable, take } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
+import { FormInvalidsComponent } from '../../../../core/components/form-invalids/form-invalids.component';
+import { SignalFieldComponent } from '../../../../core/components/signal-field/signal-field.component';
+import { SignalFieldType } from '../../../../core/model/signal-field.model';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { DEFAULT_DYNAMIC_DB_KEY } from '../../../../shared/util/global';
@@ -26,17 +27,15 @@ import {
   TestConnectionResult,
 } from '../../model';
 import { DatabaseConfigService } from '../../services/database-config.service';
-import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 
 @Component({
   selector: 'app-database-edit',
   imports: [
     FormField,
-    CommonModule,
+    SignalFieldComponent,
+    FormInvalidsComponent,
     TranslatePipe,
     MatDialogModule,
-    MatButtonModule,
-    TrimOnBlurDirective,
   ],
   templateUrl: './database-edit.component.html',
   styleUrl: './database-edit.component.scss',
@@ -52,6 +51,11 @@ export class DatabaseEditComponent implements OnInit {
     databaseConfigList: DatabaseConfig[];
     isAdd: boolean;
   }>(MAT_DIALOG_DATA);
+  readonly fieldType = SignalFieldType;
+  readonly databaseTypeOptions = Object.values(DatabaseType).map(value => ({
+    value,
+    label: value.toLowerCase(),
+  }));
   readonly isProcessing = signal(false);
   readonly formModel = signal({
     configId: '',
@@ -82,27 +86,35 @@ export class DatabaseEditComponent implements OnInit {
         : undefined
     );
     required(p.sqliteFilePath, {
+      message: 'database.sqliteFilePathRequired',
       when: ({ valueOf }) => valueOf(p.databaseType) === DatabaseType.SQLITE,
     });
     required(p.port, {
+      message: 'database.portRequired',
       when: ({ valueOf }) =>
         valueOf(p.databaseType) === DatabaseType.POSTGRESQL,
     });
     validate(p.port, ({ value, valueOf }) =>
       valueOf(p.databaseType) === DatabaseType.POSTGRESQL &&
       (!Number.isInteger(value()) || value() < 1 || value() > 65535)
-        ? { kind: 'portRange' }
+        ? { kind: 'portRange', message: 'database.portRange' }
         : undefined
     );
-    for (const field of [p.host, p.databaseName, p.username, p.password]) {
+    for (const [field, message] of [
+      [p.host, 'database.hostRequired'],
+      [p.databaseName, 'database.databaseNameRequired'],
+      [p.username, 'database.usernameRequired'],
+      [p.password, 'database.passwordRequired'],
+    ] as const) {
       required(field, {
+        message,
         when: ({ valueOf }) =>
           valueOf(p.databaseType) === DatabaseType.POSTGRESQL,
       });
     }
-    required(p.configId);
-    required(p.configName);
-    required(p.databaseType);
+    required(p.configId, { message: 'database.configIdRequired' });
+    required(p.configName, { message: 'database.configNameRequired' });
+    required(p.databaseType, { message: 'database.databaseTypeRequired' });
   });
 
   databaseType = DatabaseType;

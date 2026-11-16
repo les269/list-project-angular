@@ -1,26 +1,44 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { KeyValuePipe } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from '@angular/core';
+import {
+  IsActiveMatchOptions,
+  Router,
+  RouterLink,
+  RouterLinkActive,
+} from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
-import { ThemeService } from '../../../features/theme/services/theme.service';
 import { ThemeHeader, ThemeHeaderType } from '../../../features/theme/models';
 import { routes } from '../../../app.routes';
 import { LayoutStore } from '../../stores/layout.store';
-import { ThemeHiddenService } from '../../../features/theme/services';
 
 @Component({
-  imports: [CommonModule, RouterModule, TranslatePipe],
+  imports: [KeyValuePipe, RouterLink, RouterLinkActive, TranslatePipe],
   selector: 'app-sidenav',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'sidenav.component.html',
   styleUrls: ['sidenav.component.scss'],
 })
 export class SidenavComponent {
   readonly router = inject(Router);
-  readonly themeService = inject(ThemeService);
-  readonly themeHiddenService = inject(ThemeHiddenService);
   readonly layoutStore = inject(LayoutStore);
 
   readonly eThemeHeaderType = ThemeHeaderType;
+  readonly pageMatchOptions: IsActiveMatchOptions = {
+    paths: 'exact',
+    queryParams: 'ignored',
+    matrixParams: 'ignored',
+    fragment: 'ignored',
+  };
+  readonly sectionMatchOptions: IsActiveMatchOptions = {
+    ...this.pageMatchOptions,
+    paths: 'subset',
+  };
+
   readonly openSidenav = computed(() => this.layoutStore.openSidenav());
   readonly list = computed(() => this.layoutStore.visibleList());
   readonly routes = routes
@@ -28,7 +46,9 @@ export class SidenavComponent {
     .map(x => ({ path: x.path, title: x.data!['title'] }));
 
   close() {
-    this.layoutStore.toggleSidenav();
+    if (this.openSidenav()) {
+      this.layoutStore.toggleSidenav();
+    }
   }
 
   navigateList(item: ThemeHeader) {

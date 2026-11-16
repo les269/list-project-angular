@@ -1,148 +1,142 @@
-<div class="d-flex justify-content-between align-items-center">
-  <h2 mat-dialog-title>
+<div class="dialog-header">
+  <h2 mat-dialog-title class="dialog-title">
     {{ 'home.shareTagList' | translate }}
   </h2>
-  <button class="d-flex mx-2" mat-icon-button (click)="onNoClick()">
+  <button
+    type="button"
+    class="dialog-close"
+    (click)="onNoClick()"
+    [disabled]="isSaving() || isDeleting()"
+    [attr.aria-label]="'g.close' | translate">
     <mat-icon>close</mat-icon>
   </button>
 </div>
-<mat-dialog-content class="scrollbar-primary overflow-y-hidden">
-  <div class="share-tag-list">
-    <div class="toolbar d-flex justify-content-between align-items-center mb-2">
-      <div class="filter-box" style="flex: 1; max-width: 420px">
-        <input
-          class="form-control"
-          [placeholder]="'g.filter' | translate"
-          (input)="applyFilter($event)" />
-      </div>
-      <div class="ms-2">
-        <button type="button" class="btn add" (click)="openAddDialog()">
-          {{ 'g.add' | translate }}
-        </button>
-      </div>
+<mat-dialog-content class="dialog-content scrollbar-primary">
+  <div class="management-list">
+    <div class="toolbar">
+      <input
+        class="form-control filter-input"
+        type="search"
+        [attr.aria-label]="'g.filter' | translate"
+        (input)="applyFilter($event)" />
+      <button
+        type="button"
+        class="dialog-button dialog-button-primary"
+        [disabled]="isSaving() || isDeleting()"
+        (click)="openAddDialog()">
+        {{ 'g.add' | translate }}
+      </button>
     </div>
-
-    <div class="dialog">
-      <div class="table-container">
-        <table
-          mat-table
-          [dataSource]="dataSource.value()"
-          multiTemplateDataRows
-          matSort>
-          <!-- ID Column -->
-          <ng-container matColumnDef="shareTagId">
-            <th
-              mat-header-cell
-              *matHeaderCellDef
-              mat-sort-header
-              class="sticky-header"
-              [ngStyle]="{ width: '200px' }">
-              {{ 'shareTag.tagId' | translate }}
-            </th>
-            <td mat-cell *matCellDef="let tag">{{ tag.shareTagId }}</td>
-          </ng-container>
-
-          <!-- Name Column -->
-          <ng-container matColumnDef="shareTagName">
-            <th
-              mat-header-cell
-              *matHeaderCellDef
-              mat-sort-header
-              class="sticky-header"
-              [ngStyle]="{ width: '250px' }">
-              {{ 'shareTag.tagName' | translate }}
-            </th>
-            <td mat-cell *matCellDef="let tag">{{ tag.shareTagName }}</td>
-          </ng-container>
-
-          <!-- Updated Time -->
-          <ng-container matColumnDef="updatedTime">
-            <th
-              mat-header-cell
-              *matHeaderCellDef
-              mat-sort-header
-              class="sticky-header"
-              [ngStyle]="{ width: '250px' }">
-              {{ 'g.updatedTime' | translate }}
-            </th>
-            <td mat-cell *matCellDef="let tag">
-              {{ tag.updatedTime | date: 'yyyy-MM-dd HH:mm' }}
-            </td>
-          </ng-container>
-
-          <!-- Actions -->
-          <ng-container matColumnDef="action">
-            <th
-              mat-header-cell
-              *matHeaderCellDef
-              class="sticky-header"
-              [ngStyle]="{ width: '150px' }"></th>
-            <td mat-cell *matCellDef="let tag">
-              <div class="d-flex">
-                <button mat-icon-button (click)="onEditTag(tag)">
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button mat-icon-button (click)="onReorderTag(tag)">
-                  <mat-icon>reorder</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  [disabled]="isDeleting() || isSaving()"
-                  (click)="deleteTag(tag.shareTagId)">
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </div>
-            </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-        </table>
-      </div>
-      @if (!dataSource.value().data || dataSource.value().data.length === 0) {
-        <div class="empty mt-2">
-          {{ 'shareTag.noTags' | translate }}
-        </div>
-      }
+    <div class="table-container scrollbar-primary">
+      <table
+        mat-table
+        [dataSource]="dataSource.value()"
+        multiTemplateDataRows
+        matSort>
+        <ng-container matColumnDef="shareTagId">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            {{ 'shareTag.tagId' | translate }}
+          </th>
+          <td mat-cell *matCellDef="let tag">{{ tag.shareTagId }}</td>
+        </ng-container>
+        <ng-container matColumnDef="shareTagName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            {{ 'shareTag.tagName' | translate }}
+          </th>
+          <td mat-cell *matCellDef="let tag">{{ tag.shareTagName }}</td>
+        </ng-container>
+        <ng-container matColumnDef="updatedTime">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            {{ 'g.updatedTime' | translate }}
+          </th>
+          <td mat-cell *matCellDef="let tag">
+            {{ tag.updatedTime | date: 'yyyy-MM-dd HH:mm' }}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="action">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let tag">
+            <div class="row-actions">
+              <button
+                type="button"
+                class="row-action"
+                [disabled]="isSaving() || isDeleting()"
+                (click)="onEditTag(tag)"
+                [attr.aria-label]="
+                  ('g.edit' | translate) + ' ' + tag.shareTagName
+                "
+                [title]="'g.edit' | translate">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                type="button"
+                class="row-action"
+                [disabled]="isSaving() || isDeleting()"
+                (click)="onReorderTag(tag)"
+                [attr.aria-label]="
+                  ('shareTag.tagValueList' | translate) + ' ' + tag.shareTagName
+                "
+                [title]="'shareTag.tagValueList' | translate">
+                <mat-icon>reorder</mat-icon>
+              </button>
+              <button
+                type="button"
+                class="row-action row-action-danger"
+                [disabled]="isDeleting() || isSaving()"
+                (click)="deleteTag(tag.shareTagId)"
+                [attr.aria-label]="
+                  ('g.delete' | translate) + ' ' + tag.shareTagName
+                "
+                [title]="'g.delete' | translate">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+        <tr
+          mat-header-row
+          *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        <tr class="empty-row" *matNoDataRow>
+          <td [attr.colspan]="displayedColumns.length">
+            {{
+              (dataSource.value().data.length === 0
+                ? 'shareTag.noTags'
+                : 'g.noData'
+              ) | translate
+            }}
+          </td>
+        </tr>
+      </table>
     </div>
   </div>
 </mat-dialog-content>
-
-<!-- Add dialog template (opened by MatDialog) -->
 <ng-template #addTagDialog>
-  <h2 mat-dialog-title>{{ 'shareTag.addTag' | translate }}</h2>
-  <mat-dialog-content>
-    <div class="mb-3">
-      <label for="shareTagId" class="form-label">{{
-        'shareTag.tagId' | translate
-      }}</label>
-      <input
-        type="text"
-        class="form-control"
-        [formField]="tagForm.shareTagId" />
-    </div>
-
-    <div class="mb-3">
-      <label for="shareTagName" class="form-label">{{
-        'shareTag.tagName' | translate
-      }}</label>
-      <input
-        type="text"
-        class="form-control"
-        [formField]="tagForm.shareTagName" />
+  <h2 mat-dialog-title class="dialog-title">
+    {{
+      (mode() === editMode.EDIT ? 'shareTag.editTag' : 'shareTag.addTag')
+        | translate
+    }}
+  </h2>
+  <mat-dialog-content class="dialog-content">
+    <div class="dialog-fields">
+      <app-signal-field [field]="tagForm.shareTagId" label="shareTag.tagId" />
+      <app-signal-field
+        [field]="tagForm.shareTagName"
+        label="shareTag.tagName" />
     </div>
   </mat-dialog-content>
-  <mat-dialog-actions>
+  <mat-dialog-actions class="dialog-actions" [attr.aria-busy]="isSaving()">
     <button
       type="button"
-      class="btn btn-secondary"
+      class="dialog-button"
       [disabled]="isSaving()"
       (click)="closeAddDialog()">
       {{ 'g.no' | translate }}
     </button>
     <button
       type="button"
-      class="btn btn-primary"
+      class="dialog-button dialog-button-primary"
       [disabled]="isSaving()"
       (click)="confirmAddTag()">
       {{ 'g.ok' | translate }}

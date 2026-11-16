@@ -1,40 +1,29 @@
-<h2 mat-dialog-title>{{ 'title.copyThemeItem' | translate }}</h2>
-<mat-dialog-content>
+<h2 mat-dialog-title class="dialog-title">
+  {{ 'title.copyThemeItem' | translate }}
+</h2>
+<mat-dialog-content class="dialog-content">
   <form (submit)="$event.preventDefault()">
-    <div class="mb-3">
-      <label for="sourceItemId" class="form-label">{{
-        'themeItem.sourceItemId' | translate
-      }}</label>
-      <input
-        id="sourceItemId"
-        name="sourceItemId"
-        type="text"
-        class="form-control"
-        [value]="data.sourceItemId"
-        readonly />
-    </div>
-
-    <div class="mb-3">
-      <label for="targetItemId" class="form-label require">{{
-        'themeItem.targetItemId' | translate
-      }}</label>
-      <input
-        id="targetItemId"
-        type="text"
-        class="form-control"
-        [formField]="targetItemIdForm" />
-    </div>
+    <fieldset class="dialog-fields" [disabled]="isProcessing()">
+      <app-signal-field
+        [field]="targetItemIdForm"
+        label="themeItem.targetItemId"
+        [trim]="true" />
+    </fieldset>
   </form>
 </mat-dialog-content>
-<mat-dialog-actions>
-  <button mat-button mat-dialog-close [disabled]="isProcessing()">
-    {{ 'g.no' | translate }}
+<mat-dialog-actions class="dialog-actions" [attr.aria-busy]="isProcessing()">
+  <button
+    type="button"
+    class="dialog-button"
+    mat-dialog-close
+    [disabled]="isProcessing()">
+    {{ 'g.cancel' | translate }}
   </button>
   <button
-    mat-button
-    cdkFocusInitial
+    type="button"
+    class="dialog-button dialog-button-primary"
     (click)="ok()"
     [disabled]="targetItemIdForm().invalid() || isProcessing()">
-    {{ 'g.ok' | translate }}
+    {{ (isProcessing() ? 'msg.copying' : 'g.copy') | translate }}
   </button>
 </mat-dialog-actions>

@@ -9,12 +9,13 @@ import {
 import { FormValueControl } from '@angular/forms/signals';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-chip-select-multiple-button',
   host: { '(focusout)': 'touch.emit()' },
-  imports: [MatChipsModule, MatIconModule],
+  imports: [MatChipsModule, MatIconModule, TranslatePipe],
   templateUrl: './chip-select-multiple-button.component.html',
   styleUrl: './chip-select-multiple-button.component.scss',
 })

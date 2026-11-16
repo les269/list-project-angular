@@ -39,6 +39,7 @@ it('複製以正規化後的名稱查重，儲存使用相同資料快照', asyn
   component.sourceForm.name().value.set('another');
   component.sourceForm.config.groupName().value.set('changed');
   existence.next(false);
+  existence.complete();
   expect(service.updateDataset).toHaveBeenCalledWith({
     name: 'copy',
     config: source.config,

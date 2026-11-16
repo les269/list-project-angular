@@ -1,10 +1,11 @@
-<div class="d-flex align-items-center gap-2 flex-wrap">
+<div class="selection-control">
   @for (item of selectedData(); track $index) {
     <mat-chip
       >{{ displayLabel(item) }}
       <button
         type="button"
         [disabled]="disabled()"
+        [attr.aria-label]="('g.clear' | translate) + ' ' + displayLabel(item)"
         matChipRemove
         (click)="removeChip(item)">
         <mat-icon>cancel</mat-icon>
@@ -12,18 +13,16 @@
     </mat-chip>
   }
   @if (required() && requiredMsg().length > 0 && value().length === 0) {
-    <div>
+    <div class="required-message">
       {{ requiredMsg() }}
     </div>
   }
 
   <button
     type="button"
-    class="btn btn-outline-primary d-flex"
+    class="selection-button"
     [disabled]="disabled()"
     (click)="openSelectTable()">
-    <mat-icon class="material-icons-outlined">
-      <span class="material-symbols-outlined">select_window_2</span>
-    </mat-icon>
+    {{ 'g.popupSelect' | translate }}
   </button>
 </div>

@@ -2,12 +2,10 @@ import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   form,
-  FormField,
   readonly as readonlyField,
   required,
   validate,
 } from '@angular/forms/signals';
-import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -17,6 +15,7 @@ import {
 } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
 import { EMPTY, finalize, switchMap } from 'rxjs';
+import { SignalFieldComponent } from '../../../core/components/signal-field/signal-field.component';
 import { SnackbarService } from '../../../core/services/snackbar.service';
 import { ApiRequestConfig } from '../model';
 import { ApiRequestConfigService } from '../service/api-request-config.service';
@@ -24,9 +23,9 @@ import { ApiRequestConfigService } from '../service/api-request-config.service';
 @Component({
   selector: 'app-copy-api-request-config-dialog',
   templateUrl: './copy-api-request-config.dialog.html',
+  styleUrl: './copy-api-request-config.dialog.scss',
   imports: [
-    FormField,
-    MatButtonModule,
+    SignalFieldComponent,
     MatDialogActions,
     MatDialogContent,
     MatDialogTitle,
@@ -50,12 +49,18 @@ export class CopyApiRequestConfigDialog {
   });
   readonly valueForm = form(this.valueModel, p => {
     readonlyField(p, { when: () => this.isSaving() });
-    required(p.apiId);
+    required(p.apiId, { message: 'apiRequestConfig.errors.required' });
     validate(p.apiId, ({ value }) => {
       const apiId = value().trim();
-      if (!apiId) return value() ? { kind: 'required' } : undefined;
+      if (!apiId)
+        return value()
+          ? { kind: 'required', message: 'apiRequestConfig.errors.required' }
+          : undefined;
       return apiId === this.duplicateApiId()
-        ? { kind: 'duplicateApiId' }
+        ? {
+            kind: 'duplicateApiId',
+            message: 'apiRequestConfig.errors.duplicateApiId',
+          }
         : undefined;
     });
   });

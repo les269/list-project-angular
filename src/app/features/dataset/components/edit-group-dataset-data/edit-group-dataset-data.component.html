@@ -1,160 +1,227 @@
-<div class="d-flex justify-content-between align-items-center">
-  <h2 mat-dialog-title>
+<div class="dialog-header">
+  <h2 mat-dialog-title class="dialog-title">
     {{ 'title.groupDatasetDataEdit' | translate }}
   </h2>
-  <button class="d-flex mx-2" mat-icon-button [mat-dialog-close]="true">
+  <button
+    type="button"
+    class="dialog-close"
+    [mat-dialog-close]="true"
+    [attr.aria-label]="'g.close' | translate">
     <mat-icon>close</mat-icon>
   </button>
 </div>
-
-<mat-dialog-content class="scrollbar-primary">
-  <div class="input-group mb-2">
-    <label class="input-group-text">{{
-      'dataset.groupName' | translate
-    }}</label>
-    <input class="form-control" trimOnBlur [formField]="groupNameForm" />
-  </div>
-  <div class="input-group mb-2">
-    <label class="input-group-text">{{
-      'dataset.primeValue' | translate
-    }}</label>
-    <input
-      class="form-control"
-      trimOnBlur
-      [formField]="primeValueForm"
-      (keydown.enter)="searchByPrimeValue()" />
-    <button
-      class="btn btn-outline-secondary d-flex"
-      type="button"
-      (click)="selectPrimeValue()">
-      <mat-icon>content_copy</mat-icon>
-    </button>
-    <button
-      class="btn btn-outline-secondary"
-      type="button"
-      (click)="searchByPrimeValue()">
-      {{ 'g.search' | translate }}
-    </button>
-    <button
-      class="btn btn-outline-secondary"
-      type="button"
-      (click)="deleteByPrimeValue()">
-      {{ 'g.delete' | translate }}
-    </button>
-  </div>
-  @if (groupDatasetConfig && groupDatasetConfig.imageSaveFolder) {
-    <div class="input-group mb-2">
-      <button
-        class="btn btn-outline-secondary"
-        type="button"
-        (click)="deleteImage()">
-        {{ 'g.deleteImage' | translate }}
-      </button>
+<mat-dialog-content class="dialog-content scrollbar-primary">
+  <div class="record-section lookup-panel">
+    <app-signal-field
+      [field]="groupNameForm"
+      label="dataset.groupName"
+      [trim]="true" />
+    <div class="lookup-row">
+      <app-signal-field
+        [field]="primeValueForm"
+        label="dataset.primeValue"
+        [trim]="true"
+        (keydown.enter)="searchByPrimeValue()" />
+      <div class="lookup-actions">
+        <button
+          type="button"
+          class="dialog-button"
+          (click)="selectPrimeValue()">
+          {{ 'g.popupSelect' | translate }}
+        </button>
+        <button
+          type="button"
+          class="dialog-button"
+          (click)="searchByPrimeValue()">
+          {{ 'g.search' | translate }}
+        </button>
+        <button
+          type="button"
+          class="dialog-button dialog-button-danger"
+          (click)="deleteByPrimeValue()">
+          {{ 'g.delete' | translate }}
+        </button>
+        @if (groupDatasetConfig()?.imageSaveFolder) {
+          <button
+            type="button"
+            class="dialog-button dialog-button-danger"
+            (click)="deleteImage()">
+            {{ 'g.deleteImage' | translate }}
+          </button>
+        }
+      </div>
     </div>
-  }
-  <hr />
-  @if (groupDatasetConfig) {
-    @for (scrapy of groupDatasetConfig.groupDatasetScrapyList; track $index) {
-      @if (
-        scrapy.visibleJson &&
-        scrapySize[scrapy.name] > 0 &&
-        scrapyInput[scrapy.name]
-      ) {
-        <div class="input-group mb-2">
-          <label class="input-group-text">{{
-            'dataset.scrapyJsonLabel' | translate: { label: scrapy.label }
-          }}</label>
-          @for (
-            size of [].constructor(scrapySize[scrapy.name]);
-            track $index;
-            let index = $index
-          ) {
-            <input
-              class="form-control"
-              trimOnBlur
-              [formField]="scrapyInputForm[scrapy.name].json[index]"
-              (keydown.enter)="
-                scrapyByJson(scrapy.name, scrapyInput[scrapy.name].json)
-              " />
+  </div>
+  @if (groupDatasetConfig(); as config) {
+    @for (
+      scrapy of config.groupDatasetScrapyList;
+      track $index;
+      let sourceIndex = $index
+    ) {
+      @if (scrapyInput[scrapy.name]; as source) {
+        <div class="record-section crawler-panel">
+          @if (scrapy.visibleJson && source.json.length > 0) {
+            <fieldset class="source-fields">
+              <legend class="visually-hidden">
+                {{
+                  'dataset.scrapyJsonLabel' | translate: { label: scrapy.label }
+                }}
+              </legend>
+              <div class="parameter-fields">
+                <label
+                  class="field-label"
+                  [for]="controlId + '-param-' + sourceIndex + '-0'"
+                  >{{
+                    'dataset.scrapyJsonLabel'
+                      | translate: { label: scrapy.label }
+                  }}</label
+                >
+                @for (param of source.json; track $index; let index = $index) {
+                  <input
+                    class="form-control"
+                    trimOnBlur
+                    [id]="controlId + '-param-' + sourceIndex + '-' + index"
+                    [attr.aria-label]="
+                      ('dataset.scrapyJsonLabel'
+                        | translate: { label: scrapy.label }) +
+                      ' ' +
+                      (index + 1)
+                    "
+                    [formField]="scrapyInputForm[scrapy.name].json[index]"
+                    (keydown.enter)="
+                      scrapyByJson(scrapy.name, scrapyInput[scrapy.name].json)
+                    " />
+                }
+              </div>
+              <div class="source-actions">
+                @if (source.json.length === 1) {
+                  <button
+                    type="button"
+                    class="dialog-button"
+                    (click)="scrapyByJson(scrapy.name, [primeValue])">
+                    {{ 'g.keywordSearch' | translate }}
+                  </button>
+                }
+                <button
+                  type="button"
+                  class="dialog-button"
+                  (click)="
+                    scrapyByJson(scrapy.name, scrapyInput[scrapy.name].json)
+                  ">
+                  {{ 'g.search' | translate }}
+                </button>
+              </div>
+            </fieldset>
           }
-          @if (scrapySize[scrapy.name] === 1) {
-            <button
-              class="btn btn-outline-secondary"
-              type="button"
-              (click)="scrapyByJson(scrapy.name, [primeValue])">
-              {{ 'g.keywordSearch' | translate }}
-            </button>
+          @if (scrapy.visibleUrl) {
+            <div class="source-row">
+              <div class="data-field">
+                <label
+                  class="field-label"
+                  [for]="controlId + '-url-' + sourceIndex"
+                  >{{
+                    'dataset.scrapyUrlLabel'
+                      | translate: { label: scrapy.label }
+                  }}</label
+                >
+                <input
+                  class="form-control"
+                  trimOnBlur
+                  [id]="controlId + '-url-' + sourceIndex"
+                  [formField]="scrapyInputForm[scrapy.name].url"
+                  (keydown.enter)="scrapyByUrl(scrapy)" />
+              </div>
+              <div class="source-actions">
+                <button
+                  type="button"
+                  class="dialog-button"
+                  (click)="scrapyByUrl(scrapy)">
+                  {{ 'g.search' | translate }}
+                </button>
+              </div>
+            </div>
           }
-          <button
-            class="btn btn-outline-secondary"
-            type="button"
-            (click)="scrapyByJson(scrapy.name, scrapyInput[scrapy.name].json)">
-            {{ 'g.search' | translate }}
-          </button>
-        </div>
-      }
-      @if (scrapy.visibleUrl && scrapyInput[scrapy.name]) {
-        <div class="input-group mb-2">
-          <label class="input-group-text">{{
-            'dataset.scrapyUrlLabel' | translate: { label: scrapy.label }
-          }}</label>
-          <input
-            class="form-control"
-            trimOnBlur
-            [formField]="scrapyInputForm[scrapy.name].url"
-            (keydown.enter)="scrapyByUrl(scrapy)" />
-          <button
-            class="btn btn-outline-secondary"
-            type="button"
-            (click)="scrapyByUrl(scrapy)">
-            {{ 'g.search' | translate }}
-          </button>
         </div>
       }
     }
-    <hr />
-    @for (field of groupDatasetConfig.groupDatasetFieldList; track $index) {
-      @switch (field.type) {
-        @case ('string') {
-          <div class="input-group mb-2">
-            <label class="input-group-text">{{ field.label }}</label>
-            <input
-              class="form-control"
-              trimOnBlur
-              [formField]="jsonForm[field.key]" />
-          </div>
-        }
-        @case ('stringArray') {
-          <mat-form-field class="d-flex" appearance="outline">
-            <mat-label>{{ field.label }}</mat-label>
-            <mat-chip-grid #chipGrid>
-              @for (value of json[field.key]; track $index) {
-                <mat-chip-row
-                  (removed)="removeChip(value, field.key)"
-                  [editable]="true"
-                  (edited)="editChip(value, field.key, $event)">
-                  {{ value }}
-                  <button matChipRemove>
-                    <mat-icon>cancel</mat-icon>
-                  </button>
-                </mat-chip-row>
-              }
+    <div class="record-fields">
+      @for (
+        field of config.groupDatasetFieldList;
+        track $index;
+        let fieldIndex = $index
+      ) {
+        @switch (field.type) {
+          @case ('string') {
+            <div class="data-field">
+              <label
+                class="field-label"
+                [for]="controlId + '-field-' + fieldIndex"
+                >{{ field.label }}</label
+              >
               <input
                 class="form-control"
-                [matChipInputFor]="chipGrid"
-                [matChipInputAddOnBlur]="true"
-                (matChipInputTokenEnd)="addChip($event, field.key)" />
-            </mat-chip-grid>
-          </mat-form-field>
+                trimOnBlur
+                [id]="controlId + '-field-' + fieldIndex"
+                [formField]="jsonForm[field.key]" />
+            </div>
+          }
+          @case ('stringArray') {
+            <div class="array-field">
+              <label
+                class="field-label"
+                [for]="controlId + '-field-' + fieldIndex"
+                >{{ field.label }}</label
+              >
+              <div class="form-control chip-control">
+                <mat-chip-grid #chipGrid [attr.aria-label]="field.label">
+                  @for (value of json[field.key]; track $index) {
+                    <mat-chip-row
+                      (removed)="removeChip(value, field.key)"
+                      [editable]="true"
+                      (edited)="editChip(value, field.key, $event)">
+                      {{ value }}
+                      <button
+                        type="button"
+                        matChipRemove
+                        [attr.aria-label]="
+                          ('g.clear' | translate) + ' ' + value
+                        ">
+                        <mat-icon>cancel</mat-icon>
+                      </button>
+                    </mat-chip-row>
+                  }
+                  <input
+                    class="form-control"
+                    [id]="controlId + '-field-' + fieldIndex"
+                    [attr.aria-label]="field.label"
+                    [matChipInputFor]="chipGrid"
+                    [matChipInputAddOnBlur]="true"
+                    (matChipInputTokenEnd)="addChip($event, field.key)" />
+                </mat-chip-grid>
+              </div>
+            </div>
+          }
         }
       }
-    }
+    </div>
   }
 </mat-dialog-content>
-<mat-dialog-actions>
-  <button mat-button [mat-dialog-close]="true">
+<mat-dialog-actions class="dialog-actions">
+  <button type="button" class="dialog-button" [mat-dialog-close]="true">
     {{ 'g.close' | translate }}
   </button>
-  <button mat-button (click)="clearField()">{{ 'g.clear' | translate }}</button>
-  <button mat-button (click)="onUpdate()">{{ 'g.update' | translate }}</button>
+  <button
+    type="button"
+    class="dialog-button"
+    [disabled]="!groupDatasetConfig()"
+    (click)="clearField()">
+    {{ 'g.clear' | translate }}
+  </button>
+  <button
+    type="button"
+    class="dialog-button dialog-button-primary"
+    [disabled]="!groupDatasetConfig()"
+    (click)="onUpdate()">
+    {{ 'g.update' | translate }}
+  </button>
 </mat-dialog-actions>

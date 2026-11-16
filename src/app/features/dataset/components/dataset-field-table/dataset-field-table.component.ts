@@ -1,12 +1,7 @@
 import { createDatasetField } from '../../util/dataset-field';
-import { CommonModule } from '@angular/common';
 import { Component, input } from '@angular/core';
-import { FieldTree, FormField } from '@angular/forms/signals';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
-import { TranslatePipe } from '@ngx-translate/core';
+import { FieldTree } from '@angular/forms/signals';
+import { SignalFieldComponent } from '../../../../core/components/signal-field/signal-field.component';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 import {
   GenericColumnType,
@@ -19,17 +14,9 @@ import { DatasetField, DatasetFieldType } from '../../model';
 @Component({
   selector: 'app-dataset-field-table',
 
-  imports: [
-    MatTableModule,
-    FormField,
-    MatButtonModule,
-    TranslatePipe,
-    CommonModule,
-    MatIconModule,
-    MatCheckboxModule,
-    GenericTableComponent,
-  ],
+  imports: [SignalFieldComponent, GenericTableComponent],
   templateUrl: './dataset-field-table.component.html',
+  styleUrl: './dataset-field-table.component.scss',
 })
 export class DatasetFieldTableComponent {
   // inject

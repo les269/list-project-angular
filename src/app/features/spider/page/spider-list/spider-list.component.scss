@@ -1,0 +1,21 @@
+@use '../../../../../styles/management-list-page';
+
+@include management-list-page.layout($table-min-width: 880px);
+
+.mat-column-spiderId {
+  min-width: 180px;
+  max-width: 280px;
+  overflow-wrap: anywhere;
+}
+
+.mat-column-description {
+  min-width: 240px;
+  max-width: 480px;
+  overflow-wrap: anywhere;
+}
+
+.empty-state {
+  padding: var(--app-space-8);
+  color: var(--app-text-secondary);
+  text-align: center;
+}

@@ -1,0 +1,187 @@
+@use '../../../../../styles/editor-dialog' as dialog;
+
+@include dialog.layout;
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  gap: var(--app-space-2);
+  padding: var(--app-space-2) var(--app-space-4) var(--app-space-2)
+    var(--app-space-6);
+  border-bottom: 1px solid var(--app-border);
+
+  .dialog-title {
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+    font-size: var(--app-font-size-body);
+    line-height: 24px;
+    border-bottom: 0;
+  }
+}
+
+.dialog-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  color: var(--app-text-secondary);
+  background: transparent;
+  border: 0;
+  border-radius: var(--app-radius-sm);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--app-text-primary);
+    background: var(--app-hover-bg);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--app-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+.dialog-content {
+  display: grid;
+  gap: var(--app-space-3);
+  padding: var(--app-space-3) var(--app-space-4);
+  max-height: min(75vh, calc(100dvh - 140px));
+}
+
+.record-section {
+  display: grid;
+  gap: var(--app-space-2);
+  min-width: 0;
+}
+
+.lookup-panel + .crawler-panel,
+.lookup-panel + .record-fields,
+.crawler-panel + .record-fields {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    top: calc(var(--app-space-3) / -2);
+    border-top: 1px solid var(--app-border-strong);
+  }
+}
+
+app-signal-field {
+  min-width: 0;
+  gap: 0;
+}
+
+.record-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--app-space-2);
+  min-width: 0;
+}
+
+.lookup-row,
+.source-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--app-space-2);
+}
+
+.lookup-actions,
+.source-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--app-space-2);
+}
+
+.source-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--app-space-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.parameter-fields,
+.data-field,
+.array-field {
+  min-width: 0;
+}
+
+.parameter-fields {
+  display: grid;
+  gap: var(--app-space-1);
+}
+
+.field-label {
+  display: block;
+  margin-bottom: var(--app-space-1);
+  overflow-wrap: anywhere;
+  font: inherit;
+}
+
+.form-control {
+  min-width: 0;
+  min-height: 40px;
+  font-size: var(--app-font-size-sm);
+  font-weight: 400;
+}
+
+.array-field {
+  grid-column: 1 / -1;
+  min-width: 0;
+
+  input {
+    min-height: 24px;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+    flex-basis: 80px;
+  }
+}
+
+.chip-control {
+  padding: 0 var(--app-space-2);
+
+  &:focus-within {
+    border-color: var(--app-primary);
+    outline: 2px solid var(--app-focus-ring);
+    outline-offset: -1px;
+  }
+
+  mat-chip-row {
+    margin-block: var(--app-space-1);
+  }
+}
+
+.dialog-actions {
+  padding: var(--app-space-2) var(--app-space-4);
+}
+
+.dialog-button-danger {
+  color: #b42318;
+  border-color: #f1b4ae;
+
+  &:hover:not(:disabled) {
+    background: #fee2e2;
+    border-color: #dc8279;
+  }
+}
+
+@media (max-width: 600px) {
+  .lookup-row,
+  .source-row,
+  .source-fields,
+  .record-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

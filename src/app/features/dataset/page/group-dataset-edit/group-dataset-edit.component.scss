@@ -1,0 +1,14 @@
+@use '../../styles/dataset-editor-page' as editor;
+
+@include editor.layout;
+
+app-group-dataset-field-table,
+app-group-dataset-api-table,
+app-group-dataset-scrapy-table {
+  display: block;
+  min-width: 0;
+}
+
+app-group-dataset-scrapy-table {
+  --app-editor-table-min-width: 1040px;
+}

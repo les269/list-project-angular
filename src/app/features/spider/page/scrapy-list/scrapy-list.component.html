@@ -1,9 +1,23 @@
-<div class="col-md-10 offset-md-1 col-xs-12 mt-3">
-  <button type="button" class="btn btn-primary" (click)="onAdd()">
-    {{ 'scrapy.createScrapy' | translate }}
-  </button>
-  <div class="card">
-    <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort>
+<main class="management-page">
+  <div class="page-actions">
+    <button
+      type="button"
+      class="page-button page-button-primary"
+      (click)="onAdd()">
+      {{ 'scrapy.createScrapy' | translate }}
+    </button>
+  </div>
+  <div
+    class="table-container scrollbar-primary"
+    role="region"
+    tabindex="0"
+    [attr.aria-label]="'title.scrapyList' | translate">
+    <table
+      mat-table
+      [attr.aria-label]="'title.scrapyList' | translate"
+      [dataSource]="dataSource"
+      multiTemplateDataRows
+      matSort>
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'scrapy.name' | translate }}
@@ -29,23 +43,43 @@
         </td>
       </ng-container>
       <ng-container matColumnDef="other">
-        <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
+        <th mat-header-cell *matHeaderCellDef>
+          {{ 'g.actions' | translate }}
+        </th>
         <td mat-cell *matCellDef="let element; let i = dataIndex">
-          <div class="row flex-nowrap">
-            <button mat-icon-button (click)="onEdit(element)">
+          <div class="row-actions">
+            <button
+              type="button"
+              mat-icon-button
+              class="row-action"
+              [attr.aria-label]="('g.edit' | translate) + ' ' + element.name"
+              [matTooltip]="'g.edit' | translate"
+              (click)="onEdit(element)">
               <mat-icon>edit</mat-icon>
             </button>
-            <button mat-icon-button (click)="onCopy(element)">
+            <button
+              type="button"
+              mat-icon-button
+              class="row-action"
+              [attr.aria-label]="('g.copy' | translate) + ' ' + element.name"
+              [matTooltip]="'g.copy' | translate"
+              (click)="onCopy(element)">
               <mat-icon>file_copy</mat-icon>
             </button>
-            <button mat-icon-button (click)="onDelete(element)">
+            <button
+              type="button"
+              mat-icon-button
+              class="row-action row-action-danger"
+              [attr.aria-label]="('g.delete' | translate) + ' ' + element.name"
+              [matTooltip]="'g.delete' | translate"
+              (click)="onDelete(element)">
               <mat-icon>delete</mat-icon>
             </button>
           </div>
         </td>
       </ng-container>
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
   </div>
-</div>
+</main>

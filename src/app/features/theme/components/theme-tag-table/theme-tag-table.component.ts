@@ -56,6 +56,7 @@ import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage
     ThemeItemManageComponent,
   ],
   templateUrl: './theme-tag-table.component.html',
+  styleUrl: './theme-tag-table.component.scss',
 })
 export class ThemeTagTableComponent {
   readonly translateService = inject(TranslateService);

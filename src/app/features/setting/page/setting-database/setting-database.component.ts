@@ -104,6 +104,8 @@ export class SettingDatabaseComponent implements OnInit, AfterViewInit {
     this.matDialog
       .open(DatabaseEditComponent, {
         width: '600px',
+        maxWidth: 'calc(100vw - 32px)',
+        maxHeight: 'calc(100dvh - 32px)',
         data: {
           databaseConfig: {} as DatabaseConfig,
           databaseConfigList: this.dataSource.data,
@@ -122,6 +124,8 @@ export class SettingDatabaseComponent implements OnInit, AfterViewInit {
     this.matDialog
       .open(DatabaseEditComponent, {
         width: '600px',
+        maxWidth: 'calc(100vw - 32px)',
+        maxHeight: 'calc(100dvh - 32px)',
         data: {
           databaseConfig: element,
           databaseConfigList: this.dataSource.data,

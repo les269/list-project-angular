@@ -13,8 +13,8 @@
     font-size: 0.875rem;
     &:first-child {
       border-left: 1px solid var(--app-action-border);
-      border-top-left-radius: var(--app-radius-sm);
-      border-bottom-left-radius: var(--app-radius-sm);
+      border-top-left-radius: var(--app-action-radius);
+      border-bottom-left-radius: var(--app-action-radius);
     }
     &:first-child:not(:last-child) {
       border-top-right-radius: 0;
@@ -23,8 +23,8 @@
     }
 
     &:last-child {
-      border-top-right-radius: var(--app-radius-sm);
-      border-bottom-right-radius: var(--app-radius-sm);
+      border-top-right-radius: var(--app-action-radius);
+      border-bottom-right-radius: var(--app-action-radius);
     }
     &:last-child:not(:first-child) {
       border-top-left-radius: 0;

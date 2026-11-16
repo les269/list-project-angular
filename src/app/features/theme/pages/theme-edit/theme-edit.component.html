@@ -1,138 +1,81 @@
-<div class="container d-flex">
-  <div class="col-md-10 offset-md-1 col-xs-12">
-    <button
-      mat-icon-button
-      class="d-flex align-content-center"
-      (click)="onBack()">
-      <mat-icon>arrow_back</mat-icon>
+<div class="theme-edit-page">
+  <div class="page-heading">
+    <button type="button" class="page-button" (click)="onBack()">
+      {{ 'g.back' | translate }}
     </button>
-    <label class="h3">{{ 'themeHeader.headline' | translate }}</label>
-    <div>
-      <div class="mb-3">
-        <label for="name" class="form-label require">{{
-          'themeHeader.name' | translate
-        }}</label>
-        <input
-          type="text"
-          class="form-control"
-          id="name"
-          [formField]="form.name"
-          trimOnBlur
-          [class.is-invalid]="form.name().invalid() && form.name().touched()" />
-        <app-form-invalids
-          [control]="form.name"
-          [formAlerts]="formAlertsObj().name"></app-form-invalids>
-      </div>
-      <div class="mb-3">
-        <label for="version" class="form-label require">{{
-          'themeHeader.version' | translate
-        }}</label>
-        <input
-          type="text"
-          class="form-control"
-          id="version"
-          [formField]="form.version"
-          trimOnBlur
-          [class.is-invalid]="
-            form.version().invalid() && form.version().touched()
-          " />
-        <app-form-invalids
-          [control]="form.version"
-          [formAlerts]="formAlertsObj().version"></app-form-invalids>
-      </div>
-      <div class="mb-3">
-        <label class="form-label" for="type">{{
-          'themeHeader.type' | translate
-        }}</label>
-        <select
-          class="form-control form-select"
-          id="type"
-          [formField]="form.type"
-          [class.is-invalid]="form.type().invalid() && form.type().touched()">
-          @for (type of eThemeHeaderType | keyvalue; track type) {
-            <option [value]="type.key">
-              {{ 'themeHeader.' + type.key | translate }}
-            </option>
-          }
-        </select>
-      </div>
-      <div class="mb-3">
-        <label for="title" class="form-label require">{{
-          'themeHeader.title' | translate
-        }}</label>
-        <input
-          type="text"
-          class="form-control"
-          id="title"
-          [formField]="form.title"
-          trimOnBlur
-          [class.is-invalid]="
-            form.title().invalid() && form.title().touched()
-          " />
-        <app-form-invalids
-          [control]="form.title"
-          [formAlerts]="formAlertsObj().title"></app-form-invalids>
-      </div>
-      <div class="mb-3">
-        <label for="seq" class="form-label require">{{
-          'themeHeader.seq' | translate
-        }}</label>
-        <input
-          type="number"
-          class="form-control"
-          id="seq"
-          [formField]="form.seq"
-          trimOnBlur
-          [class.is-invalid]="form.seq().invalid() && form.seq().touched()" />
-        <app-form-invalids
-          [control]="form.seq"
-          [formAlerts]="formAlertsObj().seq"></app-form-invalids>
-      </div>
+    <h2 id="theme-header-title">{{ 'themeHeader.headline' | translate }}</h2>
+  </div>
+
+  <section class="form-panel" aria-labelledby="theme-header-title">
+    <div class="form-grid">
+      <app-signal-field
+        [field]="form.name"
+        label="themeHeader.name"
+        [trim]="true" />
+      <app-signal-field
+        [field]="form.version"
+        label="themeHeader.version"
+        [trim]="true" />
+      <app-signal-field
+        [field]="form.type"
+        label="themeHeader.type"
+        [type]="fieldType.SELECT"
+        [options]="themeTypeOptions" />
+      <app-signal-field
+        [field]="form.seq"
+        label="themeHeader.seq"
+        [type]="fieldType.NUMBER" />
+      <app-signal-field
+        class="field-wide"
+        [field]="form.title"
+        label="themeHeader.title"
+        [trim]="true" />
     </div>
-    <div class="d-flex gap-2 justify-content-end">
+    <div class="form-actions" [attr.aria-busy]="isSaving()">
       <button
-        type="submit"
-        class="btn btn-success"
+        type="button"
+        class="page-button"
+        [class.page-button-primary]="!isEditMode()"
         (click)="update(false, 'save')"
         [disabled]="!form().valid() || isSaving()">
         {{ (isSaving() ? 'msg.saving' : 'g.save') | translate }}
       </button>
       @if (isEditMode()) {
         <button
-          type="submit"
-          class="btn btn-success"
+          type="button"
+          class="page-button page-button-primary"
           (click)="update(true, 'commit')"
           [disabled]="!form().valid() || isSaving()">
           {{ (isSaving() ? 'msg.submitting' : 'g.submit') | translate }}
         </button>
       }
     </div>
+  </section>
+
+  <div class="theme-sections">
     @if (form.type().value() === eThemeHeaderType.imageList) {
       <app-theme-image
         [headerId]="currentHeaderId()"
         [imageItem]="imageItem()"
-        [themeHeaderType]="form.type().value()"></app-theme-image>
+        [themeHeaderType]="form.type().value()" />
     }
     <app-theme-label-table
       [headerId]="currentHeaderId()"
       [labelItem]="labelItem()"
-      [themeHeaderType]="form.type().value()"></app-theme-label-table>
+      [themeHeaderType]="form.type().value()" />
     <app-theme-dataset-table
       [headerId]="currentHeaderId()"
-      [datasetItem]="datasetItem()"></app-theme-dataset-table>
+      [datasetItem]="datasetItem()" />
     <app-theme-custom-table
       [headerId]="currentHeaderId()"
-      [customItem]="customItem()"></app-theme-custom-table>
-    <app-theme-tag-table
-      [headerId]="currentHeaderId()"
-      [tagItem]="tagItem()"></app-theme-tag-table>
+      [customItem]="customItem()" />
+    <app-theme-tag-table [headerId]="currentHeaderId()" [tagItem]="tagItem()" />
     <app-theme-other-setting
       [headerId]="currentHeaderId()"
       [otherSettingItem]="otherSettingItem()"
-      [themeHeaderType]="form.type().value()"></app-theme-other-setting>
+      [themeHeaderType]="form.type().value()" />
     <app-theme-top-custom-table
       [headerId]="currentHeaderId()"
-      [topCustomItem]="topCustomItem()">
-    </app-theme-top-custom-table>
+      [topCustomItem]="topCustomItem()" />
   </div>
 </div>

@@ -4,13 +4,24 @@
   type() !== fieldType.CHECKBOX &&
   type() !== fieldType.CHIPS
 ) {
-  <label [for]="controlId">{{ label() | translate }}</label>
+  <label
+    class="field-label"
+    [for]="controlId"
+    [class.require]="field()().required()"
+    >{{ label() | translate }}</label
+  >
 }
-<div [class.input-group]="inline()" [class.flex-nowrap]="inline()">
+<div
+  class="field-control"
+  [class.input-group]="inline()"
+  [class.flex-nowrap]="inline()">
   @if (label() && inline() && type() !== fieldType.CHECKBOX) {
-    <label class="input-group-text" [for]="controlId">{{
-      label() | translate
-    }}</label>
+    <label
+      class="input-group-text inline-label"
+      [for]="controlId"
+      [class.require]="field()().required()"
+      >{{ label() | translate }}</label
+    >
   }
   @switch (type()) {
     @case (fieldType.SELECT) {

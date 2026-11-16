@@ -1,48 +1,37 @@
-<h2 mat-dialog-title>{{ 'apiRequestConfig.copy' | translate }}</h2>
-<mat-dialog-content>
-  <form id="copy-api-request-config-form" (submit)="onSave($event)">
-    <div class="mb-3">
-      <label class="form-label" for="copy-api-id"
-        >{{ 'apiRequestConfig.apiId' | translate }}</label
-      >
-      <input
-        id="copy-api-id"
-        class="form-control"
-        [formField]="valueForm.apiId"
-        [class.is-invalid]="valueForm.apiId().touched() && valueForm.apiId().invalid()"
-        aria-describedby="copy-api-id-errors" />
-      <div id="copy-api-id-errors">
-        @if (valueForm.apiId().touched()) { @for (error of
-        valueForm.apiId().errors(); track error.kind) {
-        <div class="text-danger" role="alert">
-          {{ 'apiRequestConfig.errors.' + error.kind | translate }}
-        </div>
-        } }
-      </div>
-    </div>
-    <div class="mb-3">
-      <label class="form-label" for="copy-api-description"
-        >{{ 'g.description' | translate }}</label
-      >
-      <input
-        id="copy-api-description"
-        class="form-control"
-        [formField]="valueForm.description" />
-    </div>
+<h2 mat-dialog-title class="dialog-title">
+  {{ 'apiRequestConfig.copy' | translate }}
+</h2>
+<mat-dialog-content class="dialog-content">
+  <form
+    id="copy-api-request-config-form"
+    class="copy-fields"
+    (submit)="onSave($event)">
+    <app-signal-field
+      [field]="valueForm.apiId"
+      label="apiRequestConfig.apiId"
+      [trim]="true" />
+    <app-signal-field
+      [field]="valueForm.description"
+      label="g.description"
+      [trim]="true" />
     @if (saveFailed()) {
-    <div class="alert alert-danger" role="alert">
-      {{ 'apiRequestConfig.saveFailed' | translate }}
-    </div>
+      <div class="alert alert-danger save-error" role="alert">
+        {{ 'apiRequestConfig.saveFailed' | translate }}
+      </div>
     }
   </form>
 </mat-dialog-content>
-<mat-dialog-actions align="end">
-  <button type="button" mat-button (click)="onCancel()" [disabled]="isSaving()">
+<mat-dialog-actions class="dialog-actions" [attr.aria-busy]="isSaving()">
+  <button
+    type="button"
+    class="dialog-button"
+    (click)="onCancel()"
+    [disabled]="isSaving()">
     {{ 'g.no' | translate }}
   </button>
   <button
     type="submit"
-    mat-flat-button
+    class="dialog-button dialog-button-primary"
     form="copy-api-request-config-form"
     [disabled]="isSaving()">
     {{ (isSaving() ? 'apiRequestConfig.saving' : 'g.copy') | translate }}

@@ -159,6 +159,9 @@ export class DatasetListComponent implements OnInit, AfterViewInit {
   onCopy(e: Dataset) {
     this.matDialog
       .open(CopyDatasetComponent, {
+        width: '560px',
+        maxWidth: 'calc(100vw - 32px)',
+        autoFocus: 'input:not([readonly])',
         data: { source: e },
       })
       .afterClosed()
@@ -192,7 +195,8 @@ export class DatasetListComponent implements OnInit, AfterViewInit {
         groupName: e.config.groupName,
         primeValue: '',
       },
-      minWidth: '60vw',
+      width: '960px',
+      maxWidth: 'calc(100vw - 32px)',
       autoFocus: false,
     });
   }

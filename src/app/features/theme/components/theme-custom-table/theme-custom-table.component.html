@@ -1,6 +1,8 @@
-<label class="h3">{{ 'themeCustom.title' | translate }}</label>
-<div class="card mb-3">
-  <div class="card-body">
+<section class="theme-section" aria-labelledby="theme-custom-title">
+  <h2 class="section-title" id="theme-custom-title">
+    {{ 'themeCustom.title' | translate }}
+  </h2>
+  <div class="section-body">
     <app-theme-item-manage
       [headerId]="headerId()"
       [form]="form"
@@ -10,68 +12,69 @@
     <app-form-alerts
       [form]="fields"
       [formAlerts]="formAlerts()"></app-form-alerts>
-    <div class="card mb-3">
-      <app-generic-table
-        [class.table-invalid]="fields().invalid()"
-        [fields]="fields"
-        [createRow]="createRow"
-        [cols]="cols"
-        [displayedColumns]="displayedColumns"
-        [expandedTmpl]="expandedTmpl"></app-generic-table>
-    </div>
+    <app-generic-table
+      appearance="outlined"
+      [class.table-invalid]="fields().invalid()"
+      [fields]="fields"
+      [createRow]="createRow"
+      [cols]="cols"
+      [displayedColumns]="displayedColumns"
+      [expandedTmpl]="expandedTmpl"></app-generic-table>
   </div>
-</div>
+</section>
 <ng-template #expandedTmpl let-element>
-  <div class="d-flex flex-column mb-2">
+  <div class="custom-detail">
     @switch (element.type().value()) {
       <!-- 按鈕圖案自定義正反 -->
       @case (eThemeCustomType.buttonIconBoolean) {
         @let buttonIconTrue = element.buttonIconTrue;
         @let buttonIconFalse = element.buttonIconFalse;
-        <div class="d-flex align-items-center">
-          <h6 class="mb-0">
+        <div class="detail-heading">
+          <p class="detail-label">
             {{ 'themeCustom.writeIconName' | translate }}
-          </h6>
+          </p>
           <a
             href="https://fonts.google.com/icons"
-            class="card-link text-nowrap p-2"
+            class="icon-reference"
             target="_blank"
             >{{ 'themeCustom.googleIconUrl' | translate }}</a
           >
         </div>
-        <div class="d-flex align-items-center">
-          <div class="mx-1 d-flex">
+        <div class="icon-fields">
+          <div class="icon-field">
             <mat-icon class="material-icons-outlined"
               ><span class="material-symbols-outlined">
                 {{ buttonIconTrue().value() }}
               </span></mat-icon
             >
+            <input
+              type="text"
+              class="form-control"
+              [placeholder]="'themeCustom.buttonIconTrue' | translate"
+              [attr.aria-label]="'themeCustom.buttonIconTrue' | translate"
+              [formField]="buttonIconTrue"
+              [class.is-invalid]="
+                buttonIconTrue().invalid() && buttonIconTrue().touched()
+              "
+              trimOnBlur />
           </div>
-          <div class="mx-1 d-flex">
+          <div class="icon-field">
             <mat-icon class="material-icons-outlined"
               ><span class="material-symbols-outlined">
                 {{ buttonIconFalse().value() }}
               </span></mat-icon
             >
+            <input
+              type="text"
+              class="form-control"
+              [placeholder]="'themeCustom.buttonIconFalse' | translate"
+              [attr.aria-label]="'themeCustom.buttonIconFalse' | translate"
+              [formField]="buttonIconFalse"
+              [class.is-invalid]="
+                buttonIconFalse().invalid() && buttonIconFalse().touched()
+              "
+              trimOnBlur />
           </div>
-          <input
-            type="text"
-            class="form-control"
-            [placeholder]="'themeCustom.buttonIconTrue' | translate"
-            [formField]="buttonIconTrue"
-            [class.is-invalid]="
-              buttonIconTrue().invalid() && buttonIconTrue().touched()
-            "
-            trimOnBlur />
-          <input
-            type="text"
-            class="form-control"
-            [placeholder]="'themeCustom.buttonIconFalse' | translate"
-            [formField]="buttonIconFalse"
-            [class.is-invalid]="
-              buttonIconFalse().invalid() && buttonIconFalse().touched()
-            "
-            trimOnBlur />
         </div>
         <app-form-invalids
           [control]="buttonIconTrue"
@@ -84,18 +87,18 @@
       @case (eThemeCustomType.buttonIconFill) {
         @let buttonIconFill = element.buttonIconFill;
         @let buttonIconFillColor = element.buttonIconFillColor;
-        <div class="d-flex align-items-center">
-          <h6 class="mb-0">
+        <div class="detail-heading">
+          <p class="detail-label">
             {{ 'themeCustom.writeIconName' | translate }}
-          </h6>
+          </p>
           <a
             href="https://fonts.google.com/icons"
-            class="card-link text-nowrap p-2"
+            class="icon-reference"
             target="_blank"
             >{{ 'themeCustom.googleIconUrl' | translate }}</a
           >
         </div>
-        <div class="d-flex align-items-center">
+        <div class="icon-color-fields">
           <div class="mx-1 d-flex">
             <mat-icon class="material-icons-outlined"
               ><span class="material-symbols-outlined">
@@ -109,14 +112,16 @@
             }}</mat-icon>
           </div>
           <input
-            class="form-control mt-1"
+            class="form-control"
             [placeholder]="'themeCustom.fillIcon' | translate"
+            [attr.aria-label]="'themeCustom.fillIcon' | translate"
             [formField]="buttonIconFill"
             trimOnBlur />
           <input
             type="color"
             [placeholder]="'themeCustom.fillIconColor' | translate"
-            class="form-control form-control-color mt-1"
+            [attr.aria-label]="'themeCustom.fillIconColor' | translate"
+            class="form-control form-control-color"
             [formField]="buttonIconFillColor" />
         </div>
         <app-form-invalids
@@ -127,8 +132,9 @@
       @case (eThemeCustomType.copyValue) {
         @let copyValue = element.copyValue;
         <input
-          class="form-control mt-1"
+          class="form-control"
           [placeholder]="'themeCustom.copyValuePH' | translate"
+          [attr.aria-label]="'themeCustom.copyValue' | translate"
           [formField]="copyValue"
           trimOnBlur />
       }
@@ -136,28 +142,31 @@
       @case (eThemeCustomType.openUrl) {
         @let openUrl = element.openUrl;
         @let openWindowsTarget = element.openWindowsTarget;
-        <input
-          class="form-control mt-1"
-          [placeholder]="'themeCustom.openUrlPH' | translate"
-          [formField]="openUrl"
-          trimOnBlur />
-        <select
-          [formField]="openWindowsTarget"
-          class="form-control"
-          style="min-width: 200px">
-          @for (type of eOpenWindowTargetType | keyvalue; track type.key) {
-            <option [value]="type.key">
-              {{ 'themeCustom.' + type.key | translate }}
-            </option>
-          }
-        </select>
+        <div class="detail-fields url-fields">
+          <input
+            class="form-control"
+            [placeholder]="'themeCustom.openUrlPH' | translate"
+            [attr.aria-label]="'themeCustom.openUrl' | translate"
+            [formField]="openUrl"
+            trimOnBlur />
+          <select
+            [formField]="openWindowsTarget"
+            [attr.aria-label]="'themeCustom.openWindowsTarget' | translate"
+            class="form-select">
+            @for (type of eOpenWindowTargetType | keyvalue; track type.key) {
+              <option [value]="type.key">
+                {{ 'themeCustom.' + type.key | translate }}
+              </option>
+            }
+          </select>
+        </div>
         <app-form-invalids
           [control]="openUrl"
           [formAlerts]="formAlertsObj().openUrl"></app-form-invalids>
       }
       <!-- 呼叫API -->
       @case (eThemeCustomType.apiConfig) {
-        <div class="mt-1 d-flex flex-wrap gap-3 align-items-center">
+        <div class="api-selection">
           <app-chip-select-button
             valueKey="apiId"
             [formField]="element.apiId"
@@ -173,8 +182,9 @@
       @case (eThemeCustomType.deleteFile) {
         @let deleteFile = element.deleteFile;
         <input
-          class="form-control mt-1"
+          class="form-control"
           [placeholder]="'themeCustom.deleteFilePH' | translate"
+          [attr.aria-label]="'themeCustom.deleteFile' | translate"
           [formField]="deleteFile"
           trimOnBlur />
         <app-form-invalids
@@ -185,15 +195,17 @@
       @case (eThemeCustomType.moveTo) {
         @let moveTo = element.moveTo;
         @let filePathForMoveTo = element.filePathForMoveTo;
-        <div class="d-flex input-group">
+        <div class="detail-fields">
           <input
             class="form-control"
             [placeholder]="'themeCustom.filePathForMoveToPH' | translate"
+            [attr.aria-label]="'themeCustom.filePathForMoveTo' | translate"
             [formField]="filePathForMoveTo"
             trimOnBlur />
           <input
             class="form-control"
             [placeholder]="'themeCustom.moveToPH' | translate"
+            [attr.aria-label]="'themeCustom.moveToDir' | translate"
             [formField]="moveTo"
             trimOnBlur />
         </div>
@@ -208,8 +220,9 @@
       @case (eThemeCustomType.openFolder) {
         @let openFolder = element.openFolder;
         <input
-          class="form-control mt-1"
+          class="form-control"
           [placeholder]="'themeCustom.openFolderPH' | translate"
+          [attr.aria-label]="'themeCustom.openFolder' | translate"
           [formField]="openFolder"
           trimOnBlur />
         <app-form-invalids
@@ -217,7 +230,7 @@
           [formAlerts]="formAlertsObj().openFolder"></app-form-invalids>
       }
     }
-    <div class="mt-1">
+    <div class="visible-datasets">
       <app-chip-input
         [label]="'themeLabel.visibleDatasetNameListPH' | translate"
         [formField]="element.visibleDatasetNameList">

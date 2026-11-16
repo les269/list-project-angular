@@ -1,247 +1,130 @@
-<h2 mat-dialog-title>{{ 'title.databaseEdit' | translate }}</h2>
-<mat-dialog-content>
-  <div class="database-edit-container">
-    <div class="form-section">
-      <!-- 設定 ID -->
-      <div class="form-group">
-        <label for="configId"
-          >{{ 'database.configId' | translate }}
-          <span class="required">*</span></label
-        >
-        <input
-          id="configId"
-          type="text"
-          [formField]="form.configId"
-          [placeholder]="'database.configIdPlaceholder' | translate"
-          trimOnBlur />
-        @if (form.configId().invalid() && form.configId().touched()) {
-          <span class="error">{{
-            'database.configIdRequired' | translate
-          }}</span>
-        }
-        @if (hasError(form, 'configIdIsDefault') && form.configId().touched()) {
-          <span class="error">{{
-            'database.configIdIsDefault' | translate
-          }}</span>
-        }
-      </div>
-
-      <!-- 設定名稱 -->
-      <div class="form-group">
-        <label for="configName"
-          >{{ 'database.configName' | translate }}
-          <span class="required">*</span></label
-        >
-        <input
-          id="configName"
-          type="text"
-          [formField]="form.configName"
-          [placeholder]="'database.configNamePlaceholder' | translate"
-          trimOnBlur />
-        @if (form.configName().invalid() && form.configName().touched()) {
-          <span class="error">{{
-            'database.configNameRequired' | translate
-          }}</span>
-        }
-      </div>
-
-      <!-- 資料庫類型 -->
-      <div class="form-group">
-        <label for="databaseType"
-          >{{ 'database.databaseType' | translate }}
-          <span class="required">*</span></label
-        >
-        <select id="databaseType" [formField]="form.databaseType">
-          @for (item of databaseType | keyvalue; track $index) {
-            <option
-              [value]="item.value"
-              [selected]="item.value === form.databaseType().value()">
-              {{ item.value | lowercase }}
-            </option>
-          }
-        </select>
-        @if (form.databaseType().invalid() && form.databaseType().touched()) {
-          <span class="error">{{
-            'database.databaseTypeRequired' | translate
-          }}</span>
-        }
-      </div>
-      @if (isSqlite) {
-        <!-- SQLite 檔案位置 -->
-        <div class="form-group">
-          <label for="sqliteFilePath"
-            >{{ 'database.sqliteFilePath' | translate }}
-            <span class="required">*</span></label
-          >
-          <input
-            id="sqliteFilePath"
-            type="text"
-            [formField]="form.sqliteFilePath"
-            [placeholder]="'database.sqliteFilePathPlaceholder' | translate"
-            trimOnBlur />
-          @if (
-            hasError(form.sqliteFilePath, 'required') &&
-            form.sqliteFilePath().touched()
-          ) {
-            <span class="error">{{
-              'database.sqliteFilePathRequired' | translate
-            }}</span>
-          }
+<h2 mat-dialog-title class="dialog-title">
+  {{ 'title.databaseEdit' | translate }}
+</h2>
+<mat-dialog-content class="dialog-content scrollbar-primary">
+  <div class="editor-fields">
+    <div class="field-row">
+      <app-signal-field
+        id="configId"
+        [field]="form.configId"
+        label="database.configId"
+        hint="database.configIdPlaceholder"
+        [trim]="true" />
+      @if (hasError(form, 'configIdIsDefault') && form.configId().touched()) {
+        <div class="field-error" role="alert">
+          {{ 'database.configIdIsDefault' | translate }}
         </div>
       }
     </div>
-
-    <!-- PostgreSQL 專用欄位 -->
-    @if (isPostgresql) {
-      <div class="form-section">
-        <h3>{{ 'database.postgreSQLSetting' | translate }}</h3>
-
-        <!-- 主機 -->
-        <div class="form-group">
-          <label for="host"
-            >{{ 'database.host' | translate }}
-            <span class="required">*</span></label
-          >
-          <input
-            id="host"
-            type="text"
-            [formField]="form.host"
-            [placeholder]="'database.hostPlaceholder' | translate"
-            trimOnBlur />
-          @if (form.host().invalid() && form.host().touched()) {
-            <span class="error">{{ 'database.hostRequired' | translate }}</span>
-          }
-        </div>
-
-        <!-- 連接埠 -->
-        <div class="form-group">
-          <label for="port"
-            >{{ 'database.port' | translate }}
-            <span class="required">*</span></label
-          >
-          <input
-            id="port"
-            type="number"
-            [formField]="form.port"
-            [placeholder]="'database.portPlaceholder' | translate" />
-          @if (form.port().invalid() && form.port().touched()) {
-            <span class="error">{{
-              (hasError(form.port, 'portRange')
-                ? 'database.portRange'
-                : 'database.portRequired'
-              ) | translate
-            }}</span>
-          }
-        </div>
-
-        <!-- 資料庫名稱 -->
-        <div class="form-group">
-          <label for="databaseName"
-            >{{ 'database.databaseName' | translate }}
-            <span class="required">*</span></label
-          >
-          <input
-            id="databaseName"
-            type="text"
-            [formField]="form.databaseName"
-            [placeholder]="'database.databaseNamePlaceholder' | translate"
-            trimOnBlur />
-          @if (form.databaseName().invalid() && form.databaseName().touched()) {
-            <span class="error">{{
-              'database.databaseNameRequired' | translate
-            }}</span>
-          }
-        </div>
-
-        <!-- 使用者名稱 -->
-        <div class="form-group">
-          <label for="username"
-            >{{ 'database.username' | translate }}
-            <span class="required">*</span></label
-          >
-          <input
-            id="username"
-            type="text"
-            [formField]="form.username"
-            [placeholder]="'database.usernamePlaceholder' | translate"
-            trimOnBlur />
-          @if (form.username().invalid() && form.username().touched()) {
-            <span class="error">{{
-              'database.usernameRequired' | translate
-            }}</span>
-          }
-        </div>
-
-        <!-- 密碼 -->
-        <div class="form-group">
-          <label for="password"
-            >{{ 'database.password' | translate }}
-            <span class="required">*</span></label
+    <app-signal-field
+      id="configName"
+      [field]="form.configName"
+      label="database.configName"
+      hint="database.configNamePlaceholder"
+      [trim]="true" />
+    <app-signal-field
+      id="databaseType"
+      [field]="form.databaseType"
+      label="database.databaseType"
+      [type]="fieldType.SELECT"
+      [options]="databaseTypeOptions" />
+    @if (isSqlite) {
+      <app-signal-field
+        id="sqliteFilePath"
+        [field]="form.sqliteFilePath"
+        label="database.sqliteFilePath"
+        hint="database.sqliteFilePathPlaceholder"
+        [trim]="true" />
+    }
+  </div>
+  @if (isPostgresql) {
+    <div class="editor-fields">
+      <app-signal-field
+        id="host"
+        [field]="form.host"
+        label="database.host"
+        hint="database.hostPlaceholder"
+        [trim]="true" />
+      <app-signal-field
+        id="port"
+        [field]="form.port"
+        label="database.port"
+        hint="database.portPlaceholder"
+        [type]="fieldType.NUMBER" />
+      <app-signal-field
+        id="databaseName"
+        [field]="form.databaseName"
+        label="database.databaseName"
+        hint="database.databaseNamePlaceholder"
+        [trim]="true" />
+      <app-signal-field
+        id="username"
+        [field]="form.username"
+        label="database.username"
+        hint="database.usernamePlaceholder"
+        [trim]="true" />
+      <div class="field-row">
+        <div class="editor-field">
+          <label
+            class="field-label"
+            for="password"
+            [class.require]="form.password().required()"
+            >{{ 'database.password' | translate }}</label
           >
           <input
             id="password"
+            class="form-control"
             type="password"
             [formField]="form.password"
-            [placeholder]="'database.passwordPlaceholder' | translate" />
-          @if (form.password().invalid() && form.password().touched()) {
-            <span class="error">{{
-              'database.passwordRequired' | translate
-            }}</span>
-          }
+            [placeholder]="'database.passwordPlaceholder' | translate"
+            [class.is-invalid]="
+              form.password().invalid() && form.password().touched()
+            "
+            [attr.aria-invalid]="
+              form.password().invalid() && form.password().touched()
+            "
+            aria-describedby="database-password-errors" />
         </div>
-
-        <!-- Hibernate 方言 -->
-        <!-- <div class="form-group">
-            <label for="hibernateDialect"
-              >Hibernate 方言 <span class="required">*</span></label
-            >
-            <input
-              id="hibernateDialect"
-              type="text"
-              [formField]="form.hibernateDialect"
-              placeholder="例如: org.hibernate.dialect.PostgreSQLDialect" />
-            @if (
-              form.hibernateDialect().invalid() &&
-              form.hibernateDialect().touched()
-            ) {
-              <span class="error">Hibernate 方言是必填項</span>
-            }
-          </div> -->
+        <app-form-invalids
+          id="database-password-errors"
+          [control]="form.password" />
       </div>
-    }
-
-    <!-- 其他資訊 -->
-    <div class="form-section">
-      <h3>{{ 'database.otherInfo' | translate }}</h3>
-
-      <!-- 說明 -->
-      <div class="form-group">
-        <label for="description"
-          >{{ 'g.description' | translate }}
-          <span class="optional">({{ 'g.optional' | translate }})</span></label
-        >
-        <textarea
-          id="description"
-          [formField]="form.description"
-          [placeholder]="'database.descriptionPlaceholder' | translate"
-          rows="4"></textarea>
-      </div>
+    </div>
+  }
+  <div class="editor-fields">
+    <div class="editor-field description-field">
+      <label class="field-label" for="description">{{
+        'g.description' | translate
+      }}</label>
+      <textarea
+        id="description"
+        class="form-control"
+        [formField]="form.description"
+        [placeholder]="'database.descriptionPlaceholder' | translate"
+        rows="2"></textarea>
     </div>
   </div>
 </mat-dialog-content>
-
-<mat-dialog-actions>
+<mat-dialog-actions class="dialog-actions" [attr.aria-busy]="isProcessing()">
   <button
-    mat-button
+    type="button"
+    class="dialog-button"
     [disabled]="isProcessing()"
-    type="submit"
-    (click)="onSubmit()">
-    {{ 'g.save' | translate }}
+    mat-dialog-close>
+    {{ 'g.cancel' | translate }}
   </button>
-  <button mat-button [disabled]="isProcessing()" (click)="testConnection()">
+  <button
+    type="button"
+    class="dialog-button"
+    [disabled]="isProcessing()"
+    (click)="testConnection()">
     {{ 'database.testConnection' | translate }}
   </button>
-  <button mat-button [disabled]="isProcessing()" mat-dialog-close type="reset">
-    {{ 'g.cancel' | translate }}
+  <button
+    type="button"
+    class="dialog-button dialog-button-primary"
+    [disabled]="isProcessing()"
+    (click)="onSubmit()">
+    {{ 'g.save' | translate }}
   </button>
 </mat-dialog-actions>

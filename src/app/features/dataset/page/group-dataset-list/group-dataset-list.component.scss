@@ -1,4 +1,3 @@
-.table-container {
-  overflow: auto;
-  max-height: 85vh;
-}
+@use '../../styles/dataset-list-page';
+
+@include dataset-list-page.layout($table-min-width: 960px);

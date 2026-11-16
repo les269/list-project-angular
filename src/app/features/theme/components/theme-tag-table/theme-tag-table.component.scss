@@ -1,0 +1,7 @@
+@use '../../styles/theme-section' as section;
+
+@include section.layout;
+
+app-generic-table {
+  --app-editor-table-min-width: 520px;
+}

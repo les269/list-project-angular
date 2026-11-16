@@ -1,11 +1,4 @@
-import {
-  Component,
-  computed,
-  inject,
-  linkedSignal,
-  signal,
-  viewChild,
-} from '@angular/core';
+import { Component, computed, inject, viewChild } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { SpiderPagination } from '../../model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -19,6 +12,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
 import { map } from 'rxjs';
 import { CopySpiderPaginationComponent } from '../../components/copy-spider-pagination/copy-spider-pagination.component';
@@ -32,9 +26,11 @@ import { SpiderPaginationDataComponent } from '../../components/spider-paginatio
     MatTableModule,
     MatButtonModule,
     MatIconModule,
+    MatTooltipModule,
     MatSortModule,
   ],
   templateUrl: './spider-pagination-list.component.html',
+  styleUrl: './spider-pagination-list.component.scss',
 })
 export class SpiderPaginationListComponent {
   readonly displayedColumns = [
@@ -71,8 +67,18 @@ export class SpiderPaginationListComponent {
   readonly ascSignal = computed(() => this.queryParams().asc);
   readonly searchSignal = computed(() => this.queryParams().search);
 
+  readonly filteredList = computed(() => {
+    const data = this.list.value();
+    const search = this.searchSignal().trim().toLowerCase();
+    return search
+      ? data.filter(item =>
+          item.spiderPaginationId.toLowerCase().includes(search)
+        )
+      : data;
+  });
+
   readonly dataSource = computed(() => {
-    const data = this.list.value() ?? [];
+    const data = this.filteredList();
     const sort = this.sort();
     const dataSource = new MatTableDataSource<SpiderPagination>(data);
     if (sort) {

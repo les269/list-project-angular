@@ -103,6 +103,8 @@ export class DiskManagementComponent implements OnInit, AfterViewInit {
   openAddDiskDialog(): void {
     const dialogRef = this.dialog.open(AddDiskDialogComponent, {
       width: '300px',
+      maxWidth: 'calc(100vw - 32px)',
+      maxHeight: 'calc(100dvh - 32px)',
     });
 
     dialogRef.afterClosed().subscribe(result => {

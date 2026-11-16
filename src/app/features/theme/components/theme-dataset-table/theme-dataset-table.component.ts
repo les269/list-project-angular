@@ -63,6 +63,7 @@ import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage
   ],
   selector: 'app-theme-dataset-table',
   templateUrl: 'theme-dataset-table.component.html',
+  styleUrl: './theme-dataset-table.component.scss',
 })
 export class ThemeDatasetTableComponent {
   // inject

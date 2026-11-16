@@ -1,38 +1,57 @@
-<div class="container py-3">
-  <div
-    class="d-flex flex-wrap gap-3 align-items-end justify-content-between mb-3">
-    <div class="flex-grow-1">
-      <input
-        id="request-search"
-        type="search"
-        class="form-control"
-        [(ngModel)]="searchText" />
-    </div>
+<main class="management-page">
+  <div class="page-actions">
     <button
       type="button"
-      mat-button
-      (click)="requests.reload()"
-      [disabled]="requests.isLoading() || !!deletingId()">
-      <mat-icon>refresh</mat-icon>{{ 'apiRequestConfig.reload' | translate }}
-    </button>
-    <button
-      type="button"
-      mat-flat-button
+      class="page-button page-button-primary"
       (click)="onAdd()"
       [disabled]="requests.isLoading() || !!requests.error() || !!deletingId()">
-      <mat-icon>add</mat-icon>{{ 'apiRequestConfig.add' | translate }}
+      {{ 'apiRequestConfig.add' | translate }}
     </button>
+    <div class="filter-controls">
+      <input
+        #requestSearch
+        id="request-search"
+        type="search"
+        class="filter-input"
+        [attr.aria-label]="'apiRequestConfig.search' | translate"
+        [placeholder]="'apiRequestConfig.search' | translate"
+        [value]="searchText()"
+        (input)="searchText.set(requestSearch.value)" />
+      <button
+        type="button"
+        class="page-button"
+        [disabled]="!searchText()"
+        (click)="searchText.set('')">
+        {{ 'g.clear' | translate }}
+      </button>
+    </div>
   </div>
   @if (requests.isLoading()) {
-    <p role="status">{{ 'apiRequestConfig.loading' | translate }}</p>
+    <p class="page-status" role="status">
+      {{ 'apiRequestConfig.loading' | translate }}
+    </p>
   }
   @if (requests.error()) {
     <div class="alert alert-danger" role="alert">
       {{ 'apiRequestConfig.loadFailed' | translate }}
     </div>
   }
-  <div class="card overflow-auto" [attr.aria-busy]="requests.isLoading()">
-    <table mat-table [dataSource]="dataSource" matSort class="w-100">
+  @if (deleteFailed()) {
+    <div class="alert alert-danger" role="alert">
+      {{ 'apiRequestConfig.deleteFailed' | translate }}
+    </div>
+  }
+  <div
+    class="table-container scrollbar-primary"
+    role="region"
+    tabindex="0"
+    [attr.aria-label]="'title.apiRequestConfigList' | translate"
+    [attr.aria-busy]="requests.isLoading()">
+    <table
+      mat-table
+      [attr.aria-label]="'title.apiRequestConfigList' | translate"
+      [dataSource]="dataSource"
+      matSort>
       <ng-container matColumnDef="apiId">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ 'apiRequestConfig.apiId' | translate }}
@@ -51,9 +70,8 @@
         </th>
         <td mat-cell *matCellDef="let item">
           <span
-            class="badge"
-            [class.bg-success]="item.config.enabled !== false"
-            [class.bg-secondary]="item.config.enabled === false">
+            class="status-badge"
+            [class.status-badge-inactive]="item.config.enabled === false">
             {{
               (item.config.enabled === false
                 ? 'apiRequestConfig.inactive'
@@ -68,7 +86,9 @@
           {{ 'apiRequestConfig.httpMethod' | translate }}
         </th>
         <td mat-cell *matCellDef="let item">
-          {{ item.config.httpMethod.toUpperCase() }}
+          <span class="method-label">{{
+            item.config.httpMethod.toUpperCase()
+          }}</span>
         </td>
       </ng-container>
       <ng-container matColumnDef="createdTime">
@@ -88,12 +108,16 @@
         </td>
       </ng-container>
       <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef></th>
+        <th mat-header-cell *matHeaderCellDef>
+          {{ 'apiRequestConfig.actions' | translate }}
+        </th>
         <td mat-cell *matCellDef="let item">
-          <div class="d-flex align-items-center gap-1">
+          <div class="row-actions">
             <button
               type="button"
               mat-icon-button
+              class="row-action"
+              [matTooltip]="'apiRequestConfig.callApi.execute' | translate"
               (click)="onExecute(item)"
               [disabled]="!!deletingId() || requests.isLoading()"
               [attr.aria-label]="
@@ -104,6 +128,8 @@
             <button
               type="button"
               mat-icon-button
+              class="row-action"
+              [matTooltip]="'g.edit' | translate"
               (click)="onEdit(item)"
               [disabled]="!!deletingId() || requests.isLoading()"
               [attr.aria-label]="
@@ -114,6 +140,8 @@
             <button
               type="button"
               mat-icon-button
+              class="row-action"
+              [matTooltip]="'g.copy' | translate"
               (click)="onCopy(item)"
               [disabled]="!!deletingId() || requests.isLoading()"
               [attr.aria-label]="
@@ -124,6 +152,8 @@
             <button
               type="button"
               mat-icon-button
+              class="row-action row-action-danger"
+              [matTooltip]="'g.delete' | translate"
               (click)="onDelete(item)"
               [disabled]="!!deletingId() || requests.isLoading()"
               [attr.aria-label]="
@@ -134,12 +164,10 @@
           </div>
         </td>
       </ng-container>
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
       <tr *matNoDataRow>
-        <td
-          class="p-4 text-center text-muted"
-          [attr.colspan]="displayedColumns.length">
+        <td class="empty-state" [attr.colspan]="displayedColumns.length">
           @if (!requests.isLoading() && !requests.error()) {
             {{
               (searchText().trim()
@@ -152,4 +180,4 @@
       </tr>
     </table>
   </div>
-</div>
+</main>

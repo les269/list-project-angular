@@ -1,0 +1,45 @@
+@use '@angular/material' as mat;
+@use '../../styles/theme-section' as section;
+
+@include section.layout;
+
+:host {
+  @include mat.checkbox-overrides(
+    (
+      label-text-font: var(--app-font-family),
+      label-text-size: var(--app-font-size-sm),
+      label-text-weight: 400,
+    )
+  );
+}
+
+.label-detail {
+  display: grid;
+  gap: var(--app-space-3);
+  padding: var(--app-space-3) 0 var(--app-space-4);
+}
+
+.detail-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--app-space-2);
+
+  .form-control {
+    min-width: 0;
+    font-size: var(--app-font-size-sm);
+  }
+}
+
+.width-fields {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.label-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--app-space-1) var(--app-space-4);
+}
+
+.option-wide {
+  grid-column: 1 / -1;
+}

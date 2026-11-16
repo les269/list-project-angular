@@ -1,0 +1,51 @@
+@use '../../../../../styles/management-list-page';
+
+@include management-list-page.layout($table-min-width: 1120px);
+
+.mat-column-apiId {
+  min-width: 160px;
+  max-width: 240px;
+  overflow-wrap: anywhere;
+}
+
+.mat-column-description {
+  min-width: 200px;
+  max-width: 360px;
+  overflow-wrap: anywhere;
+}
+
+.status-badge,
+.method-label {
+  display: inline-block;
+  padding: var(--app-space-1) var(--app-space-2);
+  border-radius: var(--app-radius-sm);
+  font-size: var(--app-font-size-caption);
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.status-badge {
+  color: #18794e;
+  background-color: #ecfdf3;
+}
+
+.status-badge-inactive,
+.method-label {
+  color: var(--app-text-secondary);
+  background-color: var(--app-surface-muted);
+}
+
+.row-action:disabled:hover {
+  background-color: transparent;
+}
+
+.page-status,
+.empty-state {
+  color: var(--app-text-secondary);
+  font-size: var(--app-font-size-sm);
+}
+
+.empty-state {
+  padding: var(--app-space-8);
+  text-align: center;
+}

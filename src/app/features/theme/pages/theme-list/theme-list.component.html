@@ -1,82 +1,87 @@
-<div class="col-md-10 offset-md-1 col-xs-12 pt-2">
-  <div class="d-flex gap-1">
-    <button type="button" class="btn btn-primary" (click)="routeCreate()">
+<main class="theme-page">
+  <div class="page-actions">
+    <button
+      type="button"
+      class="page-button page-button-primary"
+      (click)="routeCreate()">
       {{ 'home.createTheme' | translate }}
     </button>
-    <button type="button" class="btn btn-primary" (click)="onOpenVisible()">
-      {{ 'home.visibleConfig' | translate }}
-    </button>
-    <button type="button" class="btn btn-primary" (click)="onShareTagConfig()">
-      {{ 'home.shareTagList' | translate }}
-    </button>
+    <div class="secondary-actions">
+      <button type="button" class="page-button" (click)="onOpenVisible()">
+        {{ 'home.visibleConfig' | translate }}
+      </button>
+      <button type="button" class="page-button" (click)="onShareTagConfig()">
+        {{ 'home.shareTagList' | translate }}
+      </button>
+    </div>
   </div>
+
   @for (type of eThemeHeaderType | keyvalue; track type.key) {
     @let items = list()[type.value];
     @if (items.length > 0) {
-      <h4 class="d-flex mt-4">{{ 'themeHeader.' + type.key | translate }}</h4>
-      <div class="d-flex flex-wrap">
-        @for (item of items; track $index) {
-          <div class="col-lg-4 col-md-6 col-xs-12">
-            <div class="theme-content">
-              <div class="theme-detail" (click)="navigateList(item)">
-                <div class="row">
-                  <div class="fw-bold" style="width: 100px">
-                    {{ 'themeHeader.name' | translate }}
+      <section
+        class="theme-section"
+        [attr.aria-labelledby]="'theme-' + type.key">
+        <div class="section-heading">
+          <h2 [id]="'theme-' + type.key">
+            {{ 'themeHeader.' + type.key | translate }}
+          </h2>
+          <span class="theme-count">{{ items.length }}</span>
+        </div>
+
+        <div class="theme-grid">
+          @for (item of items; track $index) {
+            <article class="theme-content">
+              <a
+                class="theme-detail"
+                [routerLink]="['/', item.type, item.name, item.version]"
+                [queryParams]="layoutStore.getQueryParamsByHeader(item)"
+                [attr.aria-labelledby]="
+                  'theme-title-' + type.key + '-' + $index
+                ">
+                <h3 [id]="'theme-title-' + type.key + '-' + $index">
+                  {{ item.title }}
+                </h3>
+                <dl class="theme-metadata">
+                  <div>
+                    <dt>{{ 'themeHeader.name' | translate }}</dt>
+                    <dd>{{ item.name }}</dd>
                   </div>
-                  <div class="row-text col-9" style="width: calc(100% - 100px)">
-                    {{ item.name }}
+                  <div>
+                    <dt>{{ 'themeHeader.version' | translate }}</dt>
+                    <dd>{{ item.version }}</dd>
                   </div>
-                </div>
-                <div class="row">
-                  <div class="fw-bold" style="width: 100px">
-                    {{ 'themeHeader.version' | translate }}
+                  <div>
+                    <dt>{{ 'themeHeader.type' | translate }}</dt>
+                    <dd>{{ 'themeHeader.' + item.type | translate }}</dd>
                   </div>
-                  <div class="row-text col-9" style="width: calc(100% - 100px)">
-                    {{ item.version }}
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="fw-bold" style="width: 100px">
-                    {{ 'themeHeader.title' | translate }}
-                  </div>
-                  <div class="row-text col-9" style="width: calc(100% - 100px)">
-                    {{ item.title }}
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="fw-bold" style="width: 100px">
-                    {{ 'themeHeader.type' | translate }}
-                  </div>
-                  <div class="row-text col-9" style="width: calc(100% - 100px)">
-                    {{ 'themeHeader.' + item.type | translate }}
-                  </div>
-                </div>
-              </div>
-              <span class="border-top"></span>
+                </dl>
+              </a>
+
               <div class="theme-buttons">
                 <button
                   type="button"
-                  class="btn btn-primary"
+                  class="page-button"
                   (click)="onEdit(item)">
                   {{ 'g.edit' | translate }}
                 </button>
                 <button
                   type="button"
-                  class="btn btn-primary"
+                  class="page-button"
                   (click)="onCopy(item)">
                   {{ 'g.copy' | translate }}
                 </button>
                 <button
                   type="button"
-                  class="btn btn-primary"
+                  class="page-button page-button-danger"
                   (click)="onDelete(item)">
                   {{ 'g.delete' | translate }}
                 </button>
               </div>
-            </div>
-          </div>
-        }
-      </div>
+            </article>
+          }
+        </div>
+      </section>
     }
   }
-</div>
+</main>

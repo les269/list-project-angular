@@ -132,6 +132,9 @@ export class GroupDatasetListComponent implements OnInit, AfterViewInit {
   onCopy(e: GroupDataset) {
     this.matDialog
       .open(CopyGroupDatasetComponent, {
+        width: '560px',
+        maxWidth: 'calc(100vw - 32px)',
+        autoFocus: 'input:not([readonly])',
         data: { source: e },
       })
       .afterClosed()
@@ -149,7 +152,8 @@ export class GroupDatasetListComponent implements OnInit, AfterViewInit {
         groupName: e.groupName,
         primeValue: '',
       },
-      minWidth: '60vw',
+      width: '960px',
+      maxWidth: 'calc(100vw - 32px)',
       autoFocus: false,
     });
   }
@@ -161,6 +165,7 @@ export class GroupDatasetListComponent implements OnInit, AfterViewInit {
         byKey: e.config.byKey,
       },
       width: '480px',
+      maxWidth: 'calc(100vw - 32px)',
       autoFocus: false,
     });
   }

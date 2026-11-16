@@ -1,13 +1,17 @@
-<mat-dialog-content>
+<mat-dialog-content class="dialog-content">
   {{ data.message }}
 </mat-dialog-content>
-<mat-dialog-actions>
+<mat-dialog-actions class="dialog-actions">
   @if (!data.onlyOk) {
-    <button mat-button mat-dialog-close (click)="no()">
+    <button type="button" class="dialog-button" (click)="no()">
       {{ 'g.no' | translate }}
     </button>
   }
-  <button mat-button mat-dialog-close cdkFocusInitial (click)="ok()">
+  <button
+    type="button"
+    class="dialog-button dialog-button-primary"
+    cdkFocusInitial
+    (click)="ok()">
     {{ 'g.ok' | translate }}
   </button>
 </mat-dialog-actions>

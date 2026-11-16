@@ -24,13 +24,7 @@ let nextControlId = 0;
     SignalDateInputComponent,
   ],
   templateUrl: './signal-field.component.html',
-  styles: `
-    :host {
-      display: block;
-      flex: 1 1 0;
-      min-width: 0;
-    }
-  `,
+  styleUrl: './signal-field.component.scss',
 })
 export class SignalFieldComponent<T> {
   // 不同欄位型別的共用顯示邊界，資料與驗證仍由呼叫端的 FieldTree 管理。

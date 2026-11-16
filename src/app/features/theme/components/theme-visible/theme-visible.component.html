@@ -1,38 +1,48 @@
-<div class="d-flex justify-content-between align-items-center">
-  <h2 mat-dialog-title>
+<div class="dialog-header">
+  <h2 mat-dialog-title class="dialog-title">
     {{ 'home.visibleConfig' | translate }}
   </h2>
-  <button class="d-flex mx-2" mat-icon-button (click)="onNoClick()">
+  <button
+    type="button"
+    class="dialog-close"
+    (click)="onNoClick()"
+    [attr.aria-label]="'g.close' | translate">
     <mat-icon>close</mat-icon>
   </button>
 </div>
-<mat-dialog-content class="scrollbar-primary">
-  <mat-list>
-    @for (
-      type of eThemeHeaderType | keyvalue;
-      track type.key;
-      let isLast = $last
-    ) {
+<mat-dialog-content class="dialog-content scrollbar-primary">
+  <div class="visibility-list">
+    @for (type of eThemeHeaderType | keyvalue; track type.key) {
       @if (list()[type.value].length > 0) {
-        <div mat-subheader>{{ 'themeHeader.' + type.key | translate }}</div>
-        @for (item of list()[type.value]; track $index) {
-          @let themeVisible = layoutStore.hasHidden(getHeaderIdByHeader(item));
-          <mat-list-item>
-            <div matListItemTitle>{{ item.title | translate }}</div>
-            <button
-              mat-button
-              matListItemIcon
-              (click)="changeVisible(item)"
-              [class.visible-btn]="themeVisible"
-              [class.hidden-btn]="!themeVisible">
-              {{ (themeVisible ? 'g.visible' : 'g.hide') | translate }}
-            </button>
-          </mat-list-item>
-        }
-      }
-      @if (!isLast) {
-        <mat-divider></mat-divider>
+        <section class="visibility-group">
+          <h3>{{ 'themeHeader.' + type.key | translate }}</h3>
+          @for (item of list()[type.value]; track getHeaderIdByHeader(item)) {
+            @let hidden = layoutStore.hasHidden(getHeaderIdByHeader(item));
+            <div class="visibility-row">
+              <span class="visibility-title">{{ item.title | translate }}</span>
+              <button
+                type="button"
+                class="dialog-button"
+                [class.dialog-button-primary]="hidden"
+                [attr.aria-label]="
+                  (item.title | translate) +
+                  ' ' +
+                  ((hidden ? 'g.visible' : 'g.hide') | translate)
+                "
+                (click)="changeVisible(item)">
+                {{ (hidden ? 'g.visible' : 'g.hide') | translate }}
+              </button>
+            </div>
+          }
+        </section>
       }
     }
-  </mat-list>
+    @if (
+      list()[eThemeHeaderType.imageList].length +
+        list()[eThemeHeaderType.table].length ===
+      0
+    ) {
+      <p class="empty-state">{{ 'g.noData' | translate }}</p>
+    }
+  </div>
 </mat-dialog-content>

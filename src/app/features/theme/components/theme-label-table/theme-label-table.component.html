@@ -1,6 +1,8 @@
-<label class="h3">{{ 'themeLabel.title' | translate }}</label>
-<div class="card mb-3">
-  <div class="card-body">
+<section class="theme-section" aria-labelledby="theme-label-title">
+  <h2 class="section-title" id="theme-label-title">
+    {{ 'themeLabel.title' | translate }}
+  </h2>
+  <div class="section-body">
     <app-theme-item-manage
       [headerId]="headerId()"
       [form]="form"
@@ -12,105 +14,111 @@
     <app-form-alerts
       [form]="fields"
       [formAlerts]="formAlerts()"></app-form-alerts>
-    <div class="card mb-3">
-      <app-generic-table
-        [class.table-invalid]="fields().invalid()"
-        [fields]="fields"
-        [createRow]="createRow"
-        [displayedColumns]="displayedColumns"
-        [cols]="cols"
-        [expandedTmpl]="expandedDetail">
-      </app-generic-table>
-    </div>
+    <app-generic-table
+      appearance="outlined"
+      [class.table-invalid]="fields().invalid()"
+      [fields]="fields"
+      [createRow]="createRow"
+      [displayedColumns]="displayedColumns"
+      [cols]="cols"
+      [expandedTmpl]="expandedDetail">
+    </app-generic-table>
   </div>
-</div>
+</section>
 <ng-template #expandedDetail let-element let-index="index">
-  <div class="d-flex">
-    <div class="column p-1">
-      @let type = element.type;
-      @if (type().value() === eThemeLabelType.stringSplit) {
-        <div class="input-group">
+  <div class="label-detail">
+    @let type = element.type;
+    @if (type().value() === eThemeLabelType.stringSplit) {
+      <div class="detail-fields">
+        <input
+          type="text"
+          class="form-control"
+          [placeholder]="'themeLabel.splitByPh' | translate"
+          [attr.aria-label]="'themeLabel.splitByPh' | translate"
+          [formField]="element.splitBy" />
+        <input
+          type="text"
+          class="form-control"
+          [placeholder]="'themeLabel.useSpacePh' | translate"
+          [attr.aria-label]="'themeLabel.useSpacePh' | translate"
+          [formField]="element.useSpace" />
+      </div>
+    }
+    @if (type().value() === eThemeLabelType.date) {
+      <div class="detail-fields">
+        <input
+          type="text"
+          class="form-control"
+          [placeholder]="'themeLabel.dateFormatPh' | translate"
+          [attr.aria-label]="'themeLabel.dateFormat' | translate"
+          [formField]="element.dateFormat" />
+      </div>
+    }
+    @if (themeHeaderType() === eThemeHeaderType.table) {
+      <div>
+        <div class="detail-fields width-fields">
           <input
             type="text"
             class="form-control"
-            [placeholder]="'themeLabel.splitByPh' | translate"
-            [formField]="element.splitBy" />
+            [placeholder]="'themeLabel.width' | translate"
+            [attr.aria-label]="'themeLabel.width' | translate"
+            [formField]="element.width"
+            [class.is-invalid]="
+              hasError(element.width, 'invalidWidth') &&
+              element.width().touched()
+            " />
           <input
             type="text"
             class="form-control"
-            [placeholder]="'themeLabel.useSpacePh' | translate"
-            [formField]="element.useSpace" />
+            [placeholder]="'themeLabel.minWidth' | translate"
+            [attr.aria-label]="'themeLabel.minWidth' | translate"
+            [formField]="element.minWidth"
+            [class.is-invalid]="
+              hasError(element.minWidth, 'invalidMinWidth') &&
+              element.minWidth().touched()
+            " />
+          <input
+            type="text"
+            class="form-control"
+            [placeholder]="'themeLabel.maxWidth' | translate"
+            [attr.aria-label]="'themeLabel.maxWidth' | translate"
+            [formField]="element.maxWidth"
+            [class.is-invalid]="
+              hasError(element.maxWidth, 'invalidMaxWidth') &&
+              element.maxWidth().touched()
+            " />
         </div>
-      }
-      @if (type().value() === eThemeLabelType.date) {
-        <div class="input-group">
-          <input
-            type="text"
-            class="form-control"
-            [placeholder]="'themeLabel.dateFormatPh' | translate"
-            [formField]="element.dateFormat" />
-        </div>
-      }
-      @if (themeHeaderType() === eThemeHeaderType.table) {
-        <div>
-          <div class="input-group">
-            <input
-              type="text"
-              class="form-control"
-              [placeholder]="'themeLabel.width' | translate"
-              [formField]="element.width"
-              [class.is-invalid]="
-                hasError(element.width, 'invalidWidth') &&
-                element.width().touched()
-              " />
-            <input
-              type="text"
-              class="form-control"
-              [placeholder]="'themeLabel.minWidth' | translate"
-              [formField]="element.minWidth"
-              [class.is-invalid]="
-                hasError(element.minWidth, 'invalidMinWidth') &&
-                element.minWidth().touched()
-              " />
-            <input
-              type="text"
-              class="form-control"
-              [placeholder]="'themeLabel.maxWidth' | translate"
-              [formField]="element.maxWidth"
-              [class.is-invalid]="
-                hasError(element.maxWidth, 'invalidMaxWidth') &&
-                element.maxWidth().touched()
-              " />
+        @if (
+          (hasError(element.width, 'invalidWidth') &&
+            element.width().touched()) ||
+          (hasError(element.minWidth, 'invalidMinWidth') &&
+            element.minWidth().touched()) ||
+          (hasError(element.maxWidth, 'invalidMaxWidth') &&
+            element.maxWidth().touched())
+        ) {
+          <div class="invalid-feedback d-flex">
+            <span class="w-100 d-flex justify-content-center">
+              @if (hasError(element.width, 'invalidWidth')) {
+                {{ 'msg.widthError' | translate }}
+              }
+            </span>
+            <span class="w-100 d-flex justify-content-center">
+              @if (hasError(element.minWidth, 'invalidMinWidth')) {
+                {{ 'msg.widthError' | translate }}
+              }
+            </span>
+            <span class="w-100 d-flex justify-content-center">
+              @if (hasError(element.maxWidth, 'invalidMaxWidth')) {
+                {{ 'msg.widthError' | translate }}
+              }
+            </span>
           </div>
-          @if (
-            (hasError(element.width, 'invalidWidth') &&
-              element.width().touched()) ||
-            (hasError(element.minWidth, 'invalidMinWidth') &&
-              element.minWidth().touched()) ||
-            (hasError(element.maxWidth, 'invalidMaxWidth') &&
-              element.maxWidth().touched())
-          ) {
-            <div class="invalid-feedback d-flex">
-              <span class="w-100 d-flex justify-content-center">
-                @if (hasError(element.width, 'invalidWidth')) {
-                  {{ 'msg.widthError' | translate }}
-                }
-              </span>
-              <span class="w-100 d-flex justify-content-center">
-                @if (hasError(element.minWidth, 'invalidMinWidth')) {
-                  {{ 'msg.widthError' | translate }}
-                }
-              </span>
-              <span class="w-100 d-flex justify-content-center">
-                @if (hasError(element.maxWidth, 'invalidMaxWidth')) {
-                  {{ 'msg.widthError' | translate }}
-                }
-              </span>
-            </div>
-          }
-        </div>
-      }
+        }
+      </div>
+    }
+    <div class="label-options">
       <mat-checkbox
+        class="option-wide"
         [formField]="element.isDefaultKey"
         (change)="changeDefaultKey(index)"
         >{{ 'themeLabel.isDefaultKey' | translate }}</mat-checkbox
@@ -140,12 +148,12 @@
       <mat-checkbox [formField]="element.useVisibleDataset">{{
         'themeLabel.useVisibleDataset' | translate
       }}</mat-checkbox>
-      @if (element.useVisibleDataset().value()) {
-        <app-chip-input
-          [label]="'themeLabel.visibleDatasetNameListPH' | translate"
-          [formField]="element.visibleDatasetNameList">
-        </app-chip-input>
-      }
     </div>
+    @if (element.useVisibleDataset().value()) {
+      <app-chip-input
+        [label]="'themeLabel.visibleDatasetNameListPH' | translate"
+        [formField]="element.visibleDatasetNameList">
+      </app-chip-input>
+    }
   </div>
 </ng-template>

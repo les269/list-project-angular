@@ -1,0 +1,32 @@
+@use '../../styles/dataset-editor-page' as editor;
+
+@include editor.layout;
+
+.text-source {
+  display: grid;
+  gap: var(--app-space-2);
+
+  app-signal-code-editor {
+    display: block;
+    height: 240px;
+    min-width: 0;
+    border: 1px solid var(--app-border-strong);
+    border-radius: var(--app-radius-sm);
+    overflow: hidden;
+  }
+
+  .page-button {
+    justify-self: start;
+  }
+}
+
+.option-block {
+  display: grid;
+  gap: var(--app-space-2);
+  min-width: 0;
+}
+
+.option-block + .option-block {
+  padding-top: var(--app-space-3);
+  border-top: 1px solid var(--app-border);
+}

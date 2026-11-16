@@ -29,7 +29,7 @@
     height: 28px;
     min-width: 8em;
     font-size: 1rem;
-    border-radius: var(--app-radius-sm);
+    border-radius: var(--app-action-radius);
     text-decoration: none;
 
     @include action-button.states;

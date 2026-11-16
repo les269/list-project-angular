@@ -1,0 +1,64 @@
+@use '../../styles/theme-section' as section;
+
+@include section.layout;
+
+.source-selection {
+  margin: 0 0 var(--app-space-4);
+  padding: 0;
+
+  legend {
+    float: none;
+    width: auto;
+    margin-bottom: var(--app-space-2);
+    font-size: var(--app-font-size-sm);
+  }
+}
+
+.source-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--app-space-2);
+}
+
+.source-option {
+  display: flex;
+  align-items: center;
+  gap: var(--app-space-2);
+  min-height: 40px;
+  padding: var(--app-space-2) var(--app-space-3);
+  border: 1px solid var(--app-border-strong);
+  border-radius: var(--app-radius-sm);
+  font-size: var(--app-font-size-sm);
+  cursor: pointer;
+
+  .form-check-input {
+    flex-shrink: 0;
+    margin: 0;
+  }
+
+  &:has(input:checked) {
+    color: var(--app-primary-hover);
+    background: var(--app-primary-soft);
+    border-color: var(--app-primary);
+  }
+
+  &:hover {
+    background: var(--app-hover-bg);
+  }
+
+  &:has(input:checked):hover {
+    background: var(--app-primary-soft-hover);
+  }
+
+  &:focus-within {
+    outline: 2px solid var(--app-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+app-signal-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-space-2);
+  font-size: var(--app-font-size-sm);
+}

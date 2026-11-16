@@ -1,71 +1,42 @@
-<h2 mat-dialog-title>{{ 'title.copyTheme' | translate }}</h2>
-<mat-dialog-content>
+<h2 mat-dialog-title class="dialog-title">
+  {{ 'title.copyTheme' | translate }}
+</h2>
+<mat-dialog-content class="dialog-content">
   <form (submit)="$event.preventDefault()">
-    <div class="mb-3">
-      <label for="name" class="form-label require">{{
-        'themeHeader.name' | translate
-      }}</label>
-      <input
-        type="text"
-        class="form-control"
-        [formField]="nameControl"
-        id="name"
-        trimOnBlur />
-      <app-form-invalids
-        [control]="nameControl"
-        [formAlerts]="formAlertsObj().name"></app-form-invalids>
-    </div>
-    <div class="mb-3">
-      <label for="version" class="form-label require">{{
-        'themeHeader.version' | translate
-      }}</label>
-      <input
-        type="text"
-        class="form-control"
-        [formField]="versionControl"
-        id="version"
-        trimOnBlur />
-      <app-form-invalids
-        [control]="versionControl"
-        [formAlerts]="formAlertsObj().version"></app-form-invalids>
-    </div>
-    <div class="mb-3">
-      <label class="form-label" for="type">{{
-        'themeHeader.type' | translate
-      }}</label>
-      <select class="form-control form-select" [formField]="typeControl">
-        @for (type of eThemeHeaderType | keyvalue; track type) {
-          <option [value]="type.key">
-            {{ 'themeHeader.' + type.key | translate }}
-          </option>
-        }
-      </select>
-    </div>
-    <div class="mb-3">
-      <label for="title" class="form-label require">{{
-        'themeHeader.title' | translate
-      }}</label>
-      <input
-        type="text"
-        class="form-control"
-        [formField]="titleControl"
-        id="title"
-        trimOnBlur />
-      <app-form-invalids
-        [control]="titleControl"
-        [formAlerts]="formAlertsObj().title"></app-form-invalids>
-    </div>
+    <fieldset class="dialog-fields" [disabled]="isProcessing()">
+      <app-signal-field
+        [field]="nameControl"
+        label="themeHeader.name"
+        [trim]="true" />
+      <app-signal-field
+        [field]="versionControl"
+        label="themeHeader.version"
+        [trim]="true" />
+      <app-signal-field
+        [field]="typeControl"
+        label="themeHeader.type"
+        [type]="fieldType.SELECT"
+        [options]="themeTypeOptions" />
+      <app-signal-field
+        [field]="titleControl"
+        label="themeHeader.title"
+        [trim]="true" />
+    </fieldset>
   </form>
 </mat-dialog-content>
-<mat-dialog-actions>
-  <button mat-button mat-dialog-close [disabled]="isProcessing()">
-    {{ 'g.no' | translate }}
+<mat-dialog-actions class="dialog-actions" [attr.aria-busy]="isProcessing()">
+  <button
+    type="button"
+    class="dialog-button"
+    mat-dialog-close
+    [disabled]="isProcessing()">
+    {{ 'g.cancel' | translate }}
   </button>
   <button
-    mat-button
-    cdkFocusInitial
+    type="button"
+    class="dialog-button dialog-button-primary"
     (click)="ok()"
     [disabled]="form().invalid() || isProcessing()">
-    {{ 'g.ok' | translate }}
+    {{ (isProcessing() ? 'msg.copying' : 'g.copy') | translate }}
   </button>
 </mat-dialog-actions>

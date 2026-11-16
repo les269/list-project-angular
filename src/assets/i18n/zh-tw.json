@@ -1,16 +1,27 @@
 {
+  "header": {
+    "openNavigation": "開啟導覽選單",
+    "closeNavigation": "關閉導覽選單"
+  },
+  "sidenav": {
+    "label": "主導覽"
+  },
   "msg": {
     "blank": "{{name}} 不可以為空",
     "deleteSuccess": "刪除成功",
     "deleteFailed": "刪除失敗",
     "copySuccess": "複製成功",
+    "copying": "複製中…",
     "commitSuccess": "提交成功",
     "addSuccess": "新增成功",
     "addFailed": "新增失敗",
     "saveSuccess": "保存成功",
+    "saving": "保存中…",
+    "submitting": "提交中…",
     "updateSuccess": "更新成功",
     "themeExist": "主題已經存在",
     "themeNotExist": "主題不存在",
+    "datasetExist": "資料集名稱已存在",
     "labelTableInUse": "目前該資料欄位表使用中，需先解除綁定後才可刪除",
     "scrapyExist": "該名稱已經存在",
     "scrapyNotExist": "該名稱不存在",
@@ -87,9 +98,10 @@
     "extractFailed": "提取失敗: {{message}}",
     "keyAndValueRequired": "鍵和值都為必填項",
     "keyAlreadyExists": "鍵已經存在",
-    "openLocalFolderSuccess": "開啟本地資料夾成功"
+    "openLocalFolderSuccess": "開啟所在資料夾成功"
   },
   "g": {
+    "actions": "操作",
     "edit": "編輯",
     "copy": "複製",
     "read": "瀏覽",
@@ -102,6 +114,7 @@
     "enabled": "啟用",
     "confirm": "確認",
     "cancel": "取消",
+    "back": "返回",
     "filter": "過濾",
     "save": "保存",
     "totalNum": "總數量",
@@ -211,6 +224,7 @@
   },
   "themeHeader": {
     "headline": "主題設定",
+    "requiredHint": "所有欄位皆為必填。",
     "name": "主題名稱",
     "version": "版本",
     "title": "標題",
@@ -227,6 +241,7 @@
     }
   },
   "spider": {
+    "filterPlaceholder": "過濾爬蟲 ID 或描述",
     "createSpider": "新增爬蟲設定",
     "createSpiderItem": "建立爬蟲項目",
     "deleteSpiderItem": "刪除爬蟲項目",
@@ -294,6 +309,7 @@
     "ignoreCase": "忽略大小寫"
   },
   "spiderPagination": {
+    "filterPlaceholder": "過濾爬蟲分頁 ID",
     "dataList": "分頁爬蟲資料",
     "groupId": "群組Id",
     "dataId": "資料Id",
@@ -490,6 +506,7 @@
   },
   "themeImage": {
     "title": "圖片設定",
+    "sourceType": "圖片來源方式",
     "imageId": "圖片表單ID",
     "imageKey": "圖片json key",
     "imageUrl": "自訂義來源",
@@ -562,6 +579,7 @@
     "copyValuePH": "自定義文字 ex: hello ${id} ${id}=>id是指data的id",
     "copyValueByKeyPH": "對應data的key",
     "openUrlPH": "自定義開啟網址 ex: https://www.google.com/search?q=${id} ${id}=>id是指data的id",
+    "openWindowsTarget": "開啟位置",
     "openUrlByKeyPH": "對應data的key",
     "buttonInputUrl": "輸入自定義開啟網址",
     "labelName": "標籤名稱",
@@ -603,6 +621,13 @@
     "headerButtons": "頭部按鈕設定",
     "defaultColor": "重設為預設顏色",
     "listPageSizeMoreZero": "圖片清單每頁預設顯示數量要大於0",
+    "listPageSizeRequired": "請輸入每頁顯示數量",
+    "listPageSizeMin": "每頁顯示數量至少為 1",
+    "useSpiderRequired": "請選擇快速刷新使用的爬蟲",
+    "refreshTypeRequired": "請選擇快速刷新方式",
+    "quickRefreshRequired": "請輸入快速刷新設定值",
+    "selectSpider": "選擇爬蟲",
+    "refreshValue": "刷新設定值",
     "checkFileExist": "檢查檔案是否存在",
     "checkFileExistPH": "ex: C:\\file\\${fileName} ${fileName}=>id是指data的fileName",
     "quickRefresh": "快速刷新設定",
@@ -669,6 +694,13 @@
     "noRedirectData": "未獲取過轉址資料"
   },
   "dataset": {
+    "dataLookup": "資料查詢",
+    "dataFields": "資料欄位",
+    "basicSettings": "基本設定",
+    "sourceSettings": "來源設定",
+    "advancedSettings": "進階選項",
+    "selectGroupDataset": "選擇資料集群組",
+    "selectPagination": "選擇分頁設定",
     "createDataset": "創建資料集",
     "name": "名稱",
     "groupName": "資料集群組名稱",
@@ -728,6 +760,8 @@
     "text": "文字文本",
     "importCsvTxt": "匯入csv,txt檔案",
     "exportOnlyJson": "匯出僅JSON資料",
+    "jsonDataFormat": "僅 JSON 資料",
+    "completeDataFormat": "完整資料",
     "exportComplete": "匯出完整資料",
     "importJson": "匯入僅JSON資料",
     "importComplete": "匯入完整檔案",
@@ -735,6 +769,8 @@
     "apiId": "API 請求設定"
   },
   "replaceValueMap": {
+    "selectMap": "選擇替換表",
+    "filterPlaceholder": "過濾被替換值或替換值",
     "swap": "翻轉",
     "searchName": "搜尋名稱",
     "match": "被替換值",
@@ -799,7 +835,7 @@
     "databaseNamePlaceholder": "請輸入資料庫名稱",
     "connectionSuccess": "連線成功",
     "connectionFailed": "連線失敗",
-    "openLocalFolder": "開啟本地資料夾"
+    "openLocalFolder": "開啟所在資料夾"
   },
   "timezones": {
     "GMT_M12": "國際日期變換線西 (UTC-12)",

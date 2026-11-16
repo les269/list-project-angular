@@ -1,8 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { form, FormField, readonly, required } from '@angular/forms/signals';
-import { MatButtonModule } from '@angular/material/button';
+import { Component, inject, signal } from '@angular/core';
+import { form, readonly, required } from '@angular/forms/signals';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -11,30 +8,26 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { EMPTY, finalize, switchMap, take } from 'rxjs';
-import { FormInvalidsComponent } from '../../../../core/components/form-invalids/form-invalids.component';
-import { FormAlert } from '../../../../core/model';
+import { SignalFieldComponent } from '../../../../core/components/signal-field/signal-field.component';
+import { SignalFieldType } from '../../../../core/model/signal-field.model';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 import { CopyThemeData, ThemeHeaderCopy, ThemeHeaderType } from '../../models';
 import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-copy-theme',
   imports: [
-    FormField,
-    MatButtonModule,
     MatDialogActions,
     MatDialogClose,
     MatDialogTitle,
     MatDialogContent,
     TranslatePipe,
-    CommonModule,
-    TrimOnBlurDirective,
-    FormInvalidsComponent,
+    SignalFieldComponent,
   ],
   templateUrl: './copy-theme.component.html',
+  styleUrl: './copy-theme.component.scss',
 })
 export class CopyThemeComponent {
   //inject
@@ -42,9 +35,12 @@ export class CopyThemeComponent {
   readonly data = inject<CopyThemeData>(MAT_DIALOG_DATA);
   readonly themeService = inject(ThemeService);
   readonly snackbarService = inject(SnackbarService);
-  readonly translateService = inject(TranslateService);
   //enum
-  readonly eThemeHeaderType = ThemeHeaderType;
+  readonly fieldType = SignalFieldType;
+  readonly themeTypeOptions = Object.values(ThemeHeaderType).map(value => ({
+    value,
+    label: `themeHeader.${value}`,
+  }));
   readonly formModel = signal({
     name: this.data.themeHeader.name,
     version: this.data.themeHeader.version,
@@ -52,10 +48,10 @@ export class CopyThemeComponent {
     title: this.data.themeHeader.title,
   });
   readonly form = form(this.formModel, p => {
-    required(p.name);
-    required(p.version);
-    required(p.type);
-    required(p.title);
+    required(p.name, { message: 'msg.required' });
+    required(p.version, { message: 'msg.required' });
+    required(p.type, { message: 'msg.required' });
+    required(p.title, { message: 'msg.required' });
     readonly(p, { when: () => this.isProcessing() });
   });
 
@@ -65,23 +61,6 @@ export class CopyThemeComponent {
   readonly typeControl = this.form.type;
   readonly titleControl = this.form.title;
   readonly isProcessing = signal(false);
-
-  private readonly requiredMessage = toSignal(
-    this.translateService.stream('msg.required'),
-    { initialValue: this.translateService.instant('msg.required') }
-  );
-
-  readonly formAlertsObj = computed(() => {
-    const required = {
-      errorId: 'required',
-      msg: this.requiredMessage(),
-    };
-    return {
-      name: [required],
-      version: [required],
-      title: [required],
-    } satisfies Record<string, FormAlert[]>;
-  });
 
   ok() {
     if (this.isProcessing()) return;

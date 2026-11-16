@@ -1,10 +1,17 @@
-<div class="topbar-content">
-  <div class="topbar-component">
-    <div class="topbar-left align-items-center">
-      <mat-icon style="color: white" (click)="store.toggleSidenav()"
-        >menu</mat-icon
-      >
-      <span class="topbar-title">{{ store.title() }}</span>
-    </div>
-  </div>
-</div>
+<header class="topbar">
+  <button
+    type="button"
+    class="menu-toggle"
+    [class.menu-toggle-active]="store.openSidenav()"
+    [attr.aria-label]="
+      (store.openSidenav() ? 'header.closeNavigation' : 'header.openNavigation')
+        | translate
+    "
+    [attr.aria-expanded]="store.openSidenav()"
+    aria-controls="main-navigation"
+    (click)="store.toggleSidenav()">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <h1 class="topbar-title" [title]="store.title()">{{ store.title() }}</h1>
+</header>

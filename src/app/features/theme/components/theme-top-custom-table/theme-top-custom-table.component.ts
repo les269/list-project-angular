@@ -67,6 +67,7 @@ import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage
     TrimOnBlurDirective,
   ],
   templateUrl: './theme-top-custom-table.component.html',
+  styleUrl: './theme-top-custom-table.component.scss',
 })
 export class ThemeTopCustomTableComponent {
   //inject

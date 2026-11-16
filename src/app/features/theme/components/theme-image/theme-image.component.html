@@ -1,55 +1,49 @@
-<label class="h3">{{ 'themeImage.title' | translate }}</label>
-<div class="card mb-3">
-  <div class="card-body">
+<section class="theme-section" aria-labelledby="theme-image-title">
+  <h2 class="section-title" id="theme-image-title">
+    {{ 'themeImage.title' | translate }}
+  </h2>
+  <div class="section-body">
     <app-theme-item-manage
       [headerId]="headerId()"
       [form]="form"
       [resetValue]="initialFormValue"
-      [defaultBinding]="defaultBinding()">
-    </app-theme-item-manage>
-    <div>
-      <div class="form-check form-check-inline">
-        <input
-          class="form-check-input"
-          type="radio"
-          [value]="eThemeImageType.key"
-          id="imageKeyRadio"
-          [formField]="group().type" />
-        <label class="form-check-label" for="imageKeyRadio">
+      [defaultBinding]="defaultBinding()" />
+    <fieldset class="source-selection">
+      <legend>{{ 'themeImage.sourceType' | translate }}</legend>
+      <div class="source-options">
+        <label class="source-option" for="imageKeyRadio">
+          <input
+            class="form-check-input"
+            type="radio"
+            [value]="eThemeImageType.key"
+            id="imageKeyRadio"
+            [formField]="group().type" />
           {{ 'themeImage.imageKey' | translate }}
         </label>
-      </div>
-      <div class="form-check form-check-inline">
-        <input
-          class="form-check-input"
-          type="radio"
-          [value]="eThemeImageType.url"
-          id="imageUrlRadio"
-          [formField]="group().type" />
-        <label class="form-check-label" for="imageUrlRadio">
+        <label class="source-option" for="imageUrlRadio">
+          <input
+            class="form-check-input"
+            type="radio"
+            [value]="eThemeImageType.url"
+            id="imageUrlRadio"
+            [formField]="group().type" />
           {{ 'themeImage.imageUrl' | translate }}
         </label>
       </div>
-      @let type = group().type().value();
-      @if (type === eThemeImageType.key) {
-        <div class="mb-3">
-          <input
-            class="form-control"
-            [formField]="group().imageKey"
-            trimOnBlur />
-        </div>
-      } @else if (type === eThemeImageType.url) {
-        <div class="mb-3">
-          <input
-            class="form-control"
-            [placeholder]="'themeImage.imageUrlPlaceholder' | translate"
-            [formField]="group().imageUrl"
-            trimOnBlur />
-        </div>
-      }
-      <app-form-alerts
-        [form]="group()"
-        [formAlerts]="formAlerts()"></app-form-alerts>
-    </div>
+    </fieldset>
+    @let type = group().type().value();
+    @if (type === eThemeImageType.key) {
+      <app-signal-field
+        [field]="group().imageKey"
+        label="themeImage.imageKey"
+        [trim]="true" />
+    } @else if (type === eThemeImageType.url) {
+      <app-signal-field
+        [field]="group().imageUrl"
+        label="themeImage.imageUrl"
+        hint="themeImage.imageUrlPlaceholder"
+        [trim]="true" />
+    }
+    <app-form-alerts [form]="group()" [formAlerts]="formAlerts()" />
   </div>
-</div>
+</section>

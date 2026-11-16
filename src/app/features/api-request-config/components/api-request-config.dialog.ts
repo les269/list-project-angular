@@ -10,7 +10,6 @@ import {
   required,
   validate,
 } from '@angular/forms/signals';
-import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
@@ -60,9 +59,9 @@ import {
 @Component({
   selector: 'app-api-request-config-dialog',
   templateUrl: './api-request-config.dialog.html',
+  styleUrl: './api-request-config.dialog.scss',
   imports: [
     FormField,
-    MatButtonModule,
     MatDialogActions,
     MatDialogTitle,
     MatDialogContent,
@@ -143,6 +142,15 @@ export class ApiRequestConfigDialog {
     });
     required(p.config.endpointUrl, {
       message: 'apiRequestConfig.errors.requiredEndpointUrl',
+    });
+    validate(p.config.endpointUrl, ({ value }) => {
+      const endpointUrl = value();
+      return endpointUrl && !endpointUrl.trim()
+        ? {
+            kind: 'required',
+            message: 'apiRequestConfig.errors.requiredEndpointUrl',
+          }
+        : undefined;
     });
     min(p.config.timeoutMs, 1, {
       message: 'apiRequestConfig.errors.invalidTimeout',
@@ -240,8 +248,8 @@ export class ApiRequestConfigDialog {
       {
         data: { refId: this.data.value.apiId, mapType: CookieListMapType.API },
         width: '1100px',
-        maxWidth: '96vw',
-        maxHeight: '92vh',
+        maxWidth: 'calc(100vw - 32px)',
+        maxHeight: 'calc(100dvh - 32px)',
         autoFocus: false,
       }
     );
@@ -254,8 +262,8 @@ export class ApiRequestConfigDialog {
       {
         data: { refId: this.data.value.apiId, mapType: HeadersMapType.API },
         width: '1100px',
-        maxWidth: '96vw',
-        maxHeight: '92vh',
+        maxWidth: 'calc(100vw - 32px)',
+        maxHeight: 'calc(100dvh - 32px)',
         autoFocus: false,
       }
     );
@@ -298,8 +306,10 @@ export class ApiRequestConfigDialog {
     this.saveFailed.set(false);
     const disableClose = this.dialogRef.disableClose;
     this.dialogRef.disableClose = true;
-    this.service
-      .exist(request.apiId)
+    (this.data.type === EditMode.CREATE
+      ? this.service.exist(request.apiId)
+      : of(false)
+    )
       .pipe(
         switchMap(exists => {
           if (exists) {

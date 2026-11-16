@@ -19,6 +19,11 @@ describe('ThemeItemManageComponent operations', () => {
       deleteThemeItem: vi.fn(() => of(undefined)),
     };
     const messages = { openI18N: vi.fn(() => of(true)) };
+    const maps = {
+      itemMapInUse: () => of(false),
+      deleteItemMap: vi.fn(() => of(undefined)),
+      updateItemMap: vi.fn(() => of(undefined)),
+    };
     await TestBed.configureTestingModule({
       imports: [ThemeItemManageComponent],
       providers: [
@@ -26,7 +31,7 @@ describe('ThemeItemManageComponent operations', () => {
         { provide: ThemeItemService, useValue: service },
         {
           provide: ThemeItemMapService,
-          useValue: { itemMapInUse: () => of(false) },
+          useValue: maps,
         },
         { provide: MessageBoxService, useValue: messages },
         { provide: SelectTableService, useValue: {} },
@@ -63,6 +68,7 @@ describe('ThemeItemManageComponent operations', () => {
       messages,
       model,
       fields,
+      maps,
     };
   }
 
@@ -108,5 +114,33 @@ describe('ThemeItemManageComponent operations', () => {
     expect(model().description).toBe('');
     expect(model().json).toBe(originalJson);
     expect(component.isProcessing()).toBe(false);
+  });
+
+  it('已綁定項目保留保存與解除綁定，解除後才顯示刪除', async () => {
+    const { fixture, component, model, maps } = await setup();
+    model.update(value => ({ ...value, itemId: 'bound' }));
+    fixture.componentRef.setInput('headerId', 'header');
+    fixture.componentRef.setInput('defaultBinding', true);
+    await fixture.whenStable();
+    const page: HTMLElement = fixture.nativeElement;
+    const labels = () =>
+      [...page.querySelectorAll('button')].map(button =>
+        button.textContent?.trim()
+      );
+    expect(labels()).toContain('g.save');
+    expect(labels()).toContain('g.unbind');
+    expect(labels()).not.toContain('g.delete');
+    page.querySelectorAll('button').forEach(button => {
+      if (button.textContent?.trim() === 'g.unbind') button.click();
+    });
+    await fixture.whenStable();
+    expect(maps.deleteItemMap).toHaveBeenCalledWith(
+      ThemeItemType.CUSTOM,
+      'bound',
+      'header'
+    );
+    expect(component.isBinding()).toBe(false);
+    expect(labels()).toContain('g.bind');
+    expect(labels()).toContain('g.delete');
   });
 });

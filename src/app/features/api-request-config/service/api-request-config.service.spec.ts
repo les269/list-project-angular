@@ -93,13 +93,7 @@ describe('API 請求設定服務', () => {
     expect(request.request.body).toEqual({
       apiId: item.apiId,
       description: item.description,
-      config: {
-        ...item.config,
-        httpParams: item.config.httpParams.map(({ seq, ...row }) => row),
-        bodyFormFields: item.config.bodyFormFields.map(
-          ({ seq, ...row }) => row
-        ),
-      },
+      config: item.config,
     });
     http.expectNone(req => req.url.startsWith('https://example.com'));
     request.flush(null);

@@ -1,4 +1,36 @@
-mat-form-field {
-  width: 100%;
-  margin-bottom: 20px;
+@use '../../../../../styles/editor-dialog' as dialog;
+
+@include dialog.layout;
+
+.dialog-title {
+  padding: var(--app-space-4) var(--app-space-6);
+  font-size: var(--app-font-size-body);
+  line-height: 24px;
+}
+
+.dialog-content {
+  padding: var(--app-space-3) var(--app-space-4);
+}
+
+.dialog-title + .dialog-content {
+  padding-top: var(--app-space-3);
+}
+
+.form-select {
+  min-height: 40px;
+  font: inherit;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: var(--app-space-1);
+  overflow-wrap: anywhere;
+}
+
+.form-select {
+  min-width: 0;
+}
+
+.dialog-actions {
+  padding: var(--app-space-2) var(--app-space-4);
 }

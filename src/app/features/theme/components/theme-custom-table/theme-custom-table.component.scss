@@ -1,0 +1,91 @@
+@use '../../styles/theme-section' as section;
+
+@include section.layout;
+
+app-generic-table {
+  --app-editor-table-min-width: 960px;
+}
+
+.custom-detail {
+  display: grid;
+  gap: var(--app-space-3);
+  padding: var(--app-space-3) 0 var(--app-space-4);
+
+  .form-control,
+  .form-select {
+    min-width: 0;
+    min-height: 40px;
+    font-size: var(--app-font-size-sm);
+    font-weight: 400;
+  }
+}
+
+.detail-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--app-space-2);
+}
+
+.detail-label {
+  margin: 0;
+  font-size: var(--app-font-size-sm);
+  font-weight: 400;
+}
+
+.icon-reference {
+  padding: var(--app-space-1) var(--app-space-2);
+  color: var(--app-primary-hover);
+  border-radius: var(--app-radius-sm);
+  font-size: var(--app-font-size-sm);
+
+  &:hover {
+    background: var(--app-primary-soft-hover);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--app-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+.detail-fields,
+.icon-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--app-space-3);
+}
+
+.url-fields {
+  grid-template-columns: minmax(0, 2fr) minmax(200px, 1fr);
+}
+
+.icon-field,
+.icon-color-fields {
+  display: flex;
+  align-items: center;
+  gap: var(--app-space-2);
+
+  mat-icon {
+    flex-shrink: 0;
+  }
+}
+
+.icon-color-fields {
+  .form-control-color {
+    flex: 0 0 48px;
+    width: 48px;
+  }
+}
+
+.api-selection {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--app-space-3);
+}
+
+.visible-datasets {
+  padding-top: var(--app-space-3);
+  border-top: 1px solid var(--app-border);
+}

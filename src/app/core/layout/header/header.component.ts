@@ -1,14 +1,15 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
+import { TranslatePipe } from '@ngx-translate/core';
 import { LayoutStore } from '../../stores/layout.store';
 
 @Component({
   selector: 'app-layout-header',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './header.component.html',
   styleUrls: ['header.component.scss'],
-  imports: [MatIconModule, MatButtonModule],
+  imports: [MatIconModule, TranslatePipe],
 })
 export class HeaderComponent {
-  store = inject(LayoutStore);
+  readonly store = inject(LayoutStore);
 }

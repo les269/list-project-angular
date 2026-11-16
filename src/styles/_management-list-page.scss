@@ -1,0 +1,211 @@
+@use '@angular/material' as mat;
+
+@mixin layout($table-min-width: 1040px, $page-selector: '.management-page') {
+  :host {
+    display: block;
+
+    @include mat.table-overrides(
+      (
+        background-color: var(--app-surface),
+        header-headline-color: var(--app-text-primary),
+        header-headline-font: var(--app-font-family),
+        header-headline-size: var(--app-font-size-sm),
+        header-headline-weight: 400,
+        header-container-height: 48px,
+        row-item-label-text-color: var(--app-text-primary),
+        row-item-label-text-font: var(--app-font-family),
+        row-item-label-text-size: var(--app-font-size-sm),
+        row-item-label-text-weight: 400,
+        row-item-outline-color: var(--app-border),
+        row-item-container-height: 56px,
+      )
+    );
+  }
+
+  #{$page-selector} {
+    max-width: 1280px;
+    margin-inline: auto;
+    padding: var(--app-space-6);
+  }
+
+  .page-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--app-space-3);
+    margin-bottom: var(--app-space-4);
+  }
+
+  .filter-controls {
+    display: flex;
+    flex: 0 1 480px;
+    align-items: center;
+    gap: var(--app-space-2);
+    min-width: 0;
+    margin-inline-start: auto;
+  }
+
+  .page-button,
+  .filter-input {
+    min-height: 40px;
+    padding: var(--app-space-2) var(--app-space-3);
+    color: var(--app-text-primary);
+    background-color: var(--app-surface);
+    border: 1px solid var(--app-border-strong);
+    border-radius: var(--app-radius-sm);
+    font-family: inherit;
+    font-size: var(--app-font-size-sm);
+    font-weight: 400;
+    line-height: 1.4;
+  }
+
+  .page-button {
+    flex-shrink: 0;
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease;
+
+    &:hover:not(:disabled) {
+      background-color: var(--app-hover-bg);
+    }
+
+    &:disabled {
+      color: var(--app-text-secondary);
+      background-color: var(--app-surface-muted);
+      border-color: var(--app-border);
+      cursor: default;
+    }
+  }
+
+  .page-button-primary {
+    color: var(--app-surface);
+    background-color: var(--app-primary);
+    border-color: var(--app-primary);
+
+    &:hover:not(:disabled) {
+      background-color: var(--app-primary-hover);
+      border-color: var(--app-primary-hover);
+    }
+  }
+
+  .filter-input {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+
+    &::placeholder {
+      color: var(--app-text-secondary);
+      opacity: 1;
+    }
+  }
+
+  .table-container {
+    max-height: 75vh;
+    overflow: auto;
+    overscroll-behavior: contain;
+    background-color: var(--app-surface);
+    border: 1px solid var(--app-border-strong);
+    border-radius: var(--app-radius-lg);
+    box-shadow: 0 2px 8px rgb(15 23 42 / 8%);
+  }
+
+  table {
+    width: 100%;
+    min-width: $table-min-width;
+  }
+
+  th,
+  td {
+    padding-inline: var(--app-space-4);
+  }
+
+  th {
+    white-space: nowrap;
+  }
+
+  .mat-mdc-header-row {
+    background-color: #e8eef6;
+  }
+
+  td {
+    padding-block: var(--app-space-2);
+  }
+
+  tr[mat-row] {
+    &:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    &:hover,
+    &:focus-within {
+      background-color: var(--app-hover-bg);
+    }
+  }
+
+  .mat-column-name,
+  .mat-column-groupName {
+    min-width: 160px;
+    max-width: 280px;
+    overflow-wrap: anywhere;
+  }
+
+  td.mat-column-createdTime,
+  td.mat-column-updatedTime {
+    color: var(--app-text-secondary);
+    white-space: nowrap;
+  }
+
+  .row-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--app-space-1);
+
+    @include mat.icon-button-overrides(
+      (
+        icon-color: var(--app-text-secondary),
+        container-shape: var(--app-radius-sm),
+        state-layer-size: 40px,
+        touch-target-size: 40px,
+        hover-state-layer-opacity: 0,
+      )
+    );
+  }
+
+  .row-action:hover {
+    background-color: var(--app-border-strong);
+  }
+
+  .row-action-danger {
+    @include mat.icon-button-overrides(
+      (
+        icon-color: #b42318,
+      )
+    );
+  }
+
+  .page-button:focus-visible,
+  .filter-input:focus-visible,
+  .table-container:focus-visible,
+  .row-action:focus-visible {
+    outline: 2px solid var(--app-focus-ring);
+    outline-offset: -2px;
+  }
+
+  @media (max-width: 600px) {
+    #{$page-selector} {
+      padding: var(--app-space-4);
+    }
+
+    .filter-controls {
+      flex-basis: 100%;
+      margin-inline-start: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .page-button {
+      transition: none;
+    }
+  }
+}

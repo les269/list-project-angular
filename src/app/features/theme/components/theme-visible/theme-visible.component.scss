@@ -1,18 +1,41 @@
-// Button styles for visibility toggle
-.visible-btn {
-  color: #4caf50 !important;
-  font-weight: 500;
+@use '../../styles/theme-management-dialog' as management;
 
-  &:hover {
-    background-color: rgba(76, 175, 80, 0.08);
+@include management.frame;
+
+.visibility-list {
+  display: grid;
+  gap: var(--app-space-3);
+  min-width: min(320px, 65vw);
+}
+
+.visibility-group {
+  h3 {
+    margin: 0 0 var(--app-space-1);
+    color: var(--app-text-secondary);
+    font-size: var(--app-font-size-sm);
+    font-weight: 400;
   }
 }
 
-.hidden-btn {
-  color: #f44336 !important;
-  font-weight: 500;
+.visibility-group + .visibility-group {
+  padding-top: var(--app-space-3);
+  border-top: 1px solid var(--app-border);
+}
 
-  &:hover {
-    background-color: rgba(244, 67, 54, 0.08);
-  }
+.visibility-row {
+  display: flex;
+  align-items: center;
+  gap: var(--app-space-3);
+  padding-block: var(--app-space-1);
+}
+
+.visibility-title {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.empty-state {
+  margin: 0;
+  color: var(--app-text-secondary);
 }

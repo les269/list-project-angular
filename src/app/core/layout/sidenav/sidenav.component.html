@@ -1,22 +1,46 @@
-<div class="sidenav" [ngClass]="{ 'sidenav-display': openSidenav() }">
-  @for (route of routes; track route) {
-    <a class="menu-item" [routerLink]="route.path" (click)="close()">{{
-      route.title | translate
-    }}</a>
-  }
-  <div class="divider"></div>
+<nav
+  class="sidenav"
+  [class.sidenav-display]="openSidenav()"
+  [inert]="!openSidenav()"
+  [attr.aria-label]="'sidenav.label' | translate"
+  (keydown.escape)="close()">
+  <div class="menu-section">
+    @for (route of routes; track route.path) {
+      <a
+        class="menu-item"
+        [routerLink]="'/' + (route.path ?? '')"
+        routerLinkActive="menu-item-active"
+        [routerLinkActiveOptions]="
+          route.path === 'setting' ? sectionMatchOptions : pageMatchOptions
+        "
+        ariaCurrentWhenActive="page"
+        (click)="close()">
+        <span class="menu-label">{{ route.title | translate }}</span>
+      </a>
+    }
+  </div>
+
   @for (type of eThemeHeaderType | keyvalue; track type.key) {
     @if (list()[type.value].length > 0) {
-      <div class="subheader">{{ 'themeHeader.' + type.key | translate }}</div>
-      @for (item of list()[type.value]; track $index) {
-        <a
-          class="menu-item"
-          [routerLink]="navigateList(item)"
-          [queryParams]="layoutStore.getQueryParamsByHeader(item)"
-          (click)="close()"
-          >{{ item.title | translate }}</a
-        >
-      }
+      <section
+        class="menu-section"
+        [attr.aria-labelledby]="'sidenav-theme-' + type.key">
+        <h2 [id]="'sidenav-theme-' + type.key" class="subheader">
+          {{ 'themeHeader.' + type.key | translate }}
+        </h2>
+        @for (item of list()[type.value]; track $index) {
+          <a
+            class="menu-item"
+            [routerLink]="navigateList(item)"
+            [queryParams]="layoutStore.getQueryParamsByHeader(item)"
+            routerLinkActive="menu-item-active"
+            [routerLinkActiveOptions]="pageMatchOptions"
+            ariaCurrentWhenActive="page"
+            (click)="close()">
+            <span class="menu-label">{{ item.title | translate }}</span>
+          </a>
+        }
+      </section>
     }
   }
-</div>
+</nav>

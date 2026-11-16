@@ -1,11 +1,20 @@
-@if(showTitle){
-<h2 mat-dialog-title>{{ title??'title.pleaseSelect' | translate }}</h2>
+@if (showTitle) {
+  <h2 mat-dialog-title class="dialog-title">
+    {{ title ?? 'title.pleaseSelect' | translate }}
+  </h2>
 }
 
-<mat-dialog-content class="scrollbar-primary">
+<mat-dialog-content class="dialog-content scrollbar-primary">
   <div class="search-bar">
     @if (enableFilter) {
-    <input class="form-control my-2" (keyup)="applyFilter($event)" />
+      <div class="filter-controls">
+        <input
+          class="form-control"
+          [id]="filterId"
+          type="search"
+          [attr.aria-label]="'g.filter' | translate"
+          (input)="applyFilter($event)" />
+      </div>
     }
     <mat-paginator
       class="mat-paginator"
@@ -15,65 +24,90 @@
 
   <div class="table-container scrollbar-primary">
     <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort>
-      @if (selectType==='multiple') {
-      <ng-container matColumnDef="select">
-        <th mat-header-cell *matHeaderCellDef [ngStyle]="{width:'50px'}">
-          <mat-checkbox
-            (change)="$event ? toggleAllRows() : null"
-            [checked]="selection.hasValue() && isAllSelected()"
-            [indeterminate]="selection.hasValue() && !isAllSelected()">
-          </mat-checkbox>
-        </th>
-        <td mat-cell *matCellDef="let row" [ngStyle]="{width:'50px'}">
-          <mat-checkbox
-            (click)="$event.stopPropagation()"
-            (change)="$event ? selection.toggle(row) : null"
-            [checked]="selection.isSelected(row)">
-          </mat-checkbox>
-        </td>
-      </ng-container>
-      } @for (column of displayedColumns; track $index;let index = $index) {
-      <ng-container matColumnDef="{{column}}">
-        <th
-          mat-header-cell
-          *matHeaderCellDef
-          mat-sort-header="{{column}}"
-          [disabled]="!(columnSorts && columnSorts![column])">
-          {{ labels[index] | translate }}
-        </th>
-        <td
-          mat-cell
-          *matCellDef="let element"
-          class="user-select-none"
-          [ngStyle]="{maxWidth:'20vw'}">
-          {{ columnFormats?.[column] ? columnFormats![column](element[column]) :
-          element[column] }}
-        </td>
-      </ng-container>
-      } @if(selectType==='single'){
-      <tr mat-header-row *matHeaderRowDef="displayedColumns;sticky:true"></tr>
-      <tr
-        class="select-row"
-        mat-row
-        *matRowDef="let row; columns: displayedColumns;"
-        (click)="onClickOne(row)"></tr>
-      } @else {
-      <tr
-        mat-header-row
-        *matHeaderRowDef="multipleDisplayedColumns;sticky:true"></tr>
-      <tr
-        mat-row
-        *matRowDef="let row; columns: multipleDisplayedColumns;"
-        (click)="selection.toggle(row)"></tr>
+      @if (selectType === 'multiple') {
+        <ng-container matColumnDef="select">
+          <th mat-header-cell *matHeaderCellDef [ngStyle]="{ width: '50px' }">
+            <mat-checkbox
+              (change)="$event ? toggleAllRows() : null"
+              [checked]="selection.hasValue() && isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()">
+            </mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let row" [ngStyle]="{ width: '50px' }">
+            <mat-checkbox
+              (click)="$event.stopPropagation()"
+              (change)="$event ? selection.toggle(row) : null"
+              [checked]="selection.isSelected(row)">
+            </mat-checkbox>
+          </td>
+        </ng-container>
       }
+      @for (column of displayedColumns; track $index; let index = $index) {
+        <ng-container matColumnDef="{{ column }}">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            mat-sort-header="{{ column }}"
+            [disabled]="!(columnSorts && columnSorts![column])">
+            {{ labels[index] | translate }}
+          </th>
+          <td
+            mat-cell
+            *matCellDef="let element"
+            class="user-select-none"
+            [ngStyle]="{ maxWidth: '20vw' }">
+            {{
+              columnFormats?.[column]
+                ? columnFormats![column](element[column])
+                : element[column]
+            }}
+          </td>
+        </ng-container>
+      }
+      @if (selectType === 'single') {
+        <tr
+          mat-header-row
+          *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr
+          class="select-row"
+          mat-row
+          *matRowDef="let row; columns: displayedColumns"
+          (click)="onClickOne(row)"></tr>
+      } @else {
+        <tr
+          mat-header-row
+          *matHeaderRowDef="multipleDisplayedColumns; sticky: true"></tr>
+        <tr
+          class="select-row"
+          [class.selected-row]="selection.isSelected(row)"
+          mat-row
+          *matRowDef="let row; columns: multipleDisplayedColumns"
+          (click)="selection.toggle(row)"></tr>
+      }
+      <tr class="empty-row" *matNoDataRow>
+        <td
+          [attr.colspan]="
+            selectType === 'multiple'
+              ? multipleDisplayedColumns.length
+              : displayedColumns.length
+          ">
+          {{ 'g.noData' | translate }}
+        </td>
+      </tr>
     </table>
   </div>
 </mat-dialog-content>
-<mat-dialog-actions>
-  <button mat-button (click)="onNoClick()">{{ 'g.no' | translate }}</button>
-  @if(selectType==='multiple'){
-  <button mat-button cdkFocusInitial (click)="onOk()">
-    {{ 'g.ok' | translate }}
+<mat-dialog-actions class="dialog-actions">
+  <button type="button" class="dialog-button" (click)="onNoClick()">
+    {{ 'g.no' | translate }}
   </button>
+  @if (selectType === 'multiple') {
+    <button
+      type="button"
+      class="dialog-button dialog-button-primary"
+      cdkFocusInitial
+      (click)="onOk()">
+      {{ 'g.ok' | translate }}
+    </button>
   }
 </mat-dialog-actions>

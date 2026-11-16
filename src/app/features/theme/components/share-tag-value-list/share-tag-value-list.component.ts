@@ -10,8 +10,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { rxResource, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { form, FormField, readonly, required } from '@angular/forms/signals';
-import { MatButtonModule } from '@angular/material/button';
+import { form, readonly, required } from '@angular/forms/signals';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import {
   MAT_DIALOG_DATA,
@@ -29,6 +28,7 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { TranslatePipe } from '@ngx-translate/core';
 import { EMPTY, finalize, map, switchMap, take } from 'rxjs';
+import { SignalFieldComponent } from '../../../../core/components/signal-field/signal-field.component';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { CustomMatPaginatorIntl } from '../../../../core/components/custom-mat-paginatorIntl/custom-mat-paginatorIntl';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -40,14 +40,13 @@ import { ShareTagService } from '../../services/share-tag.service';
   providers: [{ provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl }],
 
   imports: [
-    FormField,
+    SignalFieldComponent,
     CommonModule,
     MatDialogModule,
     MatTableModule,
     MatSortModule,
     MatPaginatorModule,
     MatIconModule,
-    MatButtonModule,
     MatCheckboxModule,
     TranslatePipe,
   ],
@@ -212,6 +211,7 @@ export class ShareTagValueListComponent {
     this.newValueForm().reset('');
     this.addDialogRef = this.dialog.open(this.addTagValueDialog(), {
       width: '400px',
+      maxWidth: 'calc(100vw - 32px)',
     });
   }
 

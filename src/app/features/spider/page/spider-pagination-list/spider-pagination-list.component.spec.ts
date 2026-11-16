@@ -1,6 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
+import {
+  ActivatedRoute,
+  convertToParamMap,
+  provideRouter,
+  Router,
+} from '@angular/router';
+import { RouterTestingHarness } from '@angular/router/testing';
 import { provideTranslateService } from '@ngx-translate/core';
 import { of, Subject } from 'rxjs';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
@@ -77,4 +83,130 @@ describe('SpiderPaginationListComponent', () => {
       }
     }
   );
+});
+
+async function setupFiltering(url = '/spider-pagination-list') {
+  const records = ['beta', 'alpha', 'gamma'].map(spiderPaginationId => ({
+    spiderPaginationId,
+    paginationConfig: {},
+  }));
+  const service = { getAll: vi.fn(() => of(records)) };
+  await TestBed.configureTestingModule({
+    providers: [
+      provideRouter([
+        {
+          path: 'spider-pagination-list',
+          component: SpiderPaginationListComponent,
+        },
+      ]),
+      provideTranslateService(),
+      { provide: SpiderPaginationService, useValue: service },
+      { provide: MatDialog, useValue: {} },
+      { provide: SnackbarService, useValue: {} },
+      { provide: MessageBoxService, useValue: {} },
+    ],
+  }).compileComponents();
+  const harness = await RouterTestingHarness.create(url);
+  await harness.fixture.whenStable();
+  const component = harness.routeDebugElement!
+    .componentInstance as SpiderPaginationListComponent;
+  const element = harness.routeNativeElement!;
+  const input = element.querySelector<HTMLInputElement>(
+    'input[type="search"]'
+  )!;
+  const clear = element.querySelector<HTMLButtonElement>(
+    '.filter-controls button'
+  )!;
+  const rowIds = () =>
+    Array.from(
+      element.querySelectorAll('td.mat-column-spiderPaginationId'),
+      cell => cell.textContent?.trim()
+    );
+  const filter = async (value: string) => {
+    input.value = value;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    await harness.fixture.whenStable();
+  };
+  return {
+    harness,
+    component,
+    element,
+    input,
+    clear,
+    rowIds,
+    filter,
+    service,
+    records,
+    router: TestBed.inject(Router),
+  };
+}
+
+describe('SpiderPaginationListComponent 過濾', () => {
+  it('從 URL 還原條件，輸入與清除時同步更新表格及 URL', async () => {
+    const { harness, filter, input, clear, rowIds, router, service } =
+      await setupFiltering(
+        '/spider-pagination-list?searchValue=%20ALPHA%20&context=keep'
+      );
+    expect(input.value).toBe(' ALPHA ');
+    expect(rowIds()).toEqual(['alpha']);
+
+    await filter(' GAMMA ');
+    expect(rowIds()).toEqual(['gamma']);
+    expect(router.parseUrl(router.url).queryParams).toMatchObject({
+      searchValue: ' GAMMA ',
+      context: 'keep',
+    });
+
+    clear.click();
+    await harness.fixture.whenStable();
+    expect(rowIds()).toEqual(['beta', 'alpha', 'gamma']);
+    expect(input.value).toBe('');
+    expect(clear.disabled).toBe(true);
+    expect(router.parseUrl(router.url).queryParams).toMatchObject({
+      searchValue: '',
+      context: 'keep',
+    });
+    expect(service.getAll).toHaveBeenCalledTimes(1);
+  });
+
+  it('重新載入後保留過濾及排序，無符合資料時顯示提示', async () => {
+    const {
+      harness,
+      component,
+      element,
+      filter,
+      input,
+      clear,
+      rowIds,
+      service,
+      records,
+    } = await setupFiltering();
+    component.sort()!.sort({
+      id: 'spiderPaginationId',
+      start: 'asc',
+      disableClear: false,
+    });
+    await harness.fixture.whenStable();
+    await filter('beta');
+    expect(rowIds()).toEqual(['beta']);
+
+    service.getAll.mockReturnValueOnce(
+      of([...records, { spiderPaginationId: 'beta-new', paginationConfig: {} }])
+    );
+    component.list.reload();
+    await harness.fixture.whenStable();
+    expect(input.value).toBe('beta');
+    expect(rowIds()).toEqual(['beta', 'beta-new']);
+
+    await filter('missing');
+    expect(rowIds()).toEqual([]);
+    expect(element.querySelector('.empty-state')?.textContent).toContain(
+      'g.noData'
+    );
+
+    clear.click();
+    await harness.fixture.whenStable();
+    expect(rowIds()).toEqual(['alpha', 'beta', 'beta-new', 'gamma']);
+    expect(service.getAll).toHaveBeenCalledTimes(2);
+  });
 });

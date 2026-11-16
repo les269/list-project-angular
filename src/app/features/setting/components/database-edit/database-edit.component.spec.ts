@@ -38,15 +38,13 @@ async function setup() {
   }).compileComponents();
   const fixture = TestBed.createComponent(DatabaseEditComponent);
   const component = fixture.componentInstance;
-  component
-    .form()
-    .reset({
-      ...component.formModel(),
-      configId: 'demo',
-      configName: 'Demo',
-      sqliteFilePath: 'test.db',
-    });
-  fixture.detectChanges();
+  component.form().reset({
+    ...component.formModel(),
+    configId: 'demo',
+    configName: 'Demo',
+    sqliteFilePath: 'test.db',
+  });
+  await fixture.whenStable();
   return {
     component,
     fixture,
@@ -61,11 +59,11 @@ async function setup() {
 it('測試期間鎖定操作，回應僅認可送出時的資料', async () => {
   const { component, fixture, response, service, snackbar } = await setup();
   component.testConnection();
-  fixture.detectChanges();
+  await fixture.whenStable();
   expect(component.isProcessing()).toBe(true);
-  expect(fixture.nativeElement.querySelector('#configName').readOnly).toBe(
-    true
-  );
+  expect(
+    fixture.nativeElement.querySelector('#configName input').readOnly
+  ).toBe(true);
   component.testConnection();
   component.onSubmit();
   expect(service.testConnection).toHaveBeenCalledTimes(1);

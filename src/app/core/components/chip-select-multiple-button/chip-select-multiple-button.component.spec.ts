@@ -1,6 +1,7 @@
 import { Component, signal, viewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { form, FormField } from '@angular/forms/signals';
+import { provideTranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { ChipSelectMultipleButtonComponent } from './chip-select-multiple-button.component';
 
@@ -35,6 +36,7 @@ describe('ChipSelectMultipleButtonComponent', () => {
   async function setup() {
     await TestBed.configureTestingModule({
       imports: [Host],
+      providers: [provideTranslateService()],
     }).compileComponents();
     const fixture = TestBed.createComponent(Host);
     await fixture.whenStable();

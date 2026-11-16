@@ -1,0 +1,128 @@
+@use '@angular/material' as mat;
+@use '../../../../../styles/management-list-page';
+
+@include management-list-page.layout($table-min-width: 720px);
+
+:host {
+  @include mat.paginator-overrides(
+    (
+      container-background-color: var(--app-surface),
+      container-text-color: var(--app-text-secondary),
+      container-text-font: var(--app-font-family),
+      container-text-weight: 400,
+    )
+  );
+}
+
+.map-lookup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--app-space-3);
+  margin-bottom: var(--app-space-3);
+  padding-bottom: var(--app-space-3);
+  border-bottom: 1px solid var(--app-border);
+}
+
+.name-field {
+  flex: 1 1 280px;
+  min-width: 0;
+  max-width: 480px;
+  width: auto;
+  --bs-border-color: var(--app-border-strong);
+  --bs-border-radius: var(--app-radius-sm);
+
+  .form-control {
+    min-height: 40px;
+    font: inherit;
+    font-size: var(--app-font-size-sm);
+  }
+
+  .field-label {
+    display: block;
+    margin-bottom: var(--app-space-1);
+    font-size: var(--app-font-size-sm);
+    overflow-wrap: anywhere;
+  }
+
+  .form-control {
+    min-width: 0;
+  }
+}
+
+.action-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--app-space-2);
+}
+
+.page-actions {
+  gap: var(--app-space-2);
+  margin-bottom: var(--app-space-3);
+}
+
+.filter-controls {
+  flex: 1 1 240px;
+  max-width: 420px;
+}
+
+.page-button-danger {
+  color: #b42318;
+  border-color: #f1b4ae;
+
+  &:hover:not(:disabled) {
+    background: #fee2e2;
+    border-color: #dc8279;
+  }
+}
+
+.table-panel {
+  overflow: hidden;
+  background-color: var(--app-surface);
+  border: 1px solid var(--app-border-strong);
+  border-radius: var(--app-radius-lg);
+  box-shadow: 0 2px 8px rgb(15 23 42 / 8%);
+}
+
+.table-container {
+  max-height: 65vh;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+mat-paginator {
+  border-bottom: 1px solid var(--app-border);
+}
+
+.mat-column-other {
+  width: 88px;
+}
+
+.cell-input {
+  width: 100%;
+  min-width: 0;
+  min-height: 36px;
+  padding: var(--app-space-2) var(--app-space-3);
+  color: var(--app-text-primary);
+  background-color: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-sm);
+  font: inherit;
+
+  &:hover {
+    border-color: var(--app-border-strong);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--app-focus-ring);
+    outline-offset: -2px;
+  }
+}
+
+.empty-state {
+  padding: var(--app-space-4);
+  color: var(--app-text-secondary);
+  text-align: center;
+}

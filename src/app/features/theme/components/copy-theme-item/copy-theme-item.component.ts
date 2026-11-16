@@ -1,7 +1,5 @@
-import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
-import { form, FormField, readonly, required } from '@angular/forms/signals';
-import { MatButtonModule } from '@angular/material/button';
+import { form, readonly, required } from '@angular/forms/signals';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -12,6 +10,7 @@ import {
 } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
 import { EMPTY, finalize, switchMap } from 'rxjs';
+import { SignalFieldComponent } from '../../../../core/components/signal-field/signal-field.component';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { isBlank } from '../../../../shared/util/helper';
 import { CopyThemeItemData } from '../../models';
@@ -21,16 +20,15 @@ import { ThemeItemService } from '../../services';
   selector: 'app-copy-theme-item',
 
   imports: [
-    FormField,
-    MatButtonModule,
     MatDialogActions,
     MatDialogClose,
     MatDialogTitle,
     MatDialogContent,
     TranslatePipe,
-    CommonModule,
+    SignalFieldComponent,
   ],
   templateUrl: './copy-theme-item.component.html',
+  styleUrl: './copy-theme-item.component.scss',
 })
 export class CopyThemeItemComponent {
   readonly dialogRef = inject(MatDialogRef<CopyThemeItemComponent>);
@@ -43,7 +41,7 @@ export class CopyThemeItemComponent {
   readonly isProcessing = signal(false);
 
   readonly targetItemIdForm = form(this.targetItemId, p => {
-    required(p);
+    required(p, { message: 'msg.required' });
     readonly(p, { when: () => this.isProcessing() });
   });
 

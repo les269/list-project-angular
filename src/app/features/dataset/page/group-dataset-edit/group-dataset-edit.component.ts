@@ -3,31 +3,21 @@ import {
   createGroupDatasetApi,
   createGroupDatasetScrapy,
 } from '../../util/group-dataset-rows';
-import { CommonModule } from '@angular/common';
 import { Component, effect, inject, signal, untracked } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
-import {
-  applyEach,
-  disabled,
-  form,
-  FormField,
-  required,
-} from '@angular/forms/signals';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
+import { applyEach, disabled, form, required } from '@angular/forms/signals';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { EMPTY, filter, map, switchMap } from 'rxjs';
+import { SignalFieldComponent } from '../../../../core/components/signal-field/signal-field.component';
+import { EditMode } from '../../../../core/model/global.model';
+import { SignalFieldType } from '../../../../core/model/signal-field.model';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { isNotBlank } from '../../../../shared/util/helper';
-import { hasFieldError } from '../../../../shared/util/signal-form';
 import { GroupDatasetApiTableComponent } from '../../components/group-dataset-api-table/group-dataset-api-table.component';
 import { GroupDatasetFieldTableComponent } from '../../components/group-dataset-field-table/group-dataset-field-table.component';
 import { GroupDatasetScrapyTableComponent } from '../../components/group-dataset-scrapy-table/group-dataset-scrapy-table.component';
 import {
-  DatasetEditMode,
   GroupDataset,
   GroupDatasetConfigType,
   GroupDatasetFieldType,
@@ -38,21 +28,16 @@ import { GroupDatasetService } from '../../service/group-dataset.service';
   selector: 'app-group-dataset-edit',
 
   imports: [
-    MatTableModule,
-    FormField,
-    MatButtonModule,
     TranslatePipe,
-    CommonModule,
-    MatIconModule,
-    MatCheckboxModule,
+    SignalFieldComponent,
     GroupDatasetFieldTableComponent,
     GroupDatasetScrapyTableComponent,
     GroupDatasetApiTableComponent,
   ],
   templateUrl: './group-dataset-edit.component.html',
+  styleUrl: './group-dataset-edit.component.scss',
 })
 export class GroupDatasetEditComponent {
-  readonly hasError = hasFieldError;
   // inject
   readonly router = inject(Router);
   readonly route = inject(ActivatedRoute);
@@ -61,8 +46,12 @@ export class GroupDatasetEditComponent {
   // enum
   readonly eGroupDatasetFieldType = GroupDatasetFieldType;
   readonly eGroupDatasetConfigType = GroupDatasetConfigType;
+  readonly fieldType = SignalFieldType;
+  readonly configTypeOptions = Object.values(GroupDatasetConfigType)
+    .sort()
+    .map(value => ({ value, label: `dataset.${value}` }));
   // signals
-  readonly status = signal(DatasetEditMode.create);
+  readonly status = signal<EditMode>(EditMode.CREATE);
 
   readonly groupDatasetName = toSignal<string | null>(
     this.route.paramMap.pipe(
@@ -108,16 +97,16 @@ export class GroupDatasetEditComponent {
       required(row.apiId);
       required(row.label);
     });
-    required(p.groupName);
-    required(p.config.byKey);
+    required(p.groupName, { message: 'msg.required' });
+    required(p.config.byKey, { message: 'msg.required' });
   });
 
   get isCreateMode() {
-    return this.status() === DatasetEditMode.create;
+    return this.status() === EditMode.CREATE;
   }
 
   get isEditMode() {
-    return this.status() === DatasetEditMode.edit;
+    return this.status() === EditMode.EDIT;
   }
 
   get groupNameControl() {
@@ -157,7 +146,7 @@ export class GroupDatasetEditComponent {
 
       untracked(() => {
         this.patchForm(groupDataset);
-        this.status.set(DatasetEditMode.edit);
+        this.status.set(EditMode.EDIT);
       });
     });
   }

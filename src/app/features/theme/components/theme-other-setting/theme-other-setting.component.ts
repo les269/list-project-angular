@@ -26,9 +26,10 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatTableModule } from '@angular/material/table';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ChipInputColorComponent } from '../../../../core/components/chip-input-color/chip-input-color.component';
+import { FormInvalidsComponent } from '../../../../core/components/form-invalids/form-invalids.component';
+import { SignalFieldComponent } from '../../../../core/components/signal-field/signal-field.component';
+import { SignalFieldType } from '../../../../core/model/signal-field.model';
 import { SelectTableService } from '../../../../core/services/select-table.service';
-import { hasFieldError } from '../../../../shared/util/signal-form';
-import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 import { QuickRefreshType } from '../../../dataset/model';
 import { ScrapyService } from '../../../spider/services/scrapy.service';
 import {
@@ -56,12 +57,14 @@ import { normalizeThemeItem } from '../../util/theme-item-form';
     ChipInputColorComponent,
     ThemeItemManageComponent,
     MatRadioModule,
-    TrimOnBlurDirective,
+    SignalFieldComponent,
+    FormInvalidsComponent,
   ],
   templateUrl: './theme-other-setting.component.html',
+  styleUrl: './theme-other-setting.component.scss',
 })
 export class ThemeOtherSettingComponent {
-  readonly hasError = hasFieldError;
+  readonly fieldType = SignalFieldType;
   //enums and constants
   eThemeHeaderType = ThemeHeaderType;
   eQuickRefreshType = QuickRefreshType;
@@ -94,15 +97,18 @@ export class ThemeOtherSettingComponent {
   });
   readonly initialFormValue = structuredClone(this.formModel());
   readonly form = form(this.formModel, p => {
-    required(p.json.listPageSize);
-    min(p.json.listPageSize, 1);
-    for (const field of [
-      p.json.quickRefresh,
-      p.json.quickRefreshType,
-      p.json.useSpider,
-    ]) {
+    required(p.json.listPageSize, {
+      message: 'otherSetting.listPageSizeRequired',
+    });
+    min(p.json.listPageSize, 1, { message: 'otherSetting.listPageSizeMin' });
+    for (const [field, message] of [
+      [p.json.quickRefresh, 'otherSetting.quickRefreshRequired'],
+      [p.json.quickRefreshType, 'otherSetting.refreshTypeRequired'],
+      [p.json.useSpider, 'otherSetting.useSpiderRequired'],
+    ] as const) {
       required(field, {
         when: ({ valueOf }) => valueOf(p.json.useQuickRefresh),
+        message,
       });
     }
 

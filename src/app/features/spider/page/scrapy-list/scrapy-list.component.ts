@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ScrapyConfig } from '../../model/scrapy.model';
@@ -27,10 +28,12 @@ import { MessageBoxService } from '../../../../core/services/message-box.service
     MatTableModule,
     MatButtonModule,
     MatIconModule,
+    MatTooltipModule,
     MatSortModule,
   ],
   selector: 'app-scrapy-list',
   templateUrl: 'scrapy-list.component.html',
+  styleUrl: './scrapy-list.component.scss',
 })
 export class ScrapyListComponent implements OnInit, AfterViewInit {
   displayedColumns = ['name', 'createdTime', 'updatedTime', 'other'];

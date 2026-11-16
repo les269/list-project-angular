@@ -76,6 +76,23 @@ it('完整載入隱藏清單，切換資料來源保留編輯，儲存包含所�
   fixture.detectChanges();
   await fixture.whenStable();
   const component = fixture.componentInstance;
+  const page: HTMLElement = fixture.nativeElement;
+  expect(component.isEditMode).toBe(true);
+  expect(
+    page.querySelector<HTMLInputElement>(
+      'app-signal-field[label="dataset.groupName"] input'
+    )!.disabled
+  ).toBe(true);
+  expect(page.querySelectorAll('.form-grid label.require')).toHaveLength(2);
+  expect(page.querySelectorAll('.form-actions button')).toHaveLength(2);
+  const sourceType = page.querySelector<HTMLSelectElement>(
+    'app-signal-field[label="dataset.getDataType"] select'
+  )!;
+  const changeSource = (value: GroupDatasetConfigType) => {
+    sourceType.value = value;
+    sourceType.dispatchEvent(new Event('input', { bubbles: true }));
+    sourceType.dispatchEvent(new Event('change'));
+  };
   expect(JSON.parse(JSON.stringify(component.form().value()))).toEqual(source);
   expect(component.form().dirty()).toBe(false);
   expect(
@@ -88,20 +105,20 @@ it('完整載入隱藏清單，切換資料來源保留編輯，儲存包含所�
   component.form.config.groupDatasetScrapyList[0]
     .label()
     .value.set('Changed crawler');
-  component.form.config.type().value.set(GroupDatasetConfigType.api);
+  changeSource(GroupDatasetConfigType.api);
   fixture.detectChanges();
   await fixture.whenStable();
   expect(
     fixture.debugElement.query(By.directive(GroupDatasetScrapyTableComponent))
   ).toBeNull();
   component.form.config.groupDatasetApiList[0].label().value.set('Changed API');
-  component.form.config.type().value.set(GroupDatasetConfigType.scrapy);
+  changeSource(GroupDatasetConfigType.scrapy);
   fixture.detectChanges();
   await fixture.whenStable();
   expect(component.form.config.groupDatasetScrapyList[0].label().value()).toBe(
     'Changed crawler'
   );
-  component.form.config.type().value.set(GroupDatasetConfigType.api);
+  changeSource(GroupDatasetConfigType.api);
   fixture.detectChanges();
   await fixture.whenStable();
   expect(component.form.config.groupDatasetApiList[0].label().value()).toBe(

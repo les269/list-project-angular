@@ -1,21 +1,29 @@
-<h2 mat-dialog-title>{{ 'title.copyDataset' | translate }}</h2>
-<mat-dialog-content>
-  <div class="mb-3">
-    <label for="name" class="form-label">{{
-      'dataset.name' | translate
-    }}</label>
-    <input
-      type="text"
-      class="form-control"
-      [formField]="sourceForm.name"
-      trimOnBlur />
-  </div>
+<h2 mat-dialog-title class="dialog-title">
+  {{ 'title.copyDataset' | translate }}
+</h2>
+<mat-dialog-content class="dialog-content">
+  <form (submit)="$event.preventDefault()">
+    <fieldset class="dialog-fields" [disabled]="isProcessing()">
+      <app-signal-field
+        [field]="sourceForm.name"
+        label="dataset.name"
+        [trim]="true" />
+    </fieldset>
+  </form>
 </mat-dialog-content>
-<mat-dialog-actions>
-  <button mat-button mat-dialog-close>
-    {{ 'g.no' | translate }}
+<mat-dialog-actions class="dialog-actions" [attr.aria-busy]="isProcessing()">
+  <button
+    type="button"
+    class="dialog-button"
+    mat-dialog-close
+    [disabled]="isProcessing()">
+    {{ 'g.cancel' | translate }}
   </button>
-  <button mat-button cdkFocusInitial (click)="ok()">
-    {{ 'g.ok' | translate }}
+  <button
+    type="button"
+    class="dialog-button dialog-button-primary"
+    (click)="ok()"
+    [disabled]="sourceForm().invalid() || isProcessing()">
+    {{ (isProcessing() ? 'msg.copying' : 'g.copy') | translate }}
   </button>
 </mat-dialog-actions>

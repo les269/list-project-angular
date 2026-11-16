@@ -1,107 +1,76 @@
-<div class="container d-flex">
-  <div class="col-md-10 offset-md-1 col-xs-12 mt-2">
-    <form (submit)="$event.preventDefault()">
+<div class="editor-page">
+  <div class="page-heading">
+    <button type="button" class="page-button" (click)="onBack()">
+      {{ 'g.back' | translate }}
+    </button>
+    <h2>{{ 'title.groupDatasetEdit' | translate }}</h2>
+  </div>
+  <form class="editor-form" (submit)="$event.preventDefault()">
+    <section class="editor-section" aria-labelledby="group-dataset-basic-title">
+      <h3 class="section-title" id="group-dataset-basic-title">
+        {{ 'dataset.basicSettings' | translate }}
+      </h3>
+      <div class="section-body">
+        <div class="form-grid">
+          <app-signal-field
+            [field]="form.groupName"
+            label="dataset.groupName" />
+          <app-signal-field [field]="form.config.byKey" label="dataset.byKey" />
+        </div>
+        <app-signal-field
+          [field]="form.config.imageSaveFolder"
+          label="dataset.imageSaveFolder" />
+      </div>
+    </section>
+    <section
+      class="editor-section"
+      aria-labelledby="group-dataset-fields-title">
+      <h3 class="section-title" id="group-dataset-fields-title">
+        {{ 'dataset.fieldTable' | translate }}
+      </h3>
+      <div class="section-body">
+        <app-group-dataset-field-table [fields]="fieldListControl" />
+      </div>
+    </section>
+    <section
+      class="editor-section"
+      aria-labelledby="group-dataset-source-title">
+      <h3 class="section-title" id="group-dataset-source-title">
+        {{ 'dataset.sourceSettings' | translate }}
+      </h3>
+      <div class="section-body">
+        <app-signal-field
+          [field]="form.config.type"
+          label="dataset.getDataType"
+          [type]="fieldType.SELECT"
+          [options]="configTypeOptions" />
+        @switch (configForm.type().value()) {
+          @case (eGroupDatasetConfigType.scrapy) {
+            <app-group-dataset-scrapy-table [fields]="scrapyListControl" />
+          }
+          @case (eGroupDatasetConfigType.api) {
+            <app-group-dataset-api-table [fields]="apiListControl" />
+          }
+        }
+      </div>
+    </section>
+    <div class="form-actions">
+      @if (isEditMode) {
+        <button
+          type="button"
+          class="page-button"
+          [disabled]="form().invalid()"
+          (click)="update(false, 'save')">
+          {{ 'g.save' | translate }}
+        </button>
+      }
       <button
         type="button"
-        mat-icon-button
-        class="d-flex align-content-center"
-        (click)="onBack()">
-        <mat-icon>arrow_back</mat-icon>
+        class="page-button page-button-primary"
+        [disabled]="form().invalid()"
+        (click)="update(true, 'commit')">
+        {{ 'g.submit' | translate }}
       </button>
-      <div class="form-group mb-2">
-        <label class="form-label require">{{
-          'dataset.groupName' | translate
-        }}</label>
-        <input
-          class="form-control"
-          [formField]="form.groupName"
-          [class.is-invalid]="
-            groupNameControl().invalid() && groupNameControl().touched()
-          " />
-        @if (
-          hasError(groupNameControl, 'required') && groupNameControl().touched()
-        ) {
-          <div class="invalid-feedback d-block">
-            {{ 'msg.required' | translate }}
-          </div>
-        }
-      </div>
-      <div>
-        <div class="form-group mb-2">
-          <label class="form-label require">{{
-            'dataset.byKey' | translate
-          }}</label>
-          <input
-            class="form-control"
-            [formField]="form.config.byKey"
-            [class.is-invalid]="
-              byKeyControl().invalid() && byKeyControl().touched()
-            " />
-          @if (hasError(byKeyControl, 'required') && byKeyControl().touched()) {
-            <div class="invalid-feedback d-block">
-              {{ 'msg.required' | translate }}
-            </div>
-          }
-        </div>
-        <div class="form-group mb-2">
-          <label class="form-label">{{
-            'dataset.imageSaveFolder' | translate
-          }}</label>
-          <input
-            class="form-control"
-            [formField]="form.config.imageSaveFolder" />
-        </div>
-        <div class="h4 fw-bold">
-          {{ 'dataset.fieldTable' | translate }}
-        </div>
-        <app-group-dataset-field-table [fields]="fieldListControl">
-        </app-group-dataset-field-table>
-
-        <div class="form-group mb-2">
-          <label class="form-label">{{
-            'dataset.getDataType' | translate
-          }}</label>
-          <select
-            class="form-control form-select"
-            [formField]="form.config.type">
-            @for (type of eGroupDatasetConfigType | keyvalue; track type) {
-              <option [value]="type.key">
-                {{ 'dataset.' + type.key | translate }}
-              </option>
-            }
-          </select>
-        </div>
-        @switch (configForm.type().value()) {
-          @case ('scrapy') {
-            <app-group-dataset-scrapy-table [fields]="scrapyListControl">
-            </app-group-dataset-scrapy-table>
-          }
-          @case ('api') {
-            <app-group-dataset-api-table [fields]="apiListControl">
-            </app-group-dataset-api-table>
-          }
-        }
-      </div>
-      @if (isEditMode) {
-        <div class="my-4">
-          <button
-            type="submit"
-            [disabled]="form().invalid()"
-            class="btn btn-success w-100"
-            (click)="update(false, 'save')">
-            {{ 'g.save' | translate }}
-          </button>
-        </div>
-      }
-      <div class="my-4">
-        <button
-          type="submit"
-          [disabled]="form().invalid()"
-          class="btn btn-success w-100"
-          (click)="update(true, 'commit')">
-          {{ 'g.submit' | translate }}
-        </button>
-      </div>
-    </form>
-  </div>
+    </div>
+  </form>
 </div>

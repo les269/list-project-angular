@@ -1,7 +1,8 @@
-import { Component, effect, inject, viewChild } from '@angular/core';
+import { Component, effect, inject, signal, viewChild } from '@angular/core';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import {
   MatPaginator,
   MatPaginatorIntl,
@@ -35,20 +36,23 @@ import { ReplaceValueMapService } from '../../service/replace-value-map.service'
     MatPaginatorModule,
     MatSortModule,
     MatButtonModule,
+    MatTooltipModule,
     ScrollTopComponent,
   ],
   providers: [{ provide: MatPaginatorIntl, useClass: CustomMatPaginatorIntl }],
   templateUrl: './replace-value-map.component.html',
+  styleUrl: './replace-value-map.component.scss',
 })
 export class ReplaceValueMapComponent {
-  searchName = '';
-  displayedColumns = ['match', 'replaceValue', 'other'];
-  readonly dataSource = new MatTableDataSource<ReplaceValueList>([]);
-
   private readonly replaceValueMapService = inject(ReplaceValueMapService);
   private readonly selectTableService = inject(SelectTableService);
   private readonly snackbarService = inject(SnackbarService);
   private readonly messageBoxService = inject(MessageBoxService);
+
+  readonly searchName = signal('');
+  readonly displayedColumns = ['match', 'replaceValue', 'other'];
+  readonly dataSource = new MatTableDataSource<ReplaceValueList>([]);
+  readonly filterValue = signal('');
   readonly sort = viewChild(MatSort);
   readonly paginator = viewChild(MatPaginator);
 
@@ -75,12 +79,12 @@ export class ReplaceValueMapComponent {
   }
 
   search() {
-    if (isBlank(this.searchName)) {
+    if (isBlank(this.searchName())) {
       this.snackbarService.isBlankMessage('replaceValueMap.searchName');
       return;
     }
 
-    this.replaceValueMapService.getByName(this.searchName).subscribe(res => {
+    this.replaceValueMapService.getByName(this.searchName()).subscribe(res => {
       if (res) {
         this.dataSource.data = Object.entries(res.map).map(x => ({
           match: x[0],
@@ -101,7 +105,7 @@ export class ReplaceValueMapComponent {
         ),
         filter(x => isNotNull(x)),
         switchMap(res => {
-          this.searchName = res!.name;
+          this.searchName.set(res!.name);
           return this.replaceValueMapService.getByName(res!.name);
         })
       )
@@ -118,12 +122,12 @@ export class ReplaceValueMapComponent {
   }
 
   update() {
-    if (isBlank(this.searchName)) {
+    if (isBlank(this.searchName())) {
       this.snackbarService.isBlankMessage('replaceValueMap.searchName');
       return;
     }
     const req: ReplaceValueMap = {
-      name: this.searchName,
+      name: this.searchName(),
       map: this.dataSource.data.reduce(
         (a, b) => {
           a[b.match] = b.replaceValue;
@@ -139,22 +143,22 @@ export class ReplaceValueMapComponent {
   }
 
   delete() {
-    if (isBlank(this.searchName)) {
+    if (isBlank(this.searchName())) {
       this.snackbarService.isBlankMessage('replaceValueMap.searchName');
       return;
     }
     this.replaceValueMapService
-      .existMap(this.searchName)
+      .existMap(this.searchName())
       .pipe(
         filter(res => res),
         switchMap(x => this.messageBoxService.openI18N('msg.sureDeleteMap')),
         filter(res => isNotBlank(res)),
         switchMap(x =>
-          this.replaceValueMapService.deleteByName(this.searchName)
+          this.replaceValueMapService.deleteByName(this.searchName())
         )
       )
       .subscribe(result => {
-        this.searchName = '';
+        this.searchName.set('');
         this.dataSource.data = [];
         this.snackbarService.openI18N('msg.deleteSuccess');
       });
@@ -194,6 +198,7 @@ export class ReplaceValueMapComponent {
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
+    this.filterValue.set(filterValue);
     this.dataSource.filter = filterValue.trim().toLowerCase();
 
     if (this.dataSource.paginator) {
@@ -201,8 +206,14 @@ export class ReplaceValueMapComponent {
     }
   }
 
+  clearFilter() {
+    this.filterValue.set('');
+    this.dataSource.filter = '';
+    this.dataSource.paginator?.firstPage();
+  }
+
   export() {
-    if (isNotBlank(this.searchName) && this.dataSource.data.length > 0) {
+    if (isNotBlank(this.searchName()) && this.dataSource.data.length > 0) {
       downloadJsonFile(
         JSON.stringify(
           this.dataSource.data.reduce(
@@ -215,7 +226,7 @@ export class ReplaceValueMapComponent {
           null,
           2
         ),
-        this.searchName
+        this.searchName()
       );
     }
   }

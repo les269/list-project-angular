@@ -93,6 +93,16 @@ describe.each(cases)('Copy $kind', config => {
     expect(check).toHaveBeenCalledTimes(1);
     expect(component.isProcessing()).toBe(true);
     expect(state.dialogRef.disableClose).toBe(true);
+    await fixture.whenStable();
+    const page: HTMLElement = fixture.nativeElement;
+    expect(page.querySelector<HTMLFieldSetElement>('fieldset')!.disabled).toBe(
+      true
+    );
+    expect(
+      [...page.querySelectorAll('button')].every(button => button.disabled)
+    ).toBe(true);
+    page.querySelector<HTMLButtonElement>('.dialog-button')!.click();
+    expect(state.dialogRef.close).not.toHaveBeenCalled();
     if (config.kind === 'theme') state.themeCheck.next(false);
     else state.itemCheck.next(undefined);
     component.ok();
@@ -100,6 +110,10 @@ describe.each(cases)('Copy $kind', config => {
     state.pending.error(new Error('Copy failed'));
     expect(component.isProcessing()).toBe(false);
     expect(state.dialogRef.disableClose).toBe(false);
+    await fixture.whenStable();
+    expect(page.querySelector<HTMLFieldSetElement>('fieldset')!.disabled).toBe(
+      false
+    );
     state.themeService.existTheme.mockReturnValue(of(false));
     state.itemService.getThemeItem.mockReturnValue(of(undefined));
     copy.mockReturnValue(of(undefined));
@@ -134,6 +148,16 @@ describe.each(cases)('Copy $kind', config => {
     expect(component.isProcessing()).toBe(false);
     expect(state.dialogRef.disableClose).toBe(false);
   });
+
+  it('取消時關閉彈窗且不送出複製請求', async () => {
+    const state = await setup();
+    const fixture = TestBed.createComponent(config.componentType);
+    await fixture.whenStable();
+    fixture.nativeElement.querySelector('.dialog-button').click();
+    expect(state.dialogRef.close).toHaveBeenCalledTimes(1);
+    expect(state.themeService.existTheme).not.toHaveBeenCalled();
+    expect(state.itemService.getThemeItem).not.toHaveBeenCalled();
+  });
 });
 
 it('CopyTheme 驗證提示隨語言切換更新', async () => {
@@ -142,14 +166,48 @@ it('CopyTheme 驗證提示隨語言切換更新', async () => {
   const translate = TestBed.inject(TranslateService);
   translate.setTranslation('zh-test', { msg: { required: '必填' } });
   translate.setTranslation('en-test', { msg: { required: 'Required' } });
+  fixture.componentInstance.nameControl().value.set('');
+  fixture.componentInstance.nameControl().markAsTouched();
   await firstValueFrom(translate.use('zh-test'));
   await fixture.whenStable();
-  expect(fixture.componentInstance.formAlertsObj().name[0].msg).toBe('必填');
+  expect(fixture.nativeElement.textContent).toContain('必填');
   await firstValueFrom(translate.use('en-test'));
   await fixture.whenStable();
-  expect(fixture.componentInstance.formAlertsObj().name[0].msg).toBe(
-    'Required'
+  expect(fixture.nativeElement.textContent).toContain('Required');
+});
+
+it('複製項目的共用欄位在失焦時修剪 ID，並保留來源與複製契約', async () => {
+  const state = await setup();
+  const fixture = TestBed.createComponent(CopyThemeItemComponent);
+  await fixture.whenStable();
+  const page: HTMLElement = fixture.nativeElement;
+  expect(page.querySelector('.dialog-summary')).toBeNull();
+  const target = page.querySelector<HTMLInputElement>(
+    'app-signal-field input'
+  )!;
+  const label = page.querySelector<HTMLLabelElement>('app-signal-field label')!;
+  expect(label.htmlFor).toBe(target.id);
+  target.value = '  target  ';
+  target.dispatchEvent(new Event('input'));
+  target.dispatchEvent(new Event('blur'));
+  await fixture.whenStable();
+  expect(fixture.componentInstance.targetItemId()).toBe('target');
+  page.querySelector<HTMLButtonElement>('.dialog-button-primary')!.click();
+  expect(state.itemService.getThemeItem).toHaveBeenCalledWith(
+    ThemeItemType.LABEL,
+    'target'
   );
+  state.itemCheck.next(undefined);
+  expect(state.itemService.copyThemeItem).toHaveBeenCalledWith({
+    sourceItemId: 'source',
+    targetItemId: 'target',
+    type: ThemeItemType.LABEL,
+  });
+  expect(state.data.sourceItemId).toBe('source');
+  state.pending.next();
+  expect(state.dialogRef.close).toHaveBeenCalledWith(true);
+  state.pending.complete();
+  state.itemCheck.complete();
 });
 
 it('Note 切換讀取與編輯模式後保留內容，儲存空白段落時使用空字串', async () => {

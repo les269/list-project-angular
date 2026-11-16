@@ -71,6 +71,7 @@ import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage
   ],
   selector: 'app-theme-custom-table',
   templateUrl: 'theme-custom-table.component.html',
+  styleUrl: './theme-custom-table.component.scss',
 })
 export class ThemeCustomTableComponent {
   // injects

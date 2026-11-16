@@ -1,6 +1,5 @@
 import { Component, ElementRef, inject, viewChild } from '@angular/core';
 
-import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
   MatDialogClose,
@@ -30,9 +29,9 @@ import { GroupDatasetDataService } from '../../service/group-dataset-data.servic
     MatDialogTitle,
     MatDialogContent,
     MatIconModule,
-    MatButtonModule,
   ],
   templateUrl: './group-dataset-import-export.component.html',
+  styleUrl: './group-dataset-import-export.component.scss',
 })
 export class GroupDatasetImportExportComponent {
   readonly dialogRef = inject(MatDialogRef<GroupDatasetImportExportComponent>);

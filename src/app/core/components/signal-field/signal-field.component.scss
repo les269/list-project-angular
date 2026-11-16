@@ -1,0 +1,38 @@
+:host {
+  display: block;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.field-control {
+  min-width: 0;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: var(--app-space-1);
+  overflow-wrap: anywhere;
+}
+
+.inline-label {
+  flex: 0 1 auto;
+  max-width: 40%;
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.form-control,
+.form-select {
+  min-width: 0;
+}
+
+.input-group > app-chip-input {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+app-form-invalids {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

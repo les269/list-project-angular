@@ -1,19 +1,122 @@
-tr.select-row:hover {
-  background: whitesmoke;
-  cursor: pointer;
-  user-select: none;
+@use '@angular/material' as mat;
+@use '../../../../styles/editor-dialog' as dialog;
+
+@include dialog.layout;
+
+:host {
+  @include mat.table-overrides(
+    (
+      background-color: var(--app-surface),
+      header-headline-color: var(--app-text-primary),
+      header-headline-font: var(--app-font-family),
+      header-headline-size: var(--app-font-size-sm),
+      header-headline-weight: 400,
+      header-container-height: 40px,
+      row-item-label-text-color: var(--app-text-primary),
+      row-item-label-text-font: var(--app-font-family),
+      row-item-label-text-size: var(--app-font-size-sm),
+      row-item-label-text-weight: 400,
+      row-item-outline-color: var(--app-border),
+      row-item-container-height: 44px,
+    )
+  );
 }
 
-tr.select-row:active {
-  background: #efefef;
+.dialog-title {
+  padding: var(--app-space-4) var(--app-space-6);
+  font-size: var(--app-font-size-body);
+  line-height: 24px;
+}
+
+.dialog-content {
+  padding: var(--app-space-3) var(--app-space-4);
+}
+
+.dialog-title + .dialog-content {
+  padding-top: var(--app-space-3);
+}
+
+.search-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--app-space-2);
+  margin-bottom: var(--app-space-2);
+}
+
+.filter-controls {
+  flex: 1 1 240px;
+  min-width: 0;
+  width: auto;
+
+  .form-control {
+    min-height: 40px;
+    font: inherit;
+  }
+}
+
+.mat-paginator {
+  flex: 0 1 auto;
+  min-width: 0;
+  background: transparent;
+  color: var(--app-text-secondary);
+}
+
+.table-container {
+  max-height: 48vh;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--app-border-strong);
+  border-radius: var(--app-radius-sm);
+}
+
+table {
+  width: 100%;
+}
+
+th,
+td {
+  padding-inline: var(--app-space-3);
+}
+
+td {
+  padding-block: var(--app-space-1);
+  overflow-wrap: anywhere;
+}
+
+.mat-mdc-header-row {
+  background: #e8eef6;
+}
+
+.select-row {
   cursor: pointer;
   user-select: none;
+
+  &:nth-child(even) {
+    background: #f8fafc;
+  }
+
+  &:hover {
+    background: var(--app-hover-bg);
+  }
+
+  &:active,
+  &.selected-row {
+    background: var(--app-primary-soft);
+  }
+
+  &.selected-row:hover {
+    background: var(--app-primary-soft-hover);
+  }
 }
-.search-bar {
-  position: sticky;
-  top: 0px;
+
+.empty-row td {
+  padding: var(--app-space-4);
+  color: var(--app-text-secondary);
+  text-align: center;
 }
-.table-container {
-  overflow: auto;
-  height: 48vh;
+
+.dialog-actions {
+  padding: var(--app-space-2) var(--app-space-4);
 }

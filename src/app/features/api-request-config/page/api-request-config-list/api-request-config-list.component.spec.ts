@@ -32,6 +32,7 @@ const items: ApiRequestConfig[] = [
 async function setup() {
   const pending = new Subject<void>();
   const confirmation = new Subject<boolean>();
+  const messageBox = { openI18N: vi.fn(() => confirmation.asObservable()) };
   const service = {
     getAll: vi.fn(() => of(structuredClone(items))),
     delete: vi.fn((_item: ApiRequestConfig) => pending),
@@ -49,7 +50,7 @@ async function setup() {
       { provide: MatDialog, useValue: dialog },
       {
         provide: MessageBoxService,
-        useValue: { openI18N: () => confirmation },
+        useValue: messageBox,
       },
       { provide: SnackbarService, useValue: { openI18N: vi.fn() } },
     ],
@@ -63,6 +64,7 @@ async function setup() {
     dialog,
     pending,
     confirmation,
+    messageBox,
   };
 }
 
@@ -220,7 +222,8 @@ describe('API 請求設定清單', () => {
   });
 
   it('刪除失敗會解除鎖定，保留清單', async () => {
-    const { component, confirmation, pending } = await setup();
+    const { component, confirmation, pending, fixture, service, messageBox } =
+      await setup();
     component.onDelete(items[0]);
     confirmation.next(true);
     confirmation.complete();
@@ -228,5 +231,21 @@ describe('API 請求設定清單', () => {
     expect(component.deletingId()).toBe('');
     expect(component.deleteFailed()).toBe(true);
     expect(component.dataSource.filteredData).toEqual(items);
+    await fixture.whenStable();
+    expect(
+      fixture.nativeElement.querySelector('[role="alert"]')?.textContent
+    ).toContain('apiRequestConfig.deleteFailed');
+    const retry = new Subject<void>();
+    service.delete.mockReturnValue(retry);
+    messageBox.openI18N.mockReturnValue(of(true));
+    component.onDelete(items[0]);
+    expect(component.deleteFailed()).toBe(false);
+    expect(service.delete).toHaveBeenCalledTimes(2);
+    retry.next();
+    retry.complete();
+    await fixture.whenStable();
+    expect(component.deletingId()).toBe('');
+    expect(component.deleteFailed()).toBe(false);
+    expect(service.getAll).toHaveBeenCalledTimes(2);
   });
 });

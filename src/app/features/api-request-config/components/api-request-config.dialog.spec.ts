@@ -304,9 +304,9 @@ describe('API 請求設定編輯', () => {
       JSON.stringify(JSON.parse(source.config.requestBody), null, 2)
     );
     expect(component.valueModel().config.requestBody).toContain('{{$.id}}');
-    expect(component.valueModel().config['extraBackendSetting']).toEqual({
-      value: 42,
-    });
+    expect(component.valueModel().config).toEqual(
+      expect.objectContaining({ extraBackendSetting: { value: 42 } })
+    );
     expect(component.valueForm.config.requestBody().dirty()).toBe(true);
   });
 

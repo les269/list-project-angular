@@ -1,0 +1,3 @@
+@use '../../../../../styles/management-list-page';
+
+@include management-list-page.layout($table-min-width: 800px);

@@ -1,27 +1,42 @@
-.expanded {
+@use '@angular/material' as mat;
+@use '../../styles/settings-list-page';
+
+@include settings-list-page.layout($table-min-width: 880px);
+
+.disk-actions {
   display: flex;
-  justify-content: center;
-  > .content {
-    margin: 0px 36px;
-    width: 100%;
-    max-width: 1080px;
-    padding-top: 48px;
-    > .text-container {
-      width: 100%;
-      display: flex;
-      align-items: start;
-      padding-bottom: 24px;
-    }
-  }
-  > .card {
-    display: flex;
-    > table {
-      width: 100%;
-    }
-  }
+  flex-wrap: wrap;
+  gap: var(--app-space-2);
 }
 
-.mat-row > td,
-.mat-header-row > th {
-  border-bottom: solid #ccc 1px;
+:host {
+  @include mat.table-overrides(
+    (
+      footer-supporting-text-font: var(--app-font-family),
+      footer-supporting-text-size: var(--app-font-size-sm),
+      footer-supporting-text-weight: 400,
+    )
+  );
+}
+
+.number-cell,
+td[mat-footer-cell] {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.number-cell {
+  text-align: right;
+}
+
+.mat-column-updateDate {
+  white-space: nowrap;
+}
+
+.mat-mdc-footer-row {
+  background-color: #e8eef6;
+}
+
+td[mat-footer-cell] {
+  padding-block: var(--app-space-3);
 }

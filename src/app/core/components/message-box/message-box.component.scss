@@ -1,0 +1,13 @@
+@use '../../../../styles/editor-dialog' as dialog;
+
+@include dialog.layout;
+
+.dialog-content {
+  line-height: var(--app-line-height-body);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.dialog-actions {
+  padding: var(--app-space-2) var(--app-space-4);
+}

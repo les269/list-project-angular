@@ -1,6 +1,5 @@
 import { SignalCodeEditorComponent } from '../../../../core/components/signal-code-editor/signal-code-editor.component';
 import { createDatasetField } from '../../util/dataset-field';
-import { CommonModule } from '@angular/common';
 import { Component, effect, inject, signal, untracked } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import {
@@ -10,21 +9,22 @@ import {
   FormField,
   required,
 } from '@angular/forms/signals';
-import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { EMPTY, filter, map, switchMap } from 'rxjs';
+import { SignalFieldComponent } from '../../../../core/components/signal-field/signal-field.component';
+import { FormInvalidsComponent } from '../../../../core/components/form-invalids/form-invalids.component';
+import { EditMode } from '../../../../core/model/global.model';
+import { SignalFieldType } from '../../../../core/model/signal-field.model';
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { isNotBlank } from '../../../../shared/util/helper';
-import { hasFieldError } from '../../../../shared/util/signal-form';
 import { ScrapyPaginationService } from '../../../spider/services/scrapy-pagination.service';
 import { DatasetFieldTableComponent } from '../../components/dataset-field-table/dataset-field-table.component';
-import { Dataset, DatasetConfigType, DatasetEditMode } from '../../model';
+import { Dataset, DatasetConfigType } from '../../model';
 import { DatasetService } from '../../service/dataset.service';
 import { GroupDatasetService } from '../../service/group-dataset.service';
 
@@ -32,21 +32,20 @@ import { GroupDatasetService } from '../../service/group-dataset.service';
   selector: 'app-dataset-edit',
 
   imports: [
-    MatTableModule,
     FormField,
-    MatButtonModule,
     TranslatePipe,
-    CommonModule,
     MatIconModule,
     MatCheckboxModule,
     MatChipsModule,
     SignalCodeEditorComponent,
     DatasetFieldTableComponent,
+    SignalFieldComponent,
+    FormInvalidsComponent,
   ],
   templateUrl: './dataset-edit.component.html',
+  styleUrl: './dataset-edit.component.scss',
 })
 export class DatasetEditComponent {
-  readonly hasError = hasFieldError;
   // inject
   readonly router = inject(Router);
   readonly route = inject(ActivatedRoute);
@@ -57,8 +56,12 @@ export class DatasetEditComponent {
   readonly scrapyPaginationService = inject(ScrapyPaginationService);
   // enum and constant
   readonly eDatasetConfigType = DatasetConfigType;
+  readonly fieldType = SignalFieldType;
+  readonly configTypeOptions = Object.values(DatasetConfigType)
+    .sort()
+    .map(value => ({ value, label: `dataset.${value}` }));
   // signal
-  readonly status = signal(DatasetEditMode.create);
+  readonly status = signal<EditMode>(EditMode.CREATE);
   readonly datasetName = toSignal<string | null>(
     this.route.paramMap.pipe(
       map(params => params.get('name')),
@@ -103,17 +106,21 @@ export class DatasetEditComponent {
       required(row.label);
     });
     required(p.config.filePath, {
+      message: 'msg.required',
       when: ({ valueOf }) => valueOf(p.config.type) === DatasetConfigType.file,
     });
     required(p.config.folderPath, {
+      message: 'msg.required',
       when: ({ valueOf }) =>
         valueOf(p.config.type) === DatasetConfigType.folder,
     });
     required(p.config.scrapyPagination, {
+      message: 'msg.required',
       when: ({ valueOf }) =>
         valueOf(p.config.type) === DatasetConfigType.pagination,
     });
     required(p.config.filingRegular, {
+      message: 'msg.required',
       when: ({ valueOf }) =>
         valueOf(p.config.filing) &&
         [DatasetConfigType.file, DatasetConfigType.folder].includes(
@@ -121,18 +128,19 @@ export class DatasetEditComponent {
         ),
     });
     required(p.config.imageByKey, {
+      message: 'msg.required',
       when: ({ valueOf }) => valueOf(p.config.autoImageDownload),
     });
-    required(p.name);
-    required(p.config.groupName);
+    required(p.name, { message: 'msg.required' });
+    required(p.config.groupName, { message: 'msg.required' });
   });
 
   get isCreateMode() {
-    return this.status() === DatasetEditMode.create;
+    return this.status() === EditMode.CREATE;
   }
 
   get isEditMode() {
-    return this.status() === DatasetEditMode.edit;
+    return this.status() === EditMode.EDIT;
   }
 
   get configForm() {
@@ -198,7 +206,7 @@ export class DatasetEditComponent {
 
       untracked(() => {
         this.patchForm(dataset);
-        this.status.set(DatasetEditMode.edit);
+        this.status.set(EditMode.EDIT);
       });
     });
   }

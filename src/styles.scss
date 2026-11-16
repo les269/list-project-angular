@@ -14,12 +14,16 @@ $theme: mat.define-theme(
 :root {
   --header-height: 48px;
   --setting-sidebar-width: 240px;
-  --spec-text-primary: #0f0f0f;
-  --spec-text-secondary: #606060;
+  --spec-text-primary: var(--app-text-primary);
+  --spec-text-secondary: var(--app-text-secondary);
 }
 
 body {
-  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  background-color: var(--app-bg);
+  color: var(--app-text-primary);
+  font-family: var(--app-font-family);
+  font-size: var(--app-font-size-body);
+  line-height: var(--app-line-height-body);
 
   @include mat.all-component-themes($theme);
 }

@@ -1,15 +1,9 @@
 import { CommonModule } from '@angular/common';
-import {
-  AfterViewInit,
-  Component,
-  computed,
-  inject,
-  OnInit,
-  viewChild,
-} from '@angular/core';
+import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -23,39 +17,53 @@ import { rxResource } from '@angular/core/rxjs-interop';
 @Component({
   selector: 'app-spider-list',
   templateUrl: './spider-list.component.html',
+  styleUrl: './spider-list.component.scss',
   imports: [
     TranslatePipe,
     CommonModule,
     MatTableModule,
     MatButtonModule,
     MatIconModule,
+    MatTooltipModule,
     MatSortModule,
   ],
 })
 export class SpiderListComponent {
-  displayedColumns = [
+  readonly router = inject(Router);
+  readonly spiderConfigService = inject(SpiderConfigService);
+  readonly snackbarService = inject(SnackbarService);
+  readonly messageBoxService = inject(MessageBoxService);
+
+  readonly displayedColumns = [
     'spiderId',
     'description',
     'primeKeySize',
     'updatedTime',
     'other',
   ];
-  // dataSource = new MatTableDataSource<SpiderConfig>([]);
-
-  readonly router = inject(Router);
-  readonly spiderConfigService = inject(SpiderConfigService);
-  readonly snackbarService = inject(SnackbarService);
-  readonly messageBoxService = inject(MessageBoxService);
 
   readonly sort = viewChild(MatSort);
+  readonly filterValue = signal('');
 
   readonly list = rxResource({
     stream: () => this.spiderConfigService.getAll(),
     defaultValue: [] as SpiderConfig[],
   });
 
+  readonly filteredList = computed(() => {
+    const data = this.list.value();
+    const filter = this.filterValue().trim().toLowerCase();
+    return filter
+      ? data.filter(
+          item =>
+            item.spiderId.toLowerCase().includes(filter) ||
+            (item.description ?? '').toLowerCase().includes(filter)
+        )
+      : data;
+  });
+
   readonly dataSource = computed(() => {
-    const data = this.list.value() ?? [];
+    const data = this.filteredList();
     const sort = this.sort();
     const dataSource = new MatTableDataSource<SpiderConfig>(data);
     if (sort) {

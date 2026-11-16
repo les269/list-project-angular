@@ -41,6 +41,7 @@ import { TableDragPreviewDirective } from './table-drag-preview.directive';
 
 @Component({
   selector: 'app-generic-table',
+  host: { '[class.outlined-table]': 'appearance() === "outlined"' },
   // 表格的 cell template 透過 DOM 尋找所屬列，避免 handle 註冊到外層卡片。
   providers: [{ provide: CDK_DRAG_PARENT, useValue: null }],
   imports: [
@@ -72,6 +73,7 @@ export class GenericTableComponent {
   readonly cols = input.required<GenericTableColumn[]>();
   readonly displayedColumns = input.required<string[]>();
   readonly createRow = input.required<GenericTableRowFactory>();
+  readonly appearance = input<'default' | 'outlined'>('default');
   readonly customColTmpls =
     input<Record<string, TemplateRef<GenericTableCellContext>>>();
   readonly expandedTmpl = input<TemplateRef<GenericTableRowContext>>();

@@ -71,6 +71,7 @@ import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage
   ],
   selector: 'app-theme-label-table',
   templateUrl: 'theme-label-table.component.html',
+  styleUrl: './theme-label-table.component.scss',
 })
 export class ThemeLabelTableComponent {
   readonly hasError = hasFieldError;

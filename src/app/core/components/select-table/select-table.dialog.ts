@@ -8,7 +8,6 @@ import {
   OnInit,
   viewChild,
 } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import {
   MAT_DIALOG_DATA,
@@ -28,11 +27,12 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { BaseSelectTableData } from '../../model';
 import { CustomMatPaginatorIntl } from '../custom-mat-paginatorIntl/custom-mat-paginatorIntl';
 
+let nextSelectDialogId = 0;
+
 @Component({
   imports: [
     CommonModule,
     MatTableModule,
-    MatButtonModule,
     MatDialogActions,
     MatDialogContent,
     MatDialogTitle,
@@ -52,10 +52,11 @@ export class SelectTableDialog<O, T extends BaseSelectTableData<O>>
 {
   readonly dialogRef = inject(MatDialogRef<SelectTableDialog<O, T>>);
   readonly data = inject<T>(MAT_DIALOG_DATA);
+  readonly filterId = `select-table-filter-${++nextSelectDialogId}`;
   displayedColumns = this.data.displayedColumns;
   multipleDisplayedColumns: string[] = [];
   labels = this.data.labels;
-  dataSource = new MatTableDataSource(this.data.dataSource);
+  dataSource = new MatTableDataSource<O>();
   selectType = this.data.selectType;
   columnFormats = this.data.columnFormats;
   columnSorts = this.data.columnSorts;
@@ -72,12 +73,6 @@ export class SelectTableDialog<O, T extends BaseSelectTableData<O>>
       this.multipleDisplayedColumns = ['select', ...this.displayedColumns];
       if (this.selected && Array.isArray(this.selected)) {
         this.selection.select(...this.selected);
-        this.dataSource.data = [
-          ...this.selected,
-          ...this.dataSource.data.filter(
-            item => !this.selected!.includes(item)
-          ),
-        ];
       }
     }
   }
@@ -85,6 +80,15 @@ export class SelectTableDialog<O, T extends BaseSelectTableData<O>>
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator();
     this.dataSource.sort = this.sort();
+    // 先接上分頁再載入資料，避免首次繪製時建立全部資料列。
+    const selected = this.selection.selected;
+    const selectedRows = new Set(selected);
+    this.dataSource.data = selected.length
+      ? [
+          ...selected,
+          ...this.data.dataSource.filter(item => !selectedRows.has(item)),
+        ]
+      : this.data.dataSource;
   }
 
   onOk() {

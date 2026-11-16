@@ -1,22 +1,16 @@
 import { Component, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
+import {
+  MatDialogActions,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle,
+} from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-add-disk-dialog',
 
-  imports: [
-    CommonModule,
-    MatDialogModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    TranslatePipe,
-  ],
+  imports: [MatDialogActions, MatDialogContent, MatDialogTitle, TranslatePipe],
   templateUrl: './add-disk-dialog.component.html',
   styleUrl: './add-disk-dialog.component.scss',
 })

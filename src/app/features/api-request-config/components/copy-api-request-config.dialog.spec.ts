@@ -54,6 +54,13 @@ async function setup() {
 describe('複製 API 請求設定', () => {
   it('只顯示 ID 與說明，阻擋空白或重複 ID', async () => {
     const { fixture, component, service } = await setup();
+    const page: HTMLElement = fixture.nativeElement;
+    const apiIdInput = page.querySelector<HTMLInputElement>(
+      'app-signal-field[label="apiRequestConfig.apiId"] input'
+    )!;
+    expect(page.querySelector<HTMLLabelElement>('label.require')!.htmlFor).toBe(
+      apiIdInput.id
+    );
     expect(fixture.nativeElement.querySelectorAll('input')).toHaveLength(2);
     expect(component.valueModel()).toEqual({
       apiId: '',
@@ -62,12 +69,19 @@ describe('複製 API 請求設定', () => {
     for (const apiId of ['', '   ']) {
       component.valueForm.apiId().value.set(apiId);
       component.onSave();
+      await fixture.whenStable();
       expect(component.valueForm.apiId().invalid()).toBe(true);
+      const alerts = page.querySelectorAll('[role="alert"]');
+      expect(alerts).toHaveLength(1);
+      expect(alerts[0].textContent).toContain(
+        'apiRequestConfig.errors.required'
+      );
     }
     expect(service.exist).not.toHaveBeenCalled();
     service.exist.mockReturnValue(of(true));
     component.valueForm.apiId().value.set(' server-only-id ');
     component.onSave();
+    await fixture.whenStable();
     expect(service.exist).toHaveBeenCalledWith('server-only-id');
     expect(
       component.valueForm
@@ -77,12 +91,24 @@ describe('複製 API 請求設定', () => {
     ).toContain('duplicateApiId');
     expect(component.isSaving()).toBe(false);
     expect(service.update).not.toHaveBeenCalled();
+    expect(page.querySelector('[role="alert"]')?.textContent).toContain(
+      'apiRequestConfig.errors.duplicateApiId'
+    );
   });
 
   it('以新 ID 與說明儲存完整設定，保留原資料且不複製時間', async () => {
-    const { component, service, dialog, pending, data } = await setup();
-    component.valueModel.set({ apiId: ' copied ', description: ' 副本 ' });
-    component.onSave();
+    const { fixture, component, service, dialog, pending, data } =
+      await setup();
+    const page: HTMLElement = fixture.nativeElement;
+    const inputs = page.querySelectorAll<HTMLInputElement>(
+      'app-signal-field input'
+    );
+    inputs[0].value = ' copied ';
+    inputs[0].dispatchEvent(new Event('input', { bubbles: true }));
+    inputs[1].value = ' 副本 ';
+    inputs[1].dispatchEvent(new Event('input', { bubbles: true }));
+    await fixture.whenStable();
+    page.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
     component.onSave();
     component.onCancel();
     expect(service.update).toHaveBeenCalledTimes(1);

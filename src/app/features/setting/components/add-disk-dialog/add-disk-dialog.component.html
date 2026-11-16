@@ -1,23 +1,35 @@
-<div mat-dialog-title>
+<h2 mat-dialog-title class="dialog-title">
   {{ 'disk.addDisk' | translate }}
-</div>
+</h2>
 
-<div mat-dialog-content>
-  <mat-form-field>
-    <mat-label>{{ 'disk.diskCode' | translate }}</mat-label>
-    <mat-select [(value)]="selectedDisk">
-      <mat-option *ngFor="let option of diskOptions" [value]="option">
-        {{ option }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-</div>
+<mat-dialog-content class="dialog-content">
+  <div class="disk-field">
+    <label class="field-label" for="add-disk-code">{{
+      'disk.diskCode' | translate
+    }}</label>
+    <select
+      #diskSelect
+      id="add-disk-code"
+      class="form-select"
+      [value]="selectedDisk()"
+      (change)="selectedDisk.set(diskSelect.value)">
+      @for (option of diskOptions; track option) {
+        <option [value]="option">
+          {{ option }}
+        </option>
+      }
+    </select>
+  </div>
+</mat-dialog-content>
 
-<div mat-dialog-actions>
-  <button mat-button (click)="onCancel()">
+<mat-dialog-actions class="dialog-actions">
+  <button type="button" class="dialog-button" (click)="onCancel()">
     {{ 'g.cancel' | translate }}
   </button>
-  <button mat-button (click)="onConfirm()">
+  <button
+    type="button"
+    class="dialog-button dialog-button-primary"
+    (click)="onConfirm()">
     {{ 'g.confirm' | translate }}
   </button>
-</div>
+</mat-dialog-actions>

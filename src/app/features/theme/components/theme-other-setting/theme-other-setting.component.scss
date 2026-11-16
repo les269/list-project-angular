@@ -1,0 +1,99 @@
+@use '@angular/material' as mat;
+@use '../../styles/theme-section' as section;
+
+@include section.layout;
+
+:host {
+  @include mat.checkbox-overrides(
+    (
+      label-text-font: var(--app-font-family),
+      label-text-size: var(--app-font-size-sm),
+      label-text-weight: 400,
+    )
+  );
+  @include mat.radio-overrides(
+    (
+      label-text-font: var(--app-font-family),
+      label-text-size: var(--app-font-size-sm),
+      label-text-weight: 400,
+    )
+  );
+}
+
+.theme-other-setting,
+.table-settings,
+.refresh-fields {
+  display: grid;
+  gap: var(--app-space-4);
+}
+
+.display-settings {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: var(--app-space-6);
+}
+
+app-signal-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--app-space-2);
+  font-size: var(--app-font-size-sm);
+}
+
+.color-reset {
+  justify-self: start;
+}
+
+.quick-refresh {
+  padding: var(--app-space-4);
+  background: #f8fafc;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-md);
+
+  h3 {
+    margin: 0 0 var(--app-space-2);
+    font-size: var(--app-font-size-body);
+    font-weight: 400;
+  }
+}
+
+.refresh-fields {
+  margin-top: var(--app-space-4);
+}
+
+.spider-selection,
+.refresh-types {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--app-space-2);
+}
+
+.setting-button {
+  min-height: 40px;
+  padding: var(--app-space-2) var(--app-space-3);
+  color: var(--app-text-primary);
+  background: var(--app-surface);
+  border: 1px solid var(--app-border-strong);
+  border-radius: var(--app-radius-sm);
+  font: inherit;
+  font-size: var(--app-font-size-sm);
+  font-weight: 400;
+  line-height: 1.4;
+
+  &:hover:not(:disabled) {
+    background: var(--app-hover-bg);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--app-focus-ring);
+    outline-offset: 2px;
+  }
+}
+
+@media (max-width: 600px) {
+  .display-settings {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--app-space-4);
+  }
+}

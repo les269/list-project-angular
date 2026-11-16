@@ -1,20 +1,15 @@
-<div class="card">
-  <app-generic-table
-    [fields]="fields()"
-    [cols]="cols"
-    [displayedColumns]="displayedColumns"
-    [createRow]="createRow"></app-generic-table>
-</div>
+<app-generic-table
+  appearance="outlined"
+  [fields]="fields()"
+  [cols]="cols"
+  [displayedColumns]="displayedColumns"
+  [createRow]="createRow"></app-generic-table>
 <ng-template #expandedTmpl let-element>
   <div class="d-flex flex-column">
-    <div class="d-flex input-group my-1 align-items-center">
-      <label class="input-group-text">{{
-        'dataset.replaceValueMap' | translate
-      }}</label>
+    <div class="d-flex flex-wrap gap-2 my-1 align-items-center">
+      <span>{{ 'dataset.replaceValueMap' | translate }}</span>
       @if (element.replaceValueMapName) {
-        <label class="input-group-text">{{
-          element.replaceValueMapName
-        }}</label>
+        <span class="text-break">{{ element.replaceValueMapName }}</span>
         <button
           class="btn btn-outline-primary d-flex"
           (click)="element.replaceValueMapName = ''">

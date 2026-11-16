@@ -1,126 +1,67 @@
-.database-edit-container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 24px;
+@use '../../../../../styles/editor-dialog' as dialog;
 
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-  }
+@include dialog.layout;
+
+.dialog-title {
+  padding: var(--app-space-4) var(--app-space-6);
+  font-size: var(--app-font-size-body);
+  line-height: 24px;
 }
 
-.form-section {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  padding: 16px;
-  background-color: #fafafa;
-
-  h3 {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 600;
-    color: #333;
-  }
+.dialog-content {
+  display: grid;
+  gap: var(--app-space-3);
+  padding: var(--app-space-3) var(--app-space-4);
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+.dialog-title + .dialog-content {
+  padding-top: var(--app-space-3);
+}
 
-  label {
-    font-size: 14px;
-    font-weight: 500;
-    color: #333;
+.editor-fields,
+.field-row {
+  display: grid;
+  gap: var(--app-space-2);
+  min-width: 0;
+}
 
-    .required {
-      color: #ff4444;
-      margin-left: 2px;
-    }
+.editor-fields + .editor-fields {
+  padding-top: var(--app-space-3);
+  border-top: 1px solid var(--app-border);
+}
 
-    .optional {
-      color: #999;
-      font-weight: 400;
-      margin-left: 2px;
-    }
-  }
+app-signal-field {
+  min-width: 0;
+  gap: 0;
+}
 
-  input,
-  select,
+.form-control {
+  font: inherit;
+  min-height: 40px;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: var(--app-space-1);
+  overflow-wrap: anywhere;
+}
+
+.form-control {
+  min-width: 0;
+}
+
+.description-field {
   textarea {
-    padding: 8px 12px;
-    border: 1px solid #d0d0d0;
-    border-radius: 4px;
-    font-size: 14px;
-    font-family: inherit;
-    transition: border-color 0.2s;
-
-    &:focus {
-      outline: none;
-      border-color: #1976d2;
-      box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
-    }
-
-    &:disabled {
-      background-color: #f5f5f5;
-      color: #999;
-      cursor: not-allowed;
-    }
-  }
-
-  textarea {
+    min-height: 64px;
     resize: vertical;
-    min-height: 100px;
-  }
-
-  .error {
-    color: #ff4444;
-    font-size: 12px;
-    margin-top: 2px;
   }
 }
 
-.form-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  margin-top: 12px;
+.field-error {
+  color: #b42318;
+  font-size: var(--app-font-size-sm);
+}
 
-  button {
-    padding: 8px 24px;
-    border: none;
-    border-radius: 4px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-
-    &[type='submit'] {
-      background-color: #1976d2;
-      color: white;
-
-      &:hover:not(:disabled) {
-        background-color: #1565c0;
-      }
-
-      &:disabled {
-        background-color: #ccc;
-        cursor: not-allowed;
-      }
-    }
-
-    &[type='reset'] {
-      background-color: #f5f5f5;
-      color: #333;
-      border: 1px solid #d0d0d0;
-
-      &:hover {
-        background-color: #e0e0e0;
-      }
-    }
-  }
+.dialog-actions {
+  padding: var(--app-space-2) var(--app-space-4);
 }

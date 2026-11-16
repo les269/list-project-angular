@@ -29,6 +29,7 @@ type Row = { seq: number; name: string; selected: boolean; note: string };
         [cols]="cols()"
         [displayedColumns]="displayedColumns()"
         [createRow]="createRow"
+        [appearance]="appearance()"
         [expandedTmpl]="detail"
         [customColTmpls]="{ custom: custom }" />
     </div>
@@ -43,6 +44,7 @@ type Row = { seq: number; name: string; selected: boolean; note: string };
   `,
 })
 class TableHost {
+  readonly appearance = signal<'default' | 'outlined'>('default');
   readonly createRow = (data: Partial<Row> = {}): Row => ({
     seq: 0,
     name: '',
@@ -99,6 +101,23 @@ describe('GenericTableComponent with Signal Forms', () => {
     await fixture.whenStable();
     expect(host.model()[0]).toMatchObject({ name: 'edited', note: 'detail' });
     expect(host.fields().dirty()).toBe(true);
+  });
+
+  it('切換表格外觀後仍使用新增圖示，並保留停用與資料新增行為', async () => {
+    const page: HTMLElement = fixture.nativeElement;
+    expect(page.querySelector('.table-add mat-icon')).not.toBeNull();
+    host.appearance.set('outlined');
+    await fixture.whenStable();
+    expect(page.querySelector('.table-add mat-icon')?.textContent).toBe('add');
+    const add = page.querySelector<HTMLButtonElement>('.table-add')!;
+    expect(add.textContent?.trim()).toBe('add');
+    expect(add.getAttribute('aria-label')).toBe('g.add');
+    add.click();
+    await fixture.whenStable();
+    expect(host.model()).toHaveLength(3);
+    host.locked.set(true);
+    await fixture.whenStable();
+    expect(add.disabled).toBe(true);
   });
 
   it('keeps values, sequence, radio exclusivity and validation correct after add, move and delete', async () => {

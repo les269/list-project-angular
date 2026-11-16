@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -10,26 +9,20 @@ import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import {
   disabled,
   form,
-  FormField,
   min,
   required,
   validate,
 } from '@angular/forms/signals';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatIconModule } from '@angular/material/icon';
-import { MatListModule } from '@angular/material/list';
-import { MatTableModule } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { EMPTY, filter, finalize, map, switchMap, tap } from 'rxjs';
-import { FormInvalidsComponent } from '../../../../core/components/form-invalids/form-invalids.component';
-import { FormAlert } from '../../../../core/model';
+import { SignalFieldComponent } from '../../../../core/components/signal-field/signal-field.component';
+import { EditMode } from '../../../../core/model/global.model';
+import { SignalFieldType } from '../../../../core/model/signal-field.model';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { LayoutStore } from '../../../../core/stores/layout.store';
 import { getHeaderId, isNotBlank } from '../../../../shared/util/helper';
 import { patchField } from '../../../../shared/util/signal-form';
-import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 import { ThemeCustomTableComponent } from '../../components/theme-custom-table/theme-custom-table.component';
 import { ThemeDatasetTableComponent } from '../../components/theme-dataset-table/theme-dataset-table.component';
 import { ThemeImageComponent } from '../../components/theme-image/theme-image.component';
@@ -37,23 +30,12 @@ import { ThemeLabelTableComponent } from '../../components/theme-label-table/the
 import { ThemeOtherSettingComponent } from '../../components/theme-other-setting/theme-other-setting.component';
 import { ThemeTagTableComponent } from '../../components/theme-tag-table/theme-tag-table.component';
 import { ThemeTopCustomTableComponent } from '../../components/theme-top-custom-table/theme-top-custom-table.component';
-import {
-  ThemeEditMode,
-  ThemeHeader,
-  ThemeHeaderType,
-  ThemeItemType,
-} from '../../models';
+import { ThemeHeader, ThemeHeaderType, ThemeItemType } from '../../models';
 import { ThemeItemService } from '../../services';
 import { ThemeService } from '../../services/theme.service';
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    MatTableModule,
-    MatIconModule,
-    MatButtonModule,
-    MatCheckboxModule,
-    CommonModule,
-    MatListModule,
     TranslatePipe,
     ThemeLabelTableComponent,
     ThemeDatasetTableComponent,
@@ -62,9 +44,7 @@ import { ThemeService } from '../../services/theme.service';
     ThemeTopCustomTableComponent,
     ThemeCustomTableComponent,
     ThemeImageComponent,
-    FormInvalidsComponent,
-    TrimOnBlurDirective,
-    FormField,
+    SignalFieldComponent,
   ],
   selector: 'app-theme-edit',
   templateUrl: 'theme-edit.component.html',
@@ -76,21 +56,24 @@ export class ThemeEditComponent {
   readonly route = inject(ActivatedRoute);
   readonly themeService = inject(ThemeService);
   readonly snackbarService = inject(SnackbarService);
-  readonly translateService = inject(TranslateService);
   readonly themeItemService = inject(ThemeItemService);
   readonly layoutStore = inject(LayoutStore);
 
   // 列舉
-  readonly eThemeEditMode = ThemeEditMode;
   readonly eThemeHeaderType = ThemeHeaderType;
+  readonly fieldType = SignalFieldType;
+  readonly themeTypeOptions = Object.values(ThemeHeaderType).map(value => ({
+    value,
+    label: `themeHeader.${value}`,
+  }));
 
   // 頁面狀態
   readonly isSaving = signal(false);
-  readonly status = signal(ThemeEditMode.create);
-  readonly isEditMode = computed(() => this.status() === ThemeEditMode.edit);
+  readonly status = signal<EditMode>(EditMode.CREATE);
+  readonly isEditMode = computed(() => this.status() === EditMode.EDIT);
   readonly currentHeaderId = computed(() => {
     const req = this.themeReq();
-    if (this.status() !== ThemeEditMode.edit || !req) {
+    if (this.status() !== EditMode.EDIT || !req) {
       return '';
     }
     return getHeaderId(req.name, req.version, req.type);
@@ -152,14 +135,16 @@ export class ThemeEditComponent {
     disabled(p.name, { when: () => this.isEditMode() });
     disabled(p.version, { when: () => this.isEditMode() });
     disabled(p.type, { when: () => this.isEditMode() });
-    required(p.name);
-    required(p.version);
-    required(p.title);
-    required(p.type);
-    required(p.seq);
-    min(p.seq, 0);
+    required(p.name, { message: 'msg.required' });
+    required(p.version, { message: 'msg.required' });
+    required(p.title, { message: 'msg.required' });
+    required(p.type, { message: 'msg.required' });
+    required(p.seq, { message: 'msg.required' });
+    min(p.seq, 0, { message: 'msg.nonNegative' });
     validate(p.seq, ({ value }) =>
-      Number.isInteger(value()) ? undefined : { kind: 'pattern' }
+      Number.isInteger(value())
+        ? undefined
+        : { kind: 'pattern', message: 'msg.integer' }
     );
   });
 
@@ -181,7 +166,7 @@ export class ThemeEditComponent {
   readonly headerResource = rxResource({
     params: () => this.themeReq(),
     stream: ({ params }) => {
-      this.status.set(ThemeEditMode.edit);
+      this.status.set(EditMode.EDIT);
       return this.themeService.findTheme(params).pipe(
         tap(theme => {
           if (theme === null) {
@@ -192,43 +177,6 @@ export class ThemeEditComponent {
         })
       );
     },
-  });
-  private readonly validationMessages = toSignal(
-    this.translateService.stream([
-      'msg.required',
-      'msg.integer',
-      'msg.nonNegative',
-    ]),
-    {
-      initialValue: this.translateService.instant([
-        'msg.required',
-        'msg.integer',
-        'msg.nonNegative',
-      ]),
-    }
-  );
-  readonly formAlertsObj = computed(() => {
-    const messages = this.validationMessages();
-    const required = {
-      errorId: 'required',
-      msg: messages['msg.required'],
-    };
-    return {
-      name: [required],
-      version: [required],
-      title: [required],
-      seq: [
-        required,
-        {
-          errorId: 'pattern',
-          msg: messages['msg.integer'],
-        },
-        {
-          errorId: 'min',
-          msg: messages['msg.nonNegative'],
-        },
-      ],
-    } satisfies Record<string, FormAlert[]>;
   });
 
   onBack() {
@@ -249,11 +197,11 @@ export class ThemeEditComponent {
       .existTheme(currentModel)
       .pipe(
         switchMap(exist => {
-          if (this.status() === ThemeEditMode.create && exist) {
+          if (this.status() === EditMode.CREATE && exist) {
             this.snackbarService.openI18N('msg.themeExist');
             return EMPTY;
           }
-          if (this.status() === ThemeEditMode.edit && !exist) {
+          if (this.status() === EditMode.EDIT && !exist) {
             this.snackbarService.openI18N('msg.themeNotExist');
             return EMPTY;
           }

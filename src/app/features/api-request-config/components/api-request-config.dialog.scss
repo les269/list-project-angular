@@ -1,0 +1,107 @@
+@use '../../../../styles/editor-dialog' as dialog;
+@use '@angular/material' as mat;
+
+@include dialog.layout;
+
+:host {
+  --app-editor-table-min-width: 560px;
+}
+
+.dialog-title {
+  padding: var(--app-space-4) var(--app-space-6);
+  font-size: var(--app-font-size-body);
+  line-height: 24px;
+}
+
+.dialog-content {
+  display: grid;
+  gap: var(--app-space-2);
+  padding: var(--app-space-3) var(--app-space-4);
+}
+
+.dialog-title + .dialog-content {
+  padding-top: var(--app-space-3);
+}
+
+.editor-fields,
+.field-row {
+  display: grid;
+  gap: var(--app-space-2);
+  min-width: 0;
+}
+
+app-signal-field {
+  min-width: 0;
+  gap: 0;
+}
+
+.field-hint {
+  margin: 0;
+  color: var(--app-text-secondary);
+  font-size: var(--app-font-size-sm);
+  line-height: var(--app-line-height-body);
+}
+
+.request-tabs {
+  @include mat.tabs-overrides(
+    (
+      container-height: 40px,
+      label-text-font: var(--app-font-family),
+      label-text-size: var(--app-font-size-sm),
+      label-text-weight: 400,
+      active-label-text-color: var(--app-primary),
+      inactive-label-text-color: var(--app-text-secondary),
+      active-indicator-color: var(--app-primary),
+    )
+  );
+
+  min-width: 0;
+}
+
+.tab-panel {
+  display: grid;
+  gap: var(--app-space-2);
+  min-width: 0;
+  padding: var(--app-space-2) var(--app-space-1);
+
+  > p {
+    margin: 0;
+  }
+}
+
+.body-toolbar,
+.binding-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--app-space-2);
+}
+
+.body-toolbar {
+  justify-content: space-between;
+}
+
+.body-label {
+  margin: 0;
+}
+
+.body-editor {
+  height: 240px;
+  border: 1px solid var(--app-border-strong);
+  border-radius: var(--app-radius-sm);
+  overflow: hidden;
+}
+
+.editor-options {
+  padding-top: var(--app-space-2);
+  border-top: 1px solid var(--app-border);
+}
+
+.save-error {
+  margin: 0;
+  padding: var(--app-space-2) var(--app-space-3);
+}
+
+.dialog-actions {
+  padding: var(--app-space-2) var(--app-space-4);
+}

@@ -18,9 +18,9 @@ import {
 } from '@angular/forms/signals';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { FormAlertsComponent } from '../../../../core/components/form-alerts/form-alerts.component';
+import { SignalFieldComponent } from '../../../../core/components/signal-field/signal-field.component';
 import { FormAlert } from '../../../../core/model';
 import { isBlank } from '../../../../shared/util/helper';
-import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 import {
   ThemeHeaderType,
   ThemeImageItem,
@@ -37,9 +37,10 @@ import { normalizeThemeItem } from '../../util/theme-item-form';
     FormField,
     FormAlertsComponent,
     ThemeItemManageComponent,
-    TrimOnBlurDirective,
+    SignalFieldComponent,
   ],
   templateUrl: './theme-image.component.html',
+  styleUrl: './theme-image.component.scss',
 })
 export class ThemeImageComponent {
   //inject

@@ -9,10 +9,10 @@ import {
   viewChild,
 } from '@angular/core';
 import { rxResource, takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -35,11 +35,11 @@ import { ApiRequestConfigService } from '../../service/api-request-config.servic
   styleUrl: './api-request-config-list.component.scss',
   imports: [
     DatePipe,
-    FormsModule,
     MatTableModule,
     MatSortModule,
     MatIconModule,
     MatButtonModule,
+    MatTooltipModule,
     TranslatePipe,
   ],
 })
@@ -60,6 +60,7 @@ export class ApiRequestConfigListComponent {
   ];
   readonly searchText = signal('');
   readonly deletingId = signal('');
+  readonly deleteFailed = signal(false);
   readonly requests = rxResource({
     stream: () => this.service.getAll(),
     defaultValue: [],
@@ -116,7 +117,8 @@ export class ApiRequestConfigListComponent {
         {
           data: item,
           width: '500px',
-          maxWidth: '96vw',
+          maxWidth: 'calc(100vw - 32px)',
+          maxHeight: 'calc(100dvh - 32px)',
         }
       )
       .afterClosed()
@@ -133,8 +135,8 @@ export class ApiRequestConfigListComponent {
       {
         data: item,
         width: '1200px',
-        maxWidth: '96vw',
-        maxHeight: '92vh',
+        maxWidth: 'calc(100vw - 32px)',
+        maxHeight: 'calc(100dvh - 32px)',
         autoFocus: false,
       }
     );
@@ -151,8 +153,8 @@ export class ApiRequestConfigListComponent {
             type,
           },
           width: '900px',
-          maxWidth: '96vw',
-          maxHeight: '92vh',
+          maxWidth: 'calc(100vw - 32px)',
+          maxHeight: 'calc(100dvh - 32px)',
         }
       )
       .afterClosed()
@@ -164,6 +166,7 @@ export class ApiRequestConfigListComponent {
 
   onDelete(item: ApiRequestConfig): void {
     if (this.deletingId()) return;
+    this.deleteFailed.set(false);
     this.deletingId.set(item.apiId);
     this.messageBox
       .openI18N('msg.sureDeleteApi')
@@ -177,6 +180,7 @@ export class ApiRequestConfigListComponent {
           this.snackbar.openI18N('msg.deleteSuccess');
           this.requests.reload();
         },
+        error: () => this.deleteFailed.set(true),
       });
   }
 }

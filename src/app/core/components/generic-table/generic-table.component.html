@@ -138,6 +138,7 @@
         <button
           type="button"
           mat-icon-button
+          class="table-delete"
           [disabled]="fields()().disabled()"
           [attr.aria-label]="
             ('g.delete' | translate) +
@@ -161,7 +162,7 @@
         <button
           type="button"
           mat-button
-          class="rounded"
+          class="rounded table-add"
           [disabled]="fields()().disabled()"
           [attr.aria-label]="'g.add' | translate"
           (click)="onAdd()">

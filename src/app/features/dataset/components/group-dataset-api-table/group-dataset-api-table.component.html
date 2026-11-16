@@ -1,8 +1,6 @@
-<div class="h4 fw-bold">{{ 'dataset.apiTable' | translate }}</div>
-<div class="card">
-  <app-generic-table
-    [fields]="fields()"
-    [cols]="cols()"
-    [displayedColumns]="displayedColumns"
-    [createRow]="createRow" />
-</div>
+<app-generic-table
+  appearance="outlined"
+  [fields]="fields()"
+  [cols]="cols()"
+  [displayedColumns]="displayedColumns"
+  [createRow]="createRow" />

@@ -8,7 +8,6 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
-import { TranslatePipe } from '@ngx-translate/core';
 import { GenericTableComponent } from '../../../../core/components/generic-table/generic-table.component';
 import {
   ChipSelectColumn,
@@ -26,7 +25,6 @@ import { GroupDatasetScrapy } from '../../model';
   imports: [
     MatTableModule,
     MatButtonModule,
-    TranslatePipe,
     MatIconModule,
     MatCheckboxModule,
     MatChipsModule,

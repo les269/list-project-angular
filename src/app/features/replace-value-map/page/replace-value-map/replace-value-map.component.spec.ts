@@ -26,9 +26,15 @@ async function setup() {
   }).compileComponents();
   const fixture = TestBed.createComponent(ReplaceValueMapComponent);
   const component = fixture.componentInstance;
-  component.searchName = 'test';
-  component.search();
-  fixture.detectChanges();
+  await fixture.whenStable();
+  const searchInput = fixture.nativeElement.querySelector(
+    '#replace-map-name'
+  ) as HTMLInputElement;
+  searchInput.value = 'test';
+  searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+  searchInput.dispatchEvent(
+    new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
+  );
   await fixture.whenStable();
   return { fixture, component, service };
 }
@@ -49,7 +55,6 @@ it('表格可載入與編輯，儲存立即讀取最新欄位值', async () => {
     map: { z: 'changed', a: 'first', m: 'middle' },
   });
   component.add();
-  fixture.detectChanges();
   await fixture.whenStable();
   expect(fixture.nativeElement.querySelectorAll('tr.mat-mdc-row').length).toBe(
     4
@@ -68,7 +73,6 @@ it('排序、分頁及篩選後，編輯與刪除仍對應原始列', async () =
   paginator.pageSize = 1;
   paginator.pageIndex = 1;
   paginator.page.emit({ pageIndex: 1, pageSize: 1, length: 3 });
-  fixture.detectChanges();
   await fixture.whenStable();
   const input = fixture.nativeElement.querySelector(
     'td.mat-column-replaceValue input'
@@ -78,12 +82,52 @@ it('排序、分頁及篩選後，編輯與刪除仍對應原始列', async () =
   input.dispatchEvent(new Event('input'));
   expect(component.dataSource.data[2].replaceValue).toBe('edited');
   component.applyFilter({ target: { value: 'edited' } } as unknown as Event);
-  fixture.detectChanges();
   await fixture.whenStable();
   fixture.nativeElement.querySelector('td.mat-column-other button').click();
   expect(component.dataSource.data.map(row => row.match)).toEqual(['z', 'a']);
   component.search();
-  fixture.detectChanges();
   await fixture.whenStable();
   expect(component.dataSource.data[2].replaceValue).toBe('middle');
+});
+
+it('篩選輸入及清除會回到第一頁，並保留完整的編輯資料', async () => {
+  const { fixture, component, service } = await setup();
+  const input: HTMLInputElement = fixture.nativeElement.querySelector(
+    '#replace-row-filter'
+  );
+  const clear: HTMLButtonElement = fixture.nativeElement.querySelector(
+    '.filter-controls button'
+  );
+  const paginator = component.paginator()!;
+  expect(clear.disabled).toBe(true);
+  paginator.pageSize = 1;
+  paginator.pageIndex = 2;
+  paginator.page.emit({ pageIndex: 2, pageSize: 1, length: 3 });
+  await fixture.whenStable();
+
+  input.value = ' LAST ';
+  input.dispatchEvent(new Event('input', { bubbles: true }));
+  await fixture.whenStable();
+  expect(component.dataSource.filteredData).toEqual([
+    { match: 'z', replaceValue: 'last' },
+  ]);
+  expect(paginator.pageIndex).toBe(0);
+  expect(clear.disabled).toBe(false);
+
+  input.value = 'missing';
+  input.dispatchEvent(new Event('input', { bubbles: true }));
+  await fixture.whenStable();
+  expect(component.dataSource.filteredData).toEqual([]);
+  expect(
+    fixture.nativeElement.querySelector('.empty-state')?.textContent
+  ).toContain('g.noData');
+
+  clear.click();
+  await fixture.whenStable();
+  expect(input.value).toBe('');
+  expect(clear.disabled).toBe(true);
+  expect(component.dataSource.filteredData).toHaveLength(3);
+  expect(component.dataSource.data).toHaveLength(3);
+  expect(paginator.pageIndex).toBe(0);
+  expect(service.getByName).toHaveBeenCalledTimes(1);
 });

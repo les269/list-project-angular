@@ -61,14 +61,14 @@ async function setup(enabled = true) {
 describe('API 執行畫面', () => {
   it('使用 JSON Editor 輸入參數，Headers 與 Body 分別唯讀顯示', async () => {
     const { fixture, component, dialog } = await setup();
-    const editors = fixture.debugElement
-      .queryAll(By.directive(TestCodeEditor))
-      .map(element => element.componentInstance as TestCodeEditor);
-    expect(editors).toHaveLength(3);
-    expect(editors[0].value()).toBe('{}');
-    expect(editors[0].language()).toBe('json');
+    const parametersEditor: TestCodeEditor = fixture.debugElement.query(
+      By.directive(TestCodeEditor)
+    ).componentInstance;
+    expect(fixture.nativeElement.querySelector('.response-grid')).toBeNull();
+    expect(parametersEditor.value()).toBe('{}');
+    expect(parametersEditor.language()).toBe('json');
     const parameters = '{"id":123,"template":"{{$.id}}"}';
-    editors[0].value.set(parameters);
+    parametersEditor.value.set(parameters);
     component.result.set({
       status: 200,
       headers: '{"content-type":["text/html"]}',
@@ -76,6 +76,10 @@ describe('API 執行畫面', () => {
       bodyLanguage: '',
     });
     await fixture.whenStable();
+    const editors = fixture.debugElement
+      .queryAll(By.directive(TestCodeEditor))
+      .map(element => element.componentInstance as TestCodeEditor);
+    expect(editors).toHaveLength(3);
     expect(component.valueModel().parameters).toBe(parameters);
     expect(component.valueForm().valid()).toBe(true);
     expect(editors[1].readonly()).toBe(true);

@@ -1,27 +1,41 @@
-.expanded {
-  display: flex;
-  justify-content: center;
-  > .content {
-    margin: 0px 36px;
-    width: 100%;
-    max-width: 1080px;
-    padding-top: 48px;
-    > .text-container {
-      width: 100%;
-      display: flex;
-      align-items: start;
-      padding-bottom: 24px;
-    }
+@use '../../styles/settings-list-page';
+
+@include settings-list-page.layout($table-min-width: 1120px);
+
+.current-database {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: var(--app-space-4);
+  margin: 0 0 var(--app-space-6);
+  padding: var(--app-space-4);
+  background-color: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-lg);
+
+  dt {
+    color: var(--app-text-secondary);
+    font-size: var(--app-font-size-caption);
+    font-weight: 400;
   }
-  > .card {
-    display: flex;
-    > table {
-      width: 100%;
-    }
+
+  dd {
+    margin: var(--app-space-2) 0 0;
+    color: var(--app-text-primary);
+    font-size: var(--app-font-size-sm);
+    overflow-wrap: anywhere;
   }
 }
 
-.mat-row > td,
-.mat-header-row > th {
-  border-bottom: solid #ccc 1px;
+.section-title {
+  margin: 0 0 var(--app-space-4);
+  font-size: var(--app-font-size-body);
+  font-weight: 400;
+}
+
+.mat-column-configId,
+.mat-column-configName,
+.mat-column-description {
+  min-width: 140px;
+  max-width: 280px;
+  overflow-wrap: anywhere;
 }

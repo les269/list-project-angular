@@ -1,14 +1,9 @@
-import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
+import { Component, inject } from '@angular/core';
 import {
   MAT_DIALOG_DATA,
-  MatDialog,
   MatDialogActions,
-  MatDialogClose,
   MatDialogContent,
   MatDialogRef,
-  MatDialogTitle,
 } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
 
@@ -18,16 +13,10 @@ export interface MessageBoxData {
 }
 
 @Component({
-  imports: [
-    MatButtonModule,
-    MatDialogActions,
-    MatDialogClose,
-    MatDialogContent,
-    TranslatePipe,
-    CommonModule,
-  ],
+  imports: [MatDialogActions, MatDialogContent, TranslatePipe],
   selector: 'app-message-box',
   templateUrl: './message-box.component.html',
+  styleUrl: './message-box.component.scss',
 })
 export class MessageBoxComponent {
   readonly dialogRef = inject(MatDialogRef<MessageBoxComponent>);

@@ -11,25 +11,24 @@ import { FieldTree, FormField } from '@angular/forms/signals';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { EMPTY, finalize, Observable, switchMap, tap } from 'rxjs';
+import { EditMode } from '../../../../core/model/global.model';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { isBlank, isNotBlank } from '../../../../shared/util/helper';
 import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
-import {
-  ThemeItem,
-  ThemeItemMap,
-  ThemeItemType,
-  ThemeTableEditMode,
-} from '../../models';
+import { ThemeItem, ThemeItemMap, ThemeItemType } from '../../models';
 import { ThemeItemMapService, ThemeItemService } from '../../services';
 import { normalizeThemeItem } from '../../util/theme-item-form';
 import { CopyThemeItemComponent } from '../copy-theme-item/copy-theme-item.component';
+
+let nextManagerId = 0;
 
 @Component({
   selector: 'app-theme-item-manage',
   imports: [TranslatePipe, TrimOnBlurDirective, FormField],
   templateUrl: './theme-item-manage.component.html',
+  styleUrl: './theme-item-manage.component.scss',
 })
 export class ThemeItemManageComponent {
   readonly messageBoxService = inject(MessageBoxService);
@@ -39,6 +38,8 @@ export class ThemeItemManageComponent {
   readonly snackbarService = inject(SnackbarService);
   readonly dialog = inject(MatDialog);
   readonly translate = inject(TranslateService);
+
+  readonly controlId = `theme-item-${++nextManagerId}`;
 
   // 輸入參數
   readonly headerId = input<string>();
@@ -50,10 +51,10 @@ export class ThemeItemManageComponent {
   readonly afterSave = output<ThemeItem>();
 
   // 元件狀態
-  readonly mode = linkedSignal(() =>
-    this.defaultBinding() ? ThemeTableEditMode.EDIT : ThemeTableEditMode.NEW
+  readonly mode = linkedSignal<EditMode>(() =>
+    this.defaultBinding() ? EditMode.EDIT : EditMode.CREATE
   );
-  readonly isEditMode = computed(() => this.mode() === ThemeTableEditMode.EDIT);
+  readonly isEditMode = computed(() => this.mode() === EditMode.EDIT);
   readonly isBinding = linkedSignal<boolean>(() => this.defaultBinding());
   readonly showBindButton = computed(
     () => this.isEditMode() && isNotBlank(this.headerId() ?? '')
@@ -121,7 +122,7 @@ export class ThemeItemManageComponent {
         ),
       item => {
         this.form()().reset(normalizeThemeItem(item, this.resetValue()));
-        this.mode.set(ThemeTableEditMode.EDIT);
+        this.mode.set(EditMode.EDIT);
       }
     );
   }
@@ -167,7 +168,7 @@ export class ThemeItemManageComponent {
     return this.themeItemService.updateThemeItem(req).pipe(
       tap(() => {
         this.afterSave.emit(req);
-        this.mode.set(ThemeTableEditMode.EDIT);
+        this.mode.set(EditMode.EDIT);
         this.snackbarService.openI18N('msg.saveSuccess');
       })
     );
@@ -180,7 +181,7 @@ export class ThemeItemManageComponent {
         if (!result) {
           return;
         }
-        this.mode.set(ThemeTableEditMode.NEW);
+        this.mode.set(EditMode.CREATE);
         const form = this.form();
         form().reset(structuredClone(this.resetValue()));
       }
@@ -241,7 +242,7 @@ export class ThemeItemManageComponent {
       () => {
         fields.itemId().value.set('');
         fields.description().value.set('');
-        this.mode.set(ThemeTableEditMode.NEW);
+        this.mode.set(EditMode.CREATE);
         this.snackbarService.openI18N('msg.deleteSuccess');
       }
     );
@@ -252,6 +253,9 @@ export class ThemeItemManageComponent {
     const fields = this.form();
     const itemId = fields.itemId().value().trim();
     this.dialog.open(CopyThemeItemComponent, {
+      width: '560px',
+      maxWidth: 'calc(100vw - 32px)',
+      autoFocus: 'input:not([readonly])',
       data: {
         sourceItemId: itemId,
         type: this.type(),

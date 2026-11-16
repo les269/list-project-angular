@@ -1,9 +1,12 @@
-<div class="title">{{ 'title.setting' | translate }}</div>
-<div>
-  @for (item of routes; track $index) {
-    <app-setting-link
-      [text]="item.text | translate"
-      [link]="item.link"
-      [active]="router.url === item.link"></app-setting-link>
+<nav class="settings-links" [attr.aria-label]="'title.setting' | translate">
+  @for (item of routes; track item.link) {
+    <a
+      class="settings-link"
+      [routerLink]="item.link"
+      routerLinkActive="settings-link-active"
+      [routerLinkActiveOptions]="matchOptions"
+      ariaCurrentWhenActive="page">
+      {{ item.text | translate }}
+    </a>
   }
-</div>
+</nav>

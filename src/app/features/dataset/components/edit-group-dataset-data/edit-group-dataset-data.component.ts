@@ -1,7 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { disabled, form, FormField } from '@angular/forms/signals';
 
-import { MatButtonModule } from '@angular/material/button';
 import {
   MatChipEditedEvent,
   MatChipInputEvent,
@@ -15,10 +14,10 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { EMPTY, filter, switchMap, tap } from 'rxjs';
+import { SignalFieldComponent } from '../../../../core/components/signal-field/signal-field.component';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -37,12 +36,14 @@ export interface EditGroupDatasetDataType {
   groupName: string;
   primeValue: string;
 }
+let nextEditorId = 0;
+
 @Component({
   selector: 'app-edit-group-dataset-data',
 
   imports: [
     FormField,
-    MatButtonModule,
+    SignalFieldComponent,
     MatDialogActions,
     MatDialogClose,
     MatDialogTitle,
@@ -50,14 +51,15 @@ export interface EditGroupDatasetDataType {
     TranslatePipe,
     MatIconModule,
     MatChipsModule,
-    MatFormFieldModule,
     TrimOnBlurDirective,
   ],
   templateUrl: './edit-group-dataset-data.component.html',
+  styleUrl: './edit-group-dataset-data.component.scss',
 })
 export class EditGroupDatasetDataComponent implements OnInit {
   readonly dialogRef = inject(MatDialogRef<EditGroupDatasetDataComponent>);
   readonly data = inject<EditGroupDatasetDataType>(MAT_DIALOG_DATA);
+  readonly controlId = `group-data-${++nextEditorId}`;
   readonly groupNameModel = signal(this.data.groupName);
   readonly groupNameForm = form(this.groupNameModel, p => disabled(p));
   get groupName() {
@@ -74,7 +76,9 @@ export class EditGroupDatasetDataComponent implements OnInit {
   set primeValue(value) {
     this.primeValueModel.set(value);
   }
-  groupDatasetConfig!: GroupDatasetConfig;
+  readonly groupDatasetConfig = signal<GroupDatasetConfig | undefined>(
+    undefined
+  );
   readonly jsonModel = signal<Record<string, any>>({});
   readonly jsonForm = form(this.jsonModel);
   get json() {
@@ -83,7 +87,6 @@ export class EditGroupDatasetDataComponent implements OnInit {
   set json(value: Record<string, any>) {
     this.jsonModel.set(value);
   }
-  scrapySize: { [key in string]: number } = {};
   readonly scrapyInputModel = signal<{
     [key in string]: { url: string; json: string[] };
   }>({});
@@ -104,7 +107,7 @@ export class EditGroupDatasetDataComponent implements OnInit {
   private readonly translateService = inject(TranslateService);
   ngOnInit(): void {
     this.groupDatasetService.getGroupDataset(this.groupName).subscribe(res => {
-      this.groupDatasetConfig = res.config;
+      this.groupDatasetConfig.set(res.config);
       for (var field of res.config.groupDatasetFieldList) {
         if (field.type === 'string') {
           this.json = { ...this.json, [field.key]: '' };
@@ -177,13 +180,16 @@ export class EditGroupDatasetDataComponent implements OnInit {
   }
 
   getScrapyList() {
-    var nameList = this.groupDatasetConfig.groupDatasetScrapyList
+    const config = this.groupDatasetConfig();
+    if (!config) {
+      return;
+    }
+    var nameList = config.groupDatasetScrapyList
       .filter(x => x.visibleJson || x.visibleUrl)
       .map(x => x.name);
     if (nameList && nameList.length > 0) {
       this.scrapyService.getByNameList(nameList).subscribe(res => {
         for (var x of res) {
-          this.scrapySize[x.name] = x.paramSize;
           this.scrapyInput = {
             ...this.scrapyInput,
             [x.name]: {
@@ -195,7 +201,6 @@ export class EditGroupDatasetDataComponent implements OnInit {
       });
     }
   }
-
   selectPrimeValue() {
     this.groupDatasetDataService
       .getAllGroupDatasetDataOnlyPrimeValue(this.groupName)
@@ -240,9 +245,13 @@ export class EditGroupDatasetDataComponent implements OnInit {
   }
 
   onUpdate(): void {
+    const config = this.groupDatasetConfig();
+    if (!config) {
+      return;
+    }
     var req: GroupDatasetData = {
       groupName: this.groupName,
-      primeValue: this.json[this.groupDatasetConfig.byKey],
+      primeValue: this.json[config.byKey],
       json: this.json,
     };
     this.groupDatasetDataService.updateGroupDatasetData(req).subscribe(() => {
@@ -305,7 +314,11 @@ export class EditGroupDatasetDataComponent implements OnInit {
   }
 
   clearField() {
-    for (var field of this.groupDatasetConfig.groupDatasetFieldList) {
+    const config = this.groupDatasetConfig();
+    if (!config) {
+      return;
+    }
+    for (var field of config.groupDatasetFieldList) {
       if (field.type === 'string') {
         this.json = { ...this.json, [field.key]: '' };
       } else if (field.type === 'stringArray') {

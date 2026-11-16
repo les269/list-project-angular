@@ -1,109 +1,159 @@
-<div class="col-md-10 offset-md-1 col-xs-12">
-  <div class="input-group my-2 w-50">
-    <label class="input-group-text">{{
-      'replaceValueMap.searchName' | translate
-    }}</label>
-    <input
-      class="form-control"
-      #searchNameInput
-      [value]="searchName"
-      (input)="searchName = searchNameInput.value"
-      (keydown.enter)="search()" />
-    <button
-      class="btn btn-outline-secondary d-flex"
-      type="button"
-      (click)="selectMap()">
-      <mat-icon>content_copy</mat-icon>
-    </button>
-    <button class="btn btn-outline-secondary" type="button" (click)="search()">
-      {{ 'g.search' | translate }}
-    </button>
-  </div>
-  <div class="d-flex">
-    <input
-      type="file"
-      accept=".json"
-      (change)="onFileSelected($event)"
-      hidden
-      #fileInput />
-    <button class="btn btn-outline-primary d-flex" (click)="fileInput.click()">
-      {{ 'g.importJson' | translate }}
-    </button>
-    <button class="btn btn-outline-primary d-flex" (click)="export()">
-      {{ 'g.export' | translate }}
-    </button>
-  </div>
-  <div class="d-flex justify-content-between">
-    <div class="d-flex gap-2">
-      <button
-        type="button"
-        class="btn btn-outline-primary d-flex"
-        (click)="add()">
-        {{ 'replaceValueMap.add' | translate }}
-      </button>
-      <button
-        type="button"
-        class="btn btn-outline-primary d-flex"
-        (click)="swap()"
-        [disabled]="dataSource.data.length === 0">
-        {{ 'replaceValueMap.swap' | translate }}
-      </button>
+<main class="management-page">
+  <div class="map-lookup">
+    <div class="name-field">
+      <label class="field-label" for="replace-map-name">{{
+        'replaceValueMap.searchName' | translate
+      }}</label>
+      <input
+        id="replace-map-name"
+        class="form-control"
+        #searchNameInput
+        [value]="searchName()"
+        (input)="searchName.set(searchNameInput.value)"
+        (keydown.enter)="search()" />
     </div>
-    <div class="d-flex">
-      <button class="btn btn-outline-primary d-flex" (click)="delete()">
+    <div class="action-group">
+      <button type="button" class="page-button" (click)="selectMap()">
+        {{ 'replaceValueMap.selectMap' | translate }}
+      </button>
+      <button type="button" class="page-button" (click)="search()">
+        {{ 'g.search' | translate }}
+      </button>
+      <button
+        type="button"
+        class="page-button page-button-danger"
+        (click)="delete()">
         {{ 'g.delete' | translate }}
       </button>
-      <button class="btn btn-outline-primary d-flex" (click)="update()">
+      <button
+        type="button"
+        class="page-button page-button-primary"
+        (click)="update()">
         {{ 'g.update' | translate }}
       </button>
     </div>
   </div>
-  <div class="input-group mt-2">
-    <input class="form-control" (keyup)="applyFilter($event)" />
+
+  <input
+    type="file"
+    accept=".json"
+    (change)="onFileSelected($event)"
+    hidden
+    #fileInput />
+  <div class="page-actions">
+    <div class="action-group">
+      <button type="button" class="page-button" (click)="add()">
+        {{ 'replaceValueMap.add' | translate }}
+      </button>
+      <button
+        type="button"
+        class="page-button"
+        (click)="swap()"
+        [disabled]="dataSource.data.length === 0">
+        {{ 'replaceValueMap.swap' | translate }}
+      </button>
+      <button type="button" class="page-button" (click)="fileInput.click()">
+        {{ 'g.importJson' | translate }}
+      </button>
+      <button type="button" class="page-button" (click)="export()">
+        {{ 'g.export' | translate }}
+      </button>
+    </div>
+    <div class="filter-controls">
+      <input
+        id="replace-row-filter"
+        type="search"
+        class="filter-input"
+        [attr.aria-label]="'replaceValueMap.filterPlaceholder' | translate"
+        [placeholder]="'replaceValueMap.filterPlaceholder' | translate"
+        [value]="filterValue()"
+        (input)="applyFilter($event)" />
+      <button
+        type="button"
+        class="page-button"
+        [disabled]="!filterValue()"
+        (click)="clearFilter()">
+        {{ 'g.clear' | translate }}
+      </button>
+    </div>
   </div>
 
-  <mat-paginator
-    class="mat-paginator"
-    [pageSizeOptions]="[25, 50, 100, 300, 500]"
-    [showFirstLastButtons]="true"></mat-paginator>
-  <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort>
-    <ng-container matColumnDef="match">
-      <th mat-header-cell *matHeaderCellDef [mat-sort-header]="'match'">
-        {{ 'replaceValueMap.match' | translate }}
-      </th>
-      <td mat-cell *matCellDef="let element">
-        <input
-          class="form-control"
-          #matchInput
-          [value]="element.match"
-          (input)="element.match = matchInput.value" />
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="replaceValue">
-      <th mat-header-cell *matHeaderCellDef [mat-sort-header]="'replaceValue'">
-        {{ 'replaceValueMap.replaceValue' | translate }}
-      </th>
-      <td mat-cell *matCellDef="let element">
-        <input
-          class="form-control"
-          #replaceValueInput
-          [value]="element.replaceValue"
-          (input)="element.replaceValue = replaceValueInput.value" />
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="other">
-      <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
-      <td mat-cell *matCellDef="let element; let i = dataIndex">
-        <div class="row flex-nowrap">
-          <button mat-icon-button (click)="onDelete(element)">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
-      </td>
-    </ng-container>
+  <div class="table-panel">
+    <mat-paginator
+      [pageSizeOptions]="[25, 50, 100, 300, 500]"
+      [showFirstLastButtons]="true"></mat-paginator>
+    <div
+      class="table-container scrollbar-primary"
+      role="region"
+      tabindex="0"
+      [attr.aria-label]="'title.replaceValueMap' | translate">
+      <table
+        mat-table
+        [dataSource]="dataSource"
+        [attr.aria-label]="'title.replaceValueMap' | translate"
+        multiTemplateDataRows
+        matSort>
+        <ng-container matColumnDef="match">
+          <th mat-header-cell *matHeaderCellDef [mat-sort-header]="'match'">
+            {{ 'replaceValueMap.match' | translate }}
+          </th>
+          <td mat-cell *matCellDef="let element">
+            <input
+              class="cell-input"
+              [attr.aria-label]="'replaceValueMap.match' | translate"
+              #matchInput
+              [value]="element.match"
+              (input)="element.match = matchInput.value" />
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="replaceValue">
+          <th
+            mat-header-cell
+            *matHeaderCellDef
+            [mat-sort-header]="'replaceValue'">
+            {{ 'replaceValueMap.replaceValue' | translate }}
+          </th>
+          <td mat-cell *matCellDef="let element">
+            <input
+              class="cell-input"
+              [attr.aria-label]="'replaceValueMap.replaceValue' | translate"
+              #replaceValueInput
+              [value]="element.replaceValue"
+              (input)="element.replaceValue = replaceValueInput.value" />
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="other">
+          <th mat-header-cell *matHeaderCellDef>
+            {{ 'g.actions' | translate }}
+          </th>
+          <td mat-cell *matCellDef="let element">
+            <div class="row-actions">
+              <button
+                type="button"
+                mat-icon-button
+                class="row-action row-action-danger"
+                [attr.aria-label]="
+                  ('g.delete' | translate) + ' ' + element.match
+                "
+                [matTooltip]="'g.delete' | translate"
+                (click)="onDelete(element)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-  </table>
-</div>
+        <tr
+          mat-header-row
+          *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        <tr *matNoDataRow>
+          <td class="empty-state" [attr.colspan]="displayedColumns.length">
+            {{ 'g.noData' | translate }}
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</main>
 <app-scrollTop></app-scrollTop>

@@ -1,8 +1,13 @@
-import { Component, computed, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from '@angular/core';
 import { ThemeHeader, ThemeHeaderType } from '../../models';
-import { CommonModule } from '@angular/common';
+import { KeyValuePipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ThemeService } from '../../services/theme.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -14,8 +19,9 @@ import { CopyThemeComponent } from '../../components/copy-theme/copy-theme.compo
 import { LayoutStore } from '../../../../core/stores/layout.store';
 
 @Component({
-  imports: [CommonModule, TranslatePipe],
+  imports: [KeyValuePipe, RouterLink, TranslatePipe],
   selector: 'app-theme-list',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'theme-list.component.html',
   styleUrls: ['theme-list.component.scss'],
 })
@@ -26,9 +32,9 @@ export class ThemeListComponent {
   readonly matDialog = inject(MatDialog);
   readonly messageBoxService = inject(MessageBoxService);
   readonly layoutStore = inject(LayoutStore);
-  readonly list = computed(() => this.layoutStore.visibleList());
 
-  eThemeHeaderType = ThemeHeaderType;
+  readonly eThemeHeaderType = ThemeHeaderType;
+  readonly list = computed(() => this.layoutStore.visibleList());
 
   routeCreate() {
     this.router.navigate(['theme-edit']);
@@ -43,6 +49,9 @@ export class ThemeListComponent {
   onCopy(item: ThemeHeader) {
     this.matDialog
       .open(CopyThemeComponent, {
+        width: '560px',
+        maxWidth: 'calc(100vw - 32px)',
+        autoFocus: 'input:not([readonly])',
         data: { themeHeader: item },
       })
       .afterClosed()
@@ -64,12 +73,6 @@ export class ThemeListComponent {
     });
   }
 
-  navigateList(item: ThemeHeader) {
-    this.router.navigate([item.type, item.name, item.version], {
-      queryParams: this.layoutStore.getQueryParamsByHeader(item),
-    });
-  }
-
   onOpenVisible() {
     this.matDialog.open(ThemeVisibleComponent);
   }
@@ -77,8 +80,8 @@ export class ThemeListComponent {
   onShareTagConfig() {
     this.matDialog.open(ShareTagListComponent, {
       width: '800px',
-      maxWidth: '800px',
-      height: '600px',
+      maxWidth: 'calc(100vw - 32px)',
+      maxHeight: '92vh',
     });
   }
 }
