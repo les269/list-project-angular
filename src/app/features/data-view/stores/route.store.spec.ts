@@ -180,6 +180,23 @@ async function setup(url = query(3)) {
   };
 }
 
+it('搜尋後瀏覽器返回不會額外強制捲到頂端', async () => {
+  const { harness, view, history } = await setup();
+  view.routeStore.searchValue.set('target');
+  view.routeStore.patchQuery({ type: QueryActionType.search });
+  await harness.fixture.whenStable();
+  await new Promise(resolve => setTimeout(resolve, 0));
+
+  vi.mocked(window.scrollTo).mockClear();
+  await history('back');
+  await new Promise(resolve => setTimeout(resolve, 0));
+  expect(view.routeStore.queryParamsSearchValue()).toBe('');
+  expect(window.scrollTo).not.toHaveBeenCalledWith({
+    top: 0,
+    behavior: 'smooth',
+  });
+});
+
 it('從第三頁搜尋到一頁結果只導覽一次，上一頁與下一頁可還原查詢及頁碼', async () => {
   const { harness, view, router, history } = await setup();
   const previousData = view.filterStore.viewData();

@@ -77,12 +77,6 @@ export class ImageListViewComponent {
   fixedImage = viewChild<FixedImageComponent>('fixedImage');
 
   constructor() {
-    // 監聽路由變化並滾動到頂部
-    effect(() => {
-      this.store.queryParamMap();
-      setTimeout(() => this.toTop());
-    });
-
     // 驗證必要的 headerId
     effect(() => {
       if (isBlank(this.store.headerId())) {
