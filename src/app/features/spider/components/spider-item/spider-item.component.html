@@ -1,248 +1,247 @@
-<div>
-  <div class="input-group my-2">
-    <label class="input-group-text">{{
-      'spider.spiderItemId' | translate
-    }}</label>
-    <input
-      class="form-control"
-      [formField]="spiderItemId"
-      [class.is-invalid]="spiderItemId().invalid() && spiderItemId().touched()"
-      trimOnBlur />
-    @if (spiderItemId().invalid() && spiderItemId().touched()) {
-      <div class="invalid-feedback d-block">
-        @if (hasError(spiderItemId, 'required')) {
-          {{
-            'msg.blank'
-              | translate: { name: ('spider.spiderItemId' | translate) }
-          }}
-        }
-      </div>
-    }
-  </div>
-  <div class="input-group my-2">
-    <label class="input-group-text">{{ 'g.description' | translate }}</label>
-    <input class="form-control" [formField]="description" trimOnBlur />
-  </div>
-  <div class="input-group my-2">
-    <label class="input-group-text">{{
-      'spider.urlType.name' | translate
-    }}</label>
-    <select class="form-control form-select" [formField]="urlType">
-      @for (urlType of eUrlType | keyvalue; track urlType) {
-        <option [value]="urlType.key">
-          {{ 'spider.urlType.' + urlType.key | translate }}
-        </option>
+<div class="item-editor">
+  <section
+    class="editor-section"
+    [attr.aria-label]="'spider.basicSettings' | translate">
+    <h4 class="section-title">{{ 'spider.basicSettings' | translate }}</h4>
+    <div class="section-body">
+      <app-signal-field
+        [field]="spiderItemId"
+        label="spider.spiderItemId"
+        [trim]="true" />
+      <app-signal-field
+        [field]="description"
+        label="g.description"
+        [trim]="true" />
+      <app-signal-field
+        [field]="urlType"
+        label="spider.urlType.name"
+        [type]="fieldType.SELECT"
+        [options]="urlTypeOptions" />
+      @if (modePrimeKey) {
+        <div
+          class="helper-text"
+          [innerHTML]="'spider.primeKeyPH' | translate"></div>
       }
-    </select>
-  </div>
-  @if (modePrimeKey) {
-    <label class="form-text"
-      ><div [innerHTML]="'spider.primeKeyPH' | translate"></div
-    ></label>
-  }
-  @if (modeParams) {
-    <label class="form-text"
-      ><div [innerHTML]="'spider.paramsPH' | translate"></div
-    ></label>
-  }
-  <div class="d-flex">
-    <mat-checkbox [formField]="skipWhenUsingUrl">{{
-      'spider.skipWhenUsingUrl' | translate
-    }}</mat-checkbox>
-  </div>
-  <div class="input-group my-2">
-    <label class="input-group-text">{{ 'spider.url' | translate }}</label>
-    <input class="form-control" [formField]="url" trimOnBlur />
-  </div>
+      @if (modeParams) {
+        <div
+          class="helper-text"
+          [innerHTML]="'spider.paramsPH' | translate"></div>
+      }
+      <mat-checkbox [formField]="skipWhenUsingUrl">{{
+        'spider.skipWhenUsingUrl' | translate
+      }}</mat-checkbox>
+      <app-signal-field [field]="url" label="spider.url" [trim]="true" />
+      <div class="button-row">
+        <button
+          type="button"
+          class="page-button"
+          (click)="onHeadersDialog()"
+          [disabled]="isProcessing()">
+          {{ 'spider.settingHeaders' | translate }}
+        </button>
+        <button
+          type="button"
+          class="page-button"
+          (click)="onCookiesDialog()"
+          [disabled]="isProcessing()">
+          {{ 'spider.settingCookies' | translate }}
+        </button>
+      </div>
+    </div>
+    <div class="section-actions">
+      <ng-container [ngTemplateOutlet]="buttonTmpl" />
+    </div>
+  </section>
 
-  <div class="d-flex gap-2">
-    <button
-      type="button"
-      class="btn btn-primary"
-      (click)="onHeadersDialog()"
-      [disabled]="isProcessing()">
-      {{ 'spider.settingHeaders' | translate }}
-    </button>
-    <button
-      type="button"
-      class="btn btn-primary"
-      (click)="onCookiesDialog()"
-      [disabled]="isProcessing()">
-      {{ 'spider.settingCookies' | translate }}
-    </button>
-  </div>
-  <ng-container [ngTemplateOutlet]="buttonTmpl"></ng-container>
   <app-extraction-rules
     [fields]="extractionRuleList"
     [mode]="extractionRuleMode"
     [showHelp]="true" />
-  <ng-container [ngTemplateOutlet]="buttonTmpl"></ng-container>
-  <div class="form-group mb-2">
-    @if (useSelector) {
-      <label>{{ 'spider.testHtml' | translate }}</label>
-      <app-signal-code-editor
-        [style.height]="'300px'"
-        [formField]="htmlData"
-        [language]="'html'"
-        [indentWithTab]="true" />
-      <button
-        type="button"
-        class="btn btn-primary"
-        (click)="onTestParse()"
-        [disabled]="isProcessing()">
-        {{ 'spider.test' | translate }}
-      </button>
-      <div class="my-2">
-        <div class="btn-group">
-          <button
-            type="button"
-            class="btn btn-outline-secondary"
-            (click)="htmlFile.click()"
-            [disabled]="isProcessing()">
-            {{ 'spider.uploadHtml' | translate }}
-          </button>
-          <button
-            type="button"
-            class="btn btn-primary"
-            (click)="onTestParseWithFile(selectedHtmlFile())"
-            [disabled]="!selectedHtmlFile() || isProcessing()">
-            {{ 'spider.test' | translate }}
-          </button>
-        </div>
-        <input
-          #htmlFile
-          class="d-none"
-          type="file"
-          (change)="onUpload($event, selectedHtmlFile)"
-          accept=".html,.htm" />
-
-        @if (selectedHtmlFile() !== null) {
-          <div class="text-success small mt-1">
-            {{ 'g.selectedFile' | translate }}:
-            <strong>{{ selectedHtmlFile()!.name }}</strong>
+  <section
+    class="editor-section"
+    [attr.aria-label]="'spider.testArea' | translate">
+    <h4 class="section-title">{{ 'spider.testArea' | translate }}</h4>
+    <div class="section-body">
+      @if (useSelector) {
+        <div
+          class="test-block"
+          role="group"
+          [attr.aria-label]="'spider.testHtml' | translate">
+          <span class="field-label">{{ 'spider.testHtml' | translate }}</span>
+          <app-signal-code-editor
+            [formField]="htmlData"
+            language="html"
+            [indentWithTab]="true" />
+          <div class="button-row">
+            <button
+              type="button"
+              class="page-button page-button-primary"
+              (click)="onTestParse()"
+              [disabled]="isProcessing()">
+              {{ 'spider.test' | translate }}
+            </button>
           </div>
-        }
-      </div>
-    }
-    @if (useJsonPath) {
-      <label>{{ 'spider.testJson' | translate }}</label>
-      <app-signal-code-editor
-        [style.height]="'300px'"
-        [formField]="jsonData"
-        [language]="'json'"
-        [indentWithTab]="true" />
-      <div class="my-2 btn-group">
-        <button
-          type="button"
-          class="btn btn-outline-secondary"
-          (click)="onFormatJson()"
-          [disabled]="isProcessing()">
-          {{ 'g.format' | translate }}
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary"
-          (click)="onTestParse()"
-          [disabled]="isProcessing()">
-          {{ 'spider.test' | translate }}
-        </button>
-      </div>
-      <div class="my-2">
-        <div class="btn-group">
-          <button
-            type="button"
-            class="btn btn-outline-secondary"
-            (click)="jsonFile.click()"
-            [disabled]="isProcessing()">
-            {{ 'spider.uploadJson' | translate }}
-          </button>
-          <button
-            type="button"
-            class="btn btn-primary"
-            (click)="onTestParseWithFile(selectedJsonFile())"
-            [disabled]="!selectedJsonFile() || isProcessing()">
-            {{ 'spider.test' | translate }}
-          </button>
-        </div>
-        <input
-          #jsonFile
-          class="d-none"
-          type="file"
-          (change)="onUpload($event, selectedJsonFile)"
-          accept=".json" />
-
-        @if (selectedJsonFile() !== null) {
-          <div class="text-success small mt-1">
-            已選擇檔案: <strong>{{ selectedJsonFile()!.name }}</strong>
+          <div class="file-test">
+            <div class="button-row">
+              <button
+                type="button"
+                class="page-button"
+                (click)="htmlFile.click()"
+                [disabled]="isProcessing()">
+                {{ 'spider.uploadHtml' | translate }}
+              </button>
+              <button
+                type="button"
+                class="page-button page-button-primary"
+                (click)="onTestParseWithFile(selectedHtmlFile())"
+                [disabled]="!selectedHtmlFile() || isProcessing()">
+                {{ 'spider.test' | translate }}
+              </button>
+            </div>
+            <input
+              #htmlFile
+              hidden
+              type="file"
+              (change)="onUpload($event, selectedHtmlFile)"
+              accept=".html,.htm" />
+            @if (selectedHtmlFile(); as file) {
+              <p class="helper-text" role="status">
+                {{ 'g.selectedFile' | translate }}: {{ file.name }}
+              </p>
+            }
           </div>
-        }
+        </div>
+      }
+      @if (useJsonPath) {
+        <div
+          class="test-block"
+          role="group"
+          [attr.aria-label]="'spider.testJson' | translate">
+          <span class="field-label">{{ 'spider.testJson' | translate }}</span>
+          <app-signal-code-editor
+            [formField]="jsonData"
+            language="json"
+            [indentWithTab]="true" />
+          <div class="button-row">
+            <button
+              type="button"
+              class="page-button"
+              (click)="onFormatJson()"
+              [disabled]="isProcessing()">
+              {{ 'g.format' | translate }}
+            </button>
+            <button
+              type="button"
+              class="page-button page-button-primary"
+              (click)="onTestParse()"
+              [disabled]="isProcessing()">
+              {{ 'spider.test' | translate }}
+            </button>
+          </div>
+          <div class="file-test">
+            <div class="button-row">
+              <button
+                type="button"
+                class="page-button"
+                (click)="jsonFile.click()"
+                [disabled]="isProcessing()">
+                {{ 'spider.uploadJson' | translate }}
+              </button>
+              <button
+                type="button"
+                class="page-button page-button-primary"
+                (click)="onTestParseWithFile(selectedJsonFile())"
+                [disabled]="!selectedJsonFile() || isProcessing()">
+                {{ 'spider.test' | translate }}
+              </button>
+            </div>
+            <input
+              #jsonFile
+              hidden
+              type="file"
+              (change)="onUpload($event, selectedJsonFile)"
+              accept=".json" />
+            @if (selectedJsonFile(); as file) {
+              <p class="helper-text" role="status">
+                {{ 'g.selectedFile' | translate }}: {{ file.name }}
+              </p>
+            }
+          </div>
+        </div>
+      }
+      <div
+        class="test-block"
+        role="group"
+        [attr.aria-label]="'spider.testResult' | translate">
+        <span class="field-label">{{ 'spider.testResult' | translate }}</span>
+        <app-signal-code-editor
+          [formField]="resultJsonData"
+          language="json"
+          [indentWithTab]="true" />
       </div>
-    }
-  </div>
-  <label>{{ 'spider.testResult' | translate }}</label>
-  <app-signal-code-editor
-    class="mb-4"
-    [formField]="resultJsonData"
-    [language]="'json'"
-    [indentWithTab]="true" />
+    </div>
+  </section>
 </div>
 
 <ng-template #buttonTmpl>
-  <div class="d-flex my-2 gap-2">
+  <div class="item-actions">
+    <div class="button-row">
+      @if (!isBinding()) {
+        <button
+          type="button"
+          class="page-button page-button-accent"
+          (click)="onReadItems()"
+          [disabled]="isProcessing()">
+          {{ 'g.read' | translate }}
+        </button>
+      }
+      @if (isCreateMode()) {
+        <button
+          type="button"
+          class="page-button page-button-primary"
+          (click)="onAddItem()"
+          [disabled]="isProcessing()">
+          {{ 'g.add' | translate }}
+        </button>
+      }
+      @if (isEditMode()) {
+        <button
+          type="button"
+          class="page-button page-button-primary"
+          (click)="onSaveItem()"
+          [disabled]="isProcessing()">
+          {{ 'g.save' | translate }}
+        </button>
+      }
+      @if (isEditMode() && hasSpiderId()) {
+        <button
+          type="button"
+          class="page-button page-button-accent"
+          (click)="toggleBind()"
+          [disabled]="isProcessing()">
+          {{ (isBinding() ? 'g.unbind' : 'g.bind') | translate }}
+        </button>
+      }
+    </div>
     @if (!isBinding()) {
-      <button
-        type="button"
-        class="btn btn-outline-primary"
-        (click)="onReadItems()"
-        [disabled]="isProcessing()">
-        {{ 'g.read' | translate }}
-      </button>
-    }
-    @if (isCreateMode()) {
-      <button
-        type="button"
-        class="btn btn-outline-primary"
-        (click)="onAddItem()"
-        [disabled]="isProcessing()">
-        {{ 'g.add' | translate }}
-      </button>
-    }
-    @if (isEditMode()) {
-      <button
-        type="button"
-        class="btn btn-outline-primary"
-        (click)="onSaveItem()"
-        [disabled]="isProcessing()">
-        {{ 'g.save' | translate }}
-      </button>
-    }
-
-    @if (isEditMode() && hasSpiderId()) {
-      <button
-        type="button"
-        class="btn btn-outline-primary"
-        (click)="toggleBind()"
-        [disabled]="isProcessing()">
-        {{ (isBinding() ? 'g.unbind' : 'g.bind') | translate }}
-      </button>
-    }
-    @if (!isBinding()) {
-      <button
-        type="button"
-        class="btn btn-danger"
-        (click)="onClear()"
-        [disabled]="isProcessing()">
-        {{ 'g.clear' | translate }}
-      </button>
-    }
-    @if (isEditMode() && !isBinding()) {
-      <button
-        type="button"
-        class="btn btn-danger"
-        [disabled]="isBinding() || isProcessing()"
-        (click)="onDeleteItem()">
-        {{ 'g.delete' | translate }}
-      </button>
+      <div class="button-row danger-actions">
+        <button
+          type="button"
+          class="page-button page-button-danger"
+          (click)="onClear()"
+          [disabled]="isProcessing()">
+          {{ 'g.clear' | translate }}
+        </button>
+        @if (isEditMode()) {
+          <button
+            type="button"
+            class="page-button page-button-danger"
+            (click)="onDeleteItem()"
+            [disabled]="isBinding() || isProcessing()">
+            {{ 'g.delete' | translate }}
+          </button>
+        }
+      </div>
     }
   </div>
 </ng-template>

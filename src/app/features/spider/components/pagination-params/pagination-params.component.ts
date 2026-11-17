@@ -22,6 +22,7 @@ import { toSignalFieldOptions } from '../../../../shared/util/signal-field';
     FormInvalidsComponent,
   ],
   templateUrl: './pagination-params.component.html',
+  styleUrl: './pagination-params.component.scss',
 })
 export class PaginationParamsComponent {
   readonly fieldType = SignalFieldType;

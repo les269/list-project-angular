@@ -1,0 +1,68 @@
+@use '../../../../../styles/editor-page' as editor;
+@use '../../styles/editor-buttons' as buttons;
+
+@include editor.layout;
+@include buttons.colors;
+
+:host {
+  min-width: 0;
+  color: var(--app-text-primary);
+}
+
+.item-editor {
+  display: grid;
+  gap: var(--app-space-4);
+  min-width: 0;
+}
+
+.button-row,
+.item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--app-space-2);
+}
+
+.item-actions {
+  width: 100%;
+}
+
+.danger-actions {
+  margin-inline-start: auto;
+}
+
+.section-actions {
+  padding: var(--app-space-3) var(--app-space-4);
+  border-top: 1px solid var(--app-border);
+}
+
+.test-block,
+.file-test {
+  display: grid;
+  gap: var(--app-space-2);
+  min-width: 0;
+}
+
+.test-block + .test-block {
+  margin-top: var(--app-space-4);
+}
+
+.test-block {
+  .field-label {
+    margin: 0;
+  }
+
+  app-signal-code-editor {
+    height: 300px;
+    min-width: 0;
+    border: 1px solid var(--app-border-strong);
+    border-radius: var(--app-radius-sm);
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 600px) {
+  .danger-actions {
+    margin-inline-start: 0;
+  }
+}

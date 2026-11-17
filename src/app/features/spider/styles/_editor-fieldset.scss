@@ -1,0 +1,53 @@
+@mixin layout(
+  $section-selector: '.settings-section',
+  $title-selector: '.settings-title'
+) {
+  :host {
+    display: block;
+    min-width: 0;
+    color: var(--app-text-primary);
+    font-size: var(--app-font-size-sm);
+    --bs-border-color: var(--app-border-strong);
+    --bs-border-radius: var(--app-radius-sm);
+  }
+
+  #{$section-selector} {
+    min-width: 0;
+    margin: 0;
+    padding: var(--app-space-4);
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-lg);
+    box-shadow: var(--app-shadow-sm);
+  }
+
+  #{$title-selector} {
+    float: none;
+    width: auto;
+    max-width: 100%;
+    margin: 0 0 var(--app-space-3);
+    padding-inline: var(--app-space-1);
+    font-size: var(--app-font-size-body);
+    font-weight: 400;
+    line-height: var(--app-line-height-heading);
+    overflow-wrap: anywhere;
+  }
+
+  .helper-text {
+    margin-bottom: var(--app-space-2);
+    color: var(--app-text-secondary);
+    font-size: var(--app-font-size-sm);
+    overflow-wrap: anywhere;
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+    gap: var(--app-space-2);
+    min-width: 0;
+  }
+
+  app-signal-field {
+    min-width: 0;
+  }
+}

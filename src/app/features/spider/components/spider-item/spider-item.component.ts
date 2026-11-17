@@ -1,4 +1,7 @@
 import { SignalCodeEditorComponent } from '../../../../core/components/signal-code-editor/signal-code-editor.component';
+import { SignalFieldComponent } from '../../../../core/components/signal-field/signal-field.component';
+import { EditMode } from '../../../../core/model/global.model';
+import { SignalFieldType } from '../../../../core/model/signal-field.model';
 import { CommonModule } from '@angular/common';
 import {
   Component,
@@ -27,15 +30,13 @@ import { MessageBoxService } from '../../../../core/services/message-box.service
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { isBlank, isNotBlank } from '../../../../shared/util/helper';
-import { hasFieldError } from '../../../../shared/util/signal-form';
-import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
+import { toSignalFieldOptions } from '../../../../shared/util/signal-field';
 import {
   CookieListMapType,
   ExtractionRule,
   ExtractionRuleMode,
   HeadersMapType,
   SpiderItem,
-  SpiderItemMode,
   SpiderMapping,
   UrlType,
 } from '../../model';
@@ -66,12 +67,12 @@ import { applyExtractionRulesSchema } from '../../schema/extraction-rules.schema
     MatCheckbox,
     SignalCodeEditorComponent,
     ExtractionRulesComponent,
-    TrimOnBlurDirective,
+    SignalFieldComponent,
   ],
   templateUrl: './spider-item.component.html',
+  styleUrl: './spider-item.component.scss',
 })
 export class SpiderItemComponent {
-  readonly hasError = hasFieldError;
   // inject
   readonly translateService = inject(TranslateService);
   readonly spiderItemService = inject(SpiderItemService);
@@ -83,6 +84,8 @@ export class SpiderItemComponent {
   readonly spiderService = inject(SpiderService);
   private readonly extractionRuleForm = inject(ExtractionRuleFormService);
   readonly matDialog = inject(MatDialog);
+  readonly fieldType = SignalFieldType;
+  readonly urlTypeOptions = toSignalFieldOptions(UrlType, 'spider.urlType');
   // input
   readonly initData = input<SpiderItem>();
   readonly index = input<number>();
@@ -90,11 +93,9 @@ export class SpiderItemComponent {
   readonly spiderId = input<string>();
   //signal
   readonly mappings = computed(() => this.mappingsRx()?.value() ?? []);
-  readonly itemMode = signal<SpiderItemMode>(SpiderItemMode.create);
-  readonly isCreateMode = computed(
-    () => this.itemMode() === SpiderItemMode.create
-  );
-  readonly isEditMode = computed(() => this.itemMode() === SpiderItemMode.edit);
+  readonly itemMode = signal<EditMode>(EditMode.CREATE);
+  readonly isCreateMode = computed(() => this.itemMode() === EditMode.CREATE);
+  readonly isEditMode = computed(() => this.itemMode() === EditMode.EDIT);
   readonly isBinding = computed(() => {
     return (
       this.isEditMode() &&
@@ -103,7 +104,7 @@ export class SpiderItemComponent {
   });
   readonly hasSpiderId = computed(() => isNotBlank(this.spiderId()));
   readonly cookieRefId = computed(() => {
-    if (this.itemMode() === SpiderItemMode.edit) {
+    if (this.itemMode() === EditMode.EDIT) {
       return this.spiderItemId().value();
     }
     return '';
@@ -219,9 +220,7 @@ export class SpiderItemComponent {
         ),
       },
     });
-    this.itemMode.set(
-      item?.spiderItemId ? SpiderItemMode.edit : SpiderItemMode.create
-    );
+    this.itemMode.set(item?.spiderItemId ? EditMode.EDIT : EditMode.CREATE);
   }
 
   private runOperation<T>(
@@ -276,7 +275,7 @@ export class SpiderItemComponent {
         ),
       () => {
         this.snackbarService.openI18N('msg.addSuccess');
-        this.itemMode.set(SpiderItemMode.edit);
+        this.itemMode.set(EditMode.EDIT);
       }
     );
   }

@@ -1,9 +1,9 @@
 @let control = fields();
-<fieldset class="border rounded p-3 my-3" [disabled]="control().disabled()">
-  <legend class="float-none w-auto fs-5">
+<fieldset class="settings-section" [disabled]="control().disabled()">
+  <legend class="settings-title">
     {{ 'spiderPagination.updateControl' | translate }}
   </legend>
-  <div class="input-group flex-nowrap mb-2">
+  <div class="field-row mb-2">
     <app-signal-field
       [field]="control.lastUpdateMode"
       label="spiderPagination.lastUpdateMode"
@@ -28,7 +28,7 @@
         emptyOption="spiderPagination.selectParam" />
     }
   </div>
-  <div class="input-group flex-nowrap">
+  <div class="field-row">
     <app-signal-field
       [field]="control.updateIntervalMode"
       label="spiderPagination.updateIntervalMode"

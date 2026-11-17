@@ -1,4 +1,6 @@
 import { SignalCodeEditorComponent } from '../../../../core/components/signal-code-editor/signal-code-editor.component';
+import { SignalFieldComponent } from '../../../../core/components/signal-field/signal-field.component';
+import { SignalFieldType } from '../../../../core/model/signal-field.model';
 import {
   CdkDragDrop,
   DragDropModule,
@@ -23,9 +25,7 @@ import {
   required,
   readonly,
 } from '@angular/forms/signals';
-import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { languages } from '@codemirror/language-data';
@@ -44,7 +44,6 @@ import { EditMode } from '../../../../core/model';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { isNotBlank } from '../../../../shared/util/helper';
-import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 import { SpiderItemComponent } from '../../components/spider-item/spider-item.component';
 import {
   ExtractionRuleMode,
@@ -62,18 +61,17 @@ import { SpiderMappingService } from '../../services/spider-mapping.service';
 @Component({
   selector: 'app-spider-edit',
   templateUrl: './spider-edit.component.html',
+  styleUrl: './spider-edit.component.scss',
   imports: [
     CommonModule,
     FormField,
-    MatButtonModule,
     MatCheckboxModule,
-    MatIconModule,
     MatTabsModule,
     DragDropModule,
     TranslatePipe,
     SpiderItemComponent,
     SignalCodeEditorComponent,
-    TrimOnBlurDirective,
+    SignalFieldComponent,
   ],
 })
 export class SpiderEditComponent {
@@ -89,6 +87,7 @@ export class SpiderEditComponent {
   // constants
   readonly languages = languages;
   readonly editMode = EditMode;
+  readonly fieldType = SignalFieldType;
 
   // signals
   readonly isProcessing = signal(false);
@@ -358,6 +357,8 @@ export class SpiderEditComponent {
       relativeTo: this.route,
       queryParams: { tab: index },
       queryParamsHandling: 'merge',
+      // 切換頁內分頁時保留捲動位置，避免全域路由捲動還原回到頂端。
+      scroll: 'manual',
     });
   }
 

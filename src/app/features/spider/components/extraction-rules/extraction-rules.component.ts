@@ -26,6 +26,7 @@ import { toSignalFieldOptions } from '../../../../shared/util/signal-field';
     SignalFieldComponent,
   ],
   templateUrl: './extraction-rules.component.html',
+  styleUrl: './extraction-rules.component.scss',
 })
 export class ExtractionRulesComponent {
   readonly fieldType = SignalFieldType;

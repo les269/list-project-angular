@@ -1,0 +1,3 @@
+@use '../../styles/editor-fieldset' as fieldset;
+
+@include fieldset.layout('.rules-section', '.rules-title');

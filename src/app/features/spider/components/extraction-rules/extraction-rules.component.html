@@ -1,5 +1,5 @@
-<fieldset class="border rounded p-3 my-3" [disabled]="fields()().disabled()">
-  <legend class="float-none w-auto fs-5">
+<fieldset class="rules-section" [disabled]="fields()().disabled()">
+  <legend class="rules-title">
     {{ 'spider.extractionRules' | translate }}
   </legend>
   <app-signal-field
@@ -11,7 +11,7 @@
     [inline]="true" />
   @if (showHelp()) {
     <div
-      class="form-text mb-2"
+      class="helper-text"
       [innerHTML]="
         (mode()().value() === extractionRuleMode.JSON_PATH
           ? 'spider.jsonPathPH'

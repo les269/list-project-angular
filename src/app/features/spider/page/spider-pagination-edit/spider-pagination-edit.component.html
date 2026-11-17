@@ -1,11 +1,13 @@
-<div class="container my-3">
-  <button
-    type="button"
-    mat-icon-button
-    [attr.aria-label]="'spiderPagination.back' | translate"
-    (click)="onBack()">
-    <mat-icon>arrow_back</mat-icon>
-  </button>
+<div class="editor-page">
+  <div class="page-heading">
+    <button
+      type="button"
+      class="page-button page-button-back"
+      (click)="onBack()">
+      {{ 'spiderPagination.back' | translate }}
+    </button>
+    <h2>{{ 'title.spiderPaginationEdit' | translate }}</h2>
+  </div>
   @if (spiderPagination.isLoading()) {
     <p role="status">{{ 'spiderPagination.loading' | translate }}</p>
   }
@@ -15,120 +17,126 @@
     </p>
     <button
       type="button"
-      class="btn btn-secondary"
+      class="page-button"
       (click)="spiderPagination.reload()">
       {{ 'spiderPagination.reload' | translate }}
     </button>
   }
-  <app-signal-field
-    class="mb-2"
-    [field]="form.spiderPaginationId"
-    label="spiderPagination.spiderPaginationId" />
-  <app-signal-field
-    class="mb-2"
-    [field]="form.paginationConfig.groupIdTemplate"
-    label="spiderPagination.groupIdTemplate" />
-  <p class="form-text">
-    {{ 'spiderPagination.groupIdTemplateDesc' | translate }}
-  </p>
-  <app-signal-field
-    class="mb-2"
-    [field]="form.paginationConfig.dataIdKey"
-    label="spiderPagination.dataIdKey" />
-  <p class="form-text">{{ 'spiderPagination.dataIdKeyDesc' | translate }}</p>
-  <app-signal-field
-    class="mb-2"
-    [field]="form.paginationConfig.startUrl"
-    label="spiderPagination.startUrl" />
-  <div class="d-flex gap-2 my-3">
-    <button
-      type="button"
-      class="btn btn-primary"
-      [disabled]="isCreateMode || form().disabled()"
-      (click)="onHeadersDialog()">
-      {{ 'spider.settingHeaders' | translate }}
-    </button>
-    <button
-      type="button"
-      class="btn btn-primary"
-      [disabled]="isCreateMode || form().disabled()"
-      (click)="onCookiesDialog()">
-      {{ 'spider.settingCookies' | translate }}
-    </button>
-  </div>
-  <app-signal-field
-    class="mb-2"
-    [field]="form.paginationConfig.nextPageUrlKey"
-    label="spiderPagination.nextPageUrlKey" />
-  <app-signal-field
-    class="mb-2"
-    [field]="form.paginationConfig.requestIntervalMs"
-    label="spiderPagination.requestIntervalMs"
-    [type]="fieldType.NUMBER" />
-  <app-signal-field
-    class="mb-2"
-    [field]="form.paginationConfig.retainHistory"
-    label="spiderPagination.retainHistory"
-    [type]="fieldType.CHECKBOX" />
-  <p class="form-text">
-    {{ 'spiderPagination.retainHistoryDesc' | translate }}
-  </p>
-
-  <app-pagination-params [fields]="form.paginationConfig.paramSettings" />
-  <app-pagination-update-control
-    [fields]="form.paginationConfig.updateControl"
-    [params]="form.paginationConfig.paramSettings" />
-  <app-extraction-rules
-    [fields]="form.paginationConfig.extractionRuleList"
-    [mode]="form.paginationConfig.extractionRuleMode" />
-  <section class="my-3" aria-labelledby="extraction-test-label">
-    <h2 id="extraction-test-label" class="fs-5">
-      {{ (useJsonPath() ? 'spider.testJson' : 'spider.testHtml') | translate }}
-    </h2>
-    @if (useJsonPath()) {
-      <app-signal-code-editor
-        style="height: 300px"
-        [formField]="testForm.json"
-        language="json"
-        [indentWithTab]="true" />
-    } @else {
-      <app-signal-code-editor
-        style="height: 300px"
-        [formField]="testForm.html"
-        language="html"
-        [indentWithTab]="true" />
-    }
-    <div class="d-flex gap-2 my-2">
-      @if (useJsonPath()) {
-        <button
-          type="button"
-          class="btn btn-outline-secondary"
-          [disabled]="testForm().disabled()"
-          (click)="onFormatJson()">
-          {{ 'g.format' | translate }}
-        </button>
-      }
+  <div class="editor-form">
+    <section class="editor-section" aria-labelledby="pagination-settings-title">
+      <h3 class="section-title" id="pagination-settings-title">
+        {{ 'spider.basicSettings' | translate }}
+      </h3>
+      <div class="section-body">
+        <app-signal-field
+          [field]="form.spiderPaginationId"
+          label="spiderPagination.spiderPaginationId" />
+        <app-signal-field
+          [field]="form.paginationConfig.groupIdTemplate"
+          label="spiderPagination.groupIdTemplate" />
+        <p class="helper-text">
+          {{ 'spiderPagination.groupIdTemplateDesc' | translate }}
+        </p>
+        <app-signal-field
+          [field]="form.paginationConfig.dataIdKey"
+          label="spiderPagination.dataIdKey" />
+        <p class="helper-text">
+          {{ 'spiderPagination.dataIdKeyDesc' | translate }}
+        </p>
+        <app-signal-field
+          [field]="form.paginationConfig.startUrl"
+          label="spiderPagination.startUrl" />
+        <div class="button-row">
+          <button
+            type="button"
+            class="page-button"
+            [disabled]="isCreateMode || form().disabled()"
+            (click)="onHeadersDialog()">
+            {{ 'spider.settingHeaders' | translate }}
+          </button>
+          <button
+            type="button"
+            class="page-button"
+            [disabled]="isCreateMode || form().disabled()"
+            (click)="onCookiesDialog()">
+            {{ 'spider.settingCookies' | translate }}
+          </button>
+        </div>
+        <app-signal-field
+          [field]="form.paginationConfig.nextPageUrlKey"
+          label="spiderPagination.nextPageUrlKey" />
+        <app-signal-field
+          [field]="form.paginationConfig.requestIntervalMs"
+          label="spiderPagination.requestIntervalMs"
+          [type]="fieldType.NUMBER" />
+        <app-signal-field
+          [field]="form.paginationConfig.retainHistory"
+          label="spiderPagination.retainHistory"
+          [type]="fieldType.CHECKBOX" />
+        <p class="helper-text">
+          {{ 'spiderPagination.retainHistoryDesc' | translate }}
+        </p>
+      </div>
+    </section>
+    <app-pagination-params [fields]="form.paginationConfig.paramSettings" />
+    <app-pagination-update-control
+      [fields]="form.paginationConfig.updateControl"
+      [params]="form.paginationConfig.paramSettings" />
+    <app-extraction-rules
+      [fields]="form.paginationConfig.extractionRuleList"
+      [mode]="form.paginationConfig.extractionRuleMode" />
+    <section class="editor-section" aria-labelledby="extraction-test-label">
+      <h3 id="extraction-test-label" class="section-title">
+        {{
+          (useJsonPath() ? 'spider.testJson' : 'spider.testHtml') | translate
+        }}
+      </h3>
+      <div class="section-body test-panel">
+        @if (useJsonPath()) {
+          <app-signal-code-editor
+            [formField]="testForm.json"
+            language="json"
+            [indentWithTab]="true" />
+        } @else {
+          <app-signal-code-editor
+            [formField]="testForm.html"
+            language="html"
+            [indentWithTab]="true" />
+        }
+        <div class="button-row">
+          @if (useJsonPath()) {
+            <button
+              type="button"
+              class="page-button"
+              [disabled]="testForm().disabled()"
+              (click)="onFormatJson()">
+              {{ 'g.format' | translate }}
+            </button>
+          }
+          <button
+            type="button"
+            class="page-button page-button-primary"
+            [disabled]="form().disabled()"
+            [attr.aria-busy]="testing()"
+            (click)="onTestParse()">
+            {{ 'spider.test' | translate }}
+          </button>
+        </div>
+        <h4 class="field-label">{{ 'spider.testResult' | translate }}</h4>
+        <app-signal-code-editor
+          [formField]="testForm.resultJson"
+          language="json"
+          [indentWithTab]="true" />
+      </div>
+    </section>
+    <div class="form-actions">
       <button
         type="button"
-        class="btn btn-primary"
+        class="page-button page-button-primary"
         [disabled]="form().disabled()"
-        [attr.aria-busy]="testing()"
-        (click)="onTestParse()">
-        {{ 'spider.test' | translate }}
+        (click)="update()">
+        {{ (isEditMode ? 'g.update' : 'g.save') | translate }}
       </button>
     </div>
-    <h3 class="fs-5">{{ 'spider.testResult' | translate }}</h3>
-    <app-signal-code-editor
-      style="height: 300px"
-      [formField]="testForm.resultJson"
-      language="json"
-      [indentWithTab]="true" />
-  </section>
-  <button
-    type="button"
-    class="btn btn-success mb-3"
-    [disabled]="form().disabled()"
-    (click)="update()">
-    {{ (isEditMode ? 'g.update' : 'g.save') | translate }}
-  </button>
+  </div>
 </div>

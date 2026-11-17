@@ -16,6 +16,7 @@ import { toSignalFieldOptions } from '../../../../shared/util/signal-field';
   selector: 'app-pagination-update-control',
   imports: [TranslatePipe, SignalFieldComponent],
   templateUrl: './pagination-update-control.component.html',
+  styleUrl: './pagination-update-control.component.scss',
 })
 export class PaginationUpdateControlComponent {
   readonly fieldType = SignalFieldType;

@@ -1,159 +1,168 @@
-<div class="container d-flex">
-  <div class="col-md-10 offset-md-1 col-xs-12 mt-2">
-    <form (submit)="$event.preventDefault()">
-      <button
-        type="button"
-        mat-icon-button
-        class="d-flex align-content-center"
-        (click)="onBack()">
-        <mat-icon>arrow_back</mat-icon>
-      </button>
-
-      <div class="form-group mb-2">
-        <label>{{ 'spider.spiderId' | translate }}</label>
-        <input class="form-control" [formField]="form.spiderId" trimOnBlur />
-      </div>
-
-      <div class="form-group mb-2">
-        <label>{{ 'g.description' | translate }}</label>
-        <input class="form-control" [formField]="form.description" trimOnBlur />
-      </div>
-
-      <div class="form-group mb-2">
-        <label>{{ 'spider.primeKeySize' | translate }}</label>
-        <input
-          class="form-control"
-          type="number"
-          [formField]="form.primeKeySize" />
-        <label class="form-text">{{
-          'spider.primeKeySizeDesc' | translate
-        }}</label>
-      </div>
-
-      <div class="form-group mb-2">
-        <label for="requestIntervalMs">{{
-          'spiderPagination.requestIntervalMs' | translate
-        }}</label>
-        <input
-          id="requestIntervalMs"
-          class="form-control"
-          type="number"
-          [formField]="form.requestIntervalMs" />
-      </div>
-
-      <div class="my-3">
+<div class="editor-page">
+  <div class="page-heading">
+    <button
+      type="button"
+      class="page-button page-button-back"
+      (click)="onBack()">
+      {{ 'g.back' | translate }}
+    </button>
+    <h2>{{ 'title.spiderEdit' | translate }}</h2>
+  </div>
+  <form class="editor-form" (submit)="$event.preventDefault()">
+    <section class="editor-section" aria-labelledby="spider-settings-title">
+      <h3 class="section-title" id="spider-settings-title">
+        {{ 'spider.basicSettings' | translate }}
+      </h3>
+      <div class="section-body">
+        <div class="form-grid">
+          <app-signal-field
+            [field]="form.spiderId"
+            label="spider.spiderId"
+            [trim]="true" />
+          <app-signal-field
+            [field]="form.description"
+            label="g.description"
+            [trim]="true" />
+          <div class="field-block">
+            <app-signal-field
+              [field]="form.primeKeySize"
+              label="spider.primeKeySize"
+              [type]="fieldType.NUMBER" />
+            <p class="helper-text">
+              {{ 'spider.primeKeySizeDesc' | translate }}
+            </p>
+          </div>
+          <app-signal-field
+            [field]="form.requestIntervalMs"
+            label="spiderPagination.requestIntervalMs"
+            [type]="fieldType.NUMBER" />
+        </div>
         <mat-checkbox [formField]="form.isUrlBased">
           {{ 'spider.isUrlBased' | translate }}
         </mat-checkbox>
       </div>
-      <div class="d-flex gap-2">
+      <div class="settings-actions">
+        @if (isCreateMode) {
+          <p class="helper-text">{{ 'spider.saveFirstHint' | translate }}</p>
+        }
         <button
           type="button"
-          class="btn btn-success"
+          class="page-button page-button-primary"
           (click)="update()"
           [disabled]="isProcessing()">
           {{ 'g.save' | translate }}
         </button>
-        @if (isEditMode) {
-          <button
-            type="button"
-            class="btn btn-primary"
-            (click)="onAddItemTab()"
-            [disabled]="isProcessing()">
-            {{ 'spider.createSpiderItem' | translate }}
-          </button>
-        }
-        @if (isEditMode && showDeleteItemButton()) {
-          <button
-            type="button"
-            class="btn btn-danger"
-            (click)="onDeleteItemTab()"
-            [disabled]="isProcessing()">
-            {{ 'spider.deleteSpiderItem' | translate }}
-          </button>
-        }
       </div>
-
-      @if (isCreateMode) {
-        <div class="form-text mb-2">
-          {{ 'spider.saveFirstHint' | translate }}
-        </div>
-      }
-
-      <hr />
-      <mat-tab-group
-        cdkDropList
-        cdkDropListOrientation="horizontal"
-        [cdkDropListDisabled]="!canDragTabs || isProcessing()"
-        [cdkDropListData]="spiderItems()"
-        cdkDropListElementContainer=".mat-mdc-tab-labels"
-        (cdkDropListDropped)="dropTab($event)"
-        [selectedIndex]="selected()"
-        (selectedIndexChange)="onTabChange($event)">
-        <mat-tab [label]="'spider.testArea' | translate">
-          <div>
-            <div class="form-group mb-2">
-              <label>{{ 'spider.testPrimeKeyList' | translate }}</label>
-              <app-signal-code-editor
-                [formField]="form.testData.primeKeyListJson"
-                [language]="'json'"
-                [indentWithTab]="true" />
-              <label class="form-text w-100">{{
-                'spider.testPrimeKeyListDesc' | translate
-              }}</label>
+    </section>
+    <section class="editor-section" aria-labelledby="spider-workspace-title">
+      <h3 class="section-title" id="spider-workspace-title">
+        {{ 'spider.itemsAndTesting' | translate }}
+      </h3>
+      <div class="section-body">
+        @if (isEditMode) {
+          <div class="workspace-actions">
+            <button
+              type="button"
+              class="page-button page-button-accent"
+              (click)="onAddItemTab()"
+              [disabled]="isProcessing()">
+              {{ 'spider.createSpiderItem' | translate }}
+            </button>
+            @if (showDeleteItemButton()) {
               <button
                 type="button"
-                class="btn btn-primary"
-                (click)="onPreviewByPrimeKeyList()"
+                class="page-button page-button-danger"
+                (click)="onDeleteItemTab()"
                 [disabled]="isProcessing()">
-                {{ 'spider.test' | translate }}
+                {{ 'spider.deleteSpiderItem' | translate }}
               </button>
-            </div>
-
-            <div class="form-group mb-2">
-              <div>{{ 'spider.testUrl' | translate }}</div>
-              <input
-                class="form-control mb-2"
-                [formField]="form.testData.url"
-                trimOnBlur />
-              <button
-                type="button"
-                class="btn btn-primary"
-                (click)="onPreviewByUrl()"
-                [disabled]="isProcessing()">
-                {{ 'spider.test' | translate }}
-              </button>
-            </div>
-            <div class="form-group mb-2">
-              <label>{{ 'spider.testResultJson' | translate }}</label>
-              <app-signal-code-editor
-                [formField]="form.testData.resultJson"
-                [language]="'json'"
-                [indentWithTab]="true" />
-            </div>
+            }
           </div>
-        </mat-tab>
-        @for (item of spiderItems(); track $index; let index = $index) {
-          @let spiderItemId = getMappingItemId(index);
-          <mat-tab>
-            <ng-template mat-tab-label>
-              <span
-                cdkDrag
-                cdkDragRootElement=".mat-mdc-tab"
-                [cdkDragDisabled]="!canDragTabs"
-                class="me-1">
-                {{ spiderItemId ?? '(' + ('g.unnamed' | translate) + ')' }}
-              </span>
-            </ng-template>
-
-            <app-spider-item
-              [initData]="item"
-              [index]="index"
-              [mappingsRx]="mappingsRx"
-              [spiderId]="spiderId() ?? ''"></app-spider-item>
-          </mat-tab>
         }
-      </mat-tab-group>
-    </form>
-  </div>
+        <mat-tab-group
+          class="workspace-tabs"
+          cdkDropList
+          cdkDropListOrientation="horizontal"
+          [cdkDropListDisabled]="!canDragTabs || isProcessing()"
+          [cdkDropListData]="spiderItems()"
+          cdkDropListElementContainer=".mat-mdc-tab-labels"
+          (cdkDropListDropped)="dropTab($event)"
+          [selectedIndex]="selected()"
+          (selectedIndexChange)="onTabChange($event)">
+          <mat-tab [label]="'spider.testArea' | translate">
+            <div class="test-panel">
+              <div
+                class="test-block"
+                role="group"
+                aria-labelledby="spider-prime-key-test-label">
+                <span class="field-label" id="spider-prime-key-test-label">{{
+                  'spider.testPrimeKeyList' | translate
+                }}</span>
+                <app-signal-code-editor
+                  [formField]="form.testData.primeKeyListJson"
+                  language="json"
+                  [indentWithTab]="true" />
+                <p class="helper-text">
+                  {{ 'spider.testPrimeKeyListDesc' | translate }}
+                </p>
+                <button
+                  type="button"
+                  class="page-button page-button-primary"
+                  (click)="onPreviewByPrimeKeyList()"
+                  [disabled]="isProcessing()">
+                  {{ 'spider.test' | translate }}
+                </button>
+              </div>
+              <div class="test-block">
+                <app-signal-field
+                  [field]="form.testData.url"
+                  label="spider.testUrl"
+                  [trim]="true" />
+                <button
+                  type="button"
+                  class="page-button page-button-primary"
+                  (click)="onPreviewByUrl()"
+                  [disabled]="isProcessing()">
+                  {{ 'spider.test' | translate }}
+                </button>
+              </div>
+              <div
+                class="test-block"
+                role="group"
+                aria-labelledby="spider-test-result-label">
+                <span class="field-label" id="spider-test-result-label">{{
+                  'spider.testResultJson' | translate
+                }}</span>
+                <app-signal-code-editor
+                  [formField]="form.testData.resultJson"
+                  language="json"
+                  [indentWithTab]="true" />
+              </div>
+            </div>
+          </mat-tab>
+          @for (item of spiderItems(); track $index; let index = $index) {
+            @let spiderItemId = getMappingItemId(index);
+            <mat-tab>
+              <ng-template mat-tab-label>
+                <span
+                  cdkDrag
+                  cdkDragRootElement=".mat-mdc-tab"
+                  [cdkDragDisabled]="!canDragTabs"
+                  class="me-1">
+                  {{ spiderItemId ?? '(' + ('g.unnamed' | translate) + ')' }}
+                </span>
+              </ng-template>
+              <div class="item-panel">
+                <app-spider-item
+                  [initData]="item"
+                  [index]="index"
+                  [mappingsRx]="mappingsRx"
+                  [spiderId]="spiderId() ?? ''" />
+              </div>
+            </mat-tab>
+          }
+        </mat-tab-group>
+      </div>
+    </section>
+  </form>
 </div>

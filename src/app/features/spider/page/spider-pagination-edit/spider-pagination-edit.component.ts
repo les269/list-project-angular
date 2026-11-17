@@ -17,9 +17,7 @@ import {
   readonly,
   required,
 } from '@angular/forms/signals';
-import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
-import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { EMPTY, finalize, map, switchMap, take } from 'rxjs';
@@ -58,8 +56,6 @@ import { applyExtractionRulesSchema } from '../../schema/extraction-rules.schema
 @Component({
   imports: [
     TranslatePipe,
-    MatIconModule,
-    MatButtonModule,
     SignalFieldComponent,
     PaginationParamsComponent,
     PaginationUpdateControlComponent,
@@ -69,6 +65,7 @@ import { applyExtractionRulesSchema } from '../../schema/extraction-rules.schema
   ],
   selector: 'app-spider-pagination-edit',
   templateUrl: './spider-pagination-edit.component.html',
+  styleUrl: './spider-pagination-edit.component.scss',
 })
 export class SpiderPaginationEditComponent {
   readonly fieldType = SignalFieldType;

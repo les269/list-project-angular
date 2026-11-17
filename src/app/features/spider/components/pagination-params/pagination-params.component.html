@@ -1,8 +1,8 @@
-<fieldset class="border rounded p-3 my-3" [disabled]="fields()().disabled()">
-  <legend class="float-none w-auto fs-5">
+<fieldset class="settings-section" [disabled]="fields()().disabled()">
+  <legend class="settings-title">
     {{ 'spiderPagination.paramSettings' | translate }}
   </legend>
-  <p class="form-text">
+  <p class="helper-text">
     {{ 'spiderPagination.paramSettingsDesc' | translate }}
   </p>
   <app-generic-table
@@ -23,7 +23,7 @@
             [type]="fieldType.CHIPS" />
         }
         @case (paramType.NUMBER_RANGE) {
-          <div class="input-group flex-nowrap">
+          <div class="field-row">
             <app-signal-field
               [field]="p.startNumStr"
               label="spiderPagination.startNumStr"
@@ -45,7 +45,7 @@
           </div>
         }
         @case (paramType.TIME_RANGE) {
-          <div class="input-group flex-nowrap mb-2">
+          <div class="field-row mb-2">
             <app-signal-field
               [field]="p.startTime"
               label="spiderPagination.startTime"
@@ -56,7 +56,7 @@
               label="spiderPagination.timeFormat"
               [inline]="true" />
           </div>
-          <div class="input-group flex-nowrap mb-2">
+          <div class="field-row mb-2">
             <app-signal-field
               [field]="p.timeInterval"
               label="spiderPagination.timeInterval"
@@ -69,7 +69,7 @@
               [inline]="true"
               [options]="timeOptions" />
           </div>
-          <div class="input-group flex-nowrap">
+          <div class="field-row">
             <app-signal-field
               [field]="p.endTimeConfig.endTimeType"
               label="spiderPagination.endTimeType"

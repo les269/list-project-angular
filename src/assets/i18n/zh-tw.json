@@ -241,6 +241,8 @@
     }
   },
   "spider": {
+    "basicSettings": "基本設定",
+    "itemsAndTesting": "爬蟲項目與測試",
     "filterPlaceholder": "過濾爬蟲 ID 或描述",
     "createSpider": "新增爬蟲設定",
     "createSpiderItem": "建立爬蟲項目",
