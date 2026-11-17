@@ -1,5 +1,5 @@
 <div class="content view-page">
-  <div class="view-toolbar">
+  <div class="view-toolbar" appSearchToolbarLayout>
     <div class="toolbar-filters">
       @if (store.themeDatasetList() && store.themeDatasetList().length > 1) {
         <select
@@ -59,22 +59,30 @@
       </button>
     </div>
     <div class="toolbar-search">
-      <input
-        type="text"
-        class="form-control"
+      <app-search-input
+        [(value)]="store.searchValue"
+        [(searchMode)]="store.searchMode"
+        [suggestions]="store.filterAutoCompleteList()"
+        (search)="store.onSearch($event)" />
+
+      <!-- <button
+        mat-icon-button
+        class="d-flex"
+        [matTooltip]="'g.search' | translate"
         [attr.aria-label]="'g.search' | translate"
-        [matAutocomplete]="auto"
-        #searchInput
-        [value]="store.searchValue()"
-        (input)="store.searchValue.set(searchInput.value)"
-        (keydown.enter)="store.onSearch(store.searchValue())" />
-      <mat-autocomplete
-        #auto="matAutocomplete"
-        (optionSelected)="store.onSearch($event.option.value)">
-        @for (option of store.filterAutoCompleteList(); track option) {
-          <mat-option [value]="option">{{ option }}</mat-option>
-        }
-      </mat-autocomplete>
+        (click)="store.onSearch(store.searchValue())">
+        <mat-icon>search</mat-icon>
+      </button> -->
+      @if (store.defaultKey() !== '') {
+        <button
+          mat-icon-button
+          class="d-flex"
+          [matTooltip]="'g.random' | translate"
+          [attr.aria-label]="'g.random' | translate"
+          (click)="store.randomSearch()">
+          <mat-icon>shuffle</mat-icon>
+        </button>
+      }
       @if (store.autoCompleteList().length > 0) {
         <button
           mat-icon-button
@@ -87,32 +95,6 @@
               select_window_2
             </span></mat-icon
           >
-        </button>
-      }
-      <button
-        mat-icon-button
-        class="d-flex"
-        [matTooltip]="'g.clear' | translate"
-        [attr.aria-label]="'g.clear' | translate"
-        (click)="store.onSearch('')">
-        <mat-icon>clear</mat-icon>
-      </button>
-      <button
-        mat-icon-button
-        class="d-flex"
-        [matTooltip]="'g.search' | translate"
-        [attr.aria-label]="'g.search' | translate"
-        (click)="store.onSearch(store.searchValue())">
-        <mat-icon>search</mat-icon>
-      </button>
-      @if (store.defaultKey() !== '') {
-        <button
-          mat-icon-button
-          class="d-flex"
-          [matTooltip]="'g.random' | translate"
-          [attr.aria-label]="'g.random' | translate"
-          (click)="store.randomSearch()">
-          <mat-icon>shuffle</mat-icon>
         </button>
       }
     </div>

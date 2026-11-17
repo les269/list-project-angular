@@ -1,0 +1,41 @@
+<div class="search-field">
+  <button
+    type="button"
+    mat-icon-button
+    [matTooltip]="
+      (searchMode() === 'and' ? 'g.searchMatchAll' : 'g.searchMatchAny')
+        | translate
+    "
+    [attr.aria-label]="'g.toggleSearchMode' | translate"
+    [attr.aria-pressed]="searchMode() === 'and'"
+    (click)="toggleSearchMode()">
+    <mat-icon>{{
+      searchMode() === 'and' ? 'join_inner' : 'join_full'
+    }}</mat-icon>
+  </button>
+  <input
+    #searchInput
+    type="text"
+    [attr.aria-label]="'g.search' | translate"
+    [matAutocomplete]="auto"
+    [value]="value()"
+    (input)="value.set(searchInput.value)"
+    (keydown)="onKeydown($event)" />
+  @if (value().length > 0) {
+    <button
+      type="button"
+      mat-icon-button
+      [matTooltip]="'g.clear' | translate"
+      [attr.aria-label]="'g.clear' | translate"
+      (click)="clear(searchInput)">
+      <mat-icon>clear</mat-icon>
+    </button>
+  }
+</div>
+<mat-autocomplete
+  #auto="matAutocomplete"
+  (optionSelected)="search.emit($event.option.value)">
+  @for (option of suggestions(); track option) {
+    <mat-option [value]="option">{{ option }}</mat-option>
+  }
+</mat-autocomplete>

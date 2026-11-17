@@ -14,6 +14,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { HeaderStore } from './header.store';
 import { QueryAction, QueryActionType } from '../../theme/models';
+import { SearchMode } from '../models/search.model';
 
 @Injectable()
 export class RouteStore {
@@ -102,13 +103,30 @@ export class RouteStore {
   readonly queryParamMap = toSignal(this.route.queryParamMap);
 
   // 搜尋保留可編輯的草稿；返回歷史時再由 URL 還原草稿內容。
-  readonly queryParamsSearchValue = toSignal(
+  private readonly encodedSearchValue = toSignal(
     this.route.queryParamMap.pipe(
       map(params => params.get('searchValue') ?? '')
     ),
     { initialValue: '' }
   );
-  readonly searchValue = linkedSignal(() => this.queryParamsSearchValue());
+  // 僅解析第一層前綴，讓 or:and:test 可表示 OR 搜尋原文 and:test。
+  private readonly appliedSearch = computed<{
+    value: string;
+    mode: SearchMode;
+  }>(() => {
+    const encoded = this.encodedSearchValue();
+    if (encoded.startsWith('and:')) {
+      return { value: encoded.slice(4), mode: 'and' };
+    }
+    if (encoded.startsWith('or:')) {
+      return { value: encoded.slice(3), mode: 'or' };
+    }
+    return { value: encoded, mode: 'or' };
+  });
+  readonly queryParamsSearchValue = computed(() => this.appliedSearch().value);
+  readonly queryParamsSearchMode = computed(() => this.appliedSearch().mode);
+  readonly searchValue = linkedSignal(() => this.appliedSearch().value);
+  readonly searchMode = linkedSignal(() => this.appliedSearch().mode);
 
   // page
   readonly queryParamsPage = toSignal(
@@ -196,7 +214,13 @@ export class RouteStore {
     const queryParams = { ...this.route.snapshot.queryParams };
     switch (action.type) {
       case QueryActionType.search:
-        queryParams['searchValue'] = this.searchValue();
+        // 一般 OR 保留舊格式；遇到保留前綴時加上 or:，避免被誤解為模式。
+        queryParams['searchValue'] =
+          this.searchMode() === 'and'
+            ? `and:${this.searchValue()}`
+            : /^(and|or):/.test(this.searchValue())
+              ? `or:${this.searchValue()}`
+              : this.searchValue();
         queryParams['page'] = 1;
         break;
       case QueryActionType.sort:

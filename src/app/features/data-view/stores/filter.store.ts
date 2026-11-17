@@ -115,18 +115,21 @@ export class FilterStore {
       .filter(label => label.isSearchValue && label.type !== 'seq')
   );
 
-  // 多個關鍵字採 OR 比對，任一可搜尋欄位符合任一關鍵字便保留該筆資料。
+  // 關鍵字依已送出的模式採 AND 或 OR；每個關鍵字可命中不同欄位。
   readonly searchedData = computed<any[]>(() => {
     const dataList = this.dataStore.useData();
     const searchValues = this.appliedSearchTokens();
     if (searchValues.length === 0) return dataList;
     const labels = this.searchLabels();
+    const mode = this.routeStore.queryParamsSearchMode();
 
-    return dataList.filter(row =>
-      searchValues.some(search =>
-        labels.some(label => this.matchValue(row[label.byKey], search))
-      )
-    );
+    return dataList.filter(row => {
+      const matchesKeyword = (search: string) =>
+        labels.some(label => this.matchValue(row[label.byKey], search));
+      return mode === 'and'
+        ? searchValues.every(matchesKeyword)
+        : searchValues.some(matchesKeyword);
+    });
   });
 
   // 在搜尋結果中依主鍵套用標籤；未選標籤時直接沿用搜尋結果。

@@ -1,0 +1,61 @@
+@use '@angular/material' as mat;
+
+:host {
+  display: block;
+  flex: 1 1 120px;
+  min-width: 0;
+
+  @include mat.icon-button-overrides(
+    (
+      state-layer-size: 38px,
+      touch-target-size: 38px,
+      container-shape: var(--app-radius-sm),
+      icon-color: var(--app-text-secondary),
+      hover-state-layer-opacity: 0,
+    )
+  );
+}
+
+.search-field {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  border: 1px solid var(--app-border-strong);
+  border-radius: var(--app-radius-sm);
+  background: var(--app-surface);
+
+  &:focus-within {
+    border-color: var(--app-focus-ring);
+    box-shadow: 0 0 0 3px rgb(37 99 235 / 15%);
+  }
+}
+
+input {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 0;
+  height: 100%;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: inherit;
+  outline: none;
+  background: transparent;
+  color: var(--app-text-primary);
+  font-size: var(--app-font-size-sm);
+  font-weight: 400;
+}
+
+button {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 7px;
+
+  &:focus-visible {
+    outline: 2px solid var(--app-focus-ring);
+    outline-offset: -3px;
+  }
+}

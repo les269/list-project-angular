@@ -7,7 +7,6 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -25,7 +24,9 @@ import { CustomButtonsComponent } from '../../components/custom-buttons/custom-b
 import { ImgContentComponent } from '../../components/img-content/img-content.component';
 import { ItemTagButtonsComponent } from '../../components/item-tag-buttons/item-tag-buttons.component';
 import { ListItemValueComponent } from '../../components/list-item-value/list-item-value.component';
+import { SearchInput } from '../../components/search-input/search-input';
 import { TopCustomButtonsComponent } from '../../components/top-custom-buttons/top-custom-buttons.component';
+import { SearchToolbarLayoutDirective } from '../../directives/search-toolbar-layout.directive';
 import {
   DataStore,
   FilterStore,
@@ -46,7 +47,8 @@ import {
     ListItemValueComponent,
     CustomButtonsComponent,
     TopCustomButtonsComponent,
-    MatAutocompleteModule,
+    SearchInput,
+    SearchToolbarLayoutDirective,
     NgTemplateOutlet,
     FixedImageComponent,
     ItemTagButtonsComponent,

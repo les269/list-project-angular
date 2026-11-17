@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import {
@@ -19,7 +18,9 @@ import { FileSizePipe } from '../../../../shared/util/util.pipe';
 import { CustomButtonsComponent } from '../../components/custom-buttons/custom-buttons.component';
 import { ItemTagButtonsComponent } from '../../components/item-tag-buttons/item-tag-buttons.component';
 import { ListItemValueComponent } from '../../components/list-item-value/list-item-value.component';
+import { SearchInput } from '../../components/search-input/search-input';
 import { TopCustomButtonsComponent } from '../../components/top-custom-buttons/top-custom-buttons.component';
+import { SearchToolbarLayoutDirective } from '../../directives/search-toolbar-layout.directive';
 import {
   DataStore,
   FilterStore,
@@ -47,7 +48,8 @@ import {
     MatButtonModule,
     CustomButtonsComponent,
     TopCustomButtonsComponent,
-    MatAutocompleteModule,
+    SearchInput,
+    SearchToolbarLayoutDirective,
     ItemTagButtonsComponent,
   ],
   providers: [

@@ -56,6 +56,9 @@ export class ListBaseViewStoreAdapter {
   get searchValue() {
     return this.routeStore.searchValue;
   }
+  get searchMode() {
+    return this.routeStore.searchMode;
+  }
   get currentPage() {
     return this.routeStore.page;
   }

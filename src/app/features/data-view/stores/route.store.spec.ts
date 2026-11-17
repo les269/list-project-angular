@@ -112,6 +112,11 @@ async function setup(url = query(3)) {
               currentPage: route.page,
               pages: filters.pages,
               searchValue: route.searchValue,
+              searchMode: route.searchMode,
+              onSearch: (text: string) => {
+                route.searchValue.set(text);
+                route.patchQuery({ type: QueryActionType.search });
+              },
               totalLength: filters.totalLength,
               queryParamsSort: route.queryParamsSort,
               queryParamsAsc: route.queryParamsAsc,
@@ -362,4 +367,86 @@ it('Dataset 與標籤選取跟隨 URL，上一頁與下一頁可還原選取狀�
   await history('forward');
   expect(view.routeStore.datasetSeq()).toBe(5);
   expect(view.routeStore.page()).toBe(2);
+});
+
+it.each([
+  ['target,two', 'target,two', 'or'],
+  ['and:target,two', 'target,two', 'and'],
+  ['or:target,two', 'target,two', 'or'],
+  ['or:and:test', 'and:test', 'or'],
+  ['and:or:test', 'or:test', 'and'],
+])('開啟搜尋連結 %s 時只解析第一層前綴', async (encoded, value, mode) => {
+  const { view, harness } = await setup(query(1, encoded));
+  expect(view.routeStore.searchValue()).toBe(value);
+  expect(view.routeStore.searchMode()).toBe(mode);
+  const inputs = harness.fixture.nativeElement.querySelectorAll(
+    'app-search-input input'
+  ) as NodeListOf<HTMLInputElement>;
+  expect(Array.from(inputs, input => input.value)).toEqual([value, value]);
+});
+
+it.each([
+  { value: 'target,two', mode: 'or' as const, encoded: 'target,two' },
+  { value: 'target,two', mode: 'and' as const, encoded: 'and:target,two' },
+  { value: 'and:test', mode: 'or' as const, encoded: 'or:and:test' },
+  { value: 'or:test', mode: 'or' as const, encoded: 'or:or:test' },
+  { value: 'and:test', mode: 'and' as const, encoded: 'and:and:test' },
+  { value: '', mode: 'and' as const, encoded: 'and:' },
+])(
+  '送出搜尋 $encoded 保留原文與模式且不增加 URL 參數',
+  async ({ value, mode, encoded }) => {
+    const { view, harness, router } = await setup(query(1));
+    const keys = Object.keys(router.parseUrl(router.url).queryParams).sort();
+    view.routeStore.searchValue.set(value);
+    view.routeStore.searchMode.set(mode);
+    view.routeStore.patchQuery({ type: QueryActionType.search });
+    await harness.fixture.whenStable();
+    const params = router.parseUrl(router.url).queryParams;
+    expect(params['searchValue']).toBe(encoded);
+    expect(Object.keys(params).sort()).toEqual(keys);
+    expect(view.routeStore.searchValue()).toBe(value);
+    expect(view.routeStore.searchMode()).toBe(mode);
+  }
+);
+
+it('切換模式只修改草稿，Enter 才套用 AND，歷史導覽還原兩種檢視的模式', async () => {
+  const { view, harness, router, history } = await setup(
+    query(1, 'target,two')
+  );
+  const modeButtons = () =>
+    Array.from(
+      harness.fixture.nativeElement.querySelectorAll(
+        'button[aria-label="g.toggleSearchMode"]'
+      )
+    ) as HTMLButtonElement[];
+  expect(view.filterStore.totalLength()).toBe(2);
+  modeButtons()[0].click();
+  await harness.fixture.whenStable();
+  expect(
+    modeButtons().map(button => button.getAttribute('aria-pressed'))
+  ).toEqual(['true', 'true']);
+  expect(view.filterStore.totalLength()).toBe(2);
+  expect(router.parseUrl(router.url).queryParams['searchValue']).toBe(
+    'target,two'
+  );
+  const input = harness.fixture.nativeElement.querySelector(
+    'app-search-input input'
+  ) as HTMLInputElement;
+  input.dispatchEvent(
+    new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
+  );
+  await harness.fixture.whenStable();
+  expect(router.parseUrl(router.url).queryParams['searchValue']).toBe(
+    'and:target,two'
+  );
+  expect(view.filterStore.totalLength()).toBe(0);
+  await history('back');
+  expect(view.routeStore.searchMode()).toBe('or');
+  expect(
+    modeButtons().map(button => button.getAttribute('aria-pressed'))
+  ).toEqual(['false', 'false']);
+  expect(view.filterStore.totalLength()).toBe(2);
+  await history('forward');
+  expect(view.routeStore.searchMode()).toBe('and');
+  expect(view.filterStore.totalLength()).toBe(0);
 });

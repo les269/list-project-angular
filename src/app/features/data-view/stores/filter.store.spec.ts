@@ -5,6 +5,7 @@ import { DataStore } from './data.store';
 import { FilterStore } from './filter.store';
 import { HeaderStore } from './header.store';
 import { RouteStore } from './route.store';
+import { SearchMode } from '../models/search.model';
 
 async function setup() {
   const rows = signal<Record<string, unknown>[]>([
@@ -16,6 +17,7 @@ async function setup() {
   ]);
   const query = signal('');
   const draft = signal('');
+  const mode = signal<SearchMode>('or');
   const page = signal(1);
   const sortKey = signal('name');
   const ascFlag = signal(true);
@@ -66,6 +68,7 @@ async function setup() {
         provide: RouteStore,
         useValue: {
           queryParamsSearchValue: query,
+          queryParamsSearchMode: mode,
           searchValue: draft,
           page,
           sortKey,
@@ -83,6 +86,7 @@ async function setup() {
     rows,
     query,
     draft,
+    mode,
     page,
     sortKey,
     ascFlag,
@@ -185,4 +189,28 @@ it('隨機排序沿用資料中的 random key，並保留筆數與分頁', async
   expect(store.totalLength()).toBe(5);
   store.setPage(2);
   expect(store.viewData().map(row => row['name'])).toEqual(['c', 'd']);
+});
+
+it('AND 的關鍵字可分散在不同欄位與陣列元素，空條件仍顯示全部資料', async () => {
+  const { store, rows, labels, query, mode } = await setup();
+  labels.update(current => [
+    ...current,
+    { ...current[0], byKey: 'skills', type: 'stringArray' },
+  ]);
+  rows.set([
+    { name: '台北', skills: ['工程師', 0] },
+    { name: '台北', skills: ['設計師'] },
+    { name: '高雄', skills: ['工程師', 0] },
+    { name: '台北', skills: null },
+  ]);
+  query.set(' 台北 , 工程師 , 0 , , ');
+  expect(store.totalLength()).toBe(4);
+  mode.set('and');
+  expect(store.searchedData()).toEqual([
+    { name: '台北', skills: ['工程師', 0] },
+  ]);
+  query.set('工程師,0');
+  expect(store.totalLength()).toBe(2);
+  query.set(' , , ');
+  expect(store.totalLength()).toBe(4);
 });

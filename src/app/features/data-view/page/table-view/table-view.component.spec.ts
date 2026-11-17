@@ -22,6 +22,7 @@ it('晚到與後續變更的配色會更新畫面，來源 row 與其他 consume
     themeTopCustomList: signal([]),
     themeCustomList: signal([]),
     searchValue: signal(''),
+    searchMode: signal<'and' | 'or'>('or'),
     filterAutoCompleteList: signal([]),
     currentPage: signal(1),
     totalLength: signal(2),
