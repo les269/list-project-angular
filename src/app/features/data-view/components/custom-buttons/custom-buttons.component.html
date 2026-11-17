@@ -5,7 +5,7 @@
         @case ('buttonIconBoolean') {
           <div class="custom-button-group">
             <button class="custom-button" (click)="changeCustomValue(custom)">
-              <label class="px-2">{{ custom.label }}</label>
+              <span>{{ custom.label }}</span>
               <mat-icon class="material-icons-outlined">
                 <span class="material-symbols-outlined">
                   {{ getCustomValueForUI(custom) }}
@@ -17,7 +17,7 @@
         @case ('buttonIconFill') {
           <div class="custom-button-group">
             <button class="custom-button" (click)="changeCustomValue(custom)">
-              <label class="px-2">{{ custom.label }}</label>
+              <span>{{ custom.label }}</span>
               <mat-icon
                 [style.color]="
                   getCustomValueForUI(custom)
@@ -41,7 +41,7 @@
             <button
               class="custom-button"
               (click)="openButtonInputUrlDialog(custom)">
-              <label class="px-2">{{ custom.label }}</label>
+              <span>{{ custom.label }}</span>
             </button>
             @let customValue = getCustomValue(custom);
             @if (customValue !== '') {
@@ -59,7 +59,7 @@
             <button
               class="custom-button"
               [ngCopy]="replaceValue(custom.copyValue, data())">
-              <label class="px-2">{{ custom.label }}</label>
+              <span>{{ custom.label }}</span>
             </button>
           </div>
         }
@@ -70,7 +70,7 @@
               [href]="replaceValue(custom.openUrl, data())"
               [target]="custom.openWindowsTarget"
               rel="noopener noreferrer">
-              <label class="px-2">{{ custom.label }}</label>
+              <span>{{ custom.label }}</span>
             </a>
           </div>
         }
@@ -79,7 +79,7 @@
             <button
               class="custom-button"
               (click)="openNoteDialog(custom, 'write')">
-              <label class="px-2">{{ custom.label }}</label>
+              <span>{{ custom.label }}</span>
             </button>
             @let noteValue = getCustomValue(custom);
             @if (noteValue !== '') {
@@ -97,7 +97,7 @@
               class="custom-button"
               [disabled]="true"
               [title]="'apiRequestConfig.executionUnavailable' | translate">
-              <label class="px-2">{{ custom.label }}</label>
+              <span>{{ custom.label }}</span>
             </button>
           </div>
         }
@@ -107,7 +107,7 @@
               class="custom-button"
               (click)="deleteFile(custom)"
               [disabled]="!fileExistForCurrentData()">
-              <label class="px-2">{{ custom.label }}</label>
+              <span>{{ custom.label }}</span>
             </button>
           </div>
         }
@@ -117,7 +117,7 @@
               class="custom-button"
               (click)="moveTo(custom)"
               [disabled]="!fileExistForCurrentData()">
-              <label class="px-2">{{ custom.label }}</label>
+              <span>{{ custom.label }}</span>
             </button>
           </div>
         }
@@ -127,7 +127,7 @@
               class="custom-button"
               (click)="openFolder(custom)"
               [disabled]="!fileExistForCurrentData()">
-              <label class="px-2">{{ custom.label }}</label>
+              <span>{{ custom.label }}</span>
             </button>
           </div>
         }

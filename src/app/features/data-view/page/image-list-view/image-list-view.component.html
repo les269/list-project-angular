@@ -1,11 +1,12 @@
-<div class="content">
-  <div class="content-header">
-    <div class="header-left col-4">
+<div class="content view-page">
+  <div class="view-toolbar">
+    <div class="toolbar-filters">
       @if (store.themeDatasetList() && store.themeDatasetList().length > 1) {
         <select
-          class="list-select"
+          class="form-select"
           #datasetSelect
           [matTooltip]="'themeDataset.selectDataset' | translate"
+          [attr.aria-label]="'themeDataset.selectDataset' | translate"
           (change)="
             store.changeDataset(
               store.themeDatasetList()[datasetSelect.selectedIndex]
@@ -25,9 +26,10 @@
         store.themeTagListForSelect().length > 1
       ) {
         <select
-          class="list-select"
+          class="form-select"
           #tagSelect
           [matTooltip]="'themeTag.selectTag' | translate"
+          [attr.aria-label]="'themeTag.selectTag' | translate"
           (change)="
             store.changeShareTag(
               store.themeTagListForSelect()[tagSelect.selectedIndex]
@@ -51,88 +53,92 @@
         class="d-flex"
         mat-icon-button
         [matTooltip]="'g.refresh' | translate"
+        [attr.aria-label]="'g.refresh' | translate"
         (click)="store.onRefresh()">
         <mat-icon>loop</mat-icon>
       </button>
     </div>
-    <div class="header-center col-4">
-      <div class="d-flex">
-        <input
-          type="text"
-          class="form-control"
-          [matAutocomplete]="auto"
-          #searchInput
-          [value]="store.searchValue()"
-          (input)="store.searchValue.set(searchInput.value)"
-          (keydown.enter)="store.onSearch(store.searchValue())" />
-        <mat-autocomplete
-          #auto="matAutocomplete"
-          (optionSelected)="store.onSearch($event.option.value)">
-          @for (option of store.filterAutoCompleteList(); track option) {
-            <mat-option [value]="option">{{ option }}</mat-option>
-          }
-        </mat-autocomplete>
-        @if (store.autoCompleteList().length > 0) {
-          <button
-            mat-icon-button
-            class="d-flex"
-            [matTooltip]="'g.popupSelect' | translate"
-            (click)="store.selectMultipleValue()">
-            <mat-icon class="material-icons-outlined"
-              ><span class="material-symbols-outlined">
-                select_window_2
-              </span></mat-icon
-            >
-          </button>
+    <div class="toolbar-search">
+      <input
+        type="text"
+        class="form-control"
+        [attr.aria-label]="'g.search' | translate"
+        [matAutocomplete]="auto"
+        #searchInput
+        [value]="store.searchValue()"
+        (input)="store.searchValue.set(searchInput.value)"
+        (keydown.enter)="store.onSearch(store.searchValue())" />
+      <mat-autocomplete
+        #auto="matAutocomplete"
+        (optionSelected)="store.onSearch($event.option.value)">
+        @for (option of store.filterAutoCompleteList(); track option) {
+          <mat-option [value]="option">{{ option }}</mat-option>
         }
+      </mat-autocomplete>
+      @if (store.autoCompleteList().length > 0) {
         <button
           mat-icon-button
           class="d-flex"
-          [matTooltip]="'g.clear' | translate"
-          (click)="store.onSearch('')">
-          <mat-icon>clear</mat-icon>
+          [matTooltip]="'g.popupSelect' | translate"
+          [attr.aria-label]="'g.popupSelect' | translate"
+          (click)="store.selectMultipleValue()">
+          <mat-icon class="material-icons-outlined"
+            ><span class="material-symbols-outlined">
+              select_window_2
+            </span></mat-icon
+          >
         </button>
+      }
+      <button
+        mat-icon-button
+        class="d-flex"
+        [matTooltip]="'g.clear' | translate"
+        [attr.aria-label]="'g.clear' | translate"
+        (click)="store.onSearch('')">
+        <mat-icon>clear</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        class="d-flex"
+        [matTooltip]="'g.search' | translate"
+        [attr.aria-label]="'g.search' | translate"
+        (click)="store.onSearch(store.searchValue())">
+        <mat-icon>search</mat-icon>
+      </button>
+      @if (store.defaultKey() !== '') {
         <button
           mat-icon-button
           class="d-flex"
-          [matTooltip]="'g.search' | translate"
-          (click)="store.onSearch(store.searchValue())">
-          <mat-icon>search</mat-icon>
+          [matTooltip]="'g.random' | translate"
+          [attr.aria-label]="'g.random' | translate"
+          (click)="store.randomSearch()">
+          <mat-icon>shuffle</mat-icon>
         </button>
-        @if (store.defaultKey() !== '') {
-          <button
-            mat-icon-button
-            class="d-flex"
-            [matTooltip]="'g.random' | translate"
-            (click)="store.randomSearch()">
-            <mat-icon>shuffle</mat-icon>
-          </button>
-        }
-      </div>
+      }
     </div>
-    <div class="header-right col-4">
+    <div class="toolbar-actions toolbar-navigation">
       <ng-container *ngTemplateOutlet="headerRight"></ng-container>
     </div>
   </div>
-  <div class="d-flex mb-2">
-    <app-top-custom-buttons
-      [themeTopCustomList]="store.themeTopCustomList()"
-      [headerId]="store.headerId()"
-      [type]="store.themeHeaderType()"
-      [topCustomValueMap]="
-        store.topCustomValueMap.value()
-      "></app-top-custom-buttons>
-  </div>
+  @if (store.themeTopCustomList().length > 0) {
+    <div class="top-actions">
+      <app-top-custom-buttons
+        [themeTopCustomList]="store.themeTopCustomList()"
+        [headerId]="store.headerId()"
+        [type]="store.themeHeaderType()"
+        [topCustomValueMap]="
+          store.topCustomValueMap.value()
+        "></app-top-custom-buttons>
+    </div>
+  }
   <div class="list-content">
-    <div class="py-2">
+    <div class="list-summary">
       {{ 'g.totalNum' | translate }}: {{ store.totalLength() }}
     </div>
     <ng-container *ngTemplateOutlet="dataListRef"></ng-container>
   </div>
-  <div class="content-footer">
-    <div class="footer-left col-4"></div>
-    <div class="footer-center col-4"></div>
-    <div class="footer-right col-4">
+  <div class="view-footer">
+    <div class="toolbar-actions toolbar-navigation">
       <ng-container *ngTemplateOutlet="headerRight"></ng-container>
     </div>
   </div>
@@ -141,9 +147,10 @@
 <ng-template #headerRight>
   @if (store.sortArray().length > 0) {
     <select
-      class="list-select"
+      class="form-select"
       #sortSelect
       [matTooltip]="'g.sort' | translate"
+      [attr.aria-label]="'g.sort' | translate"
       (change)="changeSort(store.sortArray()[sortSelect.selectedIndex])">
       @for (sort of store.sortArray(); track sort.key) {
         <option
@@ -153,43 +160,47 @@
         </option>
       }
     </select>
-    <div class="d-flex flex-column justify-content-center">
-      <mat-icon class="sortAsc" (click)="changeAsc()">{{
+    <button
+      mat-icon-button
+      [matTooltip]="'g.sort' | translate"
+      [attr.aria-label]="'g.sort' | translate"
+      (click)="changeAsc()">
+      <mat-icon>{{
         this.store.ascFlag() ? 'keyboard_arrow_down' : 'keyboard_arrow_up'
       }}</mat-icon>
-    </div>
+    </button>
   }
   @if (store.pages().length > 1) {
     <select
-      class="list-select"
+      class="form-select"
       #pageSelect
+      [attr.aria-label]="'g.page' | translate"
       [value]="store.currentPage()"
       (change)="changePage(+pageSelect.value)">
       @for (page of store.pages(); track page) {
         <option [value]="page">{{ page }} {{ 'g.page' | translate }}</option>
       }
     </select>
-    <div class="d-flex flex-column justify-content-center" style="height: 34px">
-      @if (store.currentPage() !== 1 && store.pages().length !== 1) {
-        <mat-icon
-          class="prePage"
-          (click)="store.prePage()"
-          [matTooltip]="'g.prePage' | translate"
-          >keyboard_arrow_up</mat-icon
-        >
-      }
-      @if (
-        store.currentPage() !== store.pages().length &&
-        store.pages().length !== 1
-      ) {
-        <mat-icon
-          class="nextPage"
-          (click)="store.nextPage()"
-          [matTooltip]="'g.nextPage' | translate"
-          >keyboard_arrow_down</mat-icon
-        >
-      }
-    </div>
+    @if (store.currentPage() !== 1 && store.pages().length !== 1) {
+      <button
+        mat-icon-button
+        (click)="store.prePage()"
+        [matTooltip]="'g.prePage' | translate"
+        [attr.aria-label]="'g.prePage' | translate">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+    }
+    @if (
+      store.currentPage() !== store.pages().length && store.pages().length !== 1
+    ) {
+      <button
+        mat-icon-button
+        (click)="store.nextPage()"
+        [matTooltip]="'g.nextPage' | translate"
+        [attr.aria-label]="'g.nextPage' | translate">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    }
   }
 </ng-template>
 <ng-template #dataListRef>
@@ -216,35 +227,25 @@
           "></app-img-content>
         <div class="detail-content">
           <div class="edit-button">
-            @if (store.hoveredIndex() === i) {
-              @if (store.themeOtherSetting()?.useQuickRefresh) {
-                <button
-                  class="d-flex"
-                  mat-icon-button
-                  [matTooltip]="'themeDataset.quickRefresh' | translate"
-                  (click)="quickRefresh(data)">
-                  <mat-icon class="material-icons-outlined"
-                    ><span class="material-symbols-outlined">
-                      refresh
-                    </span></mat-icon
-                  >
-                </button>
-              }
+            @if (store.themeOtherSetting()?.useQuickRefresh) {
               <button
-                class="d-flex"
                 mat-icon-button
-                [matTooltip]="'themeDataset.editData' | translate"
-                (click)="store.openEditData(data)">
-                <mat-icon class="material-icons-outlined"
-                  ><span class="material-symbols-outlined">
-                    edit
-                  </span></mat-icon
-                >
+                [matTooltip]="'themeDataset.quickRefresh' | translate"
+                [attr.aria-label]="'themeDataset.quickRefresh' | translate"
+                (click)="quickRefresh(data)">
+                <mat-icon>refresh</mat-icon>
               </button>
             }
+            <button
+              mat-icon-button
+              [matTooltip]="'themeDataset.editData' | translate"
+              [attr.aria-label]="'themeDataset.editData' | translate"
+              (click)="store.openEditData(data)">
+              <mat-icon>edit</mat-icon>
+            </button>
           </div>
 
-          <div class="detail-rows scrollbar-primary">
+          <div class="detail-rows">
             @for (
               label of store.visibleLabelList();
               track label.byKey;
@@ -271,7 +272,7 @@
             }
             @if (store.themeTagList().length > 0) {
               <div class="detail-row">
-                <div class="row-label">{{ 'g.tag' | translate }}</div>
+                <div class="row-label tag-label">{{ 'g.tag' | translate }}</div>
                 <app-item-tag-buttons
                   [value]="data[store.defaultKey()]"
                   [data]="data"

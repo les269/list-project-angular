@@ -1,45 +1,39 @@
 @use '../../../../../styles/action-button';
 
+:host {
+  display: block;
+  min-width: 0;
+}
+
 .custom-button-group {
   display: flex;
-  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0;
+  padding: 1px 0 0 1px;
 
   > .custom-button {
     @include action-button.base;
+    @include action-button.states;
 
-    height: 24px;
-    min-width: 120px;
-    border-left: none;
-    font-size: 0.875rem;
+    position: relative;
+    margin: -1px 0 0 -1px;
+    border-radius: 0;
+
     &:first-child {
-      border-left: 1px solid var(--app-action-border);
       border-top-left-radius: var(--app-action-radius);
       border-bottom-left-radius: var(--app-action-radius);
-    }
-    &:first-child:not(:last-child) {
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
-      border-right: 1px solid var(--app-action-border);
     }
 
     &:last-child {
       border-top-right-radius: var(--app-action-radius);
       border-bottom-right-radius: var(--app-action-radius);
     }
-    &:last-child:not(:first-child) {
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
-      border-left: 0px;
+
+    &[aria-pressed='true'],
+    &:focus-visible {
+      z-index: 1;
     }
-
-    > label {
-      width: max-content;
-    }
-
-    @include action-button.states;
-  }
-
-  > .custom-button.custom-icon {
-    @include action-button.icon;
   }
 }

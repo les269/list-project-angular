@@ -1,7 +1,10 @@
 <div class="d-flex custom-button-group">
   @for (themeTag of themeTagList(); track themeTag.shareTagId) {
-    <button class="custom-button" (click)="onSetTag(themeTag.shareTagId)">
-      <label class="px-2">{{ shareTagNameMap()[themeTag.shareTagId] }}</label>
+    <button
+      class="custom-button"
+      [attr.aria-pressed]="checkedTags().has(themeTag.shareTagId)"
+      (click)="onSetTag(themeTag.shareTagId)">
+      <span>{{ shareTagNameMap()[themeTag.shareTagId] }}</span>
       @if (checkedTags().has(themeTag.shareTagId)) {
         <mat-icon class="material-icons-outlined">
           <span class="material-symbols-outlined"> check </span>

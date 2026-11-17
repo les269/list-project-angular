@@ -1,149 +1,160 @@
-@media (min-width: 768px) {
-  .content {
-    padding: 0px 4%;
-  }
-  .card-body {
-    flex-direction: row;
-  }
-  .img-content {
-    flex: 0 0 auto;
-    width: 25%;
-  }
-  .detail-content {
-    flex: 0 0 auto;
-    width: 75%;
-  }
-}
-@media (max-width: 768px) {
-  .content {
-    padding: 0px 2%;
-  }
-  .card-body {
-    flex-direction: column;
-  }
-  .img-content {
-    width: 100%;
-  }
-}
-.content-header {
-  display: flex;
-  padding-bottom: 1rem;
-  > .header-left {
-    display: flex;
-    align-items: center;
-  }
-  > .header-right {
-    display: flex;
-    justify-content: flex-end;
-  }
-}
-.content-footer {
-  display: flex;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-  > .footer-right {
-    display: flex;
-    justify-content: flex-end;
-  }
-}
-mat-icon.prePage {
-  height: 17px;
-  line-height: 17px;
-  cursor: pointer;
-}
-mat-icon.nextPage {
-  height: 17px;
-  cursor: pointer;
-}
-mat-icon.sortAsc {
-  height: 17px;
-  cursor: pointer;
-}
-select.list-select {
-  min-width: 80px;
-  text-align: center;
-  margin-right: 10px;
-  height: 34px;
-  border: 1px solid #cad1d7;
-  border-radius: 30px;
-  outline: none;
-  &::-webkit-scrollbar {
-    width: 10px;
-  }
+@use '@angular/material' as mat;
+@use '../../styles/view-toolbar' as toolbar;
 
-  &::-webkit-scrollbar-track-piece {
-    background: none;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.3);
+@include toolbar.layout;
+
+.toolbar-navigation {
+  flex-wrap: nowrap;
+
+  select {
+    flex: 1 1 auto;
+    width: auto;
+    max-width: 180px;
   }
 }
-.content {
-  background: #f2f9fe;
-  padding-top: 8px;
-}
+
 .list-content {
-  background-color: #fff;
-  border: 1px solid #dee2e6;
-  box-shadow: 0px 0px 8px #888888;
+  background-color: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-md);
 }
 
-div.card {
-  width: 100%;
-  padding: 0px;
-  border: 1px solid #dee2e6;
-  min-height: 33vh;
-  border: 0px;
-  box-shadow:
-    0px 2px 1px -1px rgba(0, 0, 0, 0.2),
-    0px 1px 1px 0px rgba(0, 0, 0, 0.14),
-    0px 1px 3px 0px rgba(0, 0, 0, 0.12);
-  border-radius: 0px;
-  > div.card-body {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0px;
+.list-summary {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--app-border);
+  color: var(--app-text-secondary);
+  font-size: var(--app-font-size-sm);
+}
 
-    > div.detail-content {
-      display: flex;
-      flex-direction: column;
-      align-self: stretch;
-      padding: 2px 0.5rem;
-      gap: 4px;
-      > div.detail-rows {
-        width: 100%;
-        padding: 5px;
-        overflow: auto;
-        background-color: #f0f7f9;
-        height: 100%;
-        border: 1px solid #dee2e6;
-        > div.detail-row {
-          width: 100%;
-          display: flex;
-          > div.row-label {
-            font-size: 16px;
-            font-weight: bold;
-            display: block;
-            width: 80px;
-            min-width: 80px;
-          }
-          > div {
-            display: flex;
-            width: 100%;
-          }
-        }
-      }
-      > div.buttons-panel {
-        background-color: #f0f7f9;
-        border: 1px solid #dee2e6;
-      }
-      > div.edit-button {
-        display: flex;
-        right: 20px;
-        position: absolute;
-      }
+.card {
+  width: 100%;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 0;
+  background: var(--app-surface-muted);
+  box-shadow: none;
+
+  & + .card {
+    border-top: 1px solid var(--app-border);
+  }
+}
+
+.card-body {
+  display: grid;
+  grid-template-columns: minmax(140px, 22%) minmax(0, 1fr);
+  align-items: stretch;
+  gap: 12px;
+  width: 100%;
+  padding: 0;
+}
+
+.img-content {
+  display: block;
+  min-width: 0;
+}
+
+.detail-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 4px 8px;
+  min-width: 0;
+}
+
+.detail-rows {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+
+.detail-row {
+  display: grid;
+  grid-template-columns: minmax(72px, 100px) minmax(0, 1fr);
+  gap: 8px;
+  padding: 1px 0;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+
+  > app-list-item-value,
+  > app-item-tag-buttons {
+    display: block;
+    min-width: 0;
+  }
+}
+
+.row-label {
+  align-self: start;
+  color: #000;
+  font-size: var(--app-font-size-body);
+  font-weight: 700;
+}
+
+.tag-label {
+  align-self: center;
+}
+
+.buttons-panel {
+  grid-column: 1 / -1;
+  min-width: 0;
+  padding-top: 12px;
+}
+
+.edit-button {
+  display: flex;
+  grid-column: 2;
+  grid-row: 1;
+  gap: 4px;
+  visibility: hidden;
+
+  @include mat.icon-button-overrides(
+    (
+      state-layer-size: 40px,
+      touch-target-size: 40px,
+      container-shape: var(--app-radius-sm),
+      icon-color: var(--app-text-secondary),
+      hover-state-layer-opacity: 0,
+    )
+  );
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+
+    > mat-icon {
+      display: block;
+      line-height: 1;
     }
+
+    &:hover {
+      background: var(--app-hover-bg);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--app-focus-ring);
+      outline-offset: 2px;
+    }
+  }
+}
+
+.card:hover .edit-button,
+.card:focus-within .edit-button {
+  visibility: visible;
+}
+
+@media (max-width: 767px) {
+  .card-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .img-content {
+    height: clamp(160px, 40vw, 260px);
+  }
+
+  .detail-row {
+    grid-template-columns: 80px minmax(0, 1fr);
   }
 }

@@ -1,5 +1,31 @@
+@use '../../../../../styles/action-button';
+
+:host {
+  display: block;
+  min-width: 0;
+  --app-action-padding-inline: 10px;
+  --app-action-icon-width: 30px;
+}
+
 .buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.custom-button-group {
+  @include action-button.group;
+}
+
+.custom-button {
+  @include action-button.base;
+  @include action-button.states;
+
+  min-height: 30px;
+  padding-block: 3px;
+}
+
+.custom-button.custom-icon {
+  @include action-button.icon;
 }

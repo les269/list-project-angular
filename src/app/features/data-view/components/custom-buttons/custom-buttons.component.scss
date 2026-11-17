@@ -1,38 +1,29 @@
 @use '../../../../../styles/action-button';
 
-@media (max-width: 768px) {
-  .buttons {
-    justify-content: space-between !important;
-  }
+:host {
+  display: block;
+  min-width: 0;
+  --app-action-padding-inline: 10px;
+  --app-action-icon-width: 30px;
 }
+
 .buttons {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
-  gap: 4px;
+  align-items: flex-start;
+  gap: 6px;
 }
+
 .custom-button-group {
-  display: flex;
-  flex-direction: row;
-  > .custom-button:first-child:not(:last-child) {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    border-right: 0px;
-  }
-  > .custom-button:last-child:not(:first-child) {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-  }
+  @include action-button.group;
+
   > .custom-button {
     @include action-button.base;
-
-    height: 28px;
-    min-width: 8em;
-    font-size: 1rem;
-    border-radius: var(--app-action-radius);
-    text-decoration: none;
-
     @include action-button.states;
+
+    min-height: 30px;
+    padding-block: 3px;
   }
 
   > .custom-button.custom-icon {

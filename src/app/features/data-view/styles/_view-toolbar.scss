@@ -1,0 +1,158 @@
+@use '@angular/material' as mat;
+
+@mixin layout {
+  :host {
+    display: block;
+    min-width: 0;
+    background: var(--app-bg);
+  }
+
+  .view-page {
+    padding: 16px;
+    background: var(--app-bg);
+  }
+
+  .view-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+    margin-bottom: 12px;
+  }
+
+  .toolbar-filters,
+  .toolbar-search,
+  .toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .toolbar-filters {
+    flex: 0 1 auto;
+    flex-wrap: nowrap;
+    max-width: 100%;
+
+    select {
+      flex: 1 1 120px;
+      width: auto;
+      max-width: 240px;
+    }
+  }
+
+  .toolbar-search {
+    flex: 1 1 320px;
+
+    input {
+      flex: 1 1 120px;
+      width: 0;
+    }
+  }
+
+  .toolbar-actions {
+    flex-wrap: wrap;
+    margin-left: auto;
+    max-width: 100%;
+  }
+
+  .view-toolbar,
+  .view-footer {
+    @include mat.icon-button-overrides(
+      (
+        state-layer-size: 40px,
+        touch-target-size: 40px,
+        container-shape: var(--app-radius-sm),
+        icon-color: var(--app-text-secondary),
+        hover-state-layer-opacity: 0,
+      )
+    );
+
+    input,
+    select {
+      min-width: 0;
+      height: 40px;
+      margin: 0;
+      border: 1px solid var(--app-border-strong);
+      border-radius: var(--app-radius-sm);
+      background-color: var(--app-surface);
+      color: var(--app-text-primary);
+      font-size: var(--app-font-size-sm);
+      font-weight: 400;
+
+      &:focus {
+        border-color: var(--app-focus-ring);
+        outline: none;
+        box-shadow: 0 0 0 3px rgb(37 99 235 / 15%);
+      }
+    }
+
+    select {
+      padding: 6px 32px 6px 12px;
+      text-overflow: ellipsis;
+    }
+
+    button {
+      flex-shrink: 0;
+      min-height: 40px;
+      font-weight: 400;
+
+      &:hover {
+        background-color: var(--app-hover-bg);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--app-focus-ring);
+        outline-offset: 2px;
+      }
+    }
+
+    button[mat-icon-button] {
+      display: inline-flex;
+      width: 40px;
+      height: 40px;
+      padding: 8px;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--app-radius-sm);
+      color: var(--app-text-secondary);
+
+      > mat-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        line-height: 1;
+
+        > span {
+          display: block;
+          line-height: 1;
+        }
+      }
+    }
+  }
+
+  .top-actions {
+    margin-bottom: 12px;
+  }
+
+  .view-footer {
+    display: flex;
+    padding: 12px 0;
+  }
+
+  @media (max-width: 600px) {
+    .view-page {
+      padding: 12px;
+    }
+
+    .toolbar-filters,
+    .toolbar-search {
+      flex-basis: 100%;
+    }
+
+    .toolbar-filters select {
+      max-width: none;
+    }
+  }
+}

@@ -3,23 +3,23 @@
     @switch (custom.type) {
       @case ('openUrl') {
         <a
-          class="btn btn-outline-primary"
+          class="custom-button"
           [href]="custom.openUrl"
           target="_blank"
           rel="noopener noreferrer">
-          <label class="px-2">{{ custom.label }}</label>
+          <span>{{ custom.label }}</span>
         </a>
       }
       @case ('writeNote') {
-        <div class="btn-group">
+        <div class="custom-button-group">
           <button
-            class="btn btn-outline-primary"
+            class="custom-button"
             (click)="openNoteDialog(custom, 'write')">
-            <label class="px-2">{{ custom.label }}</label>
+            <span>{{ custom.label }}</span>
           </button>
           @if (getCustomValue(custom) !== '') {
             <button
-              class="btn btn-outline-primary d-flex"
+              class="custom-button custom-icon"
               (click)="openNoteDialog(custom, 'read')">
               <mat-icon class="material-icons-outlined">description</mat-icon>
             </button>
@@ -28,10 +28,10 @@
       }
       @case ('apiConfig') {
         <button
-          class="btn btn-outline-primary"
+          class="custom-button"
           [disabled]="true"
           [title]="'apiRequestConfig.executionUnavailable' | translate">
-          <label class="px-2">{{ custom.label }}</label>
+          <span>{{ custom.label }}</span>
         </button>
       }
     }
