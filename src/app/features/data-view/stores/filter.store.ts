@@ -17,11 +17,19 @@ export class FilterStore {
 
   constructor() {
     effect(() => {
-      if (this.dataStore.useData().length === 0) return; // wait for data to load before validating
+      // 等待資料與欄位載入完成，避免以暫時的空結果校正頁碼。
+      if (
+        this.headerStore.themeHeader.isLoading() ||
+        this.headerStore.themeItems.isLoading() ||
+        this.dataStore.datasetDataList.isLoading() ||
+        this.dataStore.shareTagValueList.isLoading()
+      )
+        return;
       const page = this.currentPage();
       const total = Math.max(1, this.pages().length);
       if (page > total) {
-        this.routeStore.setPage(1);
+        // 自動校正不新增歷史紀錄，否則上一頁會再次回到無效頁碼。
+        this.routeStore.setPage(1, { replaceUrl: true });
       }
     });
   }

@@ -5,7 +5,11 @@ import {
   linkedSignal,
   effect,
 } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import {
+  Router,
+  ActivatedRoute,
+  NavigationBehaviorOptions,
+} from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { HeaderStore } from './header.store';
@@ -24,7 +28,11 @@ export class RouteStore {
     effect(() => {
       // read the signal so effect re-runs on changes
       this.queryParamMap();
-      if (this.headerStore.themeHeader.isLoading()) return; // wait for header to load before validating
+      if (
+        this.headerStore.themeHeader.isLoading() ||
+        this.headerStore.themeItems.isLoading()
+      )
+        return;
       const current = { ...this.route.snapshot.queryParams };
       const defaults = this.baseQueryParams();
       // if defaults is not ready, skip
@@ -75,10 +83,17 @@ export class RouteStore {
       validated['tag'] =
         Number.isFinite(t) && tagSeqs.includes(t) ? t : defaults['tag'];
 
-      const currentStr = JSON.stringify(current || {});
-      const validatedStr = JSON.stringify(validated || {});
-      if (currentStr !== validatedStr) {
-        this.router.navigate([], { queryParams: validated });
+      // URL 參數皆為字串，校正時不因型別或 key 順序不同而重複導覽。
+      const keys = Object.keys(validated);
+      if (
+        Object.keys(current).length !== keys.length ||
+        keys.some(key => String(current[key]) !== String(validated[key]))
+      ) {
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: validated,
+          replaceUrl: true,
+        });
       }
     });
   }
@@ -173,11 +188,15 @@ export class RouteStore {
     };
   });
 
-  patchQuery(action: QueryAction) {
+  patchQuery(
+    action: QueryAction,
+    options: Pick<NavigationBehaviorOptions, 'replaceUrl'> = {}
+  ) {
     const queryParams = { ...this.route.snapshot.queryParams };
     switch (action.type) {
       case QueryActionType.search:
         queryParams['searchValue'] = this.searchValue();
+        queryParams['page'] = 1;
         break;
       case QueryActionType.sort:
         queryParams['sort'] = action.key;
@@ -195,13 +214,18 @@ export class RouteStore {
     }
 
     this.router.navigate([], {
+      relativeTo: this.route,
       queryParams: { ...queryParams },
+      ...options,
     });
   }
 
   // convenience setter for page that delegates to patchQuery
-  setPage(page: number) {
+  setPage(
+    page: number,
+    options: Pick<NavigationBehaviorOptions, 'replaceUrl'> = {}
+  ) {
     const target = Number.isFinite(page) ? Math.max(1, Math.floor(page)) : 1;
-    this.patchQuery({ type: QueryActionType.page, page: target });
+    this.patchQuery({ type: QueryActionType.page, page: target }, options);
   }
 }

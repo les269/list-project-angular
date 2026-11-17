@@ -175,10 +175,11 @@
       class="form-select"
       #pageSelect
       [attr.aria-label]="'g.page' | translate"
-      [value]="store.currentPage()"
       (change)="changePage(+pageSelect.value)">
       @for (page of store.pages(); track page) {
-        <option [value]="page">{{ page }} {{ 'g.page' | translate }}</option>
+        <option [value]="page" [selected]="store.currentPage() === page">
+          {{ page }} {{ 'g.page' | translate }}
+        </option>
       }
     </select>
     @if (store.currentPage() !== 1 && store.pages().length !== 1) {

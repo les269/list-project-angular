@@ -1,4 +1,4 @@
-import { computed, effect, inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { DatasetService } from '../../dataset/service/dataset.service';
 import { HeaderStore } from './header.store';
@@ -80,17 +80,11 @@ export class DataStore {
     );
   });
 
-  // clear cache when underlying dataset data or header changes
-  private _clearEffect = effect(() => {
-    this.datasetDataList.value();
-    this.headerStore.headerId();
-  });
-
   // assemble useData for the selected dataset
   useData = computed(() => {
     const dataset = this.useDataset();
     const dataList = this.datasetDataMap().find(
-      x => x.themeDataset.label === dataset.label
+      x => x.themeDataset.seq === dataset.seq
     );
 
     if (!dataList || dataList.datasetDataList.length === 0) return [];
@@ -111,17 +105,15 @@ export class DataStore {
     return new Set(this.useData().map(x => x[key]));
   });
 
-  // convenience to get useShareTag (selected tag based on route param)
+  // 依 seq 識別標籤，不將 seq 當成陣列索引。
   useShareTag = computed(() => {
     const seq = this.routeStore.shareTagSeq();
-    const themeTagListForSelect = [
-      { seq: -1, shareTagId: '' },
-      ...this.headerStore.themeTagList(),
-    ];
-    if (seq === -1) {
-      return { seq: -1, shareTagId: '' };
-    }
-    return themeTagListForSelect[seq];
+    return (
+      this.headerStore.themeTagList().find(tag => tag.seq === seq) ?? {
+        seq: -1,
+        shareTagId: '',
+      }
+    );
   });
 
   shareTagValueListReq = computed(() =>
@@ -183,7 +175,7 @@ export class DataStore {
     return true;
   }
   tagValueUpdate(event: ShareTagValue) {
-    const list = this.shareTagValueMap()[event.shareTagId];
+    const list = this.shareTagValueMap()[event.shareTagId] ?? [];
     const index = list.indexOf(event.value);
     const service$ =
       index > -1
