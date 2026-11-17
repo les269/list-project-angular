@@ -18,6 +18,7 @@ import { HeaderStore } from './header.store';
 import { RouteStore } from './route.store';
 import { By } from '@angular/platform-browser';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
+import { MatPaginator } from '@angular/material/paginator';
 import { TableViewComponent } from '../page/table-view/table-view.component';
 import { ImageListViewComponent } from '../page/image-list-view/image-list-view.component';
 import { ListBaseViewStoreAdapter } from './list-base-view.adapter';
@@ -172,6 +173,11 @@ it('從第三頁搜尋到一頁結果只導覽一次，上一頁與下一頁可�
   expect(starts).toHaveLength(1);
   expect(view.filterStore.currentPage()).toBe(1);
   expect(view.filterStore.totalLength()).toBe(1);
+  const paginator = harness.fixture.debugElement.query(
+    By.directive(MatPaginator)
+  ).componentInstance as MatPaginator;
+  expect(paginator.length).toBe(1);
+  expect(paginator.pageIndex).toBe(0);
   expect(
     harness.fixture.nativeElement.querySelectorAll(
       'select[aria-label="g.page"]'
@@ -181,6 +187,8 @@ it('從第三頁搜尋到一頁結果只導覽一次，上一頁與下一頁可�
   expect(view.routeStore.queryParamsSearchValue()).toBe('');
   expect(view.filterStore.currentPage()).toBe(3);
   expect(view.filterStore.viewData()).toEqual(previousData);
+  expect(paginator.length).toBe(5);
+  expect(paginator.pageIndex).toBe(2);
   const selectors = harness.fixture.nativeElement.querySelectorAll(
     'select[aria-label="g.page"]'
   ) as NodeListOf<HTMLSelectElement>;

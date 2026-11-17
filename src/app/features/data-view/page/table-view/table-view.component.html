@@ -131,7 +131,7 @@
   <mat-paginator
     class="mat-paginator"
     [pageIndex]="store.currentPage() - 1"
-    [length]="store.filterData().length"
+    [length]="store.totalLength()"
     [pageSize]="store.pageSize()"
     [showFirstLastButtons]="true"
     hidePageSize
