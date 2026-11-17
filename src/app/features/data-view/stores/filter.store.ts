@@ -80,15 +80,16 @@ export class FilterStore {
 
   // match value in row (array or scalar)
   matchValue(value: unknown, search: string): boolean {
-    if (!value) return false;
+    if (value === null || value === undefined) return false;
     if (Array.isArray(value)) {
       return value.some(
-        v => isNotBlank(v) && String(v).trim().toLowerCase().includes(search)
+        v =>
+          v !== null &&
+          v !== undefined &&
+          String(v).trim().toLowerCase().includes(search)
       );
     }
-    return (
-      isNotBlank(value) && String(value).trim().toLowerCase().includes(search)
-    );
+    return String(value).trim().toLowerCase().includes(search);
   }
 
   // filter data by search criteria

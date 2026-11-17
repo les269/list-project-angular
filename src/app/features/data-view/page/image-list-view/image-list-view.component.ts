@@ -163,10 +163,7 @@ export class ImageListViewComponent {
         quickRefreshType: otherSetting.quickRefreshType,
       })
       .subscribe(res => {
-        this.store.quickRefreshResult.update(x => {
-          x[primeKey] = res;
-          return x;
-        });
+        this.store.setQuickRefreshResult(datasetName, byKey, primeKey, res);
         this.store.snackbarService.openI18N('msg.refreshSuccess');
       });
   }
@@ -195,8 +192,12 @@ export class ImageListViewComponent {
   }
 
   getData(data: any) {
-    const refreshData =
-      this.store.quickRefreshResult()[data[this.store.defaultKey()]];
+    const byKey = this.store.defaultKey();
+    const refreshData = this.store.getQuickRefreshResult(
+      data[this.store.DATASET_NAME_KEY],
+      byKey,
+      data[byKey]
+    );
     return refreshData ? { ...data, ...refreshData } : data;
   }
 

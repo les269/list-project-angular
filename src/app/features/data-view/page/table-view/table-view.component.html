@@ -146,6 +146,8 @@
       [dataSource]="dataSource()"
       multiTemplateDataRows
       matSort
+      [matSortActive]="store.sortKey()"
+      [matSortDirection]="store.ascFlag() ? 'asc' : 'desc'"
       (matSortChange)="onSortChange($event)">
       @for (label of store.visibleLabelList(); track label.byKey) {
         @let key = label.byKey;

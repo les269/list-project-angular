@@ -16,13 +16,16 @@ import { DataStore } from './data.store';
 import { FilterStore } from './filter.store';
 import { HeaderStore } from './header.store';
 import { RouteStore } from './route.store';
+import { By } from '@angular/platform-browser';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import { TableViewComponent } from '../page/table-view/table-view.component';
 import { ImageListViewComponent } from '../page/image-list-view/image-list-view.component';
 import { ListBaseViewStoreAdapter } from './list-base-view.adapter';
 import { API_BASE_URL } from '../../../core/tokens/api-base-url.token';
 
 @Component({
-  template: '<app-image-list-view />',
-  imports: [ImageListViewComponent],
+  template: '<app-image-list-view /><app-table-view />',
+  imports: [ImageListViewComponent, TableViewComponent],
   providers: [RouteStore, FilterStore],
 })
 class TestView {
@@ -86,7 +89,7 @@ async function setup(url = query(3)) {
       },
     ],
   });
-  TestBed.overrideComponent(ImageListViewComponent, {
+  const viewOverride = {
     set: {
       providers: [
         {
@@ -101,6 +104,15 @@ async function setup(url = query(3)) {
               pages: filters.pages,
               searchValue: route.searchValue,
               totalLength: filters.totalLength,
+              sortKey: route.sortKey,
+              ascFlag: route.ascFlag,
+              patchQuery: (action: Parameters<RouteStore['patchQuery']>[0]) =>
+                route.patchQuery(action),
+              rowColor: signal([]),
+              filterData: filters.filterData,
+              pageSize: filters.pageSize,
+              visibleLabelList: inject(HeaderStore).visibleLabelList,
+              checkVisibleByDataset: () => true,
               setPage: (page: number) => filters.setPage(page),
               prePage: () => filters.prePage(),
               nextPage: () => filters.nextPage(),
@@ -119,7 +131,9 @@ async function setup(url = query(3)) {
         },
       ],
     },
-  });
+  };
+  TestBed.overrideComponent(ImageListViewComponent, viewOverride);
+  TestBed.overrideComponent(TableViewComponent, viewOverride);
   vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
   const harness = await RouterTestingHarness.create();
   const router = TestBed.inject(Router);
@@ -246,4 +260,38 @@ it('直接開啟第二頁、手動換頁及返回歷史時，上下頁碼選單�
   expect(router.parseUrl(router.url).queryParams['page']).toBe('2');
   expect(view.filterStore.currentPage()).toBe(2);
   expect(selectors().map(select => select.value)).toEqual(['2', '2']);
+});
+
+it('Table 排序狀態與圖示在切換方向及歷史返回時跟隨 URL', async () => {
+  const { harness, view, history } = await setup(query(1));
+  const sort = harness.fixture.debugElement
+    .query(By.directive(MatSort))
+    .injector.get(MatSort);
+  const header = () =>
+    harness.fixture.debugElement.query(By.directive(MatSortHeader))
+      .nativeElement as HTMLElement;
+  expect(sort.active).toBe('name');
+  expect(sort.direction).toBe('asc');
+  expect(header().getAttribute('aria-sort')).toBe('ascending');
+  view.routeStore.patchQuery({
+    type: QueryActionType.sort,
+    key: 'name',
+    asc: false,
+  });
+  await harness.fixture.whenStable();
+  expect(sort.direction).toBe('desc');
+  expect(header().getAttribute('aria-sort')).toBe('descending');
+  await history('back');
+  expect(sort.active).toBe('name');
+  expect(sort.direction).toBe('asc');
+  expect(header().getAttribute('aria-sort')).toBe('ascending');
+});
+
+it.each([0, 42, -12, [0, 42]])('數值 %j 可以由搜尋匹配', async value => {
+  const { harness, view, rows } = await setup(query(1));
+  rows.set([{ name: value as unknown as string }]);
+  view.routeStore.searchValue.set(Array.isArray(value) ? '42' : String(value));
+  view.routeStore.patchQuery({ type: QueryActionType.search });
+  await harness.fixture.whenStable();
+  expect(view.filterStore.totalLength()).toBe(1);
 });

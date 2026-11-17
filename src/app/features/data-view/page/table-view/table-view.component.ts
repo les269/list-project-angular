@@ -1,12 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  computed,
-  effect,
-  inject,
-  signal,
-  viewChild,
-} from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,7 +8,7 @@ import {
   MatPaginatorModule,
   PageEvent,
 } from '@angular/material/paginator';
-import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
+import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -89,25 +82,12 @@ export class TableViewComponent {
     return data;
   });
 
-  readonly matSort = viewChild(MatSort);
   getWidth = getWidth;
 
   constructor() {
     effect(() => {
       if (isBlank(this.store.headerId())) {
         this.store.router.navigate(['']);
-      }
-    });
-    // Initialize matSort based on query params when sort changes
-    effect(() => {
-      const sort = this.matSort();
-      if (sort?.active) return; // skip if already initialized
-      const sortKey = this.store.sortKey();
-      const asc = this.store.ascFlag();
-
-      if (sort && sortKey) {
-        sort.active = sortKey;
-        sort.direction = asc ? 'asc' : 'desc';
       }
     });
   }

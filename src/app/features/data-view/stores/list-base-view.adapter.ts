@@ -211,9 +211,23 @@ export class ListBaseViewStoreAdapter {
   get refreshDate() {
     return this.uiStateStore.refreshDate;
   }
-  get quickRefreshResult() {
-    return this.uiStateStore.quickRefreshResult;
-  }
+  setQuickRefreshResult = (
+    datasetName: string,
+    byKey: string,
+    primeKey: unknown,
+    result: Record<string, unknown>
+  ) =>
+    this.uiStateStore.setQuickRefreshResult(
+      datasetName,
+      byKey,
+      primeKey,
+      result
+    );
+  getQuickRefreshResult = (
+    datasetName: string,
+    byKey: string,
+    primeKey: unknown
+  ) => this.uiStateStore.getQuickRefreshResult(datasetName, byKey, primeKey);
 
   // constants
   readonly RANDOM_KEY = '__random';
@@ -239,16 +253,23 @@ export class ListBaseViewStoreAdapter {
     const data = this.dataStore.useData();
     const defaultKey = this.headerStore.defaultKey();
     const tagValueMap = this.dataStore.shareTagValueMap();
-    if (data.length === 0) return;
+    if (data.length === 0 || !defaultKey) return;
 
     let candidates: string[];
     if (tag.seq !== -1) {
       const nameSet = new Set(data.map(x => x[defaultKey]));
-      candidates = tagValueMap[tag.shareTagId].filter(v => nameSet.has(v));
+      candidates = (tagValueMap[tag.shareTagId] ?? []).filter(v =>
+        nameSet.has(v)
+      );
     } else {
       candidates = data.map(x => x[defaultKey]);
     }
 
+    candidates = candidates
+      .filter(value => typeof value === 'string' || typeof value === 'number')
+      .map(value => String(value).trim())
+      .filter(Boolean);
+    if (candidates.length === 0) return;
     const randomNo = getRandomInt(1, candidates.length) - 1;
     this.routeStore.searchValue.set(candidates[randomNo]);
     this.routeStore.patchQuery({ type: QueryActionType.search });
@@ -278,13 +299,13 @@ export class ListBaseViewStoreAdapter {
   }
 
   onRefresh() {
-    this.datasetService
-      .refreshDataByNameList(this.dataStore.useDataset().datasetList)
-      .subscribe(x => {
-        this.dataStore.datasetDataList.reload?.();
-        this.uiStateStore.refreshDate.set(new Date());
-        this.snackbarService.openI18N('msg.refreshSuccess');
-      });
+    const datasetNames = [...this.dataStore.useDataset().datasetList];
+    this.datasetService.refreshDataByNameList(datasetNames).subscribe(x => {
+      this.uiStateStore.clearQuickRefreshResults(datasetNames);
+      this.dataStore.datasetDataList.reload?.();
+      this.uiStateStore.refreshDate.set(new Date());
+      this.snackbarService.openI18N('msg.refreshSuccess');
+    });
   }
 
   selectMultipleValue() {
