@@ -31,14 +31,8 @@
 
   .toolbar-filters {
     flex: 0 1 auto;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     max-width: 100%;
-
-    select {
-      flex: 1 1 120px;
-      width: auto;
-      max-width: 240px;
-    }
   }
 
   .toolbar-search {
@@ -88,6 +82,10 @@
     }
 
     select {
+      // 依選項文字取得自然寬度，僅在超出容器時縮小；避免固定上限截斷名稱。
+      flex: 0 1 auto;
+      width: auto;
+      max-width: 100%;
       padding: 6px 32px 6px 12px;
       text-overflow: ellipsis;
     }
@@ -149,10 +147,6 @@
     .toolbar-filters,
     .toolbar-search {
       flex-basis: 100%;
-    }
-
-    .toolbar-filters select {
-      max-width: none;
     }
   }
 }
