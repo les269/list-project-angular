@@ -67,17 +67,18 @@ export class TableViewComponent {
   readonly store = inject(ListBaseViewStoreAdapter);
 
   readonly COLOR_KEY = '__color';
-  readonly rowColor: string[] = this.store.rowColor();
   readonly isExpand = signal(false);
 
   readonly dataSource = computed(() => {
     const defaultKey = this.store.defaultKey();
-    const data = this.store.viewData().slice(); // create a copy to avoid mutating original
-    if (isNotBlank(defaultKey) && this.rowColor.length > 0) {
-      return data.map((d, index) => {
-        d[this.COLOR_KEY] = this.rowColor[index % this.rowColor.length];
-        return d;
-      });
+    const rowColor = this.store.rowColor();
+    const data = this.store.viewData().slice();
+    if (isNotBlank(defaultKey) && rowColor.length > 0) {
+      // 以新物件加入顏色，避免修改 FilterStore 快取的列資料。
+      return data.map((row, index) => ({
+        ...row,
+        [this.COLOR_KEY]: rowColor[index % rowColor.length],
+      }));
     }
     return data;
   });

@@ -169,7 +169,6 @@ export class ImageListViewComponent {
   }
 
   changeSort(event: SortType) {
-    this.store.sortKey.set(event.key);
     this.updateQueryAndScroll({
       type: QueryActionType.sort,
       key: event.key,
@@ -178,11 +177,10 @@ export class ImageListViewComponent {
   }
 
   changeAsc() {
-    this.store.ascFlag.update(x => !x);
     this.updateQueryAndScroll({
       type: QueryActionType.sort,
       key: this.store.queryParamsSort(),
-      asc: this.store.ascFlag(),
+      asc: !this.store.ascFlag(),
     });
   }
 

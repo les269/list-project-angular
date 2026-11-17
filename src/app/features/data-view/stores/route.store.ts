@@ -98,20 +98,20 @@ export class RouteStore {
     });
   }
 
-  // raw queryParamMap accessor (signal) for effects
-  queryParamMap = toSignal(this.route.queryParamMap);
+  // 提供目前 URL 參數給衍生狀態與校正流程。
+  readonly queryParamMap = toSignal(this.route.queryParamMap);
 
-  // search value
-  queryParamsSearchValue = toSignal(
+  // 搜尋保留可編輯的草稿；返回歷史時再由 URL 還原草稿內容。
+  readonly queryParamsSearchValue = toSignal(
     this.route.queryParamMap.pipe(
       map(params => params.get('searchValue') ?? '')
     ),
     { initialValue: '' }
   );
-  searchValue = linkedSignal(() => this.queryParamsSearchValue());
+  readonly searchValue = linkedSignal(() => this.queryParamsSearchValue());
 
   // page
-  queryParamsPage = toSignal(
+  readonly queryParamsPage = toSignal(
     this.route.queryParamMap.pipe(
       map(params => {
         const page = params.get('page');
@@ -123,24 +123,25 @@ export class RouteStore {
     ),
     { initialValue: 1 }
   );
-  page = linkedSignal(() => this.queryParamsPage());
+  // 頁碼僅由 URL 決定，透過 setPage 導覽後再同步。
+  readonly page = this.queryParamsPage;
 
   // sort
-  queryParamsSort = toSignal(
+  readonly queryParamsSort = toSignal(
     this.route.queryParamMap.pipe(map(params => params.get('sort') ?? '')),
     { initialValue: '' }
   );
-  sortKey = linkedSignal(() => this.queryParamsSort());
+  readonly sortKey = this.queryParamsSort;
 
   // asc flag
-  queryParamsAsc = toSignal(
+  readonly queryParamsAsc = toSignal(
     this.route.queryParamMap.pipe(map(params => params.get('asc') === 'true')),
     { initialValue: true }
   );
-  ascFlag = linkedSignal(() => this.queryParamsAsc());
+  readonly ascFlag = this.queryParamsAsc;
 
   // dataset
-  queryParamsDataset = toSignal(
+  readonly queryParamsDataset = toSignal(
     this.route.queryParamMap.pipe(
       map(params => {
         const dataset = params.get('dataset');
@@ -152,10 +153,10 @@ export class RouteStore {
     ),
     { initialValue: -1 }
   );
-  datasetSeq = linkedSignal(() => this.queryParamsDataset());
+  readonly datasetSeq = this.queryParamsDataset;
 
   // share tag
-  queryParamsShareTag = toSignal(
+  readonly queryParamsShareTag = toSignal(
     this.route.queryParamMap.pipe(
       map(params => {
         const tag = params.get('tag');
@@ -167,7 +168,7 @@ export class RouteStore {
     ),
     { initialValue: -1 }
   );
-  shareTagSeq = linkedSignal(() => this.queryParamsShareTag());
+  readonly shareTagSeq = this.queryParamsShareTag;
 
   baseQueryParams = computed<Record<string, any>>(() => {
     // guard against header not loaded yet

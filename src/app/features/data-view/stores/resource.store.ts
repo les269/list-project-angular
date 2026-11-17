@@ -58,7 +58,8 @@ export class ResourceStore {
     stream: ({ params }) =>
       this.themeService.findCustomValue(params).pipe(
         map(res => {
-          const valueList = this.customValueRequest().valueList;
+          // 回應僅對應該次請求，避免換頁後讀取到另一頁的主鍵清單。
+          const valueList = params.valueList;
 
           const missing: Record<string, any> = Object.fromEntries(
             valueList.filter(v => !res.hasOwnProperty(v)).map(v => [v, {}])

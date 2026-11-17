@@ -38,6 +38,7 @@ const query = (page: number, searchValue = '') =>
   `/view?searchValue=${searchValue}&sort=name&asc=true&page=${page}&dataset=0&tag=-1`;
 
 async function setup(url = query(3)) {
+  const blocked = signal(false);
   const loading = signal(false);
   const dataLoading = signal(false);
   const rows = signal([
@@ -49,7 +50,14 @@ async function setup(url = query(3)) {
   ]);
   TestBed.configureTestingModule({
     providers: [
-      provideRouter([{ path: 'view', component: TestView }]),
+      provideRouter([
+        {
+          path: 'view',
+          component: TestView,
+          canActivate: [() => !blocked()],
+          runGuardsAndResolvers: 'paramsOrQueryParamsChange',
+        },
+      ]),
       provideLocationMocks(),
       provideTranslateService(),
       { provide: API_BASE_URL, useValue: '' },
@@ -68,8 +76,8 @@ async function setup(url = query(3)) {
               isSearchValue: true,
             },
           ]),
-          themeDatasetList: signal([{ seq: 0 }]),
-          themeTagList: signal([]),
+          themeDatasetList: signal([{ seq: 0 }, { seq: 5 }]),
+          themeTagList: signal([{ seq: 7, shareTagId: 'tag' }]),
           defaultSortLabel: signal('name'),
           defaultDataset: signal(0),
           RANDOM_KEY: '__random',
@@ -105,6 +113,8 @@ async function setup(url = query(3)) {
               pages: filters.pages,
               searchValue: route.searchValue,
               totalLength: filters.totalLength,
+              queryParamsSort: route.queryParamsSort,
+              queryParamsAsc: route.queryParamsAsc,
               sortKey: route.sortKey,
               ascFlag: route.ascFlag,
               patchQuery: (action: Parameters<RouteStore['patchQuery']>[0]) =>
@@ -153,7 +163,16 @@ async function setup(url = query(3)) {
     await end;
     await harness.fixture.whenStable();
   }
-  return { harness, view, router, location, history, rows, dataLoading };
+  return {
+    harness,
+    view,
+    router,
+    location,
+    history,
+    rows,
+    dataLoading,
+    blocked,
+  };
 }
 
 it('從第三頁搜尋到一頁結果只導覽一次，上一頁與下一頁可還原查詢及頁碼', async () => {
@@ -302,4 +321,45 @@ it.each([0, 42, -12, [0, 42]])('數值 %j 可以由搜尋匹配', async value =>
   view.routeStore.patchQuery({ type: QueryActionType.search });
   await harness.fixture.whenStable();
   expect(view.filterStore.totalLength()).toBe(1);
+});
+
+it('排序導覽被取消時保留原狀態，成功導覽與返回時才同步 URL', async () => {
+  const { harness, view, router, blocked, history } = await setup(query(2));
+  const image = harness.fixture.debugElement.query(
+    By.directive(ImageListViewComponent)
+  ).componentInstance as ImageListViewComponent;
+  blocked.set(true);
+  image.changeAsc();
+  await harness.fixture.whenStable();
+  expect(view.routeStore.ascFlag()).toBe(true);
+  expect(router.parseUrl(router.url).queryParams['asc']).toBe('true');
+  image.changeSort({ key: '__random', label: 'Random' });
+  await harness.fixture.whenStable();
+  expect(view.routeStore.sortKey()).toBe('name');
+  blocked.set(false);
+  image.changeAsc();
+  await harness.fixture.whenStable();
+  expect(view.routeStore.ascFlag()).toBe(false);
+  expect(view.routeStore.page()).toBe(2);
+  await history('back');
+  expect(view.routeStore.ascFlag()).toBe(true);
+  expect(view.routeStore.page()).toBe(2);
+});
+
+it('Dataset 與標籤選取跟隨 URL，上一頁與下一頁可還原選取狀態', async () => {
+  const { harness, view, history } = await setup(query(2));
+  view.routeStore.patchQuery({ type: QueryActionType.dataset, seq: 5 });
+  await harness.fixture.whenStable();
+  expect(view.routeStore.datasetSeq()).toBe(5);
+  view.routeStore.patchQuery({ type: QueryActionType.tag, seq: 7 });
+  await harness.fixture.whenStable();
+  expect(view.routeStore.shareTagSeq()).toBe(7);
+  await history('back');
+  expect(view.routeStore.datasetSeq()).toBe(5);
+  expect(view.routeStore.shareTagSeq()).toBe(-1);
+  await history('back');
+  expect(view.routeStore.datasetSeq()).toBe(0);
+  await history('forward');
+  expect(view.routeStore.datasetSeq()).toBe(5);
+  expect(view.routeStore.page()).toBe(2);
 });
