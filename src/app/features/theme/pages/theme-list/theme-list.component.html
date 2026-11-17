@@ -61,20 +61,23 @@
               <div class="theme-buttons">
                 <button
                   type="button"
-                  class="page-button"
+                  class="page-button page-button-edit"
                   (click)="onEdit(item)">
+                  <mat-icon aria-hidden="true">edit</mat-icon>
                   {{ 'g.edit' | translate }}
                 </button>
                 <button
                   type="button"
-                  class="page-button"
+                  class="page-button page-button-copy"
                   (click)="onCopy(item)">
+                  <mat-icon aria-hidden="true">content_copy</mat-icon>
                   {{ 'g.copy' | translate }}
                 </button>
                 <button
                   type="button"
                   class="page-button page-button-danger"
                   (click)="onDelete(item)">
+                  <mat-icon aria-hidden="true">delete_outline</mat-icon>
                   {{ 'g.delete' | translate }}
                 </button>
               </div>

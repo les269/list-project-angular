@@ -8,7 +8,7 @@
 
   @include mat.table-overrides(
     (
-      background-color: var(--app-surface),
+      background-color: var(--app-surface-muted),
       header-headline-color: var(--app-text-primary),
       header-headline-font: var(--app-font-family),
       header-headline-size: var(--app-font-size-sm),
@@ -39,10 +39,6 @@
 
   .mat-mdc-header-row {
     background: #e8eef6;
-  }
-
-  .generic-table-detail-row {
-    background: #f8fafc;
   }
 
   .mat-column-seq {

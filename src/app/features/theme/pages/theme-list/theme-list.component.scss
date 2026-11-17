@@ -55,6 +55,19 @@
   }
 }
 
+.secondary-actions .page-button {
+  min-height: 40px;
+  color: var(--app-primary-hover);
+  background-color: #dbeafe;
+  border-color: #93c5fd;
+  font-weight: 500;
+
+  &:hover {
+    background-color: var(--app-primary-soft-hover);
+    border-color: #60a5fa;
+  }
+}
+
 .page-button-danger {
   margin-inline-start: auto;
   color: #b42318;
@@ -154,6 +167,45 @@
 .theme-buttons {
   padding: var(--app-space-3) var(--app-space-4);
   border-top: 1px solid var(--app-border);
+
+  .page-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--app-space-1);
+    min-height: 40px;
+    font-weight: 500;
+
+    mat-icon {
+      width: 18px;
+      height: 18px;
+      font-size: 18px;
+      line-height: 1;
+    }
+  }
+
+  .page-button-edit,
+  .page-button-copy {
+    color: var(--app-primary-hover);
+    background-color: #dbeafe;
+    border-color: #93c5fd;
+
+    &:hover {
+      background-color: var(--app-primary-soft-hover);
+      border-color: #60a5fa;
+    }
+  }
+
+  .page-button-danger {
+    background-color: #fee2e2;
+    border-color: #dc8279;
+
+    &:hover {
+      color: var(--app-surface);
+      background-color: #b42318;
+      border-color: #b42318;
+    }
+  }
 }
 
 .page-button:focus-visible,

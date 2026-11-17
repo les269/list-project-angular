@@ -16,10 +16,11 @@ import { isNotBlank } from '../../../../shared/util/helper';
 import { ThemeVisibleComponent } from '../../components/theme-visible/theme-visible.component';
 import { ShareTagListComponent } from '../../components/share-tag-list/share-tag-list.component';
 import { CopyThemeComponent } from '../../components/copy-theme/copy-theme.component';
+import { MatIconModule } from '@angular/material/icon';
 import { LayoutStore } from '../../../../core/stores/layout.store';
 
 @Component({
-  imports: [KeyValuePipe, RouterLink, TranslatePipe],
+  imports: [KeyValuePipe, RouterLink, TranslatePipe, MatIconModule],
   selector: 'app-theme-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'theme-list.component.html',
