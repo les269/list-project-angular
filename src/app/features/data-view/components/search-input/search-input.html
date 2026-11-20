@@ -20,7 +20,8 @@
     [matAutocomplete]="auto"
     [value]="value()"
     (input)="value.set(searchInput.value)"
-    (keydown)="onKeydown($event)" />
+    (keydown)="onKeydown($event)"
+    trimOnBlur />
   @if (value().length > 0) {
     <button
       type="button"

@@ -11,6 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe } from '@ngx-translate/core';
 import { SearchMode } from '../../models/search.model';
+import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
 
 @Component({
   imports: [
@@ -19,6 +20,7 @@ import { SearchMode } from '../../models/search.model';
     MatIconModule,
     MatTooltipModule,
     TranslatePipe,
+    TrimOnBlurDirective,
   ],
   selector: 'app-search-input',
   styleUrl: './search-input.scss',
