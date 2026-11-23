@@ -26,6 +26,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatTableModule } from '@angular/material/table';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ChipInputColorComponent } from '../../../../core/components/chip-input-color/chip-input-color.component';
+import { ChipSelectButtonComponent } from '../../../../core/components/chip-select-button/chip-select-button.component';
 import { FormInvalidsComponent } from '../../../../core/components/form-invalids/form-invalids.component';
 import { SignalFieldComponent } from '../../../../core/components/signal-field/signal-field.component';
 import { SignalFieldType } from '../../../../core/model/signal-field.model';
@@ -34,6 +35,7 @@ import { QuickRefreshType } from '../../../dataset/model';
 import { ScrapyService } from '../../../spider/services/scrapy.service';
 import {
   DEFAULT_ROW_COLOR,
+  SearchBookmark,
   ThemeHeaderType,
   ThemeItemType,
   ThemeOtherSettingItem,
@@ -56,6 +58,7 @@ import { SearchBookmarkService } from '../../services/search-bookmark.service';
     MatFormFieldModule,
     MatChipsModule,
     ChipInputColorComponent,
+    ChipSelectButtonComponent,
     ThemeItemManageComponent,
     MatRadioModule,
     SignalFieldComponent,
@@ -131,20 +134,15 @@ export class ThemeOtherSettingComponent {
     stream: () => this.searchBookmarkService.getAll(),
     defaultValue: [],
   });
-  readonly searchBookmarkOptions = computed(() => {
-    const selectedId = this.formModel().json.searchBookmarkId;
-    const bookmarks = this.searchBookmarks.hasValue()
-      ? this.searchBookmarks.value()
-      : [];
-    const options = bookmarks.map(bookmark => ({
-      value: bookmark.id,
-      label: bookmark.name || bookmark.id,
-    }));
-    if (selectedId && !bookmarks.some(bookmark => bookmark.id === selectedId)) {
-      options.push({ value: selectedId, label: selectedId });
-    }
-    return [{ value: '', label: 'otherSetting.noSearchBookmark' }, ...options];
-  });
+  readonly searchBookmarkOptions = computed(() =>
+    this.searchBookmarks.hasValue() ? this.searchBookmarks.value() : []
+  );
+  readonly selectSearchBookmark = () =>
+    this.selectTableService.selectSingleSearchBookmark(
+      this.searchBookmarkOptions()
+    );
+  readonly searchBookmarkLabel = (bookmark: SearchBookmark) =>
+    bookmark.name || bookmark.id;
 
   constructor() {
     effect(() => {

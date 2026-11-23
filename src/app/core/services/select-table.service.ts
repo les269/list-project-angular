@@ -15,7 +15,11 @@ import {
   GroupDataset,
   GroupDatasetData,
 } from '../../features/dataset/model';
-import { ShareTag, ThemeItemSummary } from '../../features/theme/models';
+import {
+  SearchBookmark,
+  ShareTag,
+  ThemeItemSummary,
+} from '../../features/theme/models';
 import { ReplaceValueMap } from '../../features/replace-value-map/model';
 import { TranslateService } from '@ngx-translate/core';
 import { isNotBlank } from '../../shared/util/helper';
@@ -26,6 +30,19 @@ import { BaseSelectTableData } from '../model';
 export class SelectTableService {
   matDialog = inject(MatDialog);
   translateService = inject(TranslateService);
+
+  selectSingleSearchBookmark(dataSource: SearchBookmark[]) {
+    const data: BaseSelectTableData<SearchBookmark> = {
+      displayedColumns: ['id', 'name'],
+      labels: ['searchBookmark.id', 'searchBookmark.name'],
+      dataSource,
+      selectType: 'single',
+      enableFilter: true,
+      columnSorts: { id: true, name: true },
+      title: this.translateService.instant('otherSetting.searchBookmark'),
+    };
+    return this.openSelectDialog(data);
+  }
 
   selectSingleApi(dataSource: ApiRequestConfig[]) {
     const data: BaseSelectTableData<ApiRequestConfig> = {

@@ -27,6 +27,12 @@
   gap: var(--app-space-4);
 }
 
+.search-bookmark-selection {
+  display: grid;
+  gap: var(--app-space-2);
+  font-size: var(--app-font-size-sm);
+}
+
 .display-settings {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);

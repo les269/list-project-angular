@@ -1,7 +1,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
-import { of } from 'rxjs';
+import { EMPTY, of } from 'rxjs';
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import { ScrapyService } from '../../../spider/services/scrapy.service';
 import {
@@ -17,6 +17,9 @@ describe('ThemeOtherSettingComponent 設定欄位', () => {
   async function setup(type = ThemeHeaderType.imageList) {
     const selector = {
       selectSingleScrapy: vi.fn(() => of({ name: 'selected-spider' })),
+      selectSingleSearchBookmark: vi.fn(() =>
+        of({ id: 'shared-search', name: '共用搜尋紀錄' })
+      ),
     };
     await TestBed.configureTestingModule({
       imports: [ThemeOtherSettingComponent],
@@ -67,21 +70,36 @@ describe('ThemeOtherSettingComponent 設定欄位', () => {
   it.each([ThemeHeaderType.table, ThemeHeaderType.imageList])(
     '%s 可選擇及清除搜尋書籤，舊資料載入時回復空值',
     async type => {
-      const { fixture, page, component } = await setup(type);
-      const select = page.querySelector<HTMLSelectElement>(
-        'app-signal-field select'
+      const { fixture, page, component, selector } = await setup(type);
+      const select = page.querySelector<HTMLButtonElement>(
+        '.search-bookmark-selection .selection-button'
       )!;
-      expect(select.textContent).toContain('共用搜尋紀錄');
-      select.value = 'shared-search';
-      select.dispatchEvent(new Event('input'));
-      select.dispatchEvent(new Event('change'));
+      select.click();
+      await fixture.whenStable();
+      expect(
+        selector.selectSingleSearchBookmark
+      ).toHaveBeenCalledExactlyOnceWith([
+        { id: 'shared-search', name: '共用搜尋紀錄' },
+      ]);
+      expect(component.formModel().json.searchBookmarkId).toBe('shared-search');
+      expect(
+        page.querySelector('.search-bookmark-selection mat-chip-row')
+          ?.textContent
+      ).toContain('共用搜尋紀錄');
+      selector.selectSingleSearchBookmark.mockReturnValueOnce(EMPTY);
+      select.click();
       await fixture.whenStable();
       expect(component.formModel().json.searchBookmarkId).toBe('shared-search');
-      select.value = '';
-      select.dispatchEvent(new Event('input'));
-      select.dispatchEvent(new Event('change'));
+      page
+        .querySelector<HTMLButtonElement>(
+          '.search-bookmark-selection [matChipRemove]'
+        )!
+        .click();
       await fixture.whenStable();
       expect(component.formModel().json.searchBookmarkId).toBe('');
+      expect(
+        page.querySelector('.search-bookmark-selection mat-chip-row')
+      ).toBeNull();
 
       fixture.componentRef.setInput('otherSettingItem', {
         type: ThemeItemType.OTHERSETTING,
@@ -90,7 +108,10 @@ describe('ThemeOtherSettingComponent 設定欄位', () => {
         json: { searchBookmarkId: 'missing-bookmark' },
       });
       await fixture.whenStable();
-      expect(select.value).toBe('missing-bookmark');
+      expect(
+        page.querySelector('.search-bookmark-selection mat-chip-row')
+          ?.textContent
+      ).toContain('missing-bookmark');
       fixture.componentRef.setInput('otherSettingItem', {
         type: ThemeItemType.OTHERSETTING,
         itemId: 'legacy',
@@ -99,7 +120,9 @@ describe('ThemeOtherSettingComponent 設定欄位', () => {
       });
       await fixture.whenStable();
       expect(component.formModel().json.searchBookmarkId).toBe('');
-      expect(select.value).toBe('');
+      expect(
+        page.querySelector('.search-bookmark-selection mat-chip-row')
+      ).toBeNull();
     }
   );
 

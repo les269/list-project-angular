@@ -9,12 +9,19 @@
       [resetValue]="initialFormValue"
       [defaultBinding]="defaultBinding()" />
     <form (submit)="$event.preventDefault()" class="theme-other-setting">
-      <app-signal-field
-        [field]="group().searchBookmarkId"
-        label="otherSetting.searchBookmark"
-        [type]="fieldType.SELECT"
-        emptyOption=""
-        [options]="searchBookmarkOptions()" />
+      <div class="search-bookmark-selection">
+        <div id="search-bookmark-label">
+          {{ 'otherSetting.searchBookmark' | translate }}
+        </div>
+        <app-chip-select-button
+          aria-labelledby="search-bookmark-label"
+          [formField]="group().searchBookmarkId"
+          valueKey="id"
+          [labelKey]="searchBookmarkLabel"
+          [options]="searchBookmarkOptions"
+          [selectTable]="selectSearchBookmark" />
+        <app-form-invalids [control]="group().searchBookmarkId" />
+      </div>
       @if (themeHeaderType() === eThemeHeaderType.table) {
         <div class="table-settings">
           <app-chip-input-color
