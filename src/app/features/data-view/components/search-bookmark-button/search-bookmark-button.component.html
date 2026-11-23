@@ -1,0 +1,11 @@
+@if (bookmarkId().trim()) {
+  <button
+    type="button"
+    class="bookmark-button"
+    [matTooltip]="'searchBookmark.title' | translate"
+    [attr.aria-label]="'searchBookmark.title' | translate"
+    [attr.aria-expanded]="isOpen()"
+    (click)="toggle()">
+    <mat-icon aria-hidden="true">bookmark</mat-icon>
+  </button>
+}

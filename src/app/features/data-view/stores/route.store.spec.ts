@@ -133,6 +133,7 @@ async function setup(url = query(3)) {
               prePage: () => filters.prePage(),
               nextPage: () => filters.nextPage(),
               headerId: signal('test'),
+              themeOtherSetting: inject(HeaderStore).themeOtherSetting,
               defaultKey: signal(''),
               themeDatasetList: signal([]),
               themeTagListForSelect: signal([]),
@@ -426,7 +427,7 @@ it.each([
   }
 );
 
-it('切換模式只修改草稿，Enter 才套用 AND，歷史導覽還原兩種檢視的模式', async () => {
+it('切換 OR／AND 立即搜尋一次，歷史導覽還原兩種檢視的模式', async () => {
   const { view, harness, router, history } = await setup(
     query(1, 'target,two')
   );
@@ -437,22 +438,15 @@ it('切換模式只修改草稿，Enter 才套用 AND，歷史導覽還原兩種
       )
     ) as HTMLButtonElement[];
   expect(view.filterStore.totalLength()).toBe(2);
+  const search = vi.spyOn(view.routeStore, 'patchQuery');
   modeButtons()[0].click();
   await harness.fixture.whenStable();
   expect(
     modeButtons().map(button => button.getAttribute('aria-pressed'))
   ).toEqual(['true', 'true']);
-  expect(view.filterStore.totalLength()).toBe(2);
-  expect(router.parseUrl(router.url).queryParams['searchValue']).toBe(
-    'target,two'
-  );
-  const input = harness.fixture.nativeElement.querySelector(
-    'app-search-input input'
-  ) as HTMLInputElement;
-  input.dispatchEvent(
-    new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
-  );
-  await harness.fixture.whenStable();
+  expect(search).toHaveBeenCalledExactlyOnceWith({
+    type: QueryActionType.search,
+  });
   expect(router.parseUrl(router.url).queryParams['searchValue']).toBe(
     'and:target,two'
   );
@@ -466,4 +460,11 @@ it('切換模式只修改草稿，Enter 才套用 AND，歷史導覽還原兩種
   await history('forward');
   expect(view.routeStore.searchMode()).toBe('and');
   expect(view.filterStore.totalLength()).toBe(0);
+  modeButtons()[1].click();
+  await harness.fixture.whenStable();
+  expect(search).toHaveBeenCalledTimes(2);
+  expect(router.parseUrl(router.url).queryParams['searchValue']).toBe(
+    'target,two'
+  );
+  expect(view.filterStore.totalLength()).toBe(2);
 });

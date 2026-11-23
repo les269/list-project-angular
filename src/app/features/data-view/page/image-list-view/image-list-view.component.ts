@@ -25,6 +25,7 @@ import { ImgContentComponent } from '../../components/img-content/img-content.co
 import { ItemTagButtonsComponent } from '../../components/item-tag-buttons/item-tag-buttons.component';
 import { ListItemValueComponent } from '../../components/list-item-value/list-item-value.component';
 import { SearchInput } from '../../components/search-input/search-input';
+import { SearchBookmarkButtonComponent } from '../../components/search-bookmark-button/search-bookmark-button.component';
 import { TopCustomButtonsComponent } from '../../components/top-custom-buttons/top-custom-buttons.component';
 import { SearchToolbarLayoutDirective } from '../../directives/search-toolbar-layout.directive';
 import {
@@ -48,6 +49,7 @@ import {
     CustomButtonsComponent,
     TopCustomButtonsComponent,
     SearchInput,
+    SearchBookmarkButtonComponent,
     SearchToolbarLayoutDirective,
     NgTemplateOutlet,
     FixedImageComponent,

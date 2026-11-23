@@ -290,6 +290,10 @@
 </ng-template>
 
 <app-scrollTop></app-scrollTop>
+<app-search-bookmark-button
+  [bookmarkId]="store.themeOtherSetting()?.searchBookmarkId ?? ''"
+  [searchValue]="store.searchValue()"
+  (search)="store.onSearch($event)" />
 <app-fixed-image
   #fixedImage
   [fixedImagePath]="store.fixedImagePath()"></app-fixed-image>

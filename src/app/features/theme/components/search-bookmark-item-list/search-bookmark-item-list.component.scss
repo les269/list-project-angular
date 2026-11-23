@@ -1,0 +1,29 @@
+@use '../search-bookmark-list/search-bookmark-list.component';
+
+.item-value {
+  white-space: pre-wrap;
+}
+
+.drag-column {
+  width: 40px;
+  padding-inline: 8px;
+}
+
+.drag-handle {
+  display: block;
+  cursor: grab;
+  touch-action: none;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.cdk-drop-list-disabled .drag-handle {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}

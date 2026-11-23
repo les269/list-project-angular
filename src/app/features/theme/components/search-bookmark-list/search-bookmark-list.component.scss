@@ -1,0 +1,17 @@
+@use '../../styles/theme-management-dialog' as management;
+
+@include management.table;
+
+table {
+  border-collapse: collapse;
+}
+
+thead {
+  background: var(--app-primary-soft);
+}
+
+th,
+td {
+  height: 48px;
+  border-bottom: 1px solid var(--app-border);
+}

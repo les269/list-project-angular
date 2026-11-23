@@ -1,0 +1,52 @@
+<section [attr.aria-label]="'searchBookmark.title' | translate">
+  <header>
+    <h2>{{ 'searchBookmark.title' | translate }}</h2>
+    <button
+      type="button"
+      class="icon-button add-button"
+      [disabled]="isAdding() || items.isLoading() || !!items.error()"
+      (click)="openCreate()"
+      [attr.aria-label]="'searchBookmark.createItem' | translate"
+      [title]="'searchBookmark.createItem' | translate">
+      <mat-icon aria-hidden="true">add</mat-icon>
+    </button>
+    <button
+      type="button"
+      class="icon-button config-button"
+      [disabled]="isAdding()"
+      (click)="openConfig()"
+      [attr.aria-label]="'searchBookmark.config' | translate"
+      [title]="'searchBookmark.config' | translate">
+      <mat-icon aria-hidden="true">settings</mat-icon>
+    </button>
+    <button
+      type="button"
+      class="icon-button close-button"
+      (click)="snackbarRef.dismiss()"
+      [attr.aria-label]="'g.close' | translate">
+      <mat-icon aria-hidden="true">close</mat-icon>
+    </button>
+  </header>
+  @if (items.error()) {
+    <p role="alert">{{ 'searchBookmark.itemsLoadError' | translate }}</p>
+    <button type="button" class="value-button" (click)="items.reload()">
+      {{ 'g.refresh' | translate }}
+    </button>
+  } @else if (items.isLoading()) {
+    <p role="status">{{ 'searchBookmark.loading' | translate }}</p>
+  } @else {
+    <div class="bookmark-values">
+      @for (bookmarkItem of sortedItems(); track $index) {
+        <hr />
+        <button
+          type="button"
+          class="value-button"
+          (click)="data.onSelect(bookmarkItem.value)">
+          {{ bookmarkItem.value }}
+        </button>
+      } @empty {
+        <p>{{ 'g.noData' | translate }}</p>
+      }
+    </div>
+  }
+</section>

@@ -1,0 +1,141 @@
+<div class="dialog-header">
+  <h2 mat-dialog-title class="dialog-title">
+    {{ 'searchBookmark.title' | translate }}
+  </h2>
+  <button
+    type="button"
+    class="dialog-close"
+    [disabled]="isBusy()"
+    (click)="close()"
+    [attr.aria-label]="'g.close' | translate">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+<mat-dialog-content class="dialog-content scrollbar-primary">
+  <div
+    class="management-list"
+    [attr.aria-busy]="isBusy() || bookmarks.isLoading()">
+    <div class="toolbar">
+      <input
+        class="form-control filter-input"
+        type="search"
+        #search
+        [value]="filterValue()"
+        (input)="filterValue.set(search.value)"
+        [attr.aria-label]="'g.filter' | translate" />
+      <button
+        type="button"
+        class="dialog-button dialog-button-primary"
+        [disabled]="isBusy() || bookmarks.isLoading() || !!bookmarks.error()"
+        (click)="openCreate()">
+        {{ 'g.add' | translate }}
+      </button>
+    </div>
+    @if (bookmarks.error()) {
+      <p role="alert">{{ 'searchBookmark.loadError' | translate }}</p>
+      <button type="button" class="dialog-button" (click)="bookmarks.reload()">
+        {{ 'g.refresh' | translate }}
+      </button>
+    } @else if (bookmarks.isLoading()) {
+      <p role="status">{{ 'searchBookmark.loading' | translate }}</p>
+    } @else {
+      <div class="table-container scrollbar-primary">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">{{ 'searchBookmark.id' | translate }}</th>
+              <th scope="col">{{ 'searchBookmark.name' | translate }}</th>
+              <th scope="col">{{ 'g.updatedTime' | translate }}</th>
+              <th scope="col">{{ 'searchBookmark.actions' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (bookmark of filteredBookmarks(); track bookmark.id) {
+              <tr>
+                <td>{{ bookmark.id }}</td>
+                <td>{{ bookmark.name }}</td>
+                <td>{{ bookmark.updatedTime | date: 'yyyy-MM-dd HH:mm' }}</td>
+                <td>
+                  <div class="row-actions">
+                    <button
+                      type="button"
+                      class="row-action"
+                      [disabled]="isBusy()"
+                      (click)="openEdit(bookmark)"
+                      [attr.aria-label]="
+                        ('g.edit' | translate) + ' ' + bookmark.name
+                      ">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button
+                      type="button"
+                      class="row-action"
+                      [disabled]="isBusy()"
+                      (click)="openItems(bookmark)"
+                      [attr.aria-label]="
+                        ('searchBookmark.itemList' | translate) +
+                        ' ' +
+                        bookmark.name
+                      "
+                      [title]="'searchBookmark.itemList' | translate">
+                      <mat-icon>list</mat-icon>
+                    </button>
+                    <button
+                      type="button"
+                      class="row-action row-action-danger"
+                      [disabled]="isBusy()"
+                      (click)="deleteBookmark(bookmark)"
+                      [attr.aria-label]="
+                        ('g.delete' | translate) + ' ' + bookmark.name
+                      ">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr class="empty-row">
+                <td colspan="4">{{ 'g.noData' | translate }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</mat-dialog-content>
+<ng-template #editorTemplate>
+  <h2 mat-dialog-title class="dialog-title">
+    {{
+      (mode() === editMode.CREATE
+        ? 'searchBookmark.create'
+        : 'searchBookmark.edit'
+      ) | translate
+    }}
+  </h2>
+  <form (submit)="$event.preventDefault(); save()">
+    <mat-dialog-content class="dialog-content">
+      <div class="dialog-fields">
+        <app-signal-field [field]="bookmarkForm.id" label="searchBookmark.id" />
+        <app-signal-field
+          [field]="bookmarkForm.name"
+          label="searchBookmark.name" />
+      </div>
+    </mat-dialog-content>
+    <mat-dialog-actions class="dialog-actions" [attr.aria-busy]="isBusy()">
+      <button
+        type="button"
+        class="dialog-button"
+        [disabled]="isBusy()"
+        (click)="cancelEdit()">
+        {{ 'g.no' | translate }}
+      </button>
+      <button
+        type="submit"
+        class="dialog-button dialog-button-primary"
+        [disabled]="isBusy() || bookmarks.isLoading() || !!bookmarks.error()">
+        {{ 'g.ok' | translate }}
+      </button>
+    </mat-dialog-actions>
+  </form>
+</ng-template>

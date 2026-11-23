@@ -4,7 +4,12 @@ import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import { ScrapyService } from '../../../spider/services/scrapy.service';
-import { DEFAULT_ROW_COLOR, ThemeHeaderType } from '../../models';
+import {
+  DEFAULT_ROW_COLOR,
+  ThemeHeaderType,
+  ThemeItemType,
+} from '../../models';
+import { SearchBookmarkService } from '../../services/search-bookmark.service';
 import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage.component';
 import { ThemeOtherSettingComponent } from './theme-other-setting.component';
 
@@ -19,6 +24,12 @@ describe('ThemeOtherSettingComponent 設定欄位', () => {
         provideTranslateService(),
         { provide: ScrapyService, useValue: { getAllConfig: () => of([]) } },
         { provide: SelectTableService, useValue: selector },
+        {
+          provide: SearchBookmarkService,
+          useValue: {
+            getAll: () => of([{ id: 'shared-search', name: '共用搜尋紀錄' }]),
+          },
+        },
       ],
     })
       .overrideComponent(ThemeOtherSettingComponent, {
@@ -52,6 +63,45 @@ describe('ThemeOtherSettingComponent 設定欄位', () => {
     await fixture.whenStable();
     expect(component.listPageSize().valid()).toBe(true);
   });
+
+  it.each([ThemeHeaderType.table, ThemeHeaderType.imageList])(
+    '%s 可選擇及清除搜尋書籤，舊資料載入時回復空值',
+    async type => {
+      const { fixture, page, component } = await setup(type);
+      const select = page.querySelector<HTMLSelectElement>(
+        'app-signal-field select'
+      )!;
+      expect(select.textContent).toContain('共用搜尋紀錄');
+      select.value = 'shared-search';
+      select.dispatchEvent(new Event('input'));
+      select.dispatchEvent(new Event('change'));
+      await fixture.whenStable();
+      expect(component.formModel().json.searchBookmarkId).toBe('shared-search');
+      select.value = '';
+      select.dispatchEvent(new Event('input'));
+      select.dispatchEvent(new Event('change'));
+      await fixture.whenStable();
+      expect(component.formModel().json.searchBookmarkId).toBe('');
+
+      fixture.componentRef.setInput('otherSettingItem', {
+        type: ThemeItemType.OTHERSETTING,
+        itemId: 'existing',
+        description: '',
+        json: { searchBookmarkId: 'missing-bookmark' },
+      });
+      await fixture.whenStable();
+      expect(select.value).toBe('missing-bookmark');
+      fixture.componentRef.setInput('otherSettingItem', {
+        type: ThemeItemType.OTHERSETTING,
+        itemId: 'legacy',
+        description: '',
+        json: {},
+      });
+      await fixture.whenStable();
+      expect(component.formModel().json.searchBookmarkId).toBe('');
+      expect(select.value).toBe('');
+    }
+  );
 
   it('快速刷新保留爬蟲選擇、移除、參數切換與條件驗證', async () => {
     const { fixture, page, component, selector } = await setup();

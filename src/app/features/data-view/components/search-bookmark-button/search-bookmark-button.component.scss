@@ -1,0 +1,27 @@
+.bookmark-button {
+  position: fixed;
+  inset-inline-end: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 46px;
+  padding: 0;
+  color: var(--app-text-primary);
+  background: var(--app-surface);
+  border: 1px solid var(--app-border-strong);
+  border-inline-end: 0;
+  border-radius: var(--app-radius-md) 0 0 var(--app-radius-md);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
+
+  &:hover {
+    background: var(--app-hover-bg);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--app-focus-ring);
+    outline-offset: 2px;
+  }
+}

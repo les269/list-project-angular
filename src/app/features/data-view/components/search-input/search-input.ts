@@ -35,6 +35,7 @@ export class SearchInput {
 
   toggleSearchMode() {
     this.searchMode.update(mode => (mode === 'or' ? 'and' : 'or'));
+    this.search.emit(this.value());
   }
 
   onKeydown(event: KeyboardEvent) {

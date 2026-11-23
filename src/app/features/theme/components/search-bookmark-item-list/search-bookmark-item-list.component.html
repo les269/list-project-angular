@@ -1,0 +1,122 @@
+<div class="dialog-header">
+  <h2 mat-dialog-title class="dialog-title">
+    {{ 'searchBookmark.itemList' | translate }}：{{ bookmark.name }}
+  </h2>
+  <button
+    type="button"
+    class="dialog-close"
+    [disabled]="isBusy()"
+    (click)="close()"
+    [attr.aria-label]="'g.close' | translate">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+<mat-dialog-content class="dialog-content scrollbar-primary">
+  <div class="management-list" [attr.aria-busy]="isBusy() || items.isLoading()">
+    <div class="toolbar">
+      <input
+        class="form-control filter-input"
+        type="search"
+        #search
+        [value]="filterValue()"
+        (input)="filterValue.set(search.value)"
+        [attr.aria-label]="'g.filter' | translate" />
+      <button
+        type="button"
+        class="dialog-button"
+        [disabled]="isBusy() || items.isLoading() || hasOrderChanges()"
+        (click)="items.reload()">
+        {{ 'g.refresh' | translate }}
+      </button>
+      <button
+        type="button"
+        class="dialog-button dialog-button-primary save-order"
+        [disabled]="isBusy() || items.isLoading() || !hasOrderChanges()"
+        (click)="saveOrder()">
+        {{ 'searchBookmark.saveOrder' | translate }}
+      </button>
+      @if (hasOrderChanges()) {
+        <button
+          type="button"
+          class="dialog-button"
+          [disabled]="isBusy()"
+          (click)="resetOrder()">
+          {{ 'searchBookmark.resetOrder' | translate }}
+        </button>
+        <span role="status">{{
+          'searchBookmark.orderUnsaved' | translate
+        }}</span>
+      }
+    </div>
+    @if (items.error()) {
+      <p role="alert">{{ 'searchBookmark.itemsLoadError' | translate }}</p>
+    } @else if (items.isLoading()) {
+      <p role="status">{{ 'searchBookmark.loading' | translate }}</p>
+    } @else {
+      <div class="table-container scrollbar-primary">
+        <table>
+          <thead>
+            <tr>
+              <th
+                scope="col"
+                class="drag-column"
+                [attr.aria-label]="'searchBookmark.dragOrder' | translate"></th>
+              <th scope="col">{{ 'searchBookmark.seq' | translate }}</th>
+              <th scope="col">{{ 'searchBookmark.itemId' | translate }}</th>
+              <th scope="col">{{ 'searchBookmark.value' | translate }}</th>
+              <th scope="col">{{ 'g.updatedTime' | translate }}</th>
+              <th scope="col">{{ 'searchBookmark.actions' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody
+            cdkDropList
+            [cdkDropListData]="filteredItems()"
+            [cdkDropListDisabled]="isBusy() || items.isLoading()"
+            (cdkDropListDropped)="dropItem($event)">
+            @for (item of filteredItems(); track $index) {
+              <tr
+                cdkDrag
+                cdkDragLockAxis="y"
+                [cdkDragData]="item"
+                [cdkDragPreviewContainer]="'parent'">
+                <td class="drag-column">
+                  <mat-icon
+                    cdkDragHandle
+                    class="drag-handle"
+                    [attr.aria-label]="'searchBookmark.dragOrder' | translate"
+                    [attr.title]="'searchBookmark.dragOrder' | translate"
+                    aria-hidden="false"
+                    >drag_indicator</mat-icon
+                  >
+                </td>
+                <td>{{ item.seq }}</td>
+                <td>{{ item.id }}</td>
+                <td class="item-value">{{ item.value }}</td>
+                <td>{{ item.updatedTime | date: 'yyyy-MM-dd HH:mm' }}</td>
+                <td>
+                  <button
+                    type="button"
+                    class="row-action row-action-danger"
+                    [disabled]="
+                      isBusy() || items.isLoading() || hasOrderChanges()
+                    "
+                    [title]="'g.delete' | translate"
+                    (click)="deleteItem(item)"
+                    [attr.aria-label]="
+                      ('g.delete' | translate) + ' ' + item.value
+                    ">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr class="empty-row">
+                <td colspan="6">{{ 'g.noData' | translate }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</mat-dialog-content>

@@ -40,6 +40,7 @@ import {
 } from '../../models';
 import { ThemeItemManageComponent } from '../theme-item-manage/theme-item-manage.component';
 import { normalizeThemeItem } from '../../util/theme-item-form';
+import { SearchBookmarkService } from '../../services/search-bookmark.service';
 
 @Component({
   selector: 'app-theme-other-setting',
@@ -64,6 +65,7 @@ import { normalizeThemeItem } from '../../util/theme-item-form';
   styleUrl: './theme-other-setting.component.scss',
 })
 export class ThemeOtherSettingComponent {
+  private readonly searchBookmarkService = inject(SearchBookmarkService);
   readonly fieldType = SignalFieldType;
   //enums and constants
   eThemeHeaderType = ThemeHeaderType;
@@ -93,6 +95,7 @@ export class ThemeOtherSettingComponent {
       quickRefresh: '',
       quickRefreshType: QuickRefreshType.url,
       useSpider: '',
+      searchBookmarkId: '',
     },
   });
   readonly initialFormValue = structuredClone(this.formModel());
@@ -123,6 +126,24 @@ export class ThemeOtherSettingComponent {
   scrapyConfigList = rxResource({
     stream: () => this.scrapyService.getAllConfig(),
     defaultValue: [],
+  });
+  readonly searchBookmarks = rxResource({
+    stream: () => this.searchBookmarkService.getAll(),
+    defaultValue: [],
+  });
+  readonly searchBookmarkOptions = computed(() => {
+    const selectedId = this.formModel().json.searchBookmarkId;
+    const bookmarks = this.searchBookmarks.hasValue()
+      ? this.searchBookmarks.value()
+      : [];
+    const options = bookmarks.map(bookmark => ({
+      value: bookmark.id,
+      label: bookmark.name || bookmark.id,
+    }));
+    if (selectedId && !bookmarks.some(bookmark => bookmark.id === selectedId)) {
+      options.push({ value: selectedId, label: selectedId });
+    }
+    return [{ value: '', label: 'otherSetting.noSearchBookmark' }, ...options];
   });
 
   constructor() {

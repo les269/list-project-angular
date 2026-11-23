@@ -9,6 +9,12 @@
       [resetValue]="initialFormValue"
       [defaultBinding]="defaultBinding()" />
     <form (submit)="$event.preventDefault()" class="theme-other-setting">
+      <app-signal-field
+        [field]="group().searchBookmarkId"
+        label="otherSetting.searchBookmark"
+        [type]="fieldType.SELECT"
+        emptyOption=""
+        [options]="searchBookmarkOptions()" />
       @if (themeHeaderType() === eThemeHeaderType.table) {
         <div class="table-settings">
           <app-chip-input-color

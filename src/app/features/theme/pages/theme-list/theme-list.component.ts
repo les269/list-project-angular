@@ -18,6 +18,7 @@ import { ShareTagListComponent } from '../../components/share-tag-list/share-tag
 import { CopyThemeComponent } from '../../components/copy-theme/copy-theme.component';
 import { MatIconModule } from '@angular/material/icon';
 import { LayoutStore } from '../../../../core/stores/layout.store';
+import { SearchBookmarkListComponent } from '../../components/search-bookmark-list/search-bookmark-list.component';
 
 @Component({
   imports: [KeyValuePipe, RouterLink, TranslatePipe, MatIconModule],
@@ -80,6 +81,14 @@ export class ThemeListComponent {
 
   onShareTagConfig() {
     this.matDialog.open(ShareTagListComponent, {
+      width: '800px',
+      maxWidth: 'calc(100vw - 32px)',
+      maxHeight: '92vh',
+    });
+  }
+
+  onSearchBookmarkConfig() {
+    this.matDialog.open(SearchBookmarkListComponent, {
       width: '800px',
       maxWidth: 'calc(100vw - 32px)',
       maxHeight: '92vh',

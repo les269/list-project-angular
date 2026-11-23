@@ -18,6 +18,7 @@ export interface ThemeOtherSetting {
   quickRefresh: string;
   quickRefreshType: QuickRefreshType;
   useSpider: string;
+  searchBookmarkId: string;
 }
 export interface ThemeHeaderCopy {
   name: string;

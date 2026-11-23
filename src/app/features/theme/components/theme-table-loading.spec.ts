@@ -16,6 +16,7 @@ import { ScrapyService } from '../../spider/services/scrapy.service';
 import { ThemeItem, ThemeItemType } from '../models';
 import { ThemeItemMapService, ThemeItemService } from '../services';
 import { ShareTagService } from '../services/share-tag.service';
+import { SearchBookmarkService } from '../services/search-bookmark.service';
 import { ThemeCustomTableComponent } from './theme-custom-table/theme-custom-table.component';
 import { ThemeDatasetTableComponent } from './theme-dataset-table/theme-dataset-table.component';
 import { ThemeItemManageComponent } from './theme-item-manage/theme-item-manage.component';
@@ -297,6 +298,7 @@ describe.each(objectCases)('$type object loading', config => {
         { provide: SnackbarService, useValue: { openI18N: vi.fn() } },
         { provide: MatDialog, useValue: {} },
         { provide: ScrapyService, useValue: { getAllConfig: () => of([]) } },
+        { provide: SearchBookmarkService, useValue: { getAll: () => of([]) } },
       ],
     }).compileComponents();
     const fixture = TestBed.createComponent(config.componentType);

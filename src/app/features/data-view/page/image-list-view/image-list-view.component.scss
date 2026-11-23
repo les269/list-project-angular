@@ -3,6 +3,10 @@
 
 @include toolbar.layout;
 
+.view-page {
+  padding-inline: clamp(48px, 4vw, 72px);
+}
+
 .list-content {
   background-color: var(--app-surface);
   border: 1px solid var(--app-border);
