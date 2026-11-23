@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatSort } from '@angular/material/sort';
 import { provideTranslateService } from '@ngx-translate/core';
 import { of, Subject } from 'rxjs';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
@@ -158,7 +159,7 @@ describe('搜尋書籤資料清單', () => {
     confirmation.next(false);
     await fixture.whenStable();
     expect(service.deleteItemById).not.toHaveBeenCalled();
-    expect(component.filteredItems()).toEqual([item]);
+    expect(component.dataSource.filteredData).toEqual([item]);
     expect(component.isDeleting()).toBe(false);
   });
 
@@ -186,7 +187,7 @@ describe('搜尋書籤資料清單', () => {
       item.value,
       'second',
     ]);
-    expect(component.filteredItems()[0].seq).toBe(0);
+    expect(component.dataSource.filteredData[0].seq).toBe(0);
     expect(service.updateItemOrder).not.toHaveBeenCalled();
     expect(component.hasOrderChanges()).toBe(true);
     component.filterValue.set('third');
@@ -238,6 +239,97 @@ describe('搜尋書籤資料清單', () => {
     expect(service.updateItemOrder).toHaveBeenCalledTimes(1);
   });
 
+  it.each(['seq', 'id', 'value', 'updatedTime'])(
+    '%s 欄位排序僅影響顯示，其他排序與序號降冪禁止拖曳',
+    async column => {
+      const { fixture, component, page, service, item } = await setup();
+      const first = {
+        ...item,
+        id: 'a',
+        value: 'Alpha',
+        seq: 0,
+        updatedTime: '2026-01-01T00:00:00Z',
+      };
+      const second = {
+        ...item,
+        id: 'b',
+        value: 'Beta',
+        seq: 5,
+        updatedTime: '2026-02-01T00:00:00Z',
+      };
+      service.getItemById.mockReturnValue(of([second, first]));
+      component.items.reload();
+      await fixture.whenStable();
+      const header = page.querySelector<HTMLElement>(
+        `[mat-sort-header="${column}"]`
+      )!;
+      const displayedValues = () =>
+        Array.from(page.querySelectorAll('tbody .item-value'), cell =>
+          cell.textContent?.trim()
+        );
+      if (column !== 'seq') {
+        header.click();
+        await fixture.whenStable();
+        expect(displayedValues()).toEqual(['Alpha', 'Beta']);
+        expect(component.canDrag()).toBe(false);
+        drop(fixture, 0, 1);
+      }
+      header.click();
+      await fixture.whenStable();
+      expect(displayedValues()).toEqual(['Beta', 'Alpha']);
+      expect(component.canDrag()).toBe(false);
+      expect(
+        fixture.debugElement
+          .query(By.directive(CdkDropList))
+          .injector.get(CdkDropList).disabled
+      ).toBe(true);
+      drop(fixture, 0, 1);
+      component.saveOrder();
+      expect(component.orderedItems()).toEqual([first, second]);
+      expect(component.hasOrderChanges()).toBe(false);
+      expect(service.updateItemOrder).not.toHaveBeenCalled();
+      const seqHeader = page.querySelector<HTMLElement>(
+        '[mat-sort-header="seq"]'
+      )!;
+      seqHeader.click();
+      await fixture.whenStable();
+      expect(component.canDrag()).toBe(true);
+      expect(displayedValues()).toEqual(['Alpha', 'Beta']);
+    }
+  );
+
+  it('有順序草稿時鎖定欄位排序，重設後恢復排序', async () => {
+    const { fixture, component, page, service, item } = await setup();
+    const second = { ...item, value: 'second', seq: 5 };
+    service.getItemById.mockReturnValue(of([item, second]));
+    component.items.reload();
+    await fixture.whenStable();
+    drop(fixture, 0, 1);
+    await fixture.whenStable();
+    const header = page.querySelector<HTMLElement>(
+      '[mat-sort-header="value"]'
+    )!;
+    header.click();
+    component.changeSort({ active: 'value', direction: 'asc' });
+    await fixture.whenStable();
+    expect(component.sort()).toEqual({ active: 'seq', direction: 'asc' });
+    expect(component.orderedItems().map(entry => entry.value)).toEqual([
+      'second',
+      item.value,
+    ]);
+    expect(
+      fixture.debugElement.query(By.directive(MatSort)).injector.get(MatSort)
+        .disabled
+    ).toBe(true);
+    component.resetOrder();
+    await fixture.whenStable();
+    header.click();
+    await fixture.whenStable();
+    expect(component.sort()).toEqual({ active: 'value', direction: 'asc' });
+    expect(component.hasOrderChanges()).toBe(false);
+    expect(service.updateItemOrder).not.toHaveBeenCalled();
+  });
+
   it('篩選時拖曳只交換可見資料，隱藏資料保留原位置', async () => {
     const { fixture, component, service, item } = await setup();
     const visibleFirst = { ...item, value: 'visible first', seq: 0 };
@@ -273,7 +365,7 @@ describe('搜尋書籤資料清單', () => {
     confirmation.next(true);
     deletion.error(new Error('Request failed'));
     await fixture.whenStable();
-    expect(component.filteredItems()).toEqual([item]);
+    expect(component.dataSource.filteredData).toEqual([item]);
     expect(component.isDeleting()).toBe(false);
     expect(dialog.disableClose).toBe(false);
     expect(snackbar.openI18N).not.toHaveBeenCalled();

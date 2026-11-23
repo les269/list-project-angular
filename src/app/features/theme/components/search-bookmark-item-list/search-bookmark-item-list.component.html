@@ -54,67 +54,108 @@
       <p role="status">{{ 'searchBookmark.loading' | translate }}</p>
     } @else {
       <div class="table-container scrollbar-primary">
-        <table>
-          <thead>
-            <tr>
-              <th
-                scope="col"
-                class="drag-column"
-                [attr.aria-label]="'searchBookmark.dragOrder' | translate"></th>
-              <th scope="col">{{ 'searchBookmark.seq' | translate }}</th>
-              <th scope="col">{{ 'searchBookmark.itemId' | translate }}</th>
-              <th scope="col">{{ 'searchBookmark.value' | translate }}</th>
-              <th scope="col">{{ 'g.updatedTime' | translate }}</th>
-              <th scope="col">{{ 'searchBookmark.actions' | translate }}</th>
-            </tr>
-          </thead>
-          <tbody
-            cdkDropList
-            [cdkDropListData]="filteredItems()"
-            [cdkDropListDisabled]="isBusy() || items.isLoading()"
-            (cdkDropListDropped)="dropItem($event)">
-            @for (item of filteredItems(); track $index) {
-              <tr
-                cdkDrag
-                cdkDragLockAxis="y"
-                [cdkDragData]="item"
-                [cdkDragPreviewContainer]="'parent'">
-                <td class="drag-column">
-                  <mat-icon
-                    cdkDragHandle
-                    class="drag-handle"
-                    [attr.aria-label]="'searchBookmark.dragOrder' | translate"
-                    [attr.title]="'searchBookmark.dragOrder' | translate"
-                    aria-hidden="false"
-                    >drag_indicator</mat-icon
-                  >
-                </td>
-                <td>{{ item.seq }}</td>
-                <td>{{ item.id }}</td>
-                <td class="item-value">{{ item.value }}</td>
-                <td>{{ item.updatedTime | date: 'yyyy-MM-dd HH:mm' }}</td>
-                <td>
-                  <button
-                    type="button"
-                    class="row-action row-action-danger"
-                    [disabled]="
-                      isBusy() || items.isLoading() || hasOrderChanges()
-                    "
-                    [title]="'g.delete' | translate"
-                    (click)="deleteItem(item)"
-                    [attr.aria-label]="
-                      ('g.delete' | translate) + ' ' + item.value
-                    ">
-                    <mat-icon>delete</mat-icon>
-                  </button>
-                </td>
-              </tr>
-            } @empty {
-              <tr class="empty-row">
-                <td colspan="6">{{ 'g.noData' | translate }}</td>
-              </tr>
-            }
-          </tbody>
+        <table
+          mat-table
+          [dataSource]="dataSource"
+          matSort
+          [matSortActive]="sort().active"
+          [matSortDirection]="sort().direction"
+          [matSortDisableClear]="true"
+          [matSortDisabled]="isBusy() || hasOrderChanges()"
+          (matSortChange)="changeSort($event)"
+          cdkDropList
+          [cdkDropListData]="dataSource.filteredData"
+          [cdkDropListDisabled]="!canDrag()"
+          (cdkDropListDropped)="dropItem($event)">
+          <ng-container matColumnDef="drag">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              scope="col"
+              class="drag-column"
+              [attr.aria-label]="'searchBookmark.dragOrder' | translate"></th>
+            <td mat-cell *matCellDef="let item" class="drag-column">
+              <mat-icon
+                cdkDragHandle
+                class="drag-handle"
+                [attr.aria-label]="'searchBookmark.dragOrder' | translate"
+                [attr.title]="'searchBookmark.dragOrder' | translate"
+                aria-hidden="false"
+                >drag_indicator</mat-icon
+              >
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="seq">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              scope="col"
+              mat-sort-header="seq">
+              {{ 'searchBookmark.seq' | translate }}
+            </th>
+            <td mat-cell *matCellDef="let item">{{ item.seq }}</td>
+          </ng-container>
+          <ng-container matColumnDef="id">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              scope="col"
+              mat-sort-header="id">
+              {{ 'searchBookmark.itemId' | translate }}
+            </th>
+            <td mat-cell *matCellDef="let item">{{ item.id }}</td>
+          </ng-container>
+          <ng-container matColumnDef="value">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              scope="col"
+              mat-sort-header="value">
+              {{ 'searchBookmark.value' | translate }}
+            </th>
+            <td mat-cell *matCellDef="let item" class="item-value">
+              {{ item.value }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="updatedTime">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              scope="col"
+              mat-sort-header="updatedTime">
+              {{ 'g.updatedTime' | translate }}
+            </th>
+            <td mat-cell *matCellDef="let item">
+              {{ item.updatedTime | date: 'yyyy-MM-dd HH:mm' }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef scope="col">
+              {{ 'searchBookmark.actions' | translate }}
+            </th>
+            <td mat-cell *matCellDef="let item">
+              <button
+                type="button"
+                class="row-action row-action-danger"
+                [disabled]="isBusy() || items.isLoading() || hasOrderChanges()"
+                [title]="'g.delete' | translate"
+                (click)="deleteItem(item)"
+                [attr.aria-label]="('g.delete' | translate) + ' ' + item.value">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr
+            mat-row
+            *matRowDef="let item; columns: displayedColumns"
+            cdkDrag
+            cdkDragLockAxis="y"
+            [cdkDragData]="item"
+            [cdkDragPreviewContainer]="'parent'"></tr>
+          <tr class="empty-row" *matNoDataRow>
+            <td colspan="6">{{ 'g.noData' | translate }}</td>
+          </tr>
         </table>
       </div>
     }

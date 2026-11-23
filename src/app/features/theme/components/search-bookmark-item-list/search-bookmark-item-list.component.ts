@@ -3,9 +3,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   linkedSignal,
   signal,
+  untracked,
+  viewChild,
 } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import {
@@ -14,6 +17,8 @@ import {
   MatDialogRef,
 } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import {
   CdkDrag,
   CdkDragDrop,
@@ -37,6 +42,8 @@ import { SearchBookmarkService } from '../../services/search-bookmark.service';
     TranslatePipe,
     MatDialogModule,
     MatIconModule,
+    MatSortModule,
+    MatTableModule,
     CdkDrag,
     CdkDragHandle,
     CdkDropList,
@@ -55,14 +62,33 @@ export class SearchBookmarkItemListComponent {
   private readonly messageBox = inject(MessageBoxService);
   private readonly snackbar = inject(SnackbarService);
 
+  readonly dataSource = new MatTableDataSource<SearchBookmarkItem>();
+  readonly displayedColumns = [
+    'drag',
+    'seq',
+    'id',
+    'value',
+    'updatedTime',
+    'actions',
+  ];
   readonly isDeleting = signal(false);
   readonly isSavingOrder = signal(false);
   readonly isBusy = computed(() => this.isDeleting() || this.isSavingOrder());
   readonly filterValue = signal('');
+  readonly sort = signal<Sort>({ active: 'seq', direction: 'asc' });
+  readonly tableSort = viewChild(MatSort);
   readonly items = rxResource({
     stream: () => this.service.getItemById(this.bookmark.id),
     defaultValue: [],
   });
+  readonly canDrag = computed(
+    () =>
+      !this.isBusy() &&
+      !this.items.isLoading() &&
+      this.items.hasValue() &&
+      this.sort().active === 'seq' &&
+      this.sort().direction === 'asc'
+  );
   readonly originalItems = computed(() =>
     this.items.hasValue()
       ? [...this.items.value()].sort((a, b) => a.seq - b.seq)
@@ -80,14 +106,35 @@ export class SearchBookmarkItemListComponent {
       )
     );
   });
-  readonly filteredItems = computed(() => {
-    const query = this.filterValue().trim().toLowerCase();
-    return this.orderedItems().filter(
-      item =>
-        item.id.toLowerCase().includes(query) ||
-        item.value.toLowerCase().includes(query)
-    );
-  });
+
+  constructor() {
+    this.dataSource.filterPredicate = (item, query) =>
+      item.id.toLowerCase().includes(query) ||
+      item.value.toLowerCase().includes(query);
+    const accessor = this.dataSource.sortingDataAccessor;
+    this.dataSource.sortingDataAccessor = (item, column) =>
+      column === 'updatedTime'
+        ? Date.parse(item.updatedTime ?? '') || 0
+        : accessor(item, column);
+
+    effect(() => {
+      const items = this.orderedItems();
+      untracked(() => (this.dataSource.data = items));
+    });
+    effect(() => {
+      const sort = this.tableSort();
+      untracked(() => (this.dataSource.sort = sort ?? null));
+    });
+    effect(() => {
+      const query = this.filterValue().trim().toLowerCase();
+      untracked(() => (this.dataSource.filter = query));
+    });
+  }
+
+  changeSort(sort: Sort) {
+    if (this.isBusy() || this.hasOrderChanges()) return;
+    this.sort.set(sort);
+  }
 
   deleteItem(item: SearchBookmarkItem) {
     if (
@@ -126,8 +173,7 @@ export class SearchBookmarkItemListComponent {
   }
 
   dropItem(event: CdkDragDrop<SearchBookmarkItem[]>) {
-    if (this.isBusy() || this.items.isLoading() || !this.items.hasValue())
-      return;
+    if (!this.canDrag()) return;
     const current = this.orderedItems();
     const visible = [...event.container.data];
     if (

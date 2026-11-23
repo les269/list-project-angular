@@ -2,10 +2,11 @@ import { DatePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
+  effect,
   inject,
   signal,
   TemplateRef,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
@@ -16,6 +17,8 @@ import {
   MatDialogRef,
 } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { TranslatePipe } from '@ngx-translate/core';
 import { filter, finalize, switchMap, take } from 'rxjs';
 import { SignalFieldComponent } from '../../../../core/components/signal-field/signal-field.component';
@@ -32,6 +35,8 @@ import { SearchBookmarkItemListComponent } from '../search-bookmark-item-list/se
     TranslatePipe,
     MatDialogModule,
     MatIconModule,
+    MatSortModule,
+    MatTableModule,
     SignalFieldComponent,
   ],
   selector: 'app-search-bookmark-list',
@@ -48,26 +53,21 @@ export class SearchBookmarkListComponent {
 
   private editorDialogRef?: MatDialogRef<unknown>;
 
+  readonly dataSource = new MatTableDataSource<SearchBookmark>();
+  readonly displayedColumns = ['id', 'name', 'updatedTime', 'actions'];
   readonly editMode = EditMode;
   readonly mode = signal(EditMode.CREATE);
   readonly isEditing = signal(false);
   readonly isBusy = signal(false);
   readonly filterValue = signal('');
+  readonly sort = signal<Sort>({ active: '', direction: '' });
   readonly bookmarkModel = signal({ id: '', name: '' });
   readonly editorTemplate =
     viewChild.required<TemplateRef<unknown>>('editorTemplate');
+  readonly tableSort = viewChild(MatSort);
   readonly bookmarks = rxResource({
     stream: () => this.service.getAll(),
     defaultValue: [],
-  });
-  readonly filteredBookmarks = computed(() => {
-    const query = this.filterValue().trim().toLowerCase();
-    const bookmarks = this.bookmarks.hasValue() ? this.bookmarks.value() : [];
-    return bookmarks.filter(bookmark =>
-      [bookmark.id, bookmark.name].some(value =>
-        value.toLowerCase().includes(query)
-      )
-    );
   });
   readonly bookmarkForm = form(this.bookmarkModel, p => {
     required(p.id);
@@ -75,6 +75,30 @@ export class SearchBookmarkListComponent {
     disabled(p.id, { when: () => this.mode() === EditMode.EDIT });
     readonly(p, { when: () => this.isBusy() });
   });
+
+  constructor() {
+    this.dataSource.filterPredicate = (bookmark, query) =>
+      bookmark.id.toLowerCase().includes(query) ||
+      bookmark.name.toLowerCase().includes(query);
+    const accessor = this.dataSource.sortingDataAccessor;
+    this.dataSource.sortingDataAccessor = (bookmark, column) =>
+      column === 'updatedTime'
+        ? Date.parse(bookmark.updatedTime ?? '') || 0
+        : accessor(bookmark, column);
+
+    effect(() => {
+      const bookmarks = this.bookmarks.hasValue() ? this.bookmarks.value() : [];
+      untracked(() => (this.dataSource.data = bookmarks));
+    });
+    effect(() => {
+      const sort = this.tableSort();
+      untracked(() => (this.dataSource.sort = sort ?? null));
+    });
+    effect(() => {
+      const query = this.filterValue().trim().toLowerCase();
+      untracked(() => (this.dataSource.filter = query));
+    });
+  }
 
   openCreate() {
     if (this.isBusy() || this.isEditing()) return;

@@ -161,6 +161,50 @@ describe('搜尋書籤管理', () => {
     expect(page.querySelector('.empty-row')).not.toBeNull();
   });
 
+  it.each(['id', 'name', 'updatedTime'])(
+    '點擊 %s 欄位可切換升冪、降冪及原順序，篩選與重新載入保留排序',
+    async column => {
+      const { fixture, component, page, service } = await setup();
+      const first = {
+        id: 'a',
+        name: 'Alpha',
+        updatedTime: '2026-01-01T00:00:00Z',
+      };
+      const second = {
+        id: 'b',
+        name: 'Beta',
+        updatedTime: '2026-02-01T00:00:00Z',
+      };
+      service.getAll.mockReturnValue(of([second, first]));
+      component.bookmarks.reload();
+      await fixture.whenStable();
+      const header = page.querySelector<HTMLElement>(
+        `[mat-sort-header="${column}"]`
+      )!;
+      const ids = () =>
+        Array.from(page.querySelectorAll('tbody tr td:first-child'), cell =>
+          cell.textContent?.trim()
+        );
+      header.click();
+      await fixture.whenStable();
+      expect(ids()).toEqual(['a', 'b']);
+      header.click();
+      await fixture.whenStable();
+      expect(ids()).toEqual(['b', 'a']);
+      component.filterValue.set('alpha');
+      await fixture.whenStable();
+      expect(ids()).toEqual(['a']);
+      component.filterValue.set('');
+      service.getAll.mockReturnValue(of([first, second]));
+      component.bookmarks.reload();
+      await fixture.whenStable();
+      expect(ids()).toEqual(['b', 'a']);
+      header.click();
+      await fixture.whenStable();
+      expect(ids()).toEqual(['a', 'b']);
+    }
+  );
+
   it('編輯旁的 list 按鈕將該列書籤傳給資料清單 dialog', async () => {
     const { page, fixture } = await setup();
     const open = vi

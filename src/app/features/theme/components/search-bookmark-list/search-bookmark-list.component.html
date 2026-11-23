@@ -40,65 +40,92 @@
       <p role="status">{{ 'searchBookmark.loading' | translate }}</p>
     } @else {
       <div class="table-container scrollbar-primary">
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">{{ 'searchBookmark.id' | translate }}</th>
-              <th scope="col">{{ 'searchBookmark.name' | translate }}</th>
-              <th scope="col">{{ 'g.updatedTime' | translate }}</th>
-              <th scope="col">{{ 'searchBookmark.actions' | translate }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (bookmark of filteredBookmarks(); track bookmark.id) {
-              <tr>
-                <td>{{ bookmark.id }}</td>
-                <td>{{ bookmark.name }}</td>
-                <td>{{ bookmark.updatedTime | date: 'yyyy-MM-dd HH:mm' }}</td>
-                <td>
-                  <div class="row-actions">
-                    <button
-                      type="button"
-                      class="row-action"
-                      [disabled]="isBusy()"
-                      (click)="openEdit(bookmark)"
-                      [attr.aria-label]="
-                        ('g.edit' | translate) + ' ' + bookmark.name
-                      ">
-                      <mat-icon>edit</mat-icon>
-                    </button>
-                    <button
-                      type="button"
-                      class="row-action"
-                      [disabled]="isBusy()"
-                      (click)="openItems(bookmark)"
-                      [attr.aria-label]="
-                        ('searchBookmark.itemList' | translate) +
-                        ' ' +
-                        bookmark.name
-                      "
-                      [title]="'searchBookmark.itemList' | translate">
-                      <mat-icon>list</mat-icon>
-                    </button>
-                    <button
-                      type="button"
-                      class="row-action row-action-danger"
-                      [disabled]="isBusy()"
-                      (click)="deleteBookmark(bookmark)"
-                      [attr.aria-label]="
-                        ('g.delete' | translate) + ' ' + bookmark.name
-                      ">
-                      <mat-icon>delete</mat-icon>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            } @empty {
-              <tr class="empty-row">
-                <td colspan="4">{{ 'g.noData' | translate }}</td>
-              </tr>
-            }
-          </tbody>
+        <table
+          mat-table
+          [dataSource]="dataSource"
+          matSort
+          [matSortActive]="sort().active"
+          [matSortDirection]="sort().direction"
+          (matSortChange)="sort.set($event)">
+          <ng-container matColumnDef="id">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              scope="col"
+              mat-sort-header="id">
+              {{ 'searchBookmark.id' | translate }}
+            </th>
+            <td mat-cell *matCellDef="let bookmark">{{ bookmark.id }}</td>
+          </ng-container>
+          <ng-container matColumnDef="name">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              scope="col"
+              mat-sort-header="name">
+              {{ 'searchBookmark.name' | translate }}
+            </th>
+            <td mat-cell *matCellDef="let bookmark">{{ bookmark.name }}</td>
+          </ng-container>
+          <ng-container matColumnDef="updatedTime">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              scope="col"
+              mat-sort-header="updatedTime">
+              {{ 'g.updatedTime' | translate }}
+            </th>
+            <td mat-cell *matCellDef="let bookmark">
+              {{ bookmark.updatedTime | date: 'yyyy-MM-dd HH:mm' }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef scope="col">
+              {{ 'searchBookmark.actions' | translate }}
+            </th>
+            <td mat-cell *matCellDef="let bookmark">
+              <div class="row-actions">
+                <button
+                  type="button"
+                  class="row-action"
+                  [disabled]="isBusy()"
+                  (click)="openEdit(bookmark)"
+                  [attr.aria-label]="
+                    ('g.edit' | translate) + ' ' + bookmark.name
+                  ">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button
+                  type="button"
+                  class="row-action"
+                  [disabled]="isBusy()"
+                  (click)="openItems(bookmark)"
+                  [attr.aria-label]="
+                    ('searchBookmark.itemList' | translate) +
+                    ' ' +
+                    bookmark.name
+                  "
+                  [title]="'searchBookmark.itemList' | translate">
+                  <mat-icon>list</mat-icon>
+                </button>
+                <button
+                  type="button"
+                  class="row-action row-action-danger"
+                  [disabled]="isBusy()"
+                  (click)="deleteBookmark(bookmark)"
+                  [attr.aria-label]="
+                    ('g.delete' | translate) + ' ' + bookmark.name
+                  ">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let bookmark; columns: displayedColumns"></tr>
+          <tr class="empty-row" *matNoDataRow>
+            <td colspan="4">{{ 'g.noData' | translate }}</td>
+          </tr>
         </table>
       </div>
     }
