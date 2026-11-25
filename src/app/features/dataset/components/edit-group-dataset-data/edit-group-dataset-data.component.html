@@ -54,17 +54,18 @@
   </div>
   @if (groupDatasetConfig(); as config) {
     @for (
-      scrapy of config.groupDatasetScrapyList;
+      spider of config.groupDatasetSpiderList;
       track $index;
       let sourceIndex = $index
     ) {
-      @if (scrapyInput[scrapy.name]; as source) {
+      @if (spiderInput[spider.spiderId]; as source) {
         <div class="record-section crawler-panel">
-          @if (scrapy.visibleJson && source.json.length > 0) {
+          @if (spider.visibleJson && source.primeKeyList.length > 0) {
             <fieldset class="source-fields">
               <legend class="visually-hidden">
                 {{
-                  'dataset.scrapyJsonLabel' | translate: { label: scrapy.label }
+                  'dataset.spiderPrimeKeyLabel'
+                    | translate: { label: spider.label }
                 }}
               </legend>
               <div class="parameter-fields">
@@ -72,33 +73,42 @@
                   class="field-label"
                   [for]="controlId + '-param-' + sourceIndex + '-0'"
                   >{{
-                    'dataset.scrapyJsonLabel'
-                      | translate: { label: scrapy.label }
+                    'dataset.spiderPrimeKeyLabel'
+                      | translate: { label: spider.label }
                   }}</label
                 >
-                @for (param of source.json; track $index; let index = $index) {
+                @for (
+                  param of source.primeKeyList;
+                  track $index;
+                  let index = $index
+                ) {
                   <input
                     class="form-control"
                     trimOnBlur
                     [id]="controlId + '-param-' + sourceIndex + '-' + index"
                     [attr.aria-label]="
-                      ('dataset.scrapyJsonLabel'
-                        | translate: { label: scrapy.label }) +
+                      ('dataset.spiderPrimeKeyLabel'
+                        | translate: { label: spider.label }) +
                       ' ' +
                       (index + 1)
                     "
-                    [formField]="scrapyInputForm[scrapy.name].json[index]"
+                    [formField]="
+                      spiderInputForm[spider.spiderId].primeKeyList[index]
+                    "
                     (keydown.enter)="
-                      scrapyByJson(scrapy.name, scrapyInput[scrapy.name].json)
+                      spiderByPrimeKey(
+                        spider.spiderId,
+                        spiderInput[spider.spiderId].primeKeyList
+                      )
                     " />
                 }
               </div>
               <div class="source-actions">
-                @if (source.json.length === 1) {
+                @if (source.primeKeyList.length === 1) {
                   <button
                     type="button"
                     class="dialog-button"
-                    (click)="scrapyByJson(scrapy.name, [primeValue])">
+                    (click)="spiderByPrimeKey(spider.spiderId, [primeValue])">
                     {{ 'g.keywordSearch' | translate }}
                   </button>
                 }
@@ -106,36 +116,39 @@
                   type="button"
                   class="dialog-button"
                   (click)="
-                    scrapyByJson(scrapy.name, scrapyInput[scrapy.name].json)
+                    spiderByPrimeKey(
+                      spider.spiderId,
+                      spiderInput[spider.spiderId].primeKeyList
+                    )
                   ">
                   {{ 'g.search' | translate }}
                 </button>
               </div>
             </fieldset>
           }
-          @if (scrapy.visibleUrl) {
+          @if (spider.visibleUrl) {
             <div class="source-row">
               <div class="data-field">
                 <label
                   class="field-label"
                   [for]="controlId + '-url-' + sourceIndex"
                   >{{
-                    'dataset.scrapyUrlLabel'
-                      | translate: { label: scrapy.label }
+                    'dataset.spiderUrlLabel'
+                      | translate: { label: spider.label }
                   }}</label
                 >
                 <input
                   class="form-control"
                   trimOnBlur
                   [id]="controlId + '-url-' + sourceIndex"
-                  [formField]="scrapyInputForm[scrapy.name].url"
-                  (keydown.enter)="scrapyByUrl(scrapy)" />
+                  [formField]="spiderInputForm[spider.spiderId].url"
+                  (keydown.enter)="spiderByUrl(spider)" />
               </div>
               <div class="source-actions">
                 <button
                   type="button"
                   class="dialog-button"
-                  (click)="scrapyByUrl(scrapy)">
+                  (click)="spiderByUrl(spider)">
                   {{ 'g.search' | translate }}
                 </button>
               </div>

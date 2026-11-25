@@ -8,14 +8,14 @@ export interface GroupDatasetConfig {
   byKey: string;
   type: GroupDatasetConfigType;
   imageSaveFolder: string;
-  groupDatasetScrapyList: GroupDatasetScrapy[];
+  groupDatasetSpiderList: GroupDatasetSpider[];
   groupDatasetFieldList: GroupDatasetField[];
   groupDatasetApiList: GroupDatasetApi[];
 }
 
-export interface GroupDatasetScrapy {
+export interface GroupDatasetSpider {
   seq: number;
-  name: string;
+  spiderId: string;
   label: string;
   isDefault: boolean;
   visibleJson: boolean;
@@ -48,6 +48,6 @@ export interface GroupDatasetApi {
 }
 
 export enum GroupDatasetConfigType {
-  scrapy = 'scrapy',
+  spider = 'spider',
   api = 'api',
 }

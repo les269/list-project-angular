@@ -1,8 +1,10 @@
 import { SignalCodeEditorComponent } from '../../../core/components/signal-code-editor/signal-code-editor.component';
 import { Component, input, model, Type } from '@angular/core';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { TestBed } from '@angular/core/testing';
 import { FormValueControl } from '@angular/forms/signals';
 import { MatDialog } from '@angular/material/dialog';
+import { MAT_TABS_CONFIG } from '@angular/material/tabs';
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
@@ -20,6 +22,7 @@ import {
   ExtractionRuleMode,
   ExtractionStepCondition,
   SpiderItem,
+  SpiderMapping,
   SpiderConfig,
   UrlType,
   ValuePipeline,
@@ -482,6 +485,207 @@ it('SpiderEdit 儲存與預覽共用解析規則和操作鎖', async () => {
     spiderId: 'spider',
     primeKeyList: ['key'],
   });
+  expect(component.isProcessing()).toBe(false);
+});
+
+it('已綁定的爬蟲項目隱藏刪除按鈕，直接呼叫也保留 tab 與綁定', async () => {
+  const state = await setup();
+  const fixture = TestBed.createComponent(SpiderEditComponent);
+  await fixture.whenStable();
+  const component = fixture.componentInstance;
+  component.status.set(component.editMode.EDIT);
+  component.spiderItems.set([state.item]);
+  component.mappings.set([
+    { spiderId: 'spider', executionOrder: 0, spiderItemId: 'item' },
+  ]);
+  component.selected.set(1);
+  await fixture.whenStable();
+
+  const button = Array.from(
+    fixture.nativeElement.querySelectorAll(
+      'button'
+    ) as NodeListOf<HTMLButtonElement>
+  ).find(button => button.textContent?.includes('spider.deleteSpiderItem'));
+  expect(button).toBeUndefined();
+  component.onDeleteItemTab();
+  expect(state.messages.openI18N).not.toHaveBeenCalled();
+  expect(component.spiderItems()).toEqual([state.item]);
+  expect(component.mappings()).toHaveLength(1);
+  expect(component.selected()).toBe(1);
+  expect(state.items.delete).not.toHaveBeenCalled();
+  expect(state.maps.delete).not.toHaveBeenCalled();
+});
+
+it.each([false, true])(
+  '新 tab 移到前面保留兩個表單與選取項目，排序失敗還原：%s',
+  async fail => {
+    const state = await setup(false, 'spider');
+    const fixture = TestBed.createComponent(SpiderEditComponent);
+    await fixture.whenStable();
+    const component = fixture.componentInstance;
+    component.status.set(component.editMode.EDIT);
+    component.spiderItems.set([state.item]);
+    component.selected.set(1);
+    await fixture.whenStable();
+    component.onAddItemTab();
+    await fixture.whenStable();
+
+    const itemComponents = () =>
+      fixture.debugElement
+        .queryAll(By.directive(SpiderItemComponent))
+        .map(element => element.componentInstance as SpiderItemComponent);
+    const [existing, added] = itemComponents();
+    existing.description().value.set('existing draft');
+    added.spiderItemId().value.set('new-item');
+    added.description().value.set('new draft');
+    added.htmlData().value.set('<p>draft</p>');
+    added.itemMode.set(component.editMode.EDIT);
+    // 新項目儲存並綁定後，父層仍保留建立 tab 時的空白初始資料。
+    component.mappings.set([
+      { spiderId: 'spider', executionOrder: 0, spiderItemId: 'item' },
+      { spiderId: 'spider', executionOrder: 1, spiderItemId: 'new-item' },
+    ]);
+    await fixture.whenStable();
+    component.dropTab({
+      previousIndex: 1,
+      currentIndex: 0,
+    } as CdkDragDrop<SpiderItem[]>);
+    await fixture.whenStable();
+
+    expect(itemComponents()).toEqual([added, existing]);
+    expect(added.index()).toBe(0);
+    expect(component.selected()).toBe(1);
+    expect(state.maps.update).toHaveBeenCalledWith([
+      { spiderId: 'spider', executionOrder: 0, spiderItemId: 'new-item' },
+      { spiderId: 'spider', executionOrder: 1, spiderItemId: 'item' },
+    ]);
+    if (fail) state.pending.error(new Error('Reorder failed'));
+    else state.pending.next();
+    await fixture.whenStable();
+
+    expect(itemComponents()).toEqual(
+      fail ? [existing, added] : [added, existing]
+    );
+    expect(component.selected()).toBe(fail ? 2 : 1);
+    expect(existing.description().value()).toBe('existing draft');
+    expect(added.spiderItemId().value()).toBe('new-item');
+    expect(added.description().value()).toBe('new draft');
+    expect(added.htmlData().value()).toBe('<p>draft</p>');
+    expect(added.isEditMode()).toBe(true);
+    if (!fail) {
+      expect(added.isBinding()).toMatchObject({ executionOrder: 0 });
+      expect(existing.isBinding()).toMatchObject({ executionOrder: 1 });
+      added.toggleBind();
+      expect(state.maps.delete).toHaveBeenCalledWith('spider', 0, 'new-item');
+    }
+  }
+);
+
+it.each([false, true])(
+  '中間取消綁定後將原表單移到最後，取消失敗：%s',
+  async fail => {
+    const state = await setup(false, 'spider');
+    TestBed.overrideProvider(MAT_TABS_CONFIG, {
+      useValue: { animationDuration: '0ms' },
+    });
+    const items = ['a1', 'a3', 'a2'].map(spiderItemId => ({
+      ...structuredClone(state.item),
+      spiderItemId,
+      description: spiderItemId,
+    }));
+    const mappings: SpiderMapping[] = items.map((item, executionOrder) => ({
+      spiderId: 'spider',
+      spiderItemId: item.spiderItemId,
+      executionOrder,
+    }));
+    vi.spyOn(
+      TestBed.inject(SpiderItemService),
+      'getItemBySpiderId'
+    ).mockReturnValue(of(items));
+    const getMappings = vi
+      .spyOn(TestBed.inject(SpiderMappingService), 'getBySpiderId')
+      .mockReturnValue(of(mappings));
+    const fixture = TestBed.createComponent(SpiderEditComponent);
+    await fixture.whenStable();
+    const component = fixture.componentInstance;
+    component.status.set(component.editMode.EDIT);
+    const itemComponents = () =>
+      fixture.debugElement
+        .queryAll(By.directive(SpiderItemComponent))
+        .map(element => element.componentInstance as SpiderItemComponent);
+    for (const index of [1, 2, 3]) {
+      component.selected.set(index);
+      await fixture.whenStable();
+    }
+    const [a1, a3, a2] = itemComponents();
+    a3.description().value.set('a3 draft');
+    a2.description().value.set('a2 draft');
+    a3.htmlData().value.set('<p>a3 draft</p>');
+    component.selected.set(2);
+    await fixture.whenStable();
+    getMappings.mockReturnValue(
+      of([
+        { spiderId: 'spider', spiderItemId: 'a1', executionOrder: 0 },
+        { spiderId: 'spider', spiderItemId: 'a2', executionOrder: 1 },
+      ])
+    );
+    a3.toggleBind();
+    expect(state.maps.delete).toHaveBeenCalledWith('spider', 1, 'a3');
+    expect(component.spiderItems()).toEqual(items);
+    if (fail) {
+      getMappings.mockReturnValue(of(mappings));
+      state.pending.error(new Error('Unbind failed'));
+    } else state.pending.next();
+    await fixture.whenStable();
+
+    expect(itemComponents()).toEqual(fail ? [a1, a3, a2] : [a1, a2, a3]);
+    expect(component.selected()).toBe(fail ? 2 : 3);
+    expect(a3.description().value()).toBe('a3 draft');
+    expect(a3.htmlData().value()).toBe('<p>a3 draft</p>');
+    expect(a2.description().value()).toBe('a2 draft');
+    expect(state.maps.update).not.toHaveBeenCalled();
+    if (!fail) {
+      expect(component.getMappingItemId(1)).toBe('a2');
+      expect(a2.index()).toBe(1);
+      expect(a2.spiderItemId().value()).toBe('a2');
+      expect(a3.index()).toBe(2);
+      expect(component.isSelectedItemBound()).toBe(false);
+    }
+  }
+);
+
+it('未綁定 tab 取消時保留，確認後才移除且不刪除項目資料', async () => {
+  const state = await setup();
+  const fixture = TestBed.createComponent(SpiderEditComponent);
+  await fixture.whenStable();
+  const component = fixture.componentInstance;
+  component.spiderItems.set([state.item]);
+  component.selected.set(1);
+  component.onDeleteItemTab();
+  state.confirmation.next('');
+  expect(component.spiderItems()).toEqual([state.item]);
+  component.onDeleteItemTab();
+  state.confirmation.next('confirm');
+  expect(component.spiderItems()).toEqual([]);
+  expect(component.selected()).toBe(0);
+  expect(state.items.delete).not.toHaveBeenCalled();
+  expect(state.maps.delete).not.toHaveBeenCalled();
+});
+
+it('刪除確認期間新增綁定時保留原本的 tab', async () => {
+  const state = await setup();
+  const fixture = TestBed.createComponent(SpiderEditComponent);
+  await fixture.whenStable();
+  const component = fixture.componentInstance;
+  component.spiderItems.set([state.item]);
+  component.selected.set(1);
+  component.onDeleteItemTab();
+  component.mappings.set([
+    { spiderId: 'spider', executionOrder: 0, spiderItemId: 'item' },
+  ]);
+  state.confirmation.next('confirm');
+  expect(component.spiderItems()).toEqual([state.item]);
+  expect(component.mappings()).toHaveLength(1);
   expect(component.isProcessing()).toBe(false);
 });
 

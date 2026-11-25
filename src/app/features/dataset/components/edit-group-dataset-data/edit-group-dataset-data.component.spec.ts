@@ -5,7 +5,8 @@ import { of, Subject } from 'rxjs';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
-import { ScrapyService } from '../../../spider/services/scrapy.service';
+import { SpiderConfigService } from '../../../spider/services/spider-config.service';
+import { SpiderService } from '../../../spider/services/spider.service';
 import { GroupDatasetDataService } from '../../service/group-dataset-data.service';
 import { GroupDatasetService } from '../../service/group-dataset.service';
 import { EditGroupDatasetDataComponent } from './edit-group-dataset-data.component';
@@ -13,7 +14,8 @@ import { EditGroupDatasetDataComponent } from './edit-group-dataset-data.compone
 async function setup(
   deferredConfig = false,
   primeValue = '',
-  deferredSources = false
+  deferredSources = false,
+  primeKeySize = 1
 ) {
   const group = {
     config: {
@@ -24,9 +26,9 @@ async function setup(
         { key: 'title', label: 'Title', type: 'string' },
         { key: 'tags', label: 'Tags', type: 'stringArray' },
       ],
-      groupDatasetScrapyList: [
+      groupDatasetSpiderList: [
         {
-          name: 'crawler',
+          spiderId: 'crawler',
           label: 'Crawler',
           visibleJson: true,
           visibleUrl: true,
@@ -35,7 +37,10 @@ async function setup(
     },
   };
   const configResponse = new Subject<typeof group>();
-  const sources = [{ name: 'crawler', paramSize: 1 }];
+  const sources = [
+    { spiderId: 'crawler', primeKeySize },
+    { spiderId: 'unrelated', primeKeySize: 3 },
+  ];
   const sourceResponse = new Subject<typeof sources>();
   const record = {
     groupName: 'group',
@@ -47,10 +52,10 @@ async function setup(
     getGroupDatasetData: vi.fn(() => of(record)),
     updateGroupDatasetData: vi.fn(() => of(undefined)),
   };
-  const scrapy = {
-    getByNameList: () => (deferredSources ? sourceResponse : of(sources)),
-    scrapyByJson: vi.fn(() => of({ title: 'From params' })),
-    scrapyByUrl: vi.fn(() => of({ title: 'From URL' })),
+  const spider = {
+    getAll: () => (deferredSources ? sourceResponse : of(sources)),
+    executeByPrimeKeyList: vi.fn(() => of({ title: 'From params' })),
+    executeByUrl: vi.fn(() => of({ title: 'From URL' })),
   };
   await TestBed.configureTestingModule({
     imports: [EditGroupDatasetDataComponent],
@@ -62,7 +67,8 @@ async function setup(
       },
       { provide: MatDialogRef, useValue: { close: vi.fn() } },
       { provide: GroupDatasetDataService, useValue: records },
-      { provide: ScrapyService, useValue: scrapy },
+      { provide: SpiderService, useValue: spider },
+      { provide: SpiderConfigService, useValue: spider },
       { provide: SelectTableService, useValue: {} },
       { provide: MessageBoxService, useValue: { openI18N: () => of(true) } },
       {
@@ -98,7 +104,7 @@ async function setup(
     page,
     component: fixture.componentInstance,
     records,
-    scrapy,
+    spider,
     enter,
     initializeConfig: () => configResponse.next(group),
     initializeSources: () => sourceResponse.next(sources),
@@ -137,7 +143,7 @@ it('帶入主鍵時，非同步初始化後顯示查詢回填資料', async () =
 it('只有參數的來源較晚載入時，也會直接顯示輸入框', async () => {
   const { fixture, page, group, initializeConfig, initializeSources } =
     await setup(true, '', true);
-  group.config.groupDatasetScrapyList[0].visibleUrl = false;
+  group.config.groupDatasetSpiderList[0].visibleUrl = false;
   initializeConfig();
   await fixture.whenStable();
   expect(page.querySelector('.parameter-fields input')).toBeNull();
@@ -202,15 +208,15 @@ it('陣列標籤保留排序、去重、移除與清除操作', async () => {
 });
 
 it('來源參數與網址保留 Enter 搜尋及結果回填', async () => {
-  const { fixture, page, component, scrapy, enter } = await setup();
+  const { fixture, page, component, spider, enter } = await setup();
   enter(
     page.querySelector<HTMLInputElement>('.parameter-fields input')!,
     '  param  '
   );
   await fixture.whenStable();
-  expect(scrapy.scrapyByJson).toHaveBeenCalledWith({
-    scrapyName: 'crawler',
-    json: ['param'],
+  expect(spider.executeByPrimeKeyList).toHaveBeenCalledWith({
+    spiderId: 'crawler',
+    primeKeyList: ['param'],
   });
   expect(component.json['title']).toBe('From params');
   enter(
@@ -218,9 +224,31 @@ it('來源參數與網址保留 Enter 搜尋及結果回填', async () => {
     '  https://example.com/item  '
   );
   await fixture.whenStable();
-  expect(scrapy.scrapyByUrl).toHaveBeenCalledWith({
-    scrapyName: 'crawler',
+  expect(spider.executeByUrl).toHaveBeenCalledWith({
+    spiderId: 'crawler',
     url: 'https://example.com/item',
   });
   expect(component.json['title']).toBe('From URL');
+});
+
+it('依 Spider 的 primeKeySize 顯示參數，並排除群組未使用的 Spider', async () => {
+  const { fixture, page, component, spider, enter } = await setup(
+    false,
+    '',
+    false,
+    2
+  );
+  expect(Object.keys(component.spiderInput)).toEqual(['crawler']);
+  const inputs = page.querySelectorAll<HTMLInputElement>(
+    '.parameter-fields input'
+  );
+  expect(inputs).toHaveLength(2);
+  inputs[0].value = 'first';
+  inputs[0].dispatchEvent(new Event('input', { bubbles: true }));
+  enter(inputs[1], 'second');
+  await fixture.whenStable();
+  expect(spider.executeByPrimeKeyList).toHaveBeenCalledWith({
+    spiderId: 'crawler',
+    primeKeyList: ['first', 'second'],
+  });
 });

@@ -63,7 +63,7 @@ export enum QuickRefreshType {
 export interface DatasetQuickRefreshTO {
   byKey: string;
   primeKey: string;
-  scrapyName: string;
+  spiderId: string;
   datasetName: string;
   url: string;
   params: string[];

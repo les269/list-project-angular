@@ -60,7 +60,13 @@ it('快速刷新回應會立即更新畫面，且不覆蓋另一個 Dataset 的�
   await fixture.whenStable();
   expect(titles()).toEqual(['new A', 'old B']);
   expect(row.title).toBe('old A');
-  expect(quickRefreshDataset).toHaveBeenCalledWith(
-    expect.objectContaining({ datasetName: 'a', byKey: 'id', primeKey: 'same' })
-  );
+  expect(quickRefreshDataset).toHaveBeenCalledWith({
+    datasetName: 'a',
+    byKey: 'id',
+    primeKey: 'same',
+    spiderId: 'spider',
+    url: 'https://example.test',
+    params: [],
+    quickRefreshType: 'url',
+  });
 });

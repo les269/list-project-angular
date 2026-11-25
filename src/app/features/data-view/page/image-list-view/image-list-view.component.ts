@@ -141,7 +141,7 @@ export class ImageListViewComponent {
 
     if (!otherSetting) return;
 
-    const scrapyName = otherSetting.useSpider;
+    const spiderId = otherSetting.useSpider;
     const isParamType = otherSetting.quickRefreshType === 'params';
     const params = isParamType
       ? element[otherSetting.quickRefresh]
@@ -154,7 +154,7 @@ export class ImageListViewComponent {
       .quickRefreshDataset({
         byKey,
         primeKey,
-        scrapyName,
+        spiderId,
         datasetName,
         url,
         params,

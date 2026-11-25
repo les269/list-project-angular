@@ -1,7 +1,7 @@
 import {
   createGroupDatasetField,
   createGroupDatasetApi,
-  createGroupDatasetScrapy,
+  createGroupDatasetSpider,
 } from '../../util/group-dataset-rows';
 import { Component, effect, inject, signal, untracked } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
@@ -16,7 +16,7 @@ import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { isNotBlank } from '../../../../shared/util/helper';
 import { GroupDatasetApiTableComponent } from '../../components/group-dataset-api-table/group-dataset-api-table.component';
 import { GroupDatasetFieldTableComponent } from '../../components/group-dataset-field-table/group-dataset-field-table.component';
-import { GroupDatasetScrapyTableComponent } from '../../components/group-dataset-scrapy-table/group-dataset-scrapy-table.component';
+import { GroupDatasetSpiderTableComponent } from '../../components/group-dataset-spider-table/group-dataset-spider-table.component';
 import {
   GroupDataset,
   GroupDatasetConfigType,
@@ -31,7 +31,7 @@ import { GroupDatasetService } from '../../service/group-dataset.service';
     TranslatePipe,
     SignalFieldComponent,
     GroupDatasetFieldTableComponent,
-    GroupDatasetScrapyTableComponent,
+    GroupDatasetSpiderTableComponent,
     GroupDatasetApiTableComponent,
   ],
   templateUrl: './group-dataset-edit.component.html',
@@ -75,22 +75,20 @@ export class GroupDatasetEditComponent {
     config: {
       byKey: '',
       imageSaveFolder: '',
-      type: GroupDatasetConfigType.scrapy,
-      groupDatasetFieldList: [] as ReturnType<typeof createGroupDatasetField>[],
-      groupDatasetScrapyList: [] as ReturnType<
-        typeof createGroupDatasetScrapy
-      >[],
-      groupDatasetApiList: [] as ReturnType<typeof createGroupDatasetApi>[],
+      type: GroupDatasetConfigType.spider,
+      groupDatasetFieldList: [],
+      groupDatasetSpiderList: [],
+      groupDatasetApiList: [],
     },
-  });
+  } as GroupDataset);
   readonly form = form(this.formModel, p => {
     disabled(p.groupName, { when: () => this.isEditMode });
     applyEach(p.config.groupDatasetFieldList, row => {
       required(row.key);
       required(row.label);
     });
-    applyEach(p.config.groupDatasetScrapyList, row => {
-      required(row.name);
+    applyEach(p.config.groupDatasetSpiderList, row => {
+      required(row.spiderId);
       required(row.label);
     });
     applyEach(p.config.groupDatasetApiList, row => {
@@ -125,8 +123,8 @@ export class GroupDatasetEditComponent {
     return this.configForm.groupDatasetFieldList;
   }
 
-  get scrapyListControl() {
-    return this.configForm.groupDatasetScrapyList;
+  get spiderListControl() {
+    return this.configForm.groupDatasetSpiderList;
   }
 
   get apiListControl() {
@@ -158,12 +156,12 @@ export class GroupDatasetEditComponent {
       config: {
         byKey: config.byKey ?? '',
         imageSaveFolder: config.imageSaveFolder ?? '',
-        type: config.type ?? GroupDatasetConfigType.scrapy,
+        type: config.type ?? GroupDatasetConfigType.spider,
         groupDatasetFieldList: (config.groupDatasetFieldList ?? []).map(
           createGroupDatasetField
         ),
-        groupDatasetScrapyList: (config.groupDatasetScrapyList ?? []).map(
-          createGroupDatasetScrapy
+        groupDatasetSpiderList: (config.groupDatasetSpiderList ?? []).map(
+          createGroupDatasetSpider
         ),
         groupDatasetApiList: (config.groupDatasetApiList ?? []).map(
           createGroupDatasetApi

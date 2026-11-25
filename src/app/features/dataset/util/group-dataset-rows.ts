@@ -2,7 +2,7 @@ import {
   GroupDatasetField,
   GroupDatasetFieldType,
   GroupDatasetApi,
-  GroupDatasetScrapy,
+  GroupDatasetSpider,
 } from '../model';
 
 export const createGroupDatasetField = (
@@ -21,18 +21,18 @@ export const createGroupDatasetField = (
 export const createGroupDatasetApi = (data: Partial<GroupDatasetApi> = {}) => {
   return {
     seq: 0,
-    apiId: '',
-    label: '',
     ...data,
+    apiId: data.apiId ?? '',
+    label: data.label ?? '',
   };
 };
 
-export const createGroupDatasetScrapy = (
-  data: Partial<GroupDatasetScrapy> = {}
+export const createGroupDatasetSpider = (
+  data: Partial<GroupDatasetSpider> = {}
 ) => {
   return {
     seq: 0,
-    name: '',
+    spiderId: '',
     label: '',
     isDefault: false,
     visibleJson: false,

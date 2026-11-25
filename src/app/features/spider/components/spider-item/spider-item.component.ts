@@ -9,6 +9,7 @@ import {
   effect,
   inject,
   input,
+  output,
   ResourceRef,
   signal,
   untracked,
@@ -91,6 +92,7 @@ export class SpiderItemComponent {
   readonly index = input<number>();
   readonly mappingsRx = input<ResourceRef<SpiderMapping[]>>();
   readonly spiderId = input<string>();
+  readonly unbound = output<void>();
   //signal
   readonly mappings = computed(() => this.mappingsRx()?.value() ?? []);
   readonly itemMode = signal<EditMode>(EditMode.CREATE);
@@ -313,13 +315,14 @@ export class SpiderItemComponent {
     const spiderItemId = this.spiderItemId().value();
     if (!spiderId || executionOrder === undefined || isBlank(spiderItemId))
       return;
-    const wasBinding = !!this.isBinding();
+    const binding = this.isBinding();
+    const wasBinding = !!binding;
     this.runOperation(
       () =>
-        wasBinding
+        binding
           ? this.spiderMappingService.delete(
               spiderId,
-              executionOrder,
+              binding.executionOrder,
               spiderItemId
             )
           : this.spiderMappingService.update({
@@ -328,6 +331,7 @@ export class SpiderItemComponent {
               spiderItemId,
             }),
       () => {
+        if (wasBinding) this.unbound.emit();
         this.snackbarService.openI18N(
           wasBinding ? 'msg.unbindSuccess' : 'msg.bindSuccess'
         );

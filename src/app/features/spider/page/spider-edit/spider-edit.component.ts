@@ -122,10 +122,6 @@ export class SpiderEditComponent {
     defaultValue: [],
   });
   readonly spiderItems = linkedSignal(() => this.itemsRx.value());
-  readonly showDeleteItemButton = computed(() => {
-    const selectedIndex = this.selected();
-    return selectedIndex > 0 && selectedIndex <= this.spiderItems().length;
-  });
 
   readonly mappingsRx = rxResource({
     params: () => this.spiderId(),
@@ -141,6 +137,16 @@ export class SpiderEditComponent {
     [...this.mappingsRx.value()].sort(
       (a, b) => a.executionOrder - b.executionOrder
     )
+  );
+  readonly isSelectedItemBound = computed(() =>
+    this.mappings().some(m => m.executionOrder === this.selected() - 1)
+  );
+  readonly isItemTabDeletionDisabled = computed(
+    () =>
+      this.isProcessing() ||
+      this.mappingsRx.isLoading() ||
+      !!this.mappingsRx.error() ||
+      this.isSelectedItemBound()
   );
   readonly getMappingItemId = (index: number) => {
     const mapping = this.mappings().find(m => m.executionOrder === index);
@@ -159,6 +165,14 @@ export class SpiderEditComponent {
     const maxTabIndex = this.spiderItems().length;
     const initialTabIndex = this.initialTabIndex();
     return initialTabIndex <= maxTabIndex ? initialTabIndex : 0;
+  });
+  readonly showDeleteItemButton = computed(() => {
+    const selectedIndex = this.selected();
+    return (
+      selectedIndex > 0 &&
+      selectedIndex <= this.spiderItems().length &&
+      !this.isSelectedItemBound()
+    );
   });
 
   // form
@@ -332,13 +346,29 @@ export class SpiderEditComponent {
     this.selected.set(this.spiderItems().length);
   }
 
+  onItemUnbound(item: SpiderItem) {
+    const tabs = this.spiderItems();
+    if (!tabs.includes(item)) return;
+    const selectedItem = tabs[this.selected() - 1];
+    const reorderedTabs = [...tabs.filter(tab => tab !== item), item];
+    this.spiderItems.set(reorderedTabs);
+    this.selected.set(
+      selectedItem ? reorderedTabs.indexOf(selectedItem) + 1 : 0
+    );
+  }
+
   onDeleteItemTab() {
+    if (this.isItemTabDeletionDisabled()) return;
     const selectedIndex = this.selected();
+    if (selectedIndex <= 0 || selectedIndex > this.spiderItems().length) return;
     this.runOperation(
       () => this.messageBoxService.openI18N('msg.sureDeleteSpiderItem'),
       result => {
         if (
           !result ||
+          this.mappingsRx.isLoading() ||
+          this.mappingsRx.error() ||
+          this.mappings().some(m => m.executionOrder === selectedIndex - 1) ||
           selectedIndex <= 0 ||
           selectedIndex > this.spiderItems().length
         )
@@ -390,10 +420,15 @@ export class SpiderEditComponent {
     moveItemInArray(tabs, event.previousIndex, event.currentIndex);
     this.spiderItems.set(tabs);
     this.mappings.set(reorderedMappings);
+    this.selected.set(
+      selectedIndex === 0
+        ? 0
+        : tabs.indexOf(previousTabs[selectedIndex - 1]) + 1
+    );
 
     this.runOperation(
       () => this.spiderMappingService.updateList(reorderedMappings),
-      undefined,
+      () => this.mappingsRx.value.set(reorderedMappings),
       () => {
         this.spiderItems.set(previousTabs);
         this.mappings.set(previousMappings);

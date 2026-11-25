@@ -7,6 +7,7 @@ import {
   HeadersTO,
   ScrapyConfig,
   ScrapyPagination,
+  SpiderConfig,
   SpiderItem,
 } from '../../features/spider/model';
 import { formatDate } from '@angular/common';
@@ -57,6 +58,20 @@ export class SelectTableService {
       enableFilter: true,
       columnFormats: {
         date: value => (value == null ? '' : this.dateTransform(value)),
+      },
+    };
+    return this.openSelectDialog(data);
+  }
+
+  selectSingleSpider(dataSource: SpiderConfig[]) {
+    const data: BaseSelectTableData<SpiderConfig> = {
+      displayedColumns: ['spiderId', 'description', 'updatedTime'],
+      labels: ['spider.spiderId', 'g.description', 'g.updatedTime'],
+      dataSource,
+      selectType: 'single',
+      enableFilter: true,
+      columnFormats: {
+        updatedTime: value => (value == null ? '' : this.dateTransform(value)),
       },
     };
     return this.openSelectDialog(data);

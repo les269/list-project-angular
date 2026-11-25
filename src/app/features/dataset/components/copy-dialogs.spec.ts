@@ -38,7 +38,7 @@ describe.each(cases)('複製 $kind 彈窗', config => {
               imageSaveFolder: '',
               groupDatasetFieldList: [],
               groupDatasetApiList: [],
-              groupDatasetScrapyList: [],
+              groupDatasetSpiderList: [],
             },
           };
     const query = vi.fn((): Observable<boolean> => of(false));

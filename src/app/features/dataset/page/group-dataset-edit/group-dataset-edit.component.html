@@ -45,8 +45,8 @@
           [type]="fieldType.SELECT"
           [options]="configTypeOptions" />
         @switch (configForm.type().value()) {
-          @case (eGroupDatasetConfigType.scrapy) {
-            <app-group-dataset-scrapy-table [fields]="scrapyListControl" />
+          @case (eGroupDatasetConfigType.spider) {
+            <app-group-dataset-spider-table [fields]="spiderListControl" />
           }
           @case (eGroupDatasetConfigType.api) {
             <app-group-dataset-api-table [fields]="apiListControl" />

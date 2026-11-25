@@ -104,7 +104,7 @@ describe('Signal form migration regressions', () => {
                   groupDatasetFieldList: [
                     { key: 'title', label: 'Title', type: 'string' },
                   ],
-                  groupDatasetScrapyList: [],
+                  groupDatasetSpiderList: [],
                 },
               }),
           },

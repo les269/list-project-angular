@@ -23,11 +23,12 @@ import { SelectTableService } from '../../../../core/services/select-table.servi
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { isBlank, isNotBlank } from '../../../../shared/util/helper';
 import { TrimOnBlurDirective } from '../../../../shared/util/util.directive';
-import { ScrapyService } from '../../../spider/services/scrapy.service';
+import { SpiderConfigService } from '../../../spider/services/spider-config.service';
+import { SpiderService } from '../../../spider/services/spider.service';
 import {
   GroupDatasetConfig,
   GroupDatasetData,
-  GroupDatasetScrapy,
+  GroupDatasetSpider,
 } from '../../model';
 import { GroupDatasetDataService } from '../../service/group-dataset-data.service';
 import { GroupDatasetService } from '../../service/group-dataset.service';
@@ -87,21 +88,24 @@ export class EditGroupDatasetDataComponent implements OnInit {
   set json(value: Record<string, any>) {
     this.jsonModel.set(value);
   }
-  readonly scrapyInputModel = signal<{
-    [key in string]: { url: string; json: string[] };
+  readonly spiderInputModel = signal<{
+    [key in string]: { url: string; primeKeyList: string[] };
   }>({});
-  readonly scrapyInputForm = form(this.scrapyInputModel);
-  get scrapyInput() {
-    return this.scrapyInputModel();
+  readonly spiderInputForm = form(this.spiderInputModel);
+  get spiderInput() {
+    return this.spiderInputModel();
   }
-  set scrapyInput(value: { [key in string]: { url: string; json: string[] } }) {
-    this.scrapyInputModel.set(value);
+  set spiderInput(value: {
+    [key in string]: { url: string; primeKeyList: string[] };
+  }) {
+    this.spiderInputModel.set(value);
   }
 
   private readonly snackbarService = inject(SnackbarService);
   private readonly groupDatasetDataService = inject(GroupDatasetDataService);
   private readonly groupDatasetService = inject(GroupDatasetService);
-  private readonly scrapyService = inject(ScrapyService);
+  private readonly spiderConfigService = inject(SpiderConfigService);
+  private readonly spiderService = inject(SpiderService);
   private readonly selectTableService = inject(SelectTableService);
   private readonly messageBoxService = inject(MessageBoxService);
   private readonly translateService = inject(TranslateService);
@@ -115,7 +119,7 @@ export class EditGroupDatasetDataComponent implements OnInit {
           this.json = { ...this.json, [field.key]: [] };
         }
       }
-      this.getScrapyList();
+      this.getSpiderList();
       if (isNotBlank(this.primeValue)) {
         this.searchByPrimeValue();
       }
@@ -179,28 +183,35 @@ export class EditGroupDatasetDataComponent implements OnInit {
       });
   }
 
-  getScrapyList() {
+  getSpiderList() {
     const config = this.groupDatasetConfig();
     if (!config) {
       return;
     }
-    var nameList = config.groupDatasetScrapyList
-      .filter(x => x.visibleJson || x.visibleUrl)
-      .map(x => x.name);
-    if (nameList && nameList.length > 0) {
-      this.scrapyService.getByNameList(nameList).subscribe(res => {
-        for (var x of res) {
-          this.scrapyInput = {
-            ...this.scrapyInput,
-            [x.name]: {
+    const spiderIds = new Set(
+      config.groupDatasetSpiderList
+        .filter(row => row.visibleJson || row.visibleUrl)
+        .map(row => row.spiderId)
+    );
+    if (spiderIds.size === 0) return;
+    this.spiderConfigService.getAll().subscribe(configs => {
+      this.spiderInput = Object.fromEntries(
+        configs
+          .filter(config => spiderIds.has(config.spiderId))
+          .map(config => [
+            config.spiderId,
+            {
               url: '',
-              json: Array.from({ length: x.paramSize }, () => ''),
+              primeKeyList: Array.from(
+                { length: config.primeKeySize },
+                () => ''
+              ),
             },
-          };
-        }
-      });
-    }
+          ])
+      );
+    });
   }
+
   selectPrimeValue() {
     this.groupDatasetDataService
       .getAllGroupDatasetDataOnlyPrimeValue(this.groupName)
@@ -288,29 +299,31 @@ export class EditGroupDatasetDataComponent implements OnInit {
       });
   }
 
-  scrapyByUrl(scrapy: GroupDatasetScrapy) {
-    if (isBlank(this.scrapyInput[scrapy.name].url)) {
+  spiderByUrl(spider: GroupDatasetSpider) {
+    if (isBlank(this.spiderInput[spider.spiderId].url)) {
       this.snackbarService.isBlankMessage(
-        this.translateService.instant('dataset.scrapyUrlLabel', {
-          label: scrapy.label,
+        this.translateService.instant('dataset.spiderUrlLabel', {
+          label: spider.label,
         })
       );
       return;
     }
-    this.scrapyService
-      .scrapyByUrl({
-        scrapyName: scrapy.name,
-        url: this.scrapyInput[scrapy.name].url,
+    this.spiderService
+      .executeByUrl({
+        spiderId: spider.spiderId,
+        url: this.spiderInput[spider.spiderId].url,
       })
       .subscribe(res => {
         this.json = { ...this.json, ...res };
       });
   }
 
-  scrapyByJson(scrapyName: string, json: string[]) {
-    this.scrapyService.scrapyByJson({ scrapyName, json }).subscribe(res => {
-      this.json = { ...this.json, ...res };
-    });
+  spiderByPrimeKey(spiderId: string, primeKeyList: string[]) {
+    this.spiderService
+      .executeByPrimeKeyList({ spiderId, primeKeyList })
+      .subscribe(res => {
+        this.json = { ...this.json, ...res };
+      });
   }
 
   clearField() {

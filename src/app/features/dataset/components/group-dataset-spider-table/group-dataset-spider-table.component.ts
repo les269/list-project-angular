@@ -1,4 +1,4 @@
-import { createGroupDatasetScrapy } from '../../util/group-dataset-rows';
+import { createGroupDatasetSpider } from '../../util/group-dataset-rows';
 import { Component, computed, inject, input } from '@angular/core';
 import { FieldTree } from '@angular/forms/signals';
 
@@ -15,12 +15,12 @@ import {
   GenericTableColumn,
 } from '../../../../core/model/generic-table';
 import { SelectTableService } from '../../../../core/services/select-table.service';
-import { ScrapyConfig } from '../../../spider/model';
-import { ScrapyService } from '../../../spider/services/scrapy.service';
-import { GroupDatasetScrapy } from '../../model';
+import { SpiderConfig } from '../../../spider/model';
+import { SpiderConfigService } from '../../../spider/services/spider-config.service';
+import { GroupDatasetSpider } from '../../model';
 
 @Component({
-  selector: 'app-group-dataset-scrapy-table',
+  selector: 'app-group-dataset-spider-table',
 
   imports: [
     MatTableModule,
@@ -30,43 +30,46 @@ import { GroupDatasetScrapy } from '../../model';
     MatChipsModule,
     GenericTableComponent,
   ],
-  templateUrl: './group-dataset-scrapy-table.component.html',
+  templateUrl: './group-dataset-spider-table.component.html',
 })
-export class GroupDatasetScrapyTableComponent {
-  fields = input.required<FieldTree<GroupDatasetScrapy[]>>();
+export class GroupDatasetSpiderTableComponent {
+  readonly selectTableService = inject(SelectTableService);
+  readonly spiderConfigService = inject(SpiderConfigService);
+
+  fields = input.required<FieldTree<GroupDatasetSpider[]>>();
   displayedColumns = [
-    'name',
+    'spiderId',
     'label',
     'isDefault',
     'visibleJson',
     'visibleUrl',
   ];
 
-  nameColumn = computed(
+  spiderColumn = computed(
     () =>
       ({
-        key: 'name',
-        label: 'dataset.scrapyName',
+        key: 'spiderId',
+        label: 'spider.spiderId',
         columnType: GenericColumnType.chipSelect,
         data: this.configs.value(),
-        dataValue: 'name',
-        dataLabel: item => item.name,
+        dataValue: 'spiderId',
+        dataLabel: item => item.spiderId,
         openDialog: () =>
-          this.selectTableService.selectSingleScrapy(this.configs.value()),
-      }) satisfies ChipSelectColumn<ScrapyConfig>
+          this.selectTableService.selectSingleSpider(this.configs.value()),
+      }) satisfies ChipSelectColumn<SpiderConfig>
   );
   cols = computed(
     () =>
       [
-        this.nameColumn(),
+        this.spiderColumn(),
         {
           key: 'label',
-          label: 'dataset.scrapyLabel',
+          label: 'dataset.spiderLabel',
           columnType: GenericColumnType.input,
         },
         {
           key: 'isDefault',
-          label: 'dataset.scrapyDefault',
+          label: 'dataset.spiderDefault',
           columnType: GenericColumnType.radio,
         },
         {
@@ -82,12 +85,9 @@ export class GroupDatasetScrapyTableComponent {
       ] satisfies GenericTableColumn[]
   );
 
-  selectTableService = inject(SelectTableService);
-  scrapyService = inject(ScrapyService);
-
   configs = rxResource({
-    stream: () => this.scrapyService.getAllConfig(),
+    stream: () => this.spiderConfigService.getAll(),
     defaultValue: [],
   });
-  readonly createRow = createGroupDatasetScrapy;
+  readonly createRow = createGroupDatasetSpider;
 }

@@ -2,6 +2,7 @@ import { ChipsMapValue } from '../../../core/model';
 import { ExtractionRuleMode } from './extraction.model';
 
 export enum ValuePipelineType {
+  INITIAL_KEYS = 'INITIAL_KEYS', // 獲得初始主鍵陣列
   FIXED_VALUE = 'FIXED_VALUE', // 固定值
   FIXED_JSON_VALUE = 'FIXED_JSON_VALUE', // 固定JSON值
   CURRENT_DATA_KEY = 'CURRENT_DATA_KEY', // 當前資料鍵值

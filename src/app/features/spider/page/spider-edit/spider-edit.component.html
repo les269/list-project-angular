@@ -73,7 +73,7 @@
                 type="button"
                 class="page-button page-button-danger"
                 (click)="onDeleteItemTab()"
-                [disabled]="isProcessing()">
+                [disabled]="isItemTabDeletionDisabled()">
                 {{ 'spider.deleteSpiderItem' | translate }}
               </button>
             }
@@ -88,6 +88,7 @@
           cdkDropListElementContainer=".mat-mdc-tab-labels"
           (cdkDropListDropped)="dropTab($event)"
           [selectedIndex]="selected()"
+          [preserveContent]="true"
           (selectedIndexChange)="onTabChange($event)">
           <mat-tab [label]="'spider.testArea' | translate">
             <div class="test-panel">
@@ -140,7 +141,7 @@
               </div>
             </div>
           </mat-tab>
-          @for (item of spiderItems(); track $index; let index = $index) {
+          @for (item of spiderItems(); track item; let index = $index) {
             @let spiderItemId = getMappingItemId(index);
             <mat-tab>
               <ng-template mat-tab-label>
@@ -156,6 +157,7 @@
                 <app-spider-item
                   [initData]="item"
                   [index]="index"
+                  (unbound)="onItemUnbound(item)"
                   [mappingsRx]="mappingsRx"
                   [spiderId]="spiderId() ?? ''" />
               </div>
