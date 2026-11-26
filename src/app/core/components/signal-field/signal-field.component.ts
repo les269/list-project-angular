@@ -46,6 +46,8 @@ export class SignalFieldComponent<T> {
     () => this.field() as unknown as FieldTree<Date>
   );
   readonly label = input('');
+  /** 僅顯示標記，不建立必填驗證規則。 */
+  readonly requiredIndicator = input(false);
   readonly hint = input('');
   readonly describedBy = input('');
   readonly inputEvent = output<Event>();

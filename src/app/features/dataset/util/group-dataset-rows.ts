@@ -13,6 +13,7 @@ export const createGroupDatasetField = (
     type: data.type ?? GroupDatasetFieldType.string,
     key: data.key ?? '',
     label: data.label ?? '',
+    required: data.required ?? false,
   };
 };
 

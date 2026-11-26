@@ -9,7 +9,7 @@ import { SignalCodeEditorComponent } from '../../../../core/components/signal-co
   template: `
     <div role="group" [attr.aria-label]="label()">
       <div class="field-header">
-        <span>{{ label() }}</span>
+        <span [class.require]="requiredIndicator()">{{ label() }}</span>
         <button
           type="button"
           class="dialog-button"
@@ -60,6 +60,7 @@ import { SignalCodeEditorComponent } from '../../../../core/components/signal-co
 })
 export class JsonDataFieldComponent {
   readonly label = input.required<string>();
+  readonly requiredIndicator = input(false);
   readonly kind = input.required<'object' | 'array'>();
   readonly resetVersion = input(0);
   readonly value = model<unknown>();

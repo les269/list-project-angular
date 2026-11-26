@@ -295,6 +295,49 @@ async function setupJsonFields() {
   };
 }
 
+it('各種欄位依必填旗標顯示星號提示，空白資料仍可儲存', async () => {
+  const { fixture, page, component, records, group, initializeConfig } =
+    await setup(true);
+  for (const field of group.config.groupDatasetFieldList)
+    Object.assign(field, { required: true });
+  group.config.groupDatasetFieldList.push(
+    Object.assign(
+      { key: 'score', label: 'Score', type: 'number' },
+      { required: true }
+    ),
+    Object.assign(
+      { key: 'released', label: 'Released', type: 'date' },
+      { required: true }
+    ),
+    Object.assign(
+      { key: 'metadata', label: 'Metadata', type: 'jsonObject' },
+      { required: true }
+    ),
+    Object.assign(
+      { key: 'entries', label: 'Entries', type: 'jsonArray' },
+      { required: true }
+    )
+  );
+  initializeConfig();
+  await fixture.whenStable();
+  expect(page.querySelectorAll('.record-fields .require')).toHaveLength(7);
+  expect(component.jsonForm().valid()).toBe(true);
+  component.onUpdate();
+  expect(records.updateGroupDatasetData).toHaveBeenCalledTimes(1);
+  component.groupDatasetConfig.update(
+    config =>
+      config && {
+        ...config,
+        groupDatasetFieldList: config.groupDatasetFieldList.map(field => ({
+          ...field,
+          required: false,
+        })),
+      }
+  );
+  await fixture.whenStable();
+  expect(page.querySelectorAll('.record-fields .require')).toHaveLength(0);
+});
+
 it('日期保留來源與貼上原文，舊 formatDate 不再影響儲存', async () => {
   const { fixture, page, component, records, group, initializeConfig } =
     await setup(true);

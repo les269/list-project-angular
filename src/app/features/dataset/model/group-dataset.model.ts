@@ -27,6 +27,7 @@ export interface GroupDatasetField {
   type: GroupDatasetFieldType;
   key: string;
   label: string;
+  required: boolean;
 }
 
 export interface GroupDatasetData {

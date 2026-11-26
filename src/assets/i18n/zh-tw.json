@@ -759,6 +759,7 @@
     "fieldSeq": "順序",
     "fieldKey": "資料對應鍵",
     "fieldLabel": "鍵的標籤名稱",
+    "required": "必填",
     "type": "資料類型",
     "spiderTable": "爬蟲設定",
     "apiTable": "API 請求設定",

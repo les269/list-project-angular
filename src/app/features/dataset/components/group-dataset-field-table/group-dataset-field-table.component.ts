@@ -19,7 +19,7 @@ import { GroupDatasetField, GroupDatasetFieldType } from '../../model';
 export class GroupDatasetFieldTableComponent {
   readonly fields = input.required<FieldTree<GroupDatasetField[]>>();
   readonly eGroupDatasetFieldType = GroupDatasetFieldType;
-  readonly displayedColumns = ['key', 'label', 'type'];
+  readonly displayedColumns = ['key', 'label', 'type', 'required'];
   readonly cols: GenericTableColumn[] = [
     {
       key: 'key',
@@ -39,6 +39,11 @@ export class GroupDatasetFieldTableComponent {
       dataValue: 'key',
       dataLabel: item => `dataset.${item.key}`,
     } satisfies SelectColumn<{ key: string; value: string }>,
+    {
+      key: 'required',
+      label: 'dataset.required',
+      columnType: GenericColumnType.checkbox,
+    },
   ];
 
   readonly createRow = createGroupDatasetField;

@@ -51,7 +51,13 @@ it('完整載入隱藏清單，切換資料來源保留編輯，儲存包含所�
     config: {
       ...source.config,
       groupDatasetFieldList: [
-        { seq: 1, key: 'id', label: 'ID', type: GroupDatasetFieldType.string },
+        {
+          seq: 1,
+          key: 'id',
+          label: 'ID',
+          type: GroupDatasetFieldType.string,
+          required: false,
+        },
       ],
     },
   };
@@ -197,6 +203,20 @@ it('完整載入隱藏清單，切換資料來源保留編輯，儲存包含所�
   expect(
     page.querySelector('app-group-dataset-field-table app-signal-field')
   ).toBeNull();
+  const requiredCheckbox = page.querySelector<HTMLInputElement>(
+    'app-group-dataset-field-table input[type="checkbox"]'
+  )!;
+  expect(requiredCheckbox.checked).toBe(false);
+  requiredCheckbox.click();
+  await fixture.whenStable();
+  component.update(false, 'save');
+  expect(service.updateGroupDataset).toHaveBeenLastCalledWith(
+    expect.objectContaining({
+      config: expect.objectContaining({
+        groupDatasetFieldList: [expect.objectContaining({ required: true })],
+      }),
+    })
+  );
 });
 
 it.each([null, undefined])(

@@ -7,7 +7,7 @@
   <label
     class="field-label"
     [for]="controlId"
-    [class.require]="field()().required()"
+    [class.require]="requiredIndicator() || field()().required()"
     >{{ label() | translate }}</label
   >
 }
@@ -19,7 +19,7 @@
     <label
       class="input-group-text inline-label"
       [for]="controlId"
-      [class.require]="field()().required()"
+      [class.require]="requiredIndicator() || field()().required()"
       >{{ label() | translate }}</label
     >
   }

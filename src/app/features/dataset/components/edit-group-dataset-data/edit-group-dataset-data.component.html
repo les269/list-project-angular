@@ -167,17 +167,20 @@
           @case ('date') {
             <app-signal-field
               [field]="jsonForm[field.key]"
-              [label]="field.label" />
+              [label]="field.label"
+              [requiredIndicator]="field.required ?? false" />
           }
           @case ('number') {
             <app-signal-field
               [field]="jsonForm[field.key]"
               [label]="field.label"
+              [requiredIndicator]="field.required ?? false"
               [type]="fieldType.NUMBER" />
           }
           @case ('jsonObject') {
             <app-json-data-field
               [label]="field.label"
+              [requiredIndicator]="field.required ?? false"
               kind="object"
               [value]="json[field.key]"
               (valueChange)="onJsonFieldChange(field.key, $event)"
@@ -186,6 +189,7 @@
           @case ('jsonArray') {
             <app-json-data-field
               [label]="field.label"
+              [requiredIndicator]="field.required ?? false"
               kind="array"
               [value]="json[field.key]"
               (valueChange)="onJsonFieldChange(field.key, $event)"
@@ -195,6 +199,7 @@
             <div class="data-field">
               <label
                 class="field-label"
+                [class.require]="field.required"
                 [for]="controlId + '-field-' + fieldIndex"
                 >{{ field.label }}</label
               >
@@ -209,6 +214,7 @@
             <div class="array-field">
               <label
                 class="field-label"
+                [class.require]="field.required"
                 [for]="controlId + '-field-' + fieldIndex"
                 >{{ field.label }}</label
               >
