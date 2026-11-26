@@ -55,6 +55,7 @@ export class SignalFieldComponent<T> {
   readonly fieldType = SignalFieldType;
   readonly inline = input(false);
   readonly pickerOnly = input(true);
+  readonly step = input<number | 'any'>(1);
   readonly options = input<readonly SignalFieldOption[]>([]);
   readonly emptyOption = input('');
   readonly controlId = `signal-field-${++nextControlId}`;

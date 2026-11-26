@@ -1,5 +1,17 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { disabled, form, FormField } from '@angular/forms/signals';
+import {
+  Component,
+  computed,
+  inject,
+  OnInit,
+  signal,
+  viewChildren,
+} from '@angular/core';
+import {
+  disabled,
+  form,
+  FormField,
+  validateTree,
+} from '@angular/forms/signals';
 
 import {
   MatChipEditedEvent,
@@ -18,6 +30,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { EMPTY, filter, switchMap, tap } from 'rxjs';
 import { SignalFieldComponent } from '../../../../core/components/signal-field/signal-field.component';
+import { SignalFieldType } from '../../../../core/model/signal-field.model';
 import { MessageBoxService } from '../../../../core/services/message-box.service';
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
@@ -28,10 +41,13 @@ import { SpiderService } from '../../../spider/services/spider.service';
 import {
   GroupDatasetConfig,
   GroupDatasetData,
+  GroupDatasetFieldType,
   GroupDatasetSpider,
 } from '../../model';
 import { GroupDatasetDataService } from '../../service/group-dataset-data.service';
 import { GroupDatasetService } from '../../service/group-dataset.service';
+import { JsonDataFieldComponent } from '../json-data-field/json-data-field.component';
+import { parseGroupDatasetNumber } from '../../util/group-dataset-field-value';
 
 export interface EditGroupDatasetDataType {
   groupName: string;
@@ -45,6 +61,7 @@ let nextEditorId = 0;
   imports: [
     FormField,
     SignalFieldComponent,
+    JsonDataFieldComponent,
     MatDialogActions,
     MatDialogClose,
     MatDialogTitle,
@@ -61,6 +78,7 @@ export class EditGroupDatasetDataComponent implements OnInit {
   readonly dialogRef = inject(MatDialogRef<EditGroupDatasetDataComponent>);
   readonly data = inject<EditGroupDatasetDataType>(MAT_DIALOG_DATA);
   readonly controlId = `group-data-${++nextEditorId}`;
+  readonly fieldType = SignalFieldType;
   readonly groupNameModel = signal(this.data.groupName);
   readonly groupNameForm = form(this.groupNameModel, p => disabled(p));
   get groupName() {
@@ -81,12 +99,42 @@ export class EditGroupDatasetDataComponent implements OnInit {
     undefined
   );
   readonly jsonModel = signal<Record<string, any>>({});
-  readonly jsonForm = form(this.jsonModel);
+  readonly jsonForm = form(this.jsonModel, p => {
+    validateTree(p, ({ value, fieldTree }) =>
+      (this.groupDatasetConfig()?.groupDatasetFieldList ?? [])
+        .filter(
+          field =>
+            field.type === GroupDatasetFieldType.number &&
+            parseGroupDatasetNumber(value()[field.key]) === undefined
+        )
+        .map(field => ({
+          kind: field.type,
+          message: 'dataset.validNumberRequired',
+          fieldTree: fieldTree[field.key],
+        }))
+    );
+  });
+  readonly jsonEditors = viewChildren(JsonDataFieldComponent);
+  readonly jsonEditorReset = signal(0);
+  readonly hasInvalidJson = computed(() =>
+    this.jsonEditors().some(editor => editor.invalid())
+  );
   get json() {
     return this.jsonModel();
   }
   set json(value: Record<string, any>) {
-    this.jsonModel.set(value);
+    const defaults = Object.fromEntries(
+      (this.groupDatasetConfig()?.groupDatasetFieldList ?? [])
+        .filter(
+          field =>
+            field.type === GroupDatasetFieldType.jsonObject ||
+            field.type === GroupDatasetFieldType.jsonArray ||
+            field.type === GroupDatasetFieldType.number ||
+            field.type === GroupDatasetFieldType.date
+        )
+        .map(field => [field.key, this.defaultFieldValue(field.type)])
+    );
+    this.jsonModel.set({ ...defaults, ...value });
   }
   readonly spiderInputModel = signal<{
     [key in string]: { url: string; primeKeyList: string[] };
@@ -112,13 +160,7 @@ export class EditGroupDatasetDataComponent implements OnInit {
   ngOnInit(): void {
     this.groupDatasetService.getGroupDataset(this.groupName).subscribe(res => {
       this.groupDatasetConfig.set(res.config);
-      for (var field of res.config.groupDatasetFieldList) {
-        if (field.type === 'string') {
-          this.json = { ...this.json, [field.key]: '' };
-        } else if (field.type === 'stringArray') {
-          this.json = { ...this.json, [field.key]: [] };
-        }
-      }
+      this.clearField();
       this.getSpiderList();
       if (isNotBlank(this.primeValue)) {
         this.searchByPrimeValue();
@@ -149,6 +191,7 @@ export class EditGroupDatasetDataComponent implements OnInit {
       )
       .subscribe(res => {
         this.json = { ...this.json, ...res.json };
+        this.jsonEditorReset.update(value => value + 1);
       });
   }
 
@@ -224,6 +267,7 @@ export class EditGroupDatasetDataComponent implements OnInit {
         if (res) {
           this.primeValue = res.primeValue;
           this.json = res.json;
+          this.jsonEditorReset.update(value => value + 1);
         }
       });
   }
@@ -260,10 +304,24 @@ export class EditGroupDatasetDataComponent implements OnInit {
     if (!config) {
       return;
     }
+    if (this.hasInvalidJson()) {
+      this.snackbarService.openI18N('msg.invalidJson');
+      return;
+    }
+    if (this.jsonForm().invalid()) {
+      this.jsonForm().markAsTouched();
+      this.snackbarService.openI18N('msg.formInvalid');
+      return;
+    }
+    const json = { ...this.json };
+    for (const field of config.groupDatasetFieldList) {
+      if (field.type === GroupDatasetFieldType.number)
+        json[field.key] = parseGroupDatasetNumber(json[field.key]);
+    }
     var req: GroupDatasetData = {
       groupName: this.groupName,
-      primeValue: this.json[config.byKey],
-      json: this.json,
+      primeValue: json[config.byKey],
+      json,
     };
     this.groupDatasetDataService.updateGroupDatasetData(req).subscribe(() => {
       this.snackbarService.openI18N('msg.updateSuccess');
@@ -331,12 +389,33 @@ export class EditGroupDatasetDataComponent implements OnInit {
     if (!config) {
       return;
     }
-    for (var field of config.groupDatasetFieldList) {
-      if (field.type === 'string') {
-        this.json = { ...this.json, [field.key]: '' };
-      } else if (field.type === 'stringArray') {
-        this.json = { ...this.json, [field.key]: [] };
-      }
+    this.json = {
+      ...this.json,
+      ...Object.fromEntries(
+        config.groupDatasetFieldList.map(field => [
+          field.key,
+          this.defaultFieldValue(field.type),
+        ])
+      ),
+    };
+    this.jsonEditorReset.update(value => value + 1);
+  }
+
+  onJsonFieldChange(key: string, value: unknown) {
+    this.jsonModel.update(json => ({ ...json, [key]: value }));
+  }
+
+  private defaultFieldValue(type: GroupDatasetFieldType): unknown {
+    switch (type) {
+      case GroupDatasetFieldType.number:
+        return 0;
+      case GroupDatasetFieldType.jsonObject:
+        return {};
+      case GroupDatasetFieldType.jsonArray:
+      case GroupDatasetFieldType.stringArray:
+        return [];
+      default:
+        return '';
     }
   }
 }

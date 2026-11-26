@@ -10,6 +10,7 @@ import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
 import { Observable, of, Subject } from 'rxjs';
 import { GenericTableComponent } from '../../../core/components/generic-table/generic-table.component';
+import { ChipSelectButtonComponent } from '../../../core/components/chip-select-button/chip-select-button.component';
 import { MessageBoxService } from '../../../core/services/message-box.service';
 import { SelectTableService } from '../../../core/services/select-table.service';
 import { SnackbarService } from '../../../core/services/snackbar.service';
@@ -131,6 +132,9 @@ async function setup(realEditors = false, spiderId?: string) {
     previewExtraction: vi.fn(() => of({ ok: true })),
     previewExtractionWithFile: vi.fn(() => of({ ok: true })),
   };
+  const replacementMap = { name: 'selected-map', map: { before: 'after' } };
+  const replacementMaps = { getNameList: vi.fn(() => of([replacementMap])) };
+  const selectReplacementMap = vi.fn(() => of(replacementMap));
   TestBed.configureTestingModule({
     imports: [
       CookieTableComponent,
@@ -152,7 +156,7 @@ async function setup(realEditors = false, spiderId?: string) {
       { provide: SnackbarService, useValue: snackbar },
       {
         provide: ReplaceValueMapService,
-        useValue: { getNameList: () => of([]) },
+        useValue: replacementMaps,
       },
       { provide: MatDialog, useValue: { open: vi.fn() } },
       {
@@ -161,6 +165,7 @@ async function setup(realEditors = false, spiderId?: string) {
           selectSingleCookieList: () => of({ cookieId: 'selected' }),
           selectSingleHeadersList: () => of({ headersId: 'selected' }),
           selectSingleSpiderItem: () => of({ spiderItemId: 'item' }),
+          selectSingleReplaceValueMap: selectReplacementMap,
         },
       },
       { provide: Router, useValue: { navigate: vi.fn() } },
@@ -200,8 +205,85 @@ async function setup(realEditors = false, spiderId?: string) {
     config,
     spider,
     item,
+    replacementMaps,
+    replacementMap,
+    selectReplacementMap,
   };
 }
+
+it.each([ExtractionRuleMode.SELECT, ExtractionRuleMode.JSON_PATH])(
+  '替換表 pipeline 在 %s 下可回填、單選、儲存與清除名稱',
+  async mode => {
+    const state = await setup();
+    const fixture = TestBed.createComponent(SpiderItemComponent);
+    await fixture.whenStable();
+    const component = fixture.componentInstance;
+    component.form.spiderItemId().value.set('item');
+    component.extractionRuleMode().value.set(mode);
+    component.extractionRuleList().reset([
+      component.createExtractionRule({
+        key: 'tags',
+        selector: '.tag',
+        jsonPath: '$.tags',
+        pipelines: [
+          {
+            type: ValuePipelineType.REPLACE_VALUE_MAP,
+            useReplaceValueMap: 'saved-map',
+          } as ValuePipeline,
+        ],
+      }),
+    ]);
+    await fixture.whenStable();
+    const chip = fixture.debugElement.query(
+      By.directive(ChipSelectButtonComponent)
+    );
+    expect(chip.nativeElement.textContent).toContain('saved-map');
+    expect(
+      fixture.nativeElement.querySelectorAll('app-chip-select-button')
+    ).toHaveLength(1);
+    chip.nativeElement.querySelector('.selection-button').click();
+    await fixture.whenStable();
+    expect(state.selectReplacementMap).toHaveBeenCalledWith([
+      state.replacementMap,
+    ]);
+    expect(chip.nativeElement.querySelectorAll('mat-chip-row')).toHaveLength(1);
+    const pipeline = component.extractionRuleList[0].pipelines[0];
+    expect(pipeline.useReplaceValueMap().value()).toBe('selected-map');
+    component.onSaveItem();
+    expect(state.items.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        itemSetting: expect.objectContaining({
+          extractionRuleList: [
+            expect.objectContaining({
+              pipelines: [
+                expect.objectContaining({
+                  type: 'REPLACE_VALUE_MAP',
+                  useReplaceValueMap: 'selected-map',
+                }),
+              ],
+            }),
+          ],
+        }),
+      })
+    );
+    state.pending.next();
+    await fixture.whenStable();
+    chip.nativeElement.querySelector('mat-chip-row button').click();
+    await fixture.whenStable();
+    expect(pipeline.useReplaceValueMap().value()).toBe('');
+    expect(chip.nativeElement.querySelector('mat-chip-row')).toBeNull();
+  }
+);
+
+it('舊 pipeline 缺少替換表欄位時補空字串', async () => {
+  await setup();
+  const fixture = TestBed.createComponent(SpiderItemComponent);
+  await fixture.whenStable();
+  const row = fixture.componentInstance.createExtractionRule({
+    pipelines: [{ type: ValuePipelineType.REPLACE_VALUE_MAP } as ValuePipeline],
+  });
+  expect(row.pipelines[0].useReplaceValueMap).toBe('');
+});
 
 const tables: {
   component: Type<CookieTableComponent | HeadersTableComponent>;

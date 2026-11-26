@@ -1,4 +1,7 @@
 import { TestBed } from '@angular/core/testing';
+import { Component, input, model } from '@angular/core';
+import { FormValueControl } from '@angular/forms/signals';
+import { By } from '@angular/platform-browser';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { provideTranslateService } from '@ngx-translate/core';
 import { of, Subject } from 'rxjs';
@@ -10,6 +13,16 @@ import { SpiderService } from '../../../spider/services/spider.service';
 import { GroupDatasetDataService } from '../../service/group-dataset-data.service';
 import { GroupDatasetService } from '../../service/group-dataset.service';
 import { EditGroupDatasetDataComponent } from './edit-group-dataset-data.component';
+import { JsonDataFieldComponent } from '../json-data-field/json-data-field.component';
+import { SignalCodeEditorComponent } from '../../../../core/components/signal-code-editor/signal-code-editor.component';
+
+// 整合測試保留 JSON 欄位互動，僅替換需要瀏覽器排版 API 的第三方編輯器。
+@Component({ selector: 'app-signal-code-editor', template: '' })
+class TestJsonCodeEditor implements FormValueControl<string> {
+  readonly value = model('');
+  readonly language = input('');
+  readonly indentWithTab = input(false);
+}
 
 async function setup(
   deferredConfig = false,
@@ -82,7 +95,12 @@ async function setup(
         },
       },
     ],
-  }).compileComponents();
+  })
+    .overrideComponent(JsonDataFieldComponent, {
+      remove: { imports: [SignalCodeEditorComponent] },
+      add: { imports: [TestJsonCodeEditor] },
+    })
+    .compileComponents();
   const fixture = TestBed.createComponent(EditGroupDatasetDataComponent);
   await fixture.whenStable();
   const page: HTMLElement = fixture.nativeElement;
@@ -251,4 +269,180 @@ it('依 Spider 的 primeKeySize 顯示參數，並排除群組未使用的 Spide
     spiderId: 'crawler',
     primeKeyList: ['first', 'second'],
   });
+});
+
+async function setupJsonFields() {
+  const state = await setup(true);
+  state.group.config.groupDatasetFieldList.push(
+    { key: 'metadata', label: 'Metadata', type: 'jsonObject' },
+    { key: 'entries', label: 'Entries', type: 'jsonArray' }
+  );
+  state.initializeConfig();
+  await state.fixture.whenStable();
+  const editors = state.fixture.debugElement.queryAll(
+    By.directive(JsonDataFieldComponent)
+  );
+  return {
+    ...state,
+    fields: editors.map(
+      editor => editor.componentInstance as JsonDataFieldComponent
+    ),
+    editors: editors.map(
+      editor =>
+        editor.query(By.directive(TestJsonCodeEditor))
+          .componentInstance as TestJsonCodeEditor
+    ),
+  };
+}
+
+it('日期保留來源與貼上原文，舊 formatDate 不再影響儲存', async () => {
+  const { fixture, page, component, records, group, initializeConfig } =
+    await setup(true);
+  const dateField = {
+    key: 'released',
+    label: 'Released',
+    type: 'date',
+    formatDate: 'yyyy-MM-dd',
+  };
+  group.config.groupDatasetFieldList.push(dateField);
+  initializeConfig();
+  await fixture.whenStable();
+  expect(component.json['released']).toBe('');
+  component.json = { ...component.json, released: '2026/11/27 08:30' };
+  await fixture.whenStable();
+  const input = page.querySelector<HTMLInputElement>(
+    '.record-fields app-signal-field input[type="text"]'
+  )!;
+  expect(input.value).toBe('2026/11/27 08:30');
+  for (const value of ['2026/11/27 08:30', ' 原始日期文字 ', '']) {
+    input.value = value;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    await fixture.whenStable();
+    component.onUpdate();
+    expect(
+      JSON.parse(
+        JSON.stringify(records.updateGroupDatasetData.mock.calls.at(-1))
+      )
+    ).toEqual([
+      expect.objectContaining({
+        json: expect.objectContaining({ released: value }),
+      }),
+    ]);
+  }
+  component.clearField();
+  await fixture.whenStable();
+  expect(component.json['released']).toBe('');
+});
+
+it('數字欄位可輸入小數與負數，儲存為 number，清空時阻擋儲存', async () => {
+  const { fixture, page, component, records, group, initializeConfig } =
+    await setup(true);
+  group.config.groupDatasetFieldList.push({
+    key: 'score',
+    label: 'Score',
+    type: 'number',
+  });
+  initializeConfig();
+  await fixture.whenStable();
+  expect(component.json['score']).toBe(0);
+  const input = page.querySelector<HTMLInputElement>(
+    '.record-fields input[type="number"]'
+  )!;
+  expect(input.type).toBe('number');
+  input.value = '-12.5';
+  input.dispatchEvent(new Event('input', { bubbles: true }));
+  await fixture.whenStable();
+  component.onUpdate();
+  expect(
+    JSON.parse(JSON.stringify(records.updateGroupDatasetData.mock.calls[0]))
+  ).toEqual([
+    expect.objectContaining({
+      json: expect.objectContaining({ score: -12.5 }),
+    }),
+  ]);
+  records.updateGroupDatasetData.mockClear();
+  input.value = '';
+  input.dispatchEvent(new Event('input', { bubbles: true }));
+  input.dispatchEvent(new Event('blur'));
+  await fixture.whenStable();
+  expect(component.jsonForm().invalid()).toBe(true);
+  component.onUpdate();
+  expect(records.updateGroupDatasetData).not.toHaveBeenCalled();
+  component.clearField();
+  await fixture.whenStable();
+  expect(component.json['score']).toBe(0);
+  expect(component.jsonForm().valid()).toBe(true);
+});
+
+it('JSON 欄位初始化並以真正物件與陣列儲存，清除後恢復各自預設值', async () => {
+  const { fixture, component, records, editors, fields } =
+    await setupJsonFields();
+  expect(component.json['metadata']).toEqual({});
+  expect(component.json['entries']).toEqual([]);
+  editors[0].value.set('{"nested":{"values":[1,true,null]}}');
+  editors[1].value.set('[{"id":1},"text",null]');
+  await fixture.whenStable();
+  component.onUpdate();
+  expect(
+    JSON.parse(JSON.stringify(records.updateGroupDatasetData.mock.calls[0]))
+  ).toEqual([
+    expect.objectContaining({
+      json: expect.objectContaining({
+        metadata: { nested: { values: [1, true, null] } },
+        entries: [{ id: 1 }, 'text', null],
+      }),
+    }),
+  ]);
+  component.clearField();
+  await fixture.whenStable();
+  expect(component.json['metadata']).toEqual({});
+  expect(component.json['entries']).toEqual([]);
+  expect(fields.map(field => field.draft())).toEqual(['{}', '[]']);
+});
+
+it('JSON 無效或根型別錯誤時阻擋儲存，其他欄位變更保留草稿，清除可解除錯誤', async () => {
+  const { fixture, component, records, editors, fields, page } =
+    await setupJsonFields();
+  editors[0].value.set('{');
+  await fixture.whenStable();
+  component.json = { ...component.json, title: 'Changed' };
+  await fixture.whenStable();
+  expect(fields[0].draft()).toBe('{');
+  expect(
+    page.querySelector<HTMLButtonElement>(
+      '.dialog-actions .dialog-button-primary'
+    )!.disabled
+  ).toBe(true);
+  component.onUpdate();
+  expect(records.updateGroupDatasetData).not.toHaveBeenCalled();
+  editors[0].value.set('[]');
+  await fixture.whenStable();
+  component.onUpdate();
+  expect(records.updateGroupDatasetData).not.toHaveBeenCalled();
+  component.clearField();
+  await fixture.whenStable();
+  expect(component.hasInvalidJson()).toBe(false);
+  component.onUpdate();
+  expect(records.updateGroupDatasetData).toHaveBeenCalledTimes(1);
+});
+
+it('外部資料與查詢回填更新 JSON Editor，舊資料缺少新欄位時補預設值', async () => {
+  const { fixture, component, fields } = await setupJsonFields();
+  component.json = {
+    ...component.json,
+    id: 'loaded',
+    metadata: { loaded: [1] },
+    entries: [{ id: 2 }],
+  };
+  await fixture.whenStable();
+  expect(JSON.parse(fields[0].draft())).toEqual({ loaded: [1] });
+  expect(JSON.parse(fields[1].draft())).toEqual([{ id: 2 }]);
+  component.primeValue = 'record-1';
+  component.searchByPrimeValue();
+  await fixture.whenStable();
+  expect(JSON.parse(fields[0].draft())).toEqual({ loaded: [1] });
+  component.json = { id: 'old-record', title: 'Old', tags: [] };
+  await fixture.whenStable();
+  expect(component.json['metadata']).toEqual({});
+  expect(component.json['entries']).toEqual([]);
 });

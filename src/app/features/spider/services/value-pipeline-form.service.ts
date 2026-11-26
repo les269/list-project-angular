@@ -56,6 +56,7 @@ export class ValuePipelineFormService {
       ),
       pattern: data?.pattern ?? '',
       replacement: data?.replacement ?? '',
+      useReplaceValueMap: data?.useReplaceValueMap ?? '',
       separator: data?.separator ?? '',
       joinSeparator: data?.joinSeparator ?? ',',
       combineToString: data?.combineToString ?? '',

@@ -10,6 +10,7 @@ export enum ValuePipelineType {
   EXTRACT_OWN_TEXT = 'EXTRACT_OWN_TEXT', // 僅提取自身文本 (原本的 onlyOwn)
   EXTRACT_OBJECTS = 'EXTRACT_OBJECTS', // 將每筆資料提取為物件
   REPLACE_REGULAR = 'REPLACE_REGULAR', // 正則替換
+  REPLACE_VALUE_MAP = 'REPLACE_VALUE_MAP', // 使用替換表
   SPLIT_TEXT = 'SPLIT_TEXT', // 分割字串
   JOIN_ARRAY_TO_STRING = 'JOIN_ARRAY_TO_STRING', // 將陣列元素合併為字串
   CONVERT_TO_ARRAY = 'CONVERT_TO_ARRAY', // 轉為陣列
@@ -43,6 +44,7 @@ export interface ValuePipeline {
   extractObjectsConfig: ExtractObjectsConfig; // 當 type 是 EXTRACT_OBJECTS 時使用，指定提取物件的配置
   pattern: string; // 當 type 是 REPLACE_REGULAR 時使用
   replacement: string; // 當 type 是 REPLACE_REGULAR 時使用
+  useReplaceValueMap: string; // 當 type 是 REPLACE_VALUE_MAP 時使用，儲存替換表名稱
   separator: string; // 當 type 是 SPLIT_TEXT 時使用
   joinSeparator: string; // 當 type 是 JOIN_ARRAY_TO_STRING 時使用，指定合併字串的分隔符
   combineToString: string; // 當 type 是 COMBINE_TO_STRING 時使用

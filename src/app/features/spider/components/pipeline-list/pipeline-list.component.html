@@ -53,6 +53,15 @@
           }
         </div>
         @switch (pipelineType) {
+          @case (eValuePipelineType.REPLACE_VALUE_MAP) {
+            <app-chip-select-button
+              [attr.aria-label]="'pipeline.REPLACE_VALUE_MAP' | translate"
+              [formField]="pipeline.useReplaceValueMap"
+              valueKey="name"
+              labelKey="name"
+              [options]="replaceValueMapList()"
+              [selectTable]="selectReplaceValueMap" />
+          }
           @case (eValuePipelineType.EXTRACT_OBJECTS) {
             <div class="w-100">
               <app-signal-field

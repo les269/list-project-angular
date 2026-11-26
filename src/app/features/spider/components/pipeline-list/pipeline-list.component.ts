@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
 
 import { SignalCodeEditorComponent } from '../../../../core/components/signal-code-editor/signal-code-editor.component';
+import { ChipSelectButtonComponent } from '../../../../core/components/chip-select-button/chip-select-button.component';
 import {
   CdkDragDrop,
   DragDropModule,
@@ -61,6 +62,7 @@ import { toSignalFieldOptions } from '../../../../shared/util/signal-field';
     ChipInputMapComponent,
     GenericTableComponent,
     SignalFieldComponent,
+    ChipSelectButtonComponent,
   ],
   templateUrl: './pipeline-list.component.html',
   styleUrls: ['./pipeline-list.component.scss'],

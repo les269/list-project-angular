@@ -27,7 +27,6 @@ export interface GroupDatasetField {
   type: GroupDatasetFieldType;
   key: string;
   label: string;
-  replaceValueMapName: string;
 }
 
 export interface GroupDatasetData {
@@ -40,6 +39,10 @@ export interface GroupDatasetData {
 export enum GroupDatasetFieldType {
   string = 'string',
   stringArray = 'stringArray',
+  number = 'number',
+  date = 'date',
+  jsonObject = 'jsonObject',
+  jsonArray = 'jsonArray',
 }
 export interface GroupDatasetApi {
   seq: number;

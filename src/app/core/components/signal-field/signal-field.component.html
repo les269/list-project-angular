@@ -102,6 +102,7 @@
       <input
         class="form-control"
         type="number"
+        [step]="step()"
         (input)="inputEvent.emit($event)"
         (change)="changeEvent.emit($event)"
         [id]="controlId"

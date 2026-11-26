@@ -10,7 +10,6 @@ import { of } from 'rxjs';
 import { SnackbarService } from '../../../../core/services/snackbar.service';
 import { SelectTableService } from '../../../../core/services/select-table.service';
 import { ApiRequestConfigService } from '../../../api-request-config/service/api-request-config.service';
-import { ReplaceValueMapService } from '../../../replace-value-map/service/replace-value-map.service';
 import { SpiderConfigService } from '../../../spider/services/spider-config.service';
 import { GroupDatasetService } from '../../service/group-dataset.service';
 import { GroupDatasetConfigType, GroupDatasetFieldType } from '../../model';
@@ -31,7 +30,7 @@ it('完整載入隱藏清單，切換資料來源保留編輯，儲存包含所�
           key: 'id',
           label: 'ID',
           type: GroupDatasetFieldType.string,
-          replaceValueMapName: '',
+          replaceValueMapName: 'legacy-map',
         },
       ],
       groupDatasetSpiderList: [
@@ -45,6 +44,15 @@ it('完整載入隱藏清單，切換資料來源保留編輯，儲存包含所�
         },
       ],
       groupDatasetApiList: [{ seq: 1, apiId: 'api', label: 'API' }],
+    },
+  };
+  const expectedSource = {
+    ...source,
+    config: {
+      ...source.config,
+      groupDatasetFieldList: [
+        { seq: 1, key: 'id', label: 'ID', type: GroupDatasetFieldType.string },
+      ],
     },
   };
   const service = {
@@ -71,10 +79,6 @@ it('完整載入隱藏清單，切換資料來源保留編輯，儲存包含所�
         provide: SpiderConfigService,
         useValue: { getAll: () => of(spiderConfigs) },
       },
-      {
-        provide: ReplaceValueMapService,
-        useValue: { getNameList: () => of([]) },
-      },
     ],
   }).compileComponents();
   const fixture = TestBed.createComponent(GroupDatasetEditComponent);
@@ -97,7 +101,15 @@ it('完整載入隱藏清單，切換資料來源保留編輯，儲存包含所�
     sourceType.dispatchEvent(new Event('input', { bubbles: true }));
     sourceType.dispatchEvent(new Event('change'));
   };
-  expect(JSON.parse(JSON.stringify(component.form().value()))).toEqual(source);
+  expect(JSON.parse(JSON.stringify(component.form().value()))).toEqual(
+    expectedSource
+  );
+  expect(
+    page.querySelector('app-group-dataset-field-table app-chip-select-button')
+  ).toBeNull();
+  expect(source.config.groupDatasetFieldList[0].replaceValueMapName).toBe(
+    'legacy-map'
+  );
   expect(component.form().dirty()).toBe(false);
   expect(
     fixture.debugElement.query(By.directive(GroupDatasetApiTableComponent))
@@ -105,7 +117,7 @@ it('完整載入隱藏清單，切換資料來源保留編輯，儲存包含所�
   component.update(false, 'save');
   expect(
     JSON.parse(JSON.stringify(service.updateGroupDataset.mock.calls.at(-1)))
-  ).toEqual([source]);
+  ).toEqual([expectedSource]);
   component.form.config.groupDatasetSpiderList[0]
     .label()
     .value.set('Changed crawler');
@@ -162,6 +174,29 @@ it('完整載入隱藏清單，切換資料來源保留編輯，儲存包含所�
       }),
     })
   );
+  const fieldType = page.querySelector<HTMLSelectElement>(
+    'app-group-dataset-field-table select'
+  )!;
+  expect(Array.from(fieldType.options, option => option.value)).toEqual(
+    expect.arrayContaining(['jsonObject', 'jsonArray'])
+  );
+  for (const type of ['jsonObject', 'jsonArray', 'number', 'date']) {
+    fieldType.value = type;
+    fieldType.dispatchEvent(new Event('input', { bubbles: true }));
+    fieldType.dispatchEvent(new Event('change'));
+    await fixture.whenStable();
+    component.update(false, 'save');
+    expect(service.updateGroupDataset).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({
+          groupDatasetFieldList: [expect.objectContaining({ type })],
+        }),
+      })
+    );
+  }
+  expect(
+    page.querySelector('app-group-dataset-field-table app-signal-field')
+  ).toBeNull();
 });
 
 it.each([null, undefined])(
@@ -213,10 +248,6 @@ it.each([null, undefined])(
           useValue: { getAll: () => of([selectedApi]) },
         },
         { provide: SpiderConfigService, useValue: { getAll: () => of([]) } },
-        {
-          provide: ReplaceValueMapService,
-          useValue: { getNameList: () => of([]) },
-        },
       ],
     }).compileComponents();
     const fixture = TestBed.createComponent(GroupDatasetEditComponent);

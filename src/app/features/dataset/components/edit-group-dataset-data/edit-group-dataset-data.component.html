@@ -164,6 +164,33 @@
         let fieldIndex = $index
       ) {
         @switch (field.type) {
+          @case ('date') {
+            <app-signal-field
+              [field]="jsonForm[field.key]"
+              [label]="field.label" />
+          }
+          @case ('number') {
+            <app-signal-field
+              [field]="jsonForm[field.key]"
+              [label]="field.label"
+              [type]="fieldType.NUMBER" />
+          }
+          @case ('jsonObject') {
+            <app-json-data-field
+              [label]="field.label"
+              kind="object"
+              [value]="json[field.key]"
+              (valueChange)="onJsonFieldChange(field.key, $event)"
+              [resetVersion]="jsonEditorReset()" />
+          }
+          @case ('jsonArray') {
+            <app-json-data-field
+              [label]="field.label"
+              kind="array"
+              [value]="json[field.key]"
+              (valueChange)="onJsonFieldChange(field.key, $event)"
+              [resetVersion]="jsonEditorReset()" />
+          }
           @case ('string') {
             <div class="data-field">
               <label
@@ -233,7 +260,9 @@
   <button
     type="button"
     class="dialog-button dialog-button-primary"
-    [disabled]="!groupDatasetConfig()"
+    [disabled]="
+      !groupDatasetConfig() || hasInvalidJson() || jsonForm().invalid()
+    "
     (click)="onUpdate()">
     {{ 'g.update' | translate }}
   </button>

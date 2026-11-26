@@ -9,12 +9,10 @@ export const createGroupDatasetField = (
   data: Partial<GroupDatasetField> = {}
 ) => {
   return {
-    seq: 0,
-    type: GroupDatasetFieldType.string,
-    key: '',
-    label: '',
-    replaceValueMapName: '',
-    ...data,
+    seq: data.seq ?? 0,
+    type: data.type ?? GroupDatasetFieldType.string,
+    key: data.key ?? '',
+    label: data.label ?? '',
   };
 };
 
