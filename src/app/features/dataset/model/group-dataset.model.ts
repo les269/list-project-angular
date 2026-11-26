@@ -8,6 +8,8 @@ export interface GroupDatasetConfig {
   byKey: string;
   type: GroupDatasetConfigType;
   imageSaveFolder: string;
+  autoImageDownload: boolean;
+  imageByKey: string;
   groupDatasetSpiderList: GroupDatasetSpider[];
   groupDatasetFieldList: GroupDatasetField[];
   groupDatasetApiList: GroupDatasetApi[];

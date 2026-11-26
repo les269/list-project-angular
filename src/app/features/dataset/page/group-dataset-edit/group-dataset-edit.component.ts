@@ -75,6 +75,8 @@ export class GroupDatasetEditComponent {
     config: {
       byKey: '',
       imageSaveFolder: '',
+      autoImageDownload: false,
+      imageByKey: '',
       type: GroupDatasetConfigType.spider,
       groupDatasetFieldList: [],
       groupDatasetSpiderList: [],
@@ -97,6 +99,10 @@ export class GroupDatasetEditComponent {
     });
     required(p.groupName, { message: 'msg.required' });
     required(p.config.byKey, { message: 'msg.required' });
+    required(p.config.imageByKey, {
+      message: 'msg.required',
+      when: ({ valueOf }) => valueOf(p.config.autoImageDownload),
+    });
   });
 
   get isCreateMode() {
@@ -156,6 +162,8 @@ export class GroupDatasetEditComponent {
       config: {
         byKey: config.byKey ?? '',
         imageSaveFolder: config.imageSaveFolder ?? '',
+        autoImageDownload: config.autoImageDownload ?? false,
+        imageByKey: config.imageByKey ?? '',
         type: config.type ?? GroupDatasetConfigType.spider,
         groupDatasetFieldList: (config.groupDatasetFieldList ?? []).map(
           createGroupDatasetField

@@ -19,8 +19,6 @@ export interface DatasetConfig {
   filing: boolean;
   filingRegular: string;
   fieldList: DatasetField[];
-  autoImageDownload: boolean;
-  imageByKey: string;
   scrapyText: string;
   scrapyPagination: string;
 }

@@ -754,6 +754,7 @@
     "autoImageDownloadDesc": "下載檔案的名稱會用'資料對應的必要鍵'的值進行命名, 且不會給副檔名。",
     "imageByKey": "圖片網址的鍵值",
     "imageSaveFolder": "圖片保存的資料夾路徑",
+    "imageDownloadSettings": "圖片下載設定",
     "fieldTable": "編輯資料用設定",
     "fixedFieldTable": "編輯固定資料設定",
     "fieldSeq": "順序",

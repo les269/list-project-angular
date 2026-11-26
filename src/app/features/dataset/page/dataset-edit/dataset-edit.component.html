@@ -135,15 +135,15 @@
         }
       </div>
     </section>
-    <section class="editor-section" aria-labelledby="dataset-advanced-title">
-      <h3 class="section-title" id="dataset-advanced-title">
-        {{ 'dataset.advancedSettings' | translate }}
-      </h3>
-      <div class="section-body">
-        @if (
-          configType === eDatasetConfigType.file ||
-          configType === eDatasetConfigType.folder
-        ) {
+    @if (
+      configType === eDatasetConfigType.file ||
+      configType === eDatasetConfigType.folder
+    ) {
+      <section class="editor-section" aria-labelledby="dataset-advanced-title">
+        <h3 class="section-title" id="dataset-advanced-title">
+          {{ 'dataset.advancedSettings' | translate }}
+        </h3>
+        <div class="section-body">
           <div class="option-block">
             <mat-checkbox [formField]="form.config.filing">{{
               'dataset.filing' | translate
@@ -155,22 +155,9 @@
                 label="dataset.filingRegular" />
             }
           </div>
-        }
-        <div class="option-block">
-          <mat-checkbox [formField]="form.config.autoImageDownload">{{
-            'dataset.autoImageDownload' | translate
-          }}</mat-checkbox>
-          <p class="helper-text">
-            {{ 'dataset.autoImageDownloadDesc' | translate }}
-          </p>
-          @if (autoImageDownloadControl().value()) {
-            <app-signal-field
-              [field]="form.config.imageByKey"
-              label="dataset.imageByKey" />
-          }
         </div>
-      </div>
-    </section>
+      </section>
+    }
     <section class="editor-section" aria-labelledby="dataset-fields-title">
       <h3 class="section-title" id="dataset-fields-title">
         {{ 'dataset.fixedFieldTable' | translate }}

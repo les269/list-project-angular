@@ -22,7 +22,9 @@ it('完整載入隱藏清單，切換資料來源保留編輯，儲存包含所�
     groupName: 'group',
     config: {
       byKey: 'id',
-      imageSaveFolder: '',
+      imageSaveFolder: 'C:/images',
+      autoImageDownload: true,
+      imageByKey: 'imageUrl',
       type: GroupDatasetConfigType.spider,
       groupDatasetFieldList: [
         {
@@ -217,6 +219,55 @@ it('完整載入隱藏清單，切換資料來源保留編輯，儲存包含所�
       }),
     })
   );
+  const autoDownload = page.querySelector<HTMLInputElement>(
+    'app-signal-field[label="dataset.autoImageDownload"] input'
+  )!;
+  expect(autoDownload.checked).toBe(true);
+  expect(
+    page.querySelector<HTMLInputElement>(
+      'app-signal-field[label="dataset.imageByKey"] input'
+    )!.value
+  ).toBe('imageUrl');
+  component.form.config.imageByKey().value.set('');
+  await fixture.whenStable();
+  service.updateGroupDataset.mockClear();
+  component.update(false, 'save');
+  expect(component.form.config.imageByKey().invalid()).toBe(true);
+  expect(service.updateGroupDataset).not.toHaveBeenCalled();
+  autoDownload.click();
+  await fixture.whenStable();
+  expect(component.form.config.imageByKey().valid()).toBe(true);
+  expect(
+    page.querySelector('app-signal-field[label="dataset.imageByKey"]')
+  ).toBeNull();
+  component.update(false, 'save');
+  expect(service.updateGroupDataset).toHaveBeenLastCalledWith(
+    expect.objectContaining({
+      config: expect.objectContaining({
+        autoImageDownload: false,
+        imageByKey: '',
+        imageSaveFolder: 'C:/images',
+      }),
+    })
+  );
+  autoDownload.click();
+  await fixture.whenStable();
+  const imageKey = page.querySelector<HTMLInputElement>(
+    'app-signal-field[label="dataset.imageByKey"] input'
+  )!;
+  imageKey.value = 'cover';
+  imageKey.dispatchEvent(new Event('input', { bubbles: true }));
+  await fixture.whenStable();
+  component.update(false, 'save');
+  expect(service.updateGroupDataset).toHaveBeenLastCalledWith(
+    expect.objectContaining({
+      config: expect.objectContaining({
+        autoImageDownload: true,
+        imageByKey: 'cover',
+        imageSaveFolder: 'C:/images',
+      }),
+    })
+  );
 });
 
 it.each([null, undefined])(
@@ -273,6 +324,8 @@ it.each([null, undefined])(
     const fixture = TestBed.createComponent(GroupDatasetEditComponent);
     await fixture.whenStable();
     const component = fixture.componentInstance;
+    expect(component.form.config.autoImageDownload().value()).toBe(false);
+    expect(component.form.config.imageByKey().value()).toBe('');
     component.form.config.type().value.set(GroupDatasetConfigType.api);
     await fixture.whenStable();
 

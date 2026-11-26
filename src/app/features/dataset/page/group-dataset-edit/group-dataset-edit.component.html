@@ -17,6 +17,27 @@
             label="dataset.groupName" />
           <app-signal-field [field]="form.config.byKey" label="dataset.byKey" />
         </div>
+      </div>
+    </section>
+    <section
+      class="editor-section"
+      aria-labelledby="group-dataset-images-title">
+      <h3 class="section-title" id="group-dataset-images-title">
+        {{ 'dataset.imageDownloadSettings' | translate }}
+      </h3>
+      <div class="section-body">
+        <app-signal-field
+          [field]="form.config.autoImageDownload"
+          label="dataset.autoImageDownload"
+          [type]="fieldType.CHECKBOX" />
+        <p class="helper-text">
+          {{ 'dataset.autoImageDownloadDesc' | translate }}
+        </p>
+        @if (form.config.autoImageDownload().value()) {
+          <app-signal-field
+            [field]="form.config.imageByKey"
+            label="dataset.imageByKey" />
+        }
         <app-signal-field
           [field]="form.config.imageSaveFolder"
           label="dataset.imageSaveFolder" />

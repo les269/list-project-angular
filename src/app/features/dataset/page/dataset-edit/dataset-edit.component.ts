@@ -92,8 +92,6 @@ export class DatasetEditComponent {
       filing: false,
       filingRegular: '',
       fieldList: [] as ReturnType<typeof createDatasetField>[],
-      autoImageDownload: false,
-      imageByKey: '',
       scrapyText: '',
       scrapyPagination: '',
     },
@@ -126,10 +124,6 @@ export class DatasetEditComponent {
         [DatasetConfigType.file, DatasetConfigType.folder].includes(
           valueOf(p.config.type)
         ),
-    });
-    required(p.config.imageByKey, {
-      message: 'msg.required',
-      when: ({ valueOf }) => valueOf(p.config.autoImageDownload),
     });
     required(p.name, { message: 'msg.required' });
     required(p.config.groupName, { message: 'msg.required' });
@@ -183,14 +177,6 @@ export class DatasetEditComponent {
     return this.configForm.filing;
   }
 
-  get autoImageDownloadControl() {
-    return this.configForm.autoImageDownload;
-  }
-
-  get imageByKeyControl() {
-    return this.configForm.imageByKey;
-  }
-
   constructor() {
     effect(() => {
       const name = this.datasetName();
@@ -212,11 +198,14 @@ export class DatasetEditComponent {
   }
 
   private patchForm(dataset: Dataset) {
+    const config = structuredClone(dataset.config);
+    Reflect.deleteProperty(config, 'autoImageDownload');
+    Reflect.deleteProperty(config, 'imageByKey');
     this.form().reset({
       name: dataset.name,
       config: {
         ...structuredClone(this.initialFormValue.config),
-        ...structuredClone(dataset.config),
+        ...config,
         fieldList: (dataset.config.fieldList ?? []).map(createDatasetField),
       },
     });

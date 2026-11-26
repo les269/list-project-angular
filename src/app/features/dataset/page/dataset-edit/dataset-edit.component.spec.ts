@@ -32,7 +32,6 @@ describe('Dataset signal form validation', () => {
     fields.name().value.set('dataset');
     fields.config.groupName().value.set('group');
     fields.config.type().value.set(DatasetConfigType.text);
-    fixture.detectChanges();
     await fixture.whenStable();
     expect(
       fixture.nativeElement.querySelector('app-signal-code-editor code-editor')
@@ -45,9 +44,6 @@ describe('Dataset signal form validation', () => {
     expect(fields.config.filingRegular().invalid()).toBe(true);
     fields.config.type().value.set(DatasetConfigType.all);
     expect(fields.config.filingRegular().valid()).toBe(true);
-    fields.config.autoImageDownload().value.set(true);
-    expect(fields.config.imageByKey().invalid()).toBe(true);
-    fields.config.imageByKey().value.set('image');
     const table = TestBed.createComponent(
       DatasetFieldTableComponent
     ).componentInstance;
@@ -95,12 +91,13 @@ it('載入資料時一次初始化欄位，編輯不被覆寫，重新載入清�
       type: DatasetConfigType.text,
       groupName: 'group',
       scrapyText: 'loaded',
+      autoImageDownload: true,
+      imageByKey: 'legacy-image',
       fieldList: [{ seq: 1, key: 'key', label: 'Label' }],
     },
   };
   vi.spyOn(service, 'findDataset').mockReturnValue(of(source as any));
   const fixture = TestBed.createComponent(DatasetEditComponent);
-  fixture.detectChanges();
   await fixture.whenStable();
   const component = fixture.componentInstance;
   expect(component.isEditMode).toBe(true);
@@ -113,12 +110,25 @@ it('載入資料時一次初始化欄位，編輯不被覆寫，重新載入清�
     fixture.nativeElement.querySelectorAll('.form-actions button')
   ).toHaveLength(2);
   expect(component.form.config.fieldList[0].fixedString().value()).toBe('');
+  expect(component.form().value().config).not.toHaveProperty(
+    'autoImageDownload'
+  );
+  expect(component.form().value().config).not.toHaveProperty('imageByKey');
+  expect(source.config.autoImageDownload).toBe(true);
+  vi.spyOn(service, 'existDataset').mockReturnValue(of(true));
+  const save = vi
+    .spyOn(service, 'updateDataset')
+    .mockReturnValue(of(undefined));
+  component.update(false, 'save');
+  expect(save).toHaveBeenCalledTimes(1);
+  expect(save.mock.calls[0][0].config).not.toHaveProperty('autoImageDownload');
+  expect(save.mock.calls[0][0].config).not.toHaveProperty('imageByKey');
+
   expect(component.form().dirty()).toBe(false);
   expect(
     fixture.nativeElement.querySelectorAll('app-generic-table tbody tr').length
   ).toBeGreaterThan(0);
   component.form.config.fieldList[0].label().value.set('Edited');
-  fixture.detectChanges();
   await fixture.whenStable();
   expect(component.form.config.fieldList[0].label().value()).toBe('Edited');
   expect(source.config.fieldList[0].label).toBe('Label');
@@ -127,7 +137,6 @@ it('載入資料時一次初始化欄位，編輯不被覆寫，重新載入清�
     ...source,
     config: { ...source.config, fieldList: [] },
   } as any);
-  fixture.detectChanges();
   await fixture.whenStable();
   expect(component.form.config.filePath().value()).toBe('');
   expect(component.form.config.fieldList().value()).toEqual([]);
@@ -168,20 +177,13 @@ it('透過共用選單切換來源時保留條件欄位與歸檔清除行為', a
     page.querySelector('app-signal-field[label="dataset.filePath"]')
   ).toBeNull();
 
-  const imageDownload = page.querySelector<HTMLInputElement>(
-    '.option-block input[type="checkbox"]'
-  )!;
-  imageDownload.click();
-  await fixture.whenStable();
-  const key = page.querySelector<HTMLInputElement>(
-    'app-signal-field[label="dataset.imageByKey"] input'
-  )!;
-  expect(component.imageByKeyControl().invalid()).toBe(true);
-  key.value = 'imageUrl';
-  key.dispatchEvent(new Event('input'));
-  await fixture.whenStable();
-  expect(component.imageByKeyControl().value()).toBe('imageUrl');
-  expect(component.imageByKeyControl().valid()).toBe(true);
+  expect(
+    page.querySelector('app-signal-field[label="dataset.imageByKey"]')
+  ).toBeNull();
+  expect(component.form().value().config).not.toHaveProperty(
+    'autoImageDownload'
+  );
+  expect(component.form().value().config).not.toHaveProperty('imageByKey');
 
   select.value = DatasetConfigType.pagination;
   select.dispatchEvent(new Event('input', { bubbles: true }));
