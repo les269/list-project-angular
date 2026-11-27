@@ -168,19 +168,17 @@
             <app-signal-field
               [field]="jsonForm[field.key]"
               [label]="field.label"
-              [requiredIndicator]="field.required ?? false" />
+              [requiredIndicator]="field.required" />
           }
           @case ('number') {
             <app-signal-field
               [field]="jsonForm[field.key]"
               [label]="field.label"
-              [requiredIndicator]="field.required ?? false"
               [type]="fieldType.NUMBER" />
           }
           @case ('jsonObject') {
             <app-json-data-field
               [label]="field.label"
-              [requiredIndicator]="field.required ?? false"
               kind="object"
               [value]="json[field.key]"
               (valueChange)="onJsonFieldChange(field.key, $event)"
@@ -189,7 +187,6 @@
           @case ('jsonArray') {
             <app-json-data-field
               [label]="field.label"
-              [requiredIndicator]="field.required ?? false"
               kind="array"
               [value]="json[field.key]"
               (valueChange)="onJsonFieldChange(field.key, $event)"
