@@ -201,8 +201,11 @@ export class DatasetListComponent implements OnInit, AfterViewInit {
     });
   }
 
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
+  applyFilter(value: Event | string) {
+    const filterValue =
+      typeof value === 'string'
+        ? value
+        : (value.target as HTMLInputElement).value;
     this.filterValue.set(filterValue);
     this.dataSource.filter = filterValue.trim().toLowerCase();
     this.updateQueryParams();

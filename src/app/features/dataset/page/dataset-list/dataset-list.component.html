@@ -56,7 +56,17 @@
           {{ 'dataset.groupName' | translate }}
         </th>
         <td mat-cell *matCellDef="let element">
-          {{ element.config.groupName }}
+          @if (element.config.groupName) {
+            <button
+              type="button"
+              class="group-filter"
+              [attr.aria-label]="
+                ('g.search' | translate) + ' ' + element.config.groupName
+              "
+              (click)="applyFilter(element.config.groupName)">
+              {{ element.config.groupName }}
+            </button>
+          }
         </td>
       </ng-container>
       <ng-container matColumnDef="createdTime">
